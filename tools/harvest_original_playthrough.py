@@ -124,8 +124,11 @@ def build_global_script() -> list[str]:
         "nearby",
         "nearby detail",
         "inventory",
+        "done",
         "i",
+        "done",
         "loadout",
+        "done",
         "status",
         "character brief",
         "sheet brief",
@@ -253,7 +256,6 @@ def build_ui_surfaces_script() -> list[str]:
     """Equipment UI, material forge, save/load and slot save — all stdin-driven."""
     return base_start() + [
         "loadout",
-        "equipment",
         "done",
         "forge",
         "clear",
