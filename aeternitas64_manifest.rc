@@ -1,0 +1,2 @@
+/* Embeds UTF-8 active code page so MinGW stdio + console agree on multibyte text. */
+1 24 "aeternitas64_utf8.manifest"

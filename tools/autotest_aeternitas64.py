@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -26,6 +28,42 @@ def build() -> None:
         "aeternitas_mods.c",
         "aeternitas_mod_bootstrap.c",
     ]
+    extra_objs: list[str] = []
+    if platform.system() == "Windows":
+        windres = shutil.which("windres")
+        manifest_o = ROOT / "aeternitas64_manifest.o"
+        rc = ROOT / "aeternitas64_manifest.rc"
+        if windres and rc.is_file():
+            wr = subprocess.run(
+                [
+                    windres,
+                    str(rc),
+                    "-O",
+                    "coff",
+                    "-o",
+                    str(manifest_o),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            if wr.returncode == 0 and manifest_o.is_file():
+                extra_objs.append(str(manifest_o))
+            else:
+                print(
+                    "NOTE: windres failed; exe built without UTF-8 manifest "
+                    "(console mojibake may persist).",
+                    file=sys.stderr,
+                )
+                if wr.stderr:
+                    print(wr.stderr, file=sys.stderr)
+        else:
+            print(
+                "NOTE: windres not found or missing aeternitas64_manifest.rc; "
+                "linking without UTF-8 manifest.",
+                file=sys.stderr,
+            )
+
     cmd = [
         "gcc",
         "-std=c11",
@@ -33,6 +71,9 @@ def build() -> None:
         "-Wextra",
         "-Os",
         "-s",
+        "-finput-charset=UTF-8",
+        "-fexec-charset=UTF-8",
+        *extra_objs,
         "-o",
         str(EXE),
         *sources,
@@ -88,6 +129,7 @@ def run_smoke() -> None:
         "topic mood",
         "topic heat",
         "inventory",
+        "done",
         "status",
         "save",
         "quit",

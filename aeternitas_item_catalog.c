@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 
-/* clang-format off — mirrored from equipment_terminal_prototype.html ITEM_DB */
+/* clang-format off — compact item catalog (slug, display label, equip hints). */
 static const AetItemCatalogEntry CATALOG[] = {
     {1,  "leather_cowl",       "Leather Cowl",                  2, 0, 1, 0},
     {2,  "rusted_iron_mail",   "Rusted Iron Mail",              6, 0, 8, 1},

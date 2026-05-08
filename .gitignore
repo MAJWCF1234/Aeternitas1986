@@ -1,3 +1,8 @@
+# Local runtime saves / tool output (do not commit)
+aeternitas64_save.txt
+aeternitas64_dev_save.txt
+autotest_out.txt
+
 # Build outputs
 *.exe
 *.obj

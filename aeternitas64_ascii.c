@@ -6,11 +6,13 @@
 #include "aeternitas_world_generated.h"
 #include "aeternitas_item_catalog.h"
 #include <ctype.h>
+#include <locale.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/stat.h>
 #if defined(_WIN32)
 #include <windows.h>
 #include <conio.h>
@@ -21,8 +23,12 @@
 #endif
 #else
 #include <errno.h>
+#include <sys/select.h>
 #include <termios.h>
 #include <unistd.h>
+#endif
+#if defined(_WIN32)
+#include <io.h>
 #endif
 
 static int aet_autotest(void) {
@@ -67,6 +73,8 @@ static const char *const DIR_LABELS[DIR_COUNT] = {
 #define MAX_NOTES 32
 #define NOTE_LEN 192
 #define INPUT_LINE_MAX 512
+/** Room for fill_help_text() plus mod suffix lines (WORLD_ROOM_COUNT in format). */
+#define AETER_HELP_BODY_CAP 8192
 #define TRANSCRIPT_CAP 4096
 #define PROCESS_MSG_CAP 1536
 #define SAVE_BASENAME "aeternitas64_save.txt"
@@ -93,6 +101,10 @@ static const char *UI_RULE =
     "===============================================================================";
 static const char *UI_RULE_LIGHT =
     "--------------------------------------------------------------------------------";
+/** 120-column title rules (material forge + equipment UI). */
+static const char AETER_RULE_120[] =
+    "==============================================================================="
+    "=========================================";
 static int g_use_color;
 static const char *C_RESET = "";
 static const char *C_BORDER = "";
@@ -291,6 +303,10 @@ static int g_note_n;
 #define AETER_REP_MAX 32
 static int g_merchant_rep[AETER_REP_MAX];
 static int g_verbose_room;
+/** -1 follow env, 0 force mono, 1 force ANSI (session + save hintena/colorov). */
+static int g_settings_color_ov = -1;
+static int g_hints_pref = 1;
+static int g_ironman_stub = 0;
 #define RECAP_MAX 16
 #define RECAP_W 320
 static char g_recap[RECAP_MAX][RECAP_W];
@@ -399,6 +415,10 @@ static void format_progress_body(char *body, size_t cap);
 static void format_waypoints_body(char *body, size_t cap);
 static int cmd_waypoint_travel(const char *raw, char *msg, size_t msgcap);
 static void run_game_menu(void);
+static void run_settings_ui(void);
+static void return_to_game_screen(void);
+static void ui_block_pause(const char *title, const char *body);
+static int run_save_manager_ui(int *did_fullscreen, int esc_menu);
 static void run_material_forge(const char *pending_acc, int *did_fullscreen);
 static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscreen);
 static int inv_find(const char *name);
@@ -763,6 +783,53 @@ static void ui_flash_screen(void) {
   clear_frame();
 }
 
+#if defined(_WIN32)
+/* MinGW/UCRT stdio still uses the C locale unless we switch it; pair with
+ * SetConsole*CP so typographic UTF-8 in sources and mods renders correctly. */
+static void win32_console_utf8_begin(void) {
+  (void)SetConsoleOutputCP(CP_UTF8);
+  (void)SetConsoleCP(CP_UTF8);
+  /* Prefer GNU-style first (common on MinGW); then MSVC/UCRT ".UTF8". */
+  if (setlocale(LC_ALL, "C.UTF-8"))
+    return;
+  if (setlocale(LC_ALL, ".UTF8"))
+    return;
+  if (setlocale(LC_ALL, ".UTF-8"))
+    return;
+  (void)setlocale(LC_CTYPE, "C.UTF-8");
+}
+#endif
+
+static void ui_clear_color_codes(void) {
+  C_RESET = "";
+  C_BORDER = "";
+  C_TITLE = "";
+  C_REGION = "";
+  C_HEADING = "";
+  C_EXIT = "";
+  C_ITEM = "";
+  C_STATUS = "";
+  C_PROMPT = "";
+  C_BOOT_OK = "";
+  C_BOOT_HI = "";
+  C_MUTED = "";
+}
+
+static void ui_assign_color_codes(void) {
+  C_RESET = "\x1b[0m";
+  C_BORDER = "\x1b[90m";
+  C_TITLE = "\x1b[96;1m";
+  C_REGION = "\x1b[36m";
+  C_HEADING = "\x1b[97;1m";
+  C_EXIT = "\x1b[92;1m";
+  C_ITEM = "\x1b[93;1m";
+  C_STATUS = "\x1b[30;47;1m";
+  C_PROMPT = "\x1b[97;1m";
+  C_BOOT_OK = "\x1b[92;1m";
+  C_BOOT_HI = "\x1b[97;1m";
+  C_MUTED = "\x1b[37m";
+}
+
 static void ui_init_color(void) {
   const char *force = getenv("AETER_COLOR");
   g_use_color = 0;
@@ -785,19 +852,16 @@ static void ui_init_color(void) {
              !strcmp(force, "true"))
       g_use_color = 1;
   }
-  if (!g_use_color) return;
-  C_RESET = "\x1b[0m";
-  C_BORDER = "\x1b[90m";
-  C_TITLE = "\x1b[96;1m";
-  C_REGION = "\x1b[36m";
-  C_HEADING = "\x1b[97;1m";
-  C_EXIT = "\x1b[92;1m";
-  C_ITEM = "\x1b[93;1m";
-  C_STATUS = "\x1b[30;47;1m";
-  C_PROMPT = "\x1b[97;1m";
-  C_BOOT_OK = "\x1b[92;1m";
-  C_BOOT_HI = "\x1b[97;1m";
-  C_MUTED = "\x1b[37m";
+  if (g_settings_color_ov == 1)
+    g_use_color = 1;
+  else if (g_settings_color_ov == 0)
+    g_use_color = 0;
+
+  if (!g_use_color) {
+    ui_clear_color_codes();
+    return;
+  }
+  ui_assign_color_codes();
 }
 
 static void ui_dissolve_logo(const char *const *logo, int lines) {
@@ -1772,6 +1836,8 @@ static int write_save_file_path(const char *path) {
   fprintf(fp, "shed %d\n", g_shed_unlocked);
   fprintf(fp, "roomv %d\n", g_verbose_room);
   fprintf(fp, "craftprof %d\n", g_craft_proficiency);
+  fprintf(fp, "hintena %d\n", g_hints_pref ? 1 : 0);
+  fprintf(fp, "colorov %d\n", g_settings_color_ov);
   fprintf(fp, "histn %d\n", g_hist_n);
   for (i = 0; i < g_hist_n; i++) fprintf(fp, "%d\n", g_hist[i]);
   for (r = 0; r < WORLD_ROOM_COUNT; r++)
@@ -1932,6 +1998,30 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
     } else if (pos >= 0 && fseek(fp, pos, SEEK_SET) != 0)
       goto bad;
   }
+  {
+    long pos = ftell(fp);
+    if (pos >= 0 && fgets(buf, sizeof buf, fp)) {
+      int h;
+      chomp_line(buf);
+      if (sscanf(buf, "hintena %d", &h) == 1 && (h == 0 || h == 1))
+        g_hints_pref = h;
+      else if (fseek(fp, pos, SEEK_SET) != 0)
+        goto bad;
+    } else if (pos >= 0 && fseek(fp, pos, SEEK_SET) != 0)
+      goto bad;
+  }
+  {
+    long pos = ftell(fp);
+    if (pos >= 0 && fgets(buf, sizeof buf, fp)) {
+      int co;
+      chomp_line(buf);
+      if (sscanf(buf, "colorov %d", &co) == 1 && co >= -1 && co <= 1)
+        g_settings_color_ov = co;
+      else if (fseek(fp, pos, SEEK_SET) != 0)
+        goto bad;
+    } else if (pos >= 0 && fseek(fp, pos, SEEK_SET) != 0)
+      goto bad;
+  }
   if (!read_kv_int(fp, "histn", &g_hist_n) || g_hist_n < 0 ||
       g_hist_n > BACK_HIST)
     goto bad;
@@ -2085,6 +2175,7 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
   if (!focus_loaded)
     clear_focus();
   eq_sync_pc_sheet();
+  ui_init_color();
   snprintf(msg, msgcap, "%s — restored from %s.", pc_display_name(), path);
   causal_push("load", path);
   return 1;
@@ -2108,54 +2199,227 @@ static int load_game_slot(int slot, char *msg, size_t msgcap) {
   return load_game_path(path, msg, msgcap);
 }
 
-static void format_save_slots_body(char *body, size_t cap) {
+#define SAVE_MGR_FLOPPY_BYTES (1474560UL)
+#define SAVE_MGR_BAR_LEN 28
+
+typedef struct {
+  int slot;
+  int ok_header;
+  char path[520];
+  char dosname[16];
+  char datestr[16];
+  char sizelab[16];
+  char desc[56];
+  unsigned long bytes;
+  int room;
+  int turns;
+} AetSaveSlotInfo;
+
+static unsigned long save_mgr_total_bytes_on_disk(void) {
+  struct stat st;
+  unsigned long t = 0;
   int s;
-  size_t len;
-  int w;
-  char banner[256];
-  pc_format_identity_banner(banner, sizeof banner);
-  snprintf(body, cap,
-           "Save slots\n\n"
-           "%s\n\n"
-           "  Quick save: %s\n\n"
-           "  Use: save <1-%d>  |  load <1-%d>\n\n",
-           banner, g_save_path, SAVE_SLOT_COUNT, SAVE_SLOT_COUNT);
-  len = strlen(body);
-  for (s = 1; s <= SAVE_SLOT_COUNT && len + 8 < cap; s++) {
+  if (g_save_path[0] && stat(g_save_path, &st) == 0)
+    t += (unsigned long)st.st_size;
+  for (s = 1; s <= SAVE_SLOT_COUNT; s++) {
     char path[520];
-    FILE *fp;
-    char line[128];
-    int room = -1, turns = -1, score = 0, coins = 0;
     make_slot_save_path(s, path, sizeof path);
-    fp = fopen(path, "r");
-    if (!fp) {
-      w = snprintf(body + len, cap - len, "  %2d. empty     %s\n", s, path);
-      if (w < 0 || len + (size_t)w >= cap) break;
-      len += (size_t)w;
-      continue;
-    }
-    if (fgets(line, sizeof line, fp)) {
-      chomp_line(line);
-      if (strcmp(line, "AET64SAVE1") != 0) room = -2;
-    }
-    while (room >= -1 && fgets(line, sizeof line, fp)) {
-      int v;
-      chomp_line(line);
-      if (sscanf(line, "room %d", &v) == 1) room = v;
-      else if (sscanf(line, "turns %d", &v) == 1) turns = v;
-      else if (sscanf(line, "score %d", &v) == 1) score = v;
-      else if (sscanf(line, "coins %d", &v) == 1) coins = v;
-      if (coins >= 0 && turns >= 0 && room >= 0) break;
-    }
+    if (stat(path, &st) == 0) t += (unsigned long)st.st_size;
+  }
+  return t;
+}
+
+static void save_mgr_probe_slot(int slot, AetSaveSlotInfo *o) {
+  struct stat st;
+  FILE *fp;
+  char line[512];
+  int room = -1, turns = -1, v;
+
+  memset(o, 0, sizeof *o);
+  o->slot = slot;
+  o->room = -1;
+  snprintf(o->dosname, sizeof o->dosname, "SLOT%02d.SAV", slot);
+  make_slot_save_path(slot, o->path, sizeof o->path);
+  snprintf(o->datestr, sizeof o->datestr, "--/--/--");
+  snprintf(o->sizelab, sizeof o->sizelab, "---   ");
+  snprintf(o->desc, sizeof o->desc, "Empty Slot");
+
+  if (stat(o->path, &st) != 0) return;
+
+  o->bytes = (unsigned long)st.st_size;
+  {
+    struct tm *tm = localtime(&st.st_mtime);
+    if (tm)
+      (void)strftime(o->datestr, sizeof o->datestr, "%m-%d-%y", tm);
+  }
+  if (o->bytes < 1024)
+    snprintf(o->sizelab, sizeof o->sizelab, "%luB", o->bytes);
+  else
+    snprintf(o->sizelab, sizeof o->sizelab, "%lukB",
+             (unsigned long)(o->bytes / 1024));
+
+  fp = fopen(o->path, "r");
+  if (!fp) {
+    snprintf(o->desc, sizeof o->desc, "Read error");
+    return;
+  }
+  if (!fgets(line, sizeof line, fp)) {
     fclose(fp);
-    if (room >= 0 && room < WORLD_ROOM_COUNT)
-      w = snprintf(body + len, cap - len,
-                   "  %2d. %-20s turns:%-5d score:%-4d coins:%d\n", s,
-                   resolve_world_title(room), turns < 0 ? 0 : turns, score, coins);
-    else
-      w = snprintf(body + len, cap - len, "  %2d. unreadable %s\n", s, path);
-    if (w < 0 || len + (size_t)w >= cap) break;
-    len += (size_t)w;
+    snprintf(o->desc, sizeof o->desc, "Unreadable");
+    return;
+  }
+  chomp_line(line);
+  if (strcmp(line, "AET64SAVE1") != 0) {
+    fclose(fp);
+    snprintf(o->desc, sizeof o->desc, "Not a save file");
+    return;
+  }
+  o->ok_header = 1;
+  while (fgets(line, sizeof line, fp)) {
+    chomp_line(line);
+    if (strcmp(line, "ROOMS") == 0) break;
+    if (sscanf(line, "room %d", &v) == 1) room = v;
+    else if (sscanf(line, "turns %d", &v) == 1) turns = v;
+  }
+  fclose(fp);
+  o->room = room;
+  o->turns = turns < 0 ? 0 : turns;
+  if (room >= 0 && room < WORLD_ROOM_COUNT)
+    snprintf(o->desc, sizeof o->desc, "%s - T%d", resolve_world_title(room),
+             o->turns);
+  else if (room >= 0)
+    snprintf(o->desc, sizeof o->desc, "Room %d - T%d", room, o->turns);
+  else
+    snprintf(o->desc, sizeof o->desc, "Incomplete header");
+}
+
+static int save_mgr_delete_slot(int slot, char *msg, size_t msgcap) {
+  char path[520];
+  struct stat st;
+  if (slot < 1 || slot > SAVE_SLOT_COUNT) {
+    snprintf(msg, msgcap, "Slot must be 1-%d.", SAVE_SLOT_COUNT);
+    return 0;
+  }
+  make_slot_save_path(slot, path, sizeof path);
+  if (stat(path, &st) != 0) {
+    snprintf(msg, msgcap, "Slot %d is already empty.", slot);
+    return 0;
+  }
+  if (remove(path) != 0) {
+    snprintf(msg, msgcap, "Could not delete %s.", path);
+    return 0;
+  }
+  snprintf(msg, msgcap, "Deleted slot %d.", slot);
+  return 1;
+}
+
+static int run_save_manager_ui(int *did_fullscreen, int esc_menu) {
+  static const char *const kExit[] = {"exit", "done", "back", "resume", NULL};
+  AetSaveSlotInfo rows[SAVE_SLOT_COUNT];
+  char line[INPUT_LINE_MAX];
+  char msg[1024];
+  int s, i, filled, pct;
+  unsigned long used;
+  const char *suf;
+
+  for (;;) {
+    clear_frame();
+    used = save_mgr_total_bytes_on_disk();
+    pct = (int)((used * 100UL) / SAVE_MGR_FLOPPY_BYTES);
+    if (pct > 100) pct = 100;
+    for (s = 1; s <= SAVE_SLOT_COUNT; s++) save_mgr_probe_slot(s, &rows[s - 1]);
+
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(" %sSAVE MANAGER%s                                          %sDRIVE: "
+           "A:\\%s\n",
+           C_TITLE, C_RESET, C_HEADING, C_RESET);
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(" %sID   FILENAME      DATE      SIZE    DESCRIPTION%s\n", C_HEADING,
+           C_RESET);
+    printf(" %s", C_BORDER);
+    for (i = 0; i < 118; i++) putchar('-');
+    printf("%s\n", C_RESET);
+    for (s = 0; s < SAVE_SLOT_COUNT; s++) {
+      char descvis[52];
+      const AetSaveSlotInfo *r = &rows[s];
+      snprintf(descvis, sizeof descvis, "%.40s", r->desc);
+      printf(" %s%2d%s    %-12s  %8s   %-6s  %s%s%s\n", C_ITEM, r->slot, C_RESET,
+             r->dosname, r->datestr, r->sizelab, C_HEADING, descvis, C_RESET);
+    }
+    printf("\n%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(" %sDISK SPACE:%s [", C_HEADING, C_RESET);
+    filled = (pct * SAVE_MGR_BAR_LEN + 50) / 100;
+    if (filled > SAVE_MGR_BAR_LEN) filled = SAVE_MGR_BAR_LEN;
+    printf("%s", C_EXIT);
+    for (i = 0; i < filled; i++) putchar('#');
+    printf("%s", C_MUTED);
+    for (; i < SAVE_MGR_BAR_LEN; i++) putchar('.');
+    printf("%s] %s%d%% USED%s\n", C_RESET, C_ITEM, pct, C_RESET);
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(
+        " %sCOMMANDS:%s [SAVE #]  [LOAD #]  [DEL #]  [EXIT]   %sQuick save "
+        "file:%s\n",
+        C_MUTED, C_RESET, C_MUTED, C_RESET);
+    printf(" %s%s%s\n", C_MUTED, g_save_path[0] ? g_save_path : "(default)",
+           C_RESET);
+    suf = aet_mods_character_saves_suffix();
+    if (suf && suf[0]) printf(" %s%s%s\n", C_MUTED, suf, C_RESET);
+    printf("\n %s>>%s ", C_TITLE, C_RESET);
+    fflush(stdout);
+    if (!fgets(line, sizeof line, stdin)) {
+      if (did_fullscreen) *did_fullscreen = 1;
+      if (!esc_menu) return_to_game_screen();
+      return 0;
+    }
+    chomp_line(line);
+    strip_trailing_space(line);
+    for (i = 0; line[i]; i++) line[i] = (char)tolower((unsigned char)line[i]);
+    if (line_equals_one_of(line, kExit)) {
+      if (did_fullscreen) *did_fullscreen = 1;
+      if (!esc_menu) return_to_game_screen();
+      return 0;
+    }
+    {
+      char a0[32], a1[32];
+      int ns = sscanf(line, "%31s %31s", a0, a1);
+      int slotnum = 0;
+      if (ns >= 2) slotnum = (int)strtol(a1, NULL, 10);
+      if (ns >= 2 && (!strcmp(a0, "save") || !strcmp(a0, "s"))) {
+        if (slotnum < 1 || slotnum > SAVE_SLOT_COUNT) {
+          ui_block_pause("SAVE MANAGER", "Use: save <1-10>.");
+          continue;
+        }
+        save_game_slot(slotnum, msg, sizeof msg);
+        ui_block_pause("SAVE", msg);
+        continue;
+      }
+      if (ns >= 2 && (!strcmp(a0, "load") || !strcmp(a0, "l"))) {
+        if (slotnum < 1 || slotnum > SAVE_SLOT_COUNT) {
+          ui_block_pause("SAVE MANAGER", "Use: load <1-10>.");
+          continue;
+        }
+        if (load_game_slot(slotnum, msg, sizeof msg)) {
+          if (did_fullscreen) *did_fullscreen = 1;
+          return_to_game_screen();
+          return 1;
+        }
+        ui_block_pause("LOAD FAILED", msg);
+        continue;
+      }
+      if (ns >= 2 &&
+          (!strcmp(a0, "del") || !strcmp(a0, "delete") || !strcmp(a0, "rm"))) {
+        if (slotnum < 1 || slotnum > SAVE_SLOT_COUNT) {
+          ui_block_pause("SAVE MANAGER", "Use: del <1-10>.");
+          continue;
+        }
+        (void)save_mgr_delete_slot(slotnum, msg, sizeof msg);
+        ui_block_pause("DELETE", msg);
+        continue;
+      }
+    }
+    ui_block_pause(
+        "SAVE MANAGER",
+        "Commands: save N, load N, del N, exit (done/back/resume).\n");
   }
 }
 
@@ -2926,12 +3190,6 @@ static void format_exits(char *buf, size_t cap) {
     buf[cap - 1] = '\0';
 }
 
-static void print_exits(void) {
-  char line[512];
-  format_exits(line, sizeof line);
-  printf("%s", line);
-}
-
 static int exit_mode_matches(const char *mode, int dest, int lock_known,
                              int locked) {
   const char *ent;
@@ -2980,31 +3238,6 @@ static void format_exits_screen(char *body, size_t cap, const char *mode) {
   if (!shown) {
     body_append(body, cap, "  (No exits match this filter.)\n");
   }
-}
-
-static void print_room_blurb_banner(void) {
-  const char *bl = resolve_world_blurb(g_room);
-  char shorty[200];
-  size_t k, maxc = 140;
-  if (room_too_dark_to_see()) return;
-  if (!bl || !bl[0]) {
-    printf("\n");
-    return;
-  }
-  if (g_verbose_room) {
-    printf("%s\n\n", bl);
-    return;
-  }
-  for (k = 0; bl[k] && k < maxc && k + 4 < sizeof shorty; k++) {
-    if (bl[k] == '\n' || bl[k] == '\r')
-      shorty[k] = ' ';
-    else
-      shorty[k] = bl[k];
-  }
-  shorty[k] = '\0';
-  if (bl[k])
-    strncat(shorty, " …", sizeof shorty - strlen(shorty) - 1);
-  printf("%s\n\n", shorty);
 }
 
 static void show_room(void) {
@@ -3247,6 +3480,11 @@ typedef enum {
   GK_PGDN,
   GK_HOME,
   GK_END,
+  GK_TAB,
+  GK_LEFT,
+  GK_RIGHT,
+  GK_ENTER,
+  GK_ESC,
   GK_NONE
 } GuideKey;
 
@@ -3292,25 +3530,35 @@ static GuideKey guide_read_key_unix(int raw_ok) {
     if (ln[0] == 'k' || ln[0] == 'K') return GK_UP;
     if (ln[0] == 'n' || ln[0] == 'N') return GK_PGDN;
     if (ln[0] == 'p' || ln[0] == 'P') return GK_PGUP;
-    if (ln[0] == '\n' || ln[0] == '\r') return GK_QUIT;
+    if (ln[0] == '\n' || ln[0] == '\r') return GK_ENTER;
     return GK_NONE;
   }
   c = guide_read_byte_raw();
   if (c < 0) return GK_QUIT;
   if (c == 'q' || c == 'Q' || c == 3 || c == 4) return GK_QUIT;
-  if (c == '\r' || c == '\n') return GK_QUIT;
+  if (c == '\r' || c == '\n') return GK_ENTER;
+  if (c == 9) return GK_TAB;
   if (c == 'j' || c == 'J') return GK_DOWN;
   if (c == 'k' || c == 'K') return GK_UP;
   if (c == 'n' || c == 'N') return GK_PGDN;
   if (c == 'p' || c == 'P') return GK_PGUP;
   if (c == 27) {
+    fd_set rfds;
+    struct timeval tv = {0, 50000};
     int b1, b2, last;
+    FD_ZERO(&rfds);
+    FD_SET(STDIN_FILENO, &rfds);
+    if (select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv) <= 0)
+      return GK_ESC;
     b1 = guide_read_byte_raw();
+    if (b1 < 0) return GK_QUIT;
     if (b1 != (int)'[') return GK_NONE;
     b2 = guide_read_byte_raw();
     if (b2 < 0) return GK_QUIT;
     if (b2 == 'A') return GK_UP;
     if (b2 == 'B') return GK_DOWN;
+    if (b2 == 'C') return GK_RIGHT;
+    if (b2 == 'D') return GK_LEFT;
     if (b2 == 'H') return GK_HOME;
     if (b2 == 'F') return GK_END;
     if (b2 >= '0' && b2 <= '9') {
@@ -3349,16 +3597,23 @@ static GuideKey guide_read_key_win(void) {
         return GK_HOME;
       case 79:
         return GK_END;
+      case 75:
+        return GK_LEFT;
+      case 77:
+        return GK_RIGHT;
       default:
         return GK_NONE;
     }
   }
-  if (c == '\r' || c == '\n' || c == 3 || c == 27 || c == 'q' || c == 'Q')
-    return GK_QUIT;
+  if (c == 9) return GK_TAB;
+  if (c == '\r' || c == '\n') return GK_ENTER;
+  if (c == 27) return GK_ESC;
+  if (c == 3) return GK_QUIT;
   if (c == 'j' || c == 'J') return GK_DOWN;
   if (c == 'k' || c == 'K') return GK_UP;
   if (c == 'n' || c == 'N') return GK_PGDN;
   if (c == 'p' || c == 'P') return GK_PGUP;
+  if (c == 'q' || c == 'Q') return GK_QUIT;
   return GK_NONE;
 }
 #endif
@@ -3435,7 +3690,7 @@ static void ui_modding_guide_pager(const char *pending_acc, int *did_fullscreen)
 #else
     gk = guide_read_key_unix(raw_ok);
 #endif
-    if (gk == GK_QUIT) break;
+    if (gk == GK_QUIT || gk == GK_ENTER) break;
     if (gk == GK_UP) {
       if (scroll > 0) scroll--;
     } else if (gk == GK_DOWN) {
@@ -3484,7 +3739,7 @@ static void fill_help_text(char *buf, size_t cap) {
       "          character brief | sheet brief | identity (compact sheet); who am i |\n"
       "          my character | describe me | look at me  (aliases → character)\n"
       "          skills | skill | aptitudes | aptitude | reputation | rep | standing\n"
-      "          loadout (live gear summary) | gear | equipment | outfit (manage UI)\n"
+      "          loadout | gear | equipment | outfit — 120-col equipment & pack UI\n"
       "          traits | trait | personality\n"
       "          momentum | arc | progression | perks | perk\n"
       "          voice | speech | vocals | pronouns | bio | backstory | biography\n"
@@ -3492,7 +3747,8 @@ static void fill_help_text(char *buf, size_t cap) {
       "          vitals | wellness | hp  (focused health;  status  for full snapshot)\n"
       "          progress | visited | seen (sitrep, world progress…) |\n"
       "          journal (quest log, diary, logbook…) | objectives | goals | quests\n"
-      "  inventory | i | inv | pack (belongings…);  score  (my score, game stats…)\n"
+      "  inventory | i | inv | pack — same UI as loadout / gear / equipment / outfit\n"
+      "  score  (my score, game stats…)\n"
       "  take | get | grab <item> | (get|grab|take) all [except a,b…]\n"
       "  wares | shop | prices  —  merchant lists;  buy | purchase | sell <item>\n"
       "          (patron score shifts your column prices;  reputation  explains it)\n"
@@ -3538,7 +3794,8 @@ static void fill_help_text(char *buf, size_t cap) {
       "          failed actions now include \"Because\" hints when context is known\n"
       "          causality clear\n"
       "  save/qs  load/reload/ql/restore\n"
-      "  saves | slots | save <1-10> | load <1-10>\n"
+      "  saves | slots — fullscreen save manager (save/load/del N); also save <1-10> | "
+      "load <1-10>\n"
       "  menu  —  ASCII pause menu; resume clears it and redraws this room\n"
       "  verbose | brief  —  main-window blurbs; readied item saved in qs\n"
       "  recap | transcript (what just happened, recent messages…) | recap clear\n"
@@ -3555,38 +3812,6 @@ static void fill_help_text(char *buf, size_t cap) {
       "  Aliases: get/grab/pick up…->take, put down/deposit/stash…->drop\n"
       "  Dark rooms: light source (see status).  clear | cls\n",
       WORLD_ROOM_COUNT);
-}
-
-static void format_inventory_body(char *buf, size_t cap) {
-  int i;
-  size_t len;
-  char banner[256];
-  pc_format_identity_banner(banner, sizeof banner);
-  len = (size_t)snprintf(
-      buf, cap,
-      "%s\n"
-      "Health: %d / %d\nCoins: %d\nPack: %d / %d slots\n",
-      banner, g_health, g_max_health, g_coins, g_inv_n, MAX_INV);
-  if (g_inv_n == 0) {
-    snprintf(buf + len, cap > len ? cap - len : 0, "No items in your pack.\n");
-    return;
-  }
-  snprintf(buf + len, cap > len ? cap - len : 0, "You are carrying:\n");
-  len = strlen(buf);
-  for (i = 0; i < g_inv_n && len + 4 < cap; i++) {
-    int w;
-    int rd = (g_ready_item[0] && str_ieq(g_inv[i], g_ready_item) &&
-              inv_has(g_ready_item));
-    w = snprintf(buf + len, cap - len, "  - %s%s\n", g_inv[i],
-                 rd ? "  (readied)" : "");
-    if (w < 0 || (size_t)w >= cap - len) break;
-    len += (size_t)w;
-  }
-  if (g_last_focus[0] && inv_has(g_last_focus) && len + 80 < cap) {
-    snprintf(buf + len, cap - len,
-             "\n\"It\" / last examined (take, drop, eat…): %s\n",
-             g_last_focus);
-  }
 }
 
 static void format_lights_body(char *buf, size_t cap) {
@@ -5366,46 +5591,6 @@ static int str_contains_ci(const char *haystack, const char *needle) {
   return 0;
 }
 
-static const char *equip_display(const char *s) {
-  if (!s || !s[0] || str_ieq(s, "none")) return "—";
-  return s;
-}
-
-static void format_loadout_body(char *body, size_t cap) {
-  int si;
-  const char *rdy;
-  char banner[256];
-  pc_format_identity_banner(banner, sizeof banner);
-  snprintf(
-      body, cap,
-      "Loadout\n\n"
-      "%s\n\n"
-      "What you are actually wearing, holding, and carrying in this build.\n",
-      banner);
-  body_append(body, cap, "Equipment (live — same as equipment screen)\n");
-  for (si = 0; si < EQ_SLOT_COUNT; si++) {
-    body_append(body, cap, "  %s: %s\n", EQ_SLOT_NAME[si],
-                equip_display(g_eq_slots[si]));
-  }
-  if (g_ready_item[0] && inv_has(g_ready_item))
-    rdy = g_ready_item;
-  else
-    rdy = NULL;
-  body_append(
-      body, cap,
-      "\nReadied (combat / parse)\n"
-      "  %s\n\n",
-      rdy ? rdy : "— (equip | hold | wield <item> from pack)");
-  body_append(body, cap,
-              "Pack\n"
-              "  %d / %d slots  (inventory  for the full list)\n"
-              "  Crafting bench uses the same pack order as the forge (add #).\n"
-              "  Equipment UI lists the first 12 pack rows (catalog ID for deeper slots).\n"
-              "  See demo/material_forge_ui.html for the forge grid + attribute-blend idea.\n\n"
-              "Mods can append encumbrance fiction below.\n",
-              g_inv_n, MAX_INV);
-}
-
 static void format_traits_body(char *body, size_t cap) {
   AetPcSave p;
   const char *cl;
@@ -5951,6 +6136,12 @@ static void format_contextual_hints_body(char *body, size_t cap) {
   size_t len0;
 
   if (!body || cap < 256) return;
+  if (!g_hints_pref) {
+    snprintf(body, cap,
+             "Context hints are disabled in Settings (pause menu → option 8).\n"
+             "Turn them back on to see situational nudges.\n");
+    return;
+  }
   pc_capture(&p);
   ent = world_room_entity(g_room);
   slug = world_slug(g_room);
@@ -8894,17 +9085,6 @@ static void eq_bootstrap_from_character(void) {
   eq_sync_pc_sheet();
 }
 
-static void craft_format_inventory_cell(const char *item, char *out, size_t cap) {
-  CraftMatProfile ip;
-  char base[24];
-  if (!out || cap < 2) return;
-  out[0] = '\0';
-  if (!item || !item[0]) return;
-  craft_profile_for_item(item, &ip);
-  snprintf(base, sizeof base, "%-20.20s", item);
-  snprintf(out, cap, "%s (%s)", base, ip.mat_class ? ip.mat_class : "Mixed");
-}
-
 /* Human-readable label for forge/equipment (catalog display name, else slug → spaces). */
 static void craft_short_display_name(const char *slug, char *dst, size_t cap) {
   const AetItemCatalogEntry *cat;
@@ -9088,19 +9268,434 @@ static void ui_fit_cell(char *out, size_t cap, const char *src, int width) {
   out[i] = '\0';
 }
 
-static void ui_print_tripanel_row(const char *l, const char *m, const char *r) {
-  char lf[41], mf[38], rf[30];
-  ui_fit_cell(lf, sizeof lf, l, 40);
-  ui_fit_cell(mf, sizeof mf, m, 37);
-  ui_fit_cell(rf, sizeof rf, r, 29);
-  printf("  | %s | | %s | | %s |\n", lf, mf, rf);
+/* Visible width of a string (CSI SGR sequences do not count). */
+static int aet_sgr_vis_len(const char *s) {
+  int n = 0;
+  if (!s) return 0;
+  while (*s) {
+    if ((unsigned char)*s == '\033' && s[1] == '[') {
+      s += 2;
+      while (*s && *s != 'm') s++;
+      if (*s == 'm') s++;
+      continue;
+    }
+    n++;
+    s++;
+  }
+  return n;
 }
 
-static void ui_wrap_row_in_place(char *row, size_t cap) {
-  char tmp[192];
-  if (!row || cap < 4) return;
-  snprintf(tmp, sizeof tmp, "|%s|", row);
-  eq_copy_slug(row, cap, tmp);
+static void aet_sgr_pad_to(char *dst, size_t cap, int target_vis) {
+  size_t L;
+  if (!dst || cap < 2) return;
+  while (aet_sgr_vis_len(dst) < target_vis) {
+    L = strlen(dst);
+    if (L + 2 >= cap) break;
+    dst[L] = ' ';
+    dst[L + 1] = '\0';
+  }
+}
+
+/* Material forge tripanel: inner 38 + 38 + 36 + six pipes + 2-space indent = 120 cols. */
+enum { FORGE_CELL_L = 38, FORGE_CELL_M = 38, FORGE_CELL_R = 36 };
+
+static void forge_cell_pad(char *dst, size_t cap, const char *src, int visw) {
+  if (!dst || cap < 2) return;
+  snprintf(dst, cap, "%s", src ? src : "");
+  aet_sgr_pad_to(dst, cap, visw);
+}
+
+static void forge_print_sep(void) {
+  int k;
+  printf("  %s+", C_BORDER);
+  for (k = 0; k < FORGE_CELL_L; k++) putchar('-');
+  printf("+%s+", C_BORDER);
+  for (k = 0; k < FORGE_CELL_M; k++) putchar('-');
+  printf("+%s+", C_BORDER);
+  for (k = 0; k < FORGE_CELL_R; k++) putchar('-');
+  printf("+%s\n", C_RESET);
+}
+
+static void forge_print_row(const char *l, const char *m, const char *r) {
+  char lb[640], mb[640], rb[640];
+  forge_cell_pad(lb, sizeof lb, l, FORGE_CELL_L);
+  forge_cell_pad(mb, sizeof mb, m, FORGE_CELL_M);
+  forge_cell_pad(rb, sizeof rb, r, FORGE_CELL_R);
+  fputs("  ", stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputs(lb, stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputc(' ', stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputs(mb, stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputc(' ', stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputs(rb, stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputc('\n', stdout);
+}
+
+/* Pause menu: bipanel 55 + 55 + pipes + 2-space indent = 120 cols (matches HTML mock). */
+enum { PAUSE_CELL_W = 55 };
+
+static void pause_print_row(const char *l, const char *r) {
+  char lb[512], rb[512];
+  forge_cell_pad(lb, sizeof lb, l, PAUSE_CELL_W);
+  forge_cell_pad(rb, sizeof rb, r, PAUSE_CELL_W);
+  fputs("  ", stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputs(lb, stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs("    ", stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputs(rb, stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputc('\n', stdout);
+}
+
+static void pause_print_divider_cell(void) {
+  char d[256];
+  snprintf(d, sizeof d, "%s%*s%s", C_BORDER, PAUSE_CELL_W, "", C_RESET);
+  pause_print_row(d, d);
+}
+
+/* Settings UI: 40 + 75 inner cells; 120-column terminal frame. */
+enum { SETTINGS_CELL_L = 40, SETTINGS_CELL_R = 75 };
+
+typedef struct {
+  int color_mode;
+  int verbose_room;
+  int hints;
+  int ironman;
+  int aud_m;
+  int aud_s;
+} SettingsWork;
+
+static void settings_print_row(const char *l, const char *r) {
+  char lb[512], rb[768];
+  forge_cell_pad(lb, sizeof lb, l, SETTINGS_CELL_L);
+  forge_cell_pad(rb, sizeof rb, r, SETTINGS_CELL_R);
+  fputs("  ", stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputs(lb, stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputs(rb, stdout);
+  fputs(C_BORDER, stdout);
+  fputc('|', stdout);
+  fputs(C_RESET, stdout);
+  fputc('\n', stdout);
+}
+
+static void settings_from_globals(SettingsWork *w) {
+  w->color_mode = g_settings_color_ov;
+  if (w->color_mode < -1 || w->color_mode > 1) w->color_mode = -1;
+  w->verbose_room = g_verbose_room ? 1 : 0;
+  w->hints = g_hints_pref ? 1 : 0;
+  w->ironman = g_ironman_stub ? 1 : 0;
+  w->aud_m = 0;
+  w->aud_s = 0;
+}
+
+static void settings_apply_work(const SettingsWork *w) {
+  g_settings_color_ov = w->color_mode;
+  if (g_settings_color_ov < -1 || g_settings_color_ov > 1) g_settings_color_ov = -1;
+  g_verbose_room = w->verbose_room ? 1 : 0;
+  g_hints_pref = w->hints ? 1 : 0;
+  g_ironman_stub = w->ironman ? 1 : 0;
+  ui_init_color();
+}
+
+static const char *settings_color_caption(int cm) {
+  if (cm <= -1) return "Follow environment";
+  if (cm == 0) return "Disabled (mono)";
+  return "Enabled (ANSI)";
+}
+
+static void settings_cycle_color(int *cm, int dir) {
+  int idx =
+      (*cm <= -1) ? 0 : (*cm == 0) ? 1 : 2;
+  idx = (idx + dir + 3) % 3;
+  *cm = (idx == 0) ? -1 : (idx == 1) ? 0 : 1;
+}
+
+static int settings_cat_maxopt(int cat) {
+  static const int mx[5] = {2, 2, 2, 0, 0};
+  if (cat < 0 || cat >= 5) return 0;
+  return mx[cat];
+}
+
+#if defined(_WIN32)
+#define AETER_STDIN_TTY() (_isatty(_fileno(stdin)))
+#else
+#define AETER_STDIN_TTY() (isatty(STDIN_FILENO))
+#endif
+
+static void run_settings_ui(void) {
+  static const char *const kCat[5] = {
+      "DISPLAY & TERMINAL",
+      "AUDIO (TEXT PORT)",
+      "GAMEPLAY ASSISTS",
+      "SAVE SETTINGS & EXIT",
+      "DISCARD CHANGES",
+  };
+  SettingsWork snap, work;
+  int panel = 0;
+  int sel_l = 0;
+  int sel_r = 0;
+  int sel_cat = 0;
+#if !defined(_WIN32)
+  int raw_ok = guide_tty_raw_begin();
+#endif
+  GuideKey gk;
+
+  settings_from_globals(&snap);
+  work = snap;
+
+  if (aet_autotest() || !AETER_STDIN_TTY()) {
+    clear_frame();
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(" %sSYSTEM CONFIGURATION%s\n\n", C_TITLE, C_RESET);
+    printf(
+        " %sPipe / CI mode: open Settings from an interactive terminal for the "
+        "full UI.%s\n",
+        C_MUTED, C_RESET);
+    printf(
+        " %sPreferences still persist via quicksave after you change them in "
+        "game.%s\n",
+        C_MUTED, C_RESET);
+    ui_block_pause("SETTINGS", "[Press Enter]");
+#if !defined(_WIN32)
+    guide_tty_raw_end();
+#endif
+    return;
+  }
+
+  for (;;) {
+    char ls[512], rs[768];
+    int i, mo, row;
+
+    clear_frame();
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    {
+      char hdr[512];
+      const char ttl[] = "SYSTEM CONFIGURATION";
+      int pad = (120 - (int)(sizeof ttl - 1)) / 2;
+      if (pad < 0) pad = 0;
+      snprintf(hdr, sizeof hdr, "%s%*s%s%s", C_TITLE, pad, "", ttl, C_RESET);
+      aet_sgr_pad_to(hdr, sizeof hdr, 120);
+      printf("  %s\n", hdr);
+    }
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+
+    for (row = 0; row < 16; row++) {
+      int rrow = row;
+      ls[0] = rs[0] = '\0';
+      if (rrow < 5) {
+        int hl = (panel == 0 && sel_l == rrow);
+        int cur = (sel_cat == rrow);
+        snprintf(ls, sizeof ls, "%s%s%s%s%s", hl ? C_ITEM : "",
+                 hl ? "> " : "  ", cur ? C_EXIT : C_HEADING, kCat[rrow],
+                 C_RESET);
+      }
+      if (sel_cat == 0 && rrow >= 1 && rrow <= 5) {
+        int sr = rrow - 1;
+        int hi = (panel == 1 && sel_cat == 0 && sel_r == sr && sr < 2);
+        if (sr == 0) {
+          snprintf(rs, sizeof rs,
+                   "%s%sANSI colors       : %s%s%s%s",
+                   hi ? C_ITEM : "", hi ? "> " : "  ",
+                   C_HEADING, settings_color_caption(work.color_mode),
+                   C_RESET, hi ? " <" : "");
+        } else if (sr == 1) {
+          snprintf(rs, sizeof rs,
+                   "%s%sRoom blurbs       : %s%s%s%s",
+                   hi ? C_ITEM : "", hi ? "> " : "  ",
+                   C_HEADING, work.verbose_room ? "Verbose" : "Brief",
+                   C_RESET, hi ? " <" : "");
+        } else if (sr == 2) {
+          snprintf(rs, sizeof rs,
+                   "%s%sTip — blurbs follow  verbose / brief  commands too.%s",
+                   C_MUTED, "", C_RESET);
+        } else if (sr == 3) {
+          snprintf(rs, sizeof rs, "%s%s%s", C_MUTED,
+                   "(Also respects AETER_COLOR / terminal capabilities.)",
+                   C_RESET);
+        }
+      } else if (sel_cat == 1 && rrow >= 1 && rrow <= 4) {
+        char hb[16];
+        int sr = rrow - 1;
+        int hi = (panel == 1 && sel_cat == 1 && sel_r == sr && sr < 2);
+        for (i = 0; i < 10; i++)
+          hb[i] = (char)(i < work.aud_m ? '#' : '.');
+        hb[10] = '\0';
+        if (sr == 0) {
+          snprintf(rs, sizeof rs,
+                   "%s%sMusic (visual only): %s[%s]%s%s",
+                   hi ? C_ITEM : "", hi ? "> " : "  ", C_HEADING, hb,
+                   C_RESET, hi ? " <" : "");
+        } else if (sr == 1) {
+          for (i = 0; i < 10; i++)
+            hb[i] = (char)(i < work.aud_s ? '#' : '.');
+          hb[10] = '\0';
+          snprintf(rs, sizeof rs,
+                   "%s%sSFX (visual only)  : %s[%s]%s%s",
+                   hi ? C_ITEM : "", hi ? "> " : "  ", C_HEADING, hb,
+                   C_RESET, hi ? " <" : "");
+        } else if (sr == 2) {
+          snprintf(rs, sizeof rs, "%s%s%s", C_MUTED,
+                   "No digital audio engine in this text port — sliders are "
+                   "cosmetic.",
+                   C_RESET);
+        }
+      } else if (sel_cat == 2 && rrow >= 1 && rrow <= 5) {
+        int sr = rrow - 1;
+        int hi = (panel == 1 && sel_cat == 2 && sel_r == sr && sr < 2);
+        if (sr == 0) {
+          snprintf(rs, sizeof rs,
+                   "%s%sContext hints cmd : %s%s%s%s",
+                   hi ? C_ITEM : "", hi ? "> " : "  ", C_HEADING,
+                   work.hints ? "Enabled" : "Disabled", C_RESET,
+                   hi ? " <" : "");
+        } else if (sr == 1) {
+          snprintf(rs, sizeof rs,
+                   "%s%sIronman tours      : %s%s%s%s",
+                   hi ? C_ITEM : "", hi ? "> " : "  ", C_EXIT,
+                   work.ironman ? "Marked (future)" : "Off", C_RESET,
+                   hi ? " <" : "");
+        } else if (sr == 2) {
+          snprintf(rs, sizeof rs, "%s%s%s", C_MUTED,
+                   "Ironman does not alter saves yet — reserved for a future "
+                   "challenge flag.",
+                   C_RESET);
+        }
+      } else if (sel_cat == 3 && rrow >= 1 && rrow <= 3) {
+        if (rrow == 1)
+          snprintf(rs, sizeof rs, "%s%s%s", C_HEADING,
+                   "Writes hintena / colorov / room blurbs into your quicksave "
+                   "file.",
+                   C_RESET);
+        else if (rrow == 2)
+          snprintf(rs, sizeof rs, "%s%s%s", C_MUTED,
+                   "Choose this row on the left and press Enter.", C_RESET);
+      } else if (sel_cat == 4 && rrow >= 1 && rrow <= 3) {
+        if (rrow == 1)
+          snprintf(rs, sizeof rs, "%s%s%s", C_HEADING,
+                   "Reverts changes made on this screen since you opened it.",
+                   C_RESET);
+        else if (rrow == 2)
+          snprintf(rs, sizeof rs, "%s%s%s", C_MUTED,
+                   "Choose this row on the left and press Enter.", C_RESET);
+      }
+      settings_print_row(ls, rs);
+    }
+
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(" %s[ARROWS] Navigate   [LEFT/RIGHT] Adjust   [TAB] Switch panel   "
+           "[ENTER] Activate   [ESC] Cancel%s\n",
+           C_MUTED, C_RESET);
+    fflush(stdout);
+
+#if defined(_WIN32)
+    gk = guide_read_key_win();
+#else
+    gk = guide_read_key_unix(raw_ok);
+#endif
+
+    if (gk == GK_ESC) {
+      work = snap;
+      settings_apply_work(&work);
+      break;
+    }
+    if (gk == GK_TAB) {
+      panel = !panel;
+      if (panel && settings_cat_maxopt(sel_cat) <= 0)
+        panel = 0;
+      continue;
+    }
+
+    if (panel == 0) {
+      if (gk == GK_UP)
+        sel_l = (sel_l + 4) % 5;
+      else if (gk == GK_DOWN)
+        sel_l = (sel_l + 1) % 5;
+      sel_cat = sel_l;
+      if (gk == GK_ENTER) {
+        if (sel_l <= 2) {
+          panel = 1;
+          sel_r = 0;
+        } else if (sel_l == 3) {
+          settings_apply_work(&work);
+          if (write_save_file()) {
+            ui_block_pause("SETTINGS",
+                           "Preferences saved with your quicksave file.");
+          } else
+            ui_block_pause("SETTINGS", "Could not write save — prefs kept in "
+                                       "memory for this session.");
+          break;
+        } else {
+          work = snap;
+          settings_apply_work(&work);
+          break;
+        }
+      }
+      continue;
+    }
+
+    mo = settings_cat_maxopt(sel_cat);
+    if (gk == GK_UP && mo > 0)
+      sel_r = (sel_r + mo - 1) % mo;
+    else if (gk == GK_DOWN && mo > 0)
+      sel_r = (sel_r + 1) % mo;
+    else if ((gk == GK_LEFT || gk == GK_RIGHT) && mo > 0) {
+      int dir = (gk == GK_RIGHT) ? 1 : -1;
+      if (sel_cat == 0) {
+        if (sel_r == 0)
+          settings_cycle_color(&work.color_mode, dir);
+        else if (sel_r == 1)
+          work.verbose_room ^= 1;
+      } else if (sel_cat == 1) {
+        if (sel_r == 0) {
+          work.aud_m += dir;
+          if (work.aud_m < 0) work.aud_m = 0;
+          if (work.aud_m > 10) work.aud_m = 10;
+        } else if (sel_r == 1) {
+          work.aud_s += dir;
+          if (work.aud_s < 0) work.aud_s = 0;
+          if (work.aud_s > 10) work.aud_s = 10;
+        }
+      } else if (sel_cat == 2) {
+        if (sel_r == 0)
+          work.hints ^= 1;
+        else if (sel_r == 1)
+          work.ironman ^= 1;
+      }
+    }
+  }
+#if !defined(_WIN32)
+  guide_tty_raw_end();
+#endif
 }
 
 typedef struct {
@@ -9370,11 +9965,10 @@ static int line_equals_one_of(const char *line, const char *const *candidates) {
   return 0;
 }
 
-/* Material Forge UI matches demo/material_forge_ui.html: 120-column tripanel
- * (40+37+29), 15 visible rows. Blended attribute sums appear in the center
- * column; predicted stats + analysis on the right (see craft_predict). */
+/* Material Forge: 120 cols, tripanel 38+38+36 (mockup); 14 rows; live pack,
+ * bench, blended attrs, predicted stats + analysis. */
 static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
-  enum { FORGE_VIS_ROWS = 15 };
+  enum { FORGE_ROWS = 14 };
   static const char *const kForgeExit[] = {"done", "back", "exit", "resume",
                                            NULL};
   char bench[6][MAX_ITEM_LEN];
@@ -9384,16 +9978,21 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
   for (;;) {
     int idx_map[MAX_INV];
     int listed = 0;
-    int i, rows;
+    int i, pad_t;
     CraftAttr a = {0, 0, 0, 0, 0, 0, 0, 0};
     char out_name[64], d1[96], d2[96], d3[96];
     int ok = 0;
     char bd[12], bs[12], bh[12], bw[12];
-    char right_rows[FORGE_VIS_ROWS][64];
-    char left_row[96], mid_row[96];
-    char dn1[32], dn2[32], dn3[32];
+    char left_row[512], mid_row[512], right_cell[512];
     char blabel[48];
+    char wb[40], subln[160];
+    const char *cred;
     int st_dur = 0, st_shp = 0, st_hnd = 0, st_wgt = 0, q_score = 0;
+    const char *forge_title = "D Y N A M I C   M A T E R I A L   F O R G E";
+    char profbuf[28];
+
+    cred = g_use_color ? "\x1b[91;1m" : "";
+
     clear_frame();
     craft_predict(bench, bench_n, out_name, sizeof out_name, &a, d1, sizeof d1, d2,
                   sizeof d2, d3, sizeof d3, &ok);
@@ -9403,71 +10002,125 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
     format_bar10(st_shp, bs, sizeof bs);
     format_bar10(st_hnd, bh, sizeof bh);
     format_bar10(st_wgt, bw, sizeof bw);
-    snprintf(dn1, sizeof dn1, "%.29s", d1);
-    snprintf(dn2, sizeof dn2, "%.29s", d2);
-    snprintf(dn3, sizeof dn3, "%.29s", d3);
 
-    snprintf(right_rows[0], sizeof right_rows[0], "RESULT:%.22s", out_name);
-    right_rows[1][0] = '\0';
-    snprintf(right_rows[2], sizeof right_rows[2], "BASE STATS:");
-    snprintf(right_rows[3], sizeof right_rows[3], "D:[%s]%02d", bd, st_dur);
-    snprintf(right_rows[4], sizeof right_rows[4], "S:[%s]%02d", bs, st_shp);
-    snprintf(right_rows[5], sizeof right_rows[5], "H:[%s]%02d", bh, st_hnd);
-    snprintf(right_rows[6], sizeof right_rows[6], "W:[%s]%02d", bw, st_wgt);
-    right_rows[7][0] = '\0';
-    snprintf(right_rows[8], sizeof right_rows[8], "ANALYSIS:");
-    snprintf(right_rows[9], sizeof right_rows[9], "%s", dn1);
-    snprintf(right_rows[10], sizeof right_rows[10], "%s", dn2);
-    snprintf(right_rows[11], sizeof right_rows[11], "%s", dn3);
-    snprintf(
-        right_rows[12], sizeof right_rows[12], "Q:%d %s", q_score,
-        q_score >= 75 ? "(fine)" : (q_score >= 50 ? "(solid)" : "(rough)"));
-    snprintf(right_rows[13], sizeof right_rows[13], "PROF:%02d Add REM Craft",
+    for (i = 0; i < FORGE_ROWS && i < g_inv_n; i++) idx_map[listed++] = i;
+
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    snprintf(profbuf, sizeof profbuf, "[ PROFICIENCY: %2d ]",
              g_craft_proficiency);
-    right_rows[14][0] = '\0';
+    pad_t = 120 - 3 - (int)strlen(forge_title) - (int)strlen(profbuf);
+    if (pad_t < 1) pad_t = 1;
+    printf("   %s%s%s", C_TITLE, forge_title, C_RESET);
+    for (i = 0; i < pad_t; i++) putchar(' ');
+    printf("%s%s%s\n", C_EXIT, profbuf, C_RESET);
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
 
-    printf("%s%s%s\n", C_BORDER, UI_RULE, C_RESET);
-    printf("   %sM A T E R I A L   F O R G E%s                      %s[ PROFICIENCY: %d ]%s\n",
-           C_TITLE, C_RESET, C_STATUS, g_craft_proficiency, C_RESET);
-    printf("%s%s%s\n", C_BORDER, UI_RULE, C_RESET);
-    printf("  [ INVENTORY ]                              [ WORKBENCH : %d/6 ]                      [ PREDICTED OUTCOME ]\n",
-           bench_n);
-    printf("  +----------------------------------------+ +----------------------------------------+ +-----------------------------+\n");
-    rows = g_inv_n < FORGE_VIS_ROWS ? FORGE_VIS_ROWS : g_inv_n;
+    snprintf(wb, sizeof wb, "[ WORKBENCH : %d/6 ]", bench_n);
+    {
+      UiLineBuf sb;
+      ui_line_init(&sb, subln, sizeof subln, 120);
+      ui_line_append(&sb, " ");
+      ui_line_append(&sb, "[ RAW INVENTORY ]");
+      ui_line_append_width(&sb, "", 20);
+      ui_line_append(&sb, wb);
+      ui_line_append_width(&sb, "", 19);
+      ui_line_append(&sb, "[ PREDICTED OUTCOME ]");
+      ui_line_pad(&sb);
+      printf("%s%s%s\n", C_HEADING, subln, C_RESET);
+    }
 
-    for (i = 0; i < rows; i++) {
+    forge_print_sep();
+
+    for (i = 0; i < FORGE_ROWS; i++) {
+      CraftMatProfile ip;
+      const AetItemCatalogEntry *cat;
+      int inv_no;
+
       left_row[0] = '\0';
       mid_row[0] = '\0';
+      right_cell[0] = '\0';
+
       if (i < g_inv_n) {
-        char inv_cell[48];
-        craft_format_inventory_cell(g_inv[i], inv_cell, sizeof inv_cell);
-        snprintf(left_row, sizeof left_row, "[%2d] %s", i + 1, inv_cell);
-        idx_map[listed++] = i;
+        craft_profile_for_item(g_inv[i], &ip);
+        craft_short_display_name(g_inv[i], blabel, sizeof blabel);
+        cat = aet_item_catalog_by_slug(g_inv[i]);
+        inv_no = cat ? cat->id : (i + 1);
+        snprintf(
+            left_row, sizeof left_row,
+            " %s[%2d]%s %s%-18.18s%s %sH:%d S:%d%s", C_ITEM, inv_no, C_RESET,
+            ip.is_base_tool ? C_BOOT_OK : C_HEADING, blabel, C_RESET, C_MUTED,
+            ip.hrd, ip.shp, C_RESET);
       }
+
       if (i < 6) {
         if (i < bench_n) {
+          CraftMatProfile bpr;
+          craft_profile_for_item(bench[i], &bpr);
           craft_short_display_name(bench[i], blabel, sizeof blabel);
-          snprintf(mid_row, sizeof mid_row, "%d. %-31s", i + 1, blabel);
-        } else
-          snprintf(mid_row, sizeof mid_row, "%d. [ Empty ]", i + 1);
+          snprintf(mid_row, sizeof mid_row, "%s%d. %s%s%s", C_HEADING, i + 1,
+                   bpr.is_base_tool ? C_BOOT_OK : C_HEADING, blabel, C_RESET);
+        } else {
+          snprintf(mid_row, sizeof mid_row, "%s %d. %s[ Empty ]%s", C_HEADING,
+                   i + 1, C_MUTED, C_RESET);
+        }
       } else if (bench_n > 0) {
         if (i == 7)
-          snprintf(mid_row, sizeof mid_row, "%s", "COMBINED MATERIAL ATTRIBUTES:");
+          snprintf(mid_row, sizeof mid_row, "%s COMBINED MATERIAL ATTRIBUTES:%s",
+                   C_TITLE, C_RESET);
         else if (i == 8)
-          snprintf(mid_row, sizeof mid_row, " Hrd:%02d Shp:%02d Flx:%02d Dur:%02d",
-                   a.hrd, a.shp, a.flx, a.dur);
+          snprintf(mid_row, sizeof mid_row,
+                   "%s  Hrd:%02d Shp:%02d Flx:%02d Dur:%02d%s", C_HEADING, a.hrd,
+                   a.shp, a.flx, a.dur, C_RESET);
         else if (i == 9)
-          snprintf(mid_row, sizeof mid_row, " Wgt:%02d Grp:%02d Bnd:%02d Utl:%02d",
-                   a.wgt, a.grp, a.bnd, a.utl);
+          snprintf(mid_row, sizeof mid_row,
+                   "%s  Wgt:%02d Grp:%02d Bnd:%02d Utl:%02d%s", C_HEADING, a.wgt,
+                   a.grp, a.bnd, a.utl, C_RESET);
       }
-      ui_print_tripanel_row(left_row, mid_row,
-                            i < FORGE_VIS_ROWS ? right_rows[i] : "");
+
+      if (i == 0) {
+        snprintf(right_cell, sizeof right_cell, "%s RESULT: %s%-25.25s%s", C_TITLE,
+                 C_HEADING, out_name, C_RESET);
+      } else if (i == 2) {
+        snprintf(right_cell, sizeof right_cell, "%s BASE STATS:%s", C_HEADING,
+                 C_RESET);
+      } else if (i == 3) {
+        snprintf(right_cell, sizeof right_cell,
+                 "%s  Durability:[%s%s%s]%s%02d%s", C_MUTED, C_BOOT_OK, bd,
+                 C_RESET, C_HEADING, st_dur, C_RESET);
+      } else if (i == 4) {
+        snprintf(right_cell, sizeof right_cell,
+                 "%s  Sharpness:[%s%s%s]%s%02d%s", C_MUTED, cred, bs, C_RESET,
+                 C_HEADING, st_shp, C_RESET);
+      } else if (i == 5) {
+        snprintf(right_cell, sizeof right_cell,
+                 "%s  Handling:[%s%s%s]%s%02d%s", C_MUTED, C_ITEM, bh, C_RESET,
+                 C_HEADING, st_hnd, C_RESET);
+      } else if (i == 6) {
+        snprintf(right_cell, sizeof right_cell,
+                 "%s  Weight:[%s%s%s]%s%02d%s", C_MUTED, C_MUTED, bw, C_RESET,
+                 C_HEADING, st_wgt, C_RESET);
+      } else if (i == 8) {
+        snprintf(right_cell, sizeof right_cell, "%s ANALYSIS:%s", C_HEADING,
+                 C_RESET);
+      } else if (i == 9) {
+        snprintf(right_cell, sizeof right_cell, "%s  %.36s%s", C_MUTED, d1,
+                 C_RESET);
+      } else if (i == 10) {
+        snprintf(right_cell, sizeof right_cell, "%s  %.36s%s", C_MUTED, d2,
+                 C_RESET);
+      } else if (i == 11) {
+        snprintf(right_cell, sizeof right_cell, "%s  %.36s%s", C_MUTED, d3,
+                 C_RESET);
+      }
+
+      forge_print_row(left_row, mid_row, right_cell);
     }
-    printf("  +----------------------------------------+ +----------------------------------------+ +-----------------------------+\n");
+
+    forge_print_sep();
     printf(
-        "  %sADD #  REM #  PROF # (1-10)  CRAFT  CLEAR  DONE — properties blend; "
-        "no fixed recipes.%s\n",
-        C_MUTED, C_RESET);
+        " %sCOMMANDS: [ADD #]  [REM #]  [PROF 1-10]  [CLEAR]  [CRAFT]  [DONE]  "
+        "(blend · q%d)%s\n",
+        C_MUTED, q_score, C_RESET);
     if (pending_acc && pending_acc[0]) printf("\n%s", pending_acc);
     printf("\n%s>> %s", C_PROMPT, C_RESET);
     fflush(stdout);
@@ -9522,7 +10175,8 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
       char msg[200];
       craft_predict(bench, bench_n, made, sizeof made, &a, d1, sizeof d1, d2,
                     sizeof d2, d3, sizeof d3, &ok);
-      if (!ok || strstr(made, "Debris") != NULL) {
+      if (!ok || str_contains_ci(made, "worthless") ||
+          str_contains_ci(made, "unknown /")) {
         ui_block_pause("FORGE", "The combination collapses into useless debris.");
         continue;
       }
@@ -9553,24 +10207,140 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
   return_to_game_screen();
 }
 
-/* Equipment/inventory fullscreen: layout locked to the web UI prototype
- * (120-column stitch: 50 + 4 + 66; inner grids 48 / 64; 16 rows; 12 pack lines). */
+/* --- Equipment / inventory UI (120 cols: 50 + 4 + 66; inner 48 / 64) --- */
+static void eq_ui_emit_left_h48(void) {
+  int k;
+  printf("%s+", C_BORDER);
+  for (k = 0; k < 48; k++) putchar('-');
+  printf("+%s", C_RESET);
+}
+
+static void eq_ui_emit_right_h64(void) {
+  int k;
+  printf("%s+", C_BORDER);
+  for (k = 0; k < 64; k++) putchar('-');
+  printf("+%s", C_RESET);
+}
+
+static void eq_ui_emit_slot_row(int slot_i) {
+  char inner[256];
+  char tag[16];
+  size_t j;
+  int sdef = 0, satk = 0;
+  snprintf(tag, sizeof tag, "[%s]", EQ_SLOT_NAME[slot_i]);
+  for (j = 0; tag[j]; j++) tag[j] = (char)toupper((unsigned char)tag[j]);
+  inner[0] = '\0';
+  snprintf(inner + strlen(inner), sizeof inner - strlen(inner), " %s%-10.10s%s",
+           C_MUTED, tag, C_RESET);
+  if (g_eq_slots[slot_i][0]) {
+    const char *disp = g_eq_slots[slot_i];
+    eq_compute_item_stats(g_eq_slots[slot_i], slot_i, &sdef, &satk, NULL, NULL, &disp);
+    snprintf(inner + strlen(inner), sizeof inner - strlen(inner),
+             "%s%-20.20s%s%s(D:%02d A:%02d)%s", C_BOOT_OK, disp, C_RESET, C_HEADING,
+             sdef, satk, C_RESET);
+  } else {
+    snprintf(inner + strlen(inner), sizeof inner - strlen(inner), "%s[ Empty ]%s",
+             C_MUTED, C_RESET);
+  }
+  aet_sgr_pad_to(inner, sizeof inner, 48);
+  printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_left_spacer50(void) {
+  int k;
+  printf("%s|%s", C_BORDER, C_RESET);
+  for (k = 0; k < 48; k++) putchar(' ');
+  printf("%s|%s", C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_combat_banner(void) {
+  UiLineBuf lb;
+  char inner[96];
+  ui_line_init(&lb, inner, sizeof inner, 48);
+  ui_line_append(&lb, " [ COMBAT STATISTICS ]");
+  ui_line_pad(&lb);
+  printf("%s %s", C_BORDER, C_RESET);
+  printf("%s%s%s", C_TITLE, inner, C_RESET);
+  printf("%s %s", C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_stat_armor_wgt(int def, int wgt) {
+  char inner[256];
+  snprintf(inner, sizeof inner,
+           "%s  Armor Rating : %02d      Total Weight : %02d%s", C_HEADING, def, wgt,
+           C_RESET);
+  aet_sgr_pad_to(inner, sizeof inner, 48);
+  printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_stat_atk_mob(int atk, int twgt) {
+  char inner[320];
+  const char *mob = (twgt < 6) ? "High" : ((twgt < 12) ? "Norm" : "Heav");
+  const char *mc = (twgt < 6) ? C_EXIT : ((twgt < 12) ? C_HEADING : C_MUTED);
+  size_t L;
+  snprintf(inner, sizeof inner, "%s  Attack Power : %02d      Mobility     : ", C_HEADING,
+           atk);
+  L = strlen(inner);
+  snprintf(inner + L, sizeof inner - L, "%s%s%s", mc, mob, C_RESET);
+  aet_sgr_pad_to(inner, sizeof inner, 48);
+  printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_inv_header(void) {
+  char inner[256];
+  snprintf(inner, sizeof inner,
+           "%s ID    ITEM NAME              TYPE          ATTRIBUTES%s", C_TITLE, C_RESET);
+  aet_sgr_pad_to(inner, sizeof inner, 64);
+  printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_inv_sep(void) {
+  int k;
+  printf("%s|%s", C_BORDER, C_RESET);
+  for (k = 0; k < 64; k++) putchar('-');
+  printf("%s|%s", C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_inv_line(int inv_ix) {
+  char inner[384];
+  int idef, iatk, iwgt, slot_ix;
+  const char *slot_name = "misc";
+  const char *disp_name = g_inv[inv_ix];
+  char idbracket[16], typechunk[24];
+  const AetItemCatalogEntry *cat;
+  eq_compute_item_stats(g_inv[inv_ix], -1, &idef, &iatk, &iwgt, &slot_ix, &disp_name);
+  if (slot_ix >= 0 && slot_ix < EQ_SLOT_COUNT) slot_name = EQ_SLOT_NAME[slot_ix];
+  cat = aet_item_catalog_by_slug(g_inv[inv_ix]);
+  snprintf(idbracket, sizeof idbracket, "[%d]", cat ? cat->id : (inv_ix + 1));
+  snprintf(typechunk, sizeof typechunk, "(%s)", slot_name);
+  snprintf(inner, sizeof inner,
+           " %s%-5s%s %s%-22.22s%s %s%-12s%s %sDef:%d Atk:%d Wgt:%d%s", C_ITEM,
+           idbracket, C_RESET, C_HEADING, disp_name, C_RESET, C_MUTED, typechunk, C_RESET,
+           C_MUTED, idef, iatk, iwgt, C_RESET);
+  aet_sgr_pad_to(inner, sizeof inner, 64);
+  printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
+}
+
+static void eq_ui_emit_inv_empty(void) {
+  char inner[8];
+  inner[0] = '\0';
+  aet_sgr_pad_to(inner, sizeof inner, 64);
+  printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
+}
+
+/* Equipment/inventory fullscreen: fixed 120-column layout (50 + 4 + 66; inner
+ * grids 48 / 64; 16 rows; 12 pack lines). Matches equipment UI mockup. */
 static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscreen) {
-  enum {
-    EQ_LEFT_W = 50,
-    EQ_RIGHT_W = 66,
-    EQ_INV_ROWS = 12,
-    EQ_ROWS = 3 + EQ_INV_ROWS + 1
-  };
-  static const char *const kEqUiExit[] = {"done", "back", "exit", NULL};
+  enum { EQ_INV_ROWS = 12, EQ_ROWS = 3 + EQ_INV_ROWS + 1 };
+  static const char *const kEqUiExit[] = {"done", "back", "exit", "resume", NULL};
   char line[INPUT_LINE_MAX];
   char msg[200];
   eq_prune_slots_not_in_inventory();
   for (;;) {
-    int i, listed = 0, shown = 0;
+    int i, listed = 0;
     int idx_map[MAX_INV];
     int def = 0, atk = 0, wgt = 0;
-    char left_rows[EQ_ROWS][160], right_rows[EQ_ROWS][160];
+    int c;
     clear_frame();
     for (i = 0; i < EQ_SLOT_COUNT; i++) {
       int sdef, satk, swgt;
@@ -9580,147 +10350,26 @@ static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscr
       atk += satk;
       wgt += swgt;
     }
-    for (i = 0; i < EQ_ROWS; i++) {
-      left_rows[i][0] = '\0';
-      right_rows[i][0] = '\0';
-    }
-    snprintf(left_rows[0], sizeof left_rows[0], "+------------------------------------------------+");
-    for (i = 0; i < EQ_SLOT_COUNT; i++) {
-      UiLineBuf lb;
-      char tag[24];
-      size_t j = 0;
-      int sdef = 0, satk = 0;
-      ui_line_init(&lb, left_rows[i + 1], sizeof left_rows[i + 1], 48);
-      snprintf(tag, sizeof tag, "[%s]", EQ_SLOT_NAME[i]);
-      for (j = 0; tag[j]; j++) tag[j] = (char)toupper((unsigned char)tag[j]);
-      ui_line_append(&lb, " ");
-      ui_line_append(&lb, tag);
-      if (strlen(tag) < 10) {
-        char sp[16];
-        int n = (int)(10 - strlen(tag));
-        memset(sp, ' ', (size_t)n);
-        sp[n] = '\0';
-        ui_line_append(&lb, sp);
-      } else
-        ui_line_append(&lb, " ");
-      if (g_eq_slots[i][0]) {
-        const char *disp_name = g_eq_slots[i];
-        char stat[24];
-        eq_compute_item_stats(g_eq_slots[i], i, &sdef, &satk, NULL, NULL, &disp_name);
-        ui_line_append_width(
-            &lb,
-            disp_name, 20);
-        snprintf(stat, sizeof stat, "(D:%02d A:%02d)", sdef, satk);
-        ui_line_append(&lb, stat);
-      } else {
-        ui_line_append(&lb, "[ Empty ]");
-      }
-      ui_line_pad(&lb);
-      {
-        char boxed[160];
-        snprintf(boxed, sizeof boxed, "|%s|", left_rows[i + 1]);
-        snprintf(left_rows[i + 1], sizeof left_rows[i + 1], "%s", boxed);
-      }
-    }
-    snprintf(left_rows[9], sizeof left_rows[9], "+------------------------------------------------+");
-    ui_fit_cell(left_rows[10], sizeof left_rows[10], "", 50);
-    {
-      UiLineBuf lb;
-      ui_line_init(&lb, left_rows[11], sizeof left_rows[11], 48);
-      ui_line_append(&lb, " [ COMBAT STATISTICS ]");
-      ui_line_pad(&lb);
-      snprintf(msg, sizeof msg, " %s ", left_rows[11]);
-      snprintf(left_rows[11], sizeof left_rows[11], "%s", msg);
-    }
-    snprintf(left_rows[12], sizeof left_rows[12], "+------------------------------------------------+");
-    {
-      UiLineBuf lb;
-      char tmp[80];
-      ui_line_init(&lb, left_rows[13], sizeof left_rows[13], 48);
-      snprintf(tmp, sizeof tmp, "  Armor Rating : %02d      Total Weight : %02d", def, wgt);
-      ui_line_append(&lb, tmp);
-      ui_line_pad(&lb);
-      ui_wrap_row_in_place(left_rows[13], sizeof left_rows[13]);
-    }
-    {
-      UiLineBuf lb;
-      char tmp[80];
-      const char *mob = (wgt < 6) ? "High" : ((wgt < 12) ? "Norm" : "Heav");
-      ui_line_init(&lb, left_rows[14], sizeof left_rows[14], 48);
-      snprintf(tmp, sizeof tmp, "  Attack Power : %02d      Mobility     : %s", atk,
-               mob);
-      ui_line_append(&lb, tmp);
-      ui_line_pad(&lb);
-      ui_wrap_row_in_place(left_rows[14], sizeof left_rows[14]);
-    }
-    snprintf(left_rows[15], sizeof left_rows[15], "+------------------------------------------------+");
+    for (i = 0; i < EQ_INV_ROWS && i < g_inv_n; i++) idx_map[listed++] = i;
 
-    snprintf(right_rows[0], sizeof right_rows[0], "+----------------------------------------------------------------+");
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
     {
-      UiLineBuf rb;
-      ui_line_init(&rb, right_rows[1], sizeof right_rows[1], 64);
-      ui_line_append(&rb, " ID    ITEM NAME              TYPE          ATTRIBUTES");
-      ui_line_pad(&rb);
-      ui_wrap_row_in_place(right_rows[1], sizeof right_rows[1]);
+      const char *const ttl =
+          "***   E Q U I P M E N T   &   I N V E N T O R Y   ***";
+      int pad_left = 35, pad_mid = 25;
+      int used = pad_left + (int)strlen(ttl) + pad_mid + (int)strlen(AETER_MAIN_MENU_VER);
+      int pad_end = (used < 120) ? (120 - used) : 0;
+      for (c = 0; c < pad_left; c++) putchar(' ');
+      printf("%s%s%s", C_TITLE, ttl, C_RESET);
+      for (c = 0; c < pad_mid; c++) putchar(' ');
+      printf("%s%s%s", C_EXIT, AETER_MAIN_MENU_VER, C_RESET);
+      for (c = 0; c < pad_end; c++) putchar(' ');
+      putchar('\n');
     }
-    {
-      UiLineBuf rb;
-      ui_line_init(&rb, right_rows[2], sizeof right_rows[2], 64);
-      ui_line_append(&rb, "----------------------------------------------------------------");
-      ui_line_pad(&rb);
-      ui_wrap_row_in_place(right_rows[2], sizeof right_rows[2]);
-    }
-    for (i = 0; i < EQ_INV_ROWS && i < g_inv_n; i++) {
-      int idef, iatk, iwgt, slot_ix;
-      const char *slot_name = "misc";
-      const char *disp_name = g_inv[i];
-      UiLineBuf rb;
-      char idbracket[16], typechunk[16], atchunk[40];
-      eq_compute_item_stats(g_inv[i], -1, &idef, &iatk, &iwgt, &slot_ix, &disp_name);
-      if (slot_ix >= 0 && slot_ix < EQ_SLOT_COUNT) slot_name = EQ_SLOT_NAME[slot_ix];
-      {
-        const AetItemCatalogEntry *cat = aet_item_catalog_by_slug(g_inv[i]);
-        snprintf(idbracket, sizeof idbracket, "[%d]", cat ? cat->id : (i + 1));
-      }
-      snprintf(typechunk, sizeof typechunk, "(%s)", slot_name);
-      snprintf(atchunk, sizeof atchunk, "Def:%d Atk:%d Wgt:%d", idef, iatk, iwgt);
-      ui_line_init(&rb, right_rows[i + 3], sizeof right_rows[i + 3], 64);
-      ui_line_append(&rb, " ");
-      ui_line_append_width(&rb, idbracket, 5);
-      ui_line_append(&rb, " ");
-      ui_line_append_width(&rb, disp_name, 22);
-      ui_line_append_width(&rb, typechunk, 12);
-      ui_line_append(&rb, atchunk);
-      ui_line_pad(&rb);
-      ui_wrap_row_in_place(right_rows[i + 3], sizeof right_rows[i + 3]);
-      idx_map[listed++] = i;
-      shown++;
-    }
-    for (i = 3 + shown; i < 3 + EQ_INV_ROWS; i++) {
-      UiLineBuf rb;
-      ui_line_init(&rb, right_rows[i], sizeof right_rows[i], 64);
-      ui_line_pad(&rb);
-      ui_wrap_row_in_place(right_rows[i], sizeof right_rows[i]);
-    }
-    snprintf(right_rows[EQ_ROWS - 1], sizeof right_rows[EQ_ROWS - 1],
-             "+----------------------------------------------------------------+");
-
-    printf("%s%s%s\n", C_BORDER, UI_RULE, C_RESET);
-    {
-      UiLineBuf hb;
-      char hline[128];
-      ui_line_init(&hb, hline, sizeof hline, 120);
-      ui_line_append_width(&hb, "", 35);
-      ui_line_append(&hb, "***   E Q U I P M E N T   &   I N V E N T O R Y   ***");
-      ui_line_append_width(&hb, "", 25);
-      ui_line_append(&hb, "[ v1.3.8 ]");
-      ui_line_pad(&hb);
-      printf("%s%s%s\n", C_TITLE, hline, C_RESET);
-    }
-    printf("%s%s%s\n", C_BORDER, UI_RULE, C_RESET);
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
     {
       UiLineBuf sb;
-      char sline[128];
+      char sline[160];
       ui_line_init(&sb, sline, sizeof sline, 120);
       ui_line_append(&sb, " ");
       ui_line_append(&sb, "[ EQUIPMENT SLOTS ]");
@@ -9729,19 +10378,92 @@ static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscr
       ui_line_pad(&sb);
       printf("%s%s%s\n", C_TITLE, sline, C_RESET);
     }
+
     for (i = 0; i < EQ_ROWS; i++) {
-      char lf[EQ_LEFT_W + 1], rf[EQ_RIGHT_W + 1];
-      ui_fit_cell(lf, sizeof lf, left_rows[i], EQ_LEFT_W);
-      ui_fit_cell(rf, sizeof rf, right_rows[i], EQ_RIGHT_W);
-      printf("%s    %s\n", lf, rf);
+      switch (i) {
+      case 0:
+        eq_ui_emit_left_h48();
+        break;
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+        eq_ui_emit_slot_row(i - 1);
+        break;
+      case 9:
+        eq_ui_emit_left_h48();
+        break;
+      case 10:
+        eq_ui_emit_left_spacer50();
+        break;
+      case 11:
+        eq_ui_emit_combat_banner();
+        break;
+      case 12:
+        eq_ui_emit_left_h48();
+        break;
+      case 13:
+        eq_ui_emit_stat_armor_wgt(def, wgt);
+        break;
+      case 14:
+        eq_ui_emit_stat_atk_mob(atk, wgt);
+        break;
+      default:
+        eq_ui_emit_left_h48();
+        break;
+      }
+      printf("    ");
+      switch (i) {
+      case 0:
+        eq_ui_emit_right_h64();
+        break;
+      case 1:
+        eq_ui_emit_inv_header();
+        break;
+      case 2:
+        eq_ui_emit_inv_sep();
+        break;
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+        if (i - 3 < g_inv_n && i - 3 < EQ_INV_ROWS)
+          eq_ui_emit_inv_line(i - 3);
+        else
+          eq_ui_emit_inv_empty();
+        break;
+      default:
+        eq_ui_emit_right_h64();
+        break;
+      }
+      printf("\n");
     }
-    printf("%s%s%s\n", C_BORDER, UI_RULE, C_RESET);
-    printf(" %sCOMMANDS:[EQUIP #], [EQUIP # TO SLOT], [UNEQUIP SLOT], [DONE]%s\n",
-           C_MUTED, C_RESET);
+
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(
+        " %sEQUIP <1-%d>  |  EQUIP <id> TO <slot>  |  UNEQUIP <slot>  |  DONE | "
+        "RESUME%s\n",
+        C_MUTED, EQ_INV_ROWS, C_RESET);
+    printf(
+        " %s# = table row; [id] = catalog id (same commands). Slots: head chest hands "
+        "legs feet weapon offhand accessory.%s\n",
+        C_MUTED, C_RESET);
     if (g_inv_n > EQ_INV_ROWS)
       printf(
-          " %sPack: %d items — table lists pack rows 1-%d; deeper slots need catalog "
-          "ID (column left).%s\n",
+          " %sPack: %d items — only rows 1-%d shown; use catalog [id] or "
+          "inventory for full list.%s\n",
           C_MUTED, g_inv_n, EQ_INV_ROWS, C_RESET);
     if (pending_acc && pending_acc[0]) printf("\n%s", pending_acc);
     printf("\n%s>> %s", C_PROMPT, C_RESET);
@@ -9806,7 +10528,9 @@ static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscr
       ui_block_pause("EQUIPMENT", msg);
       continue;
     }
-    ui_block_pause("EQUIPMENT", "Unknown command.");
+    ui_block_pause(
+        "EQUIPMENT",
+        "Commands: equip <row>, equip <id> to <slot>, unequip <slot>, done, resume.");
   }
   if (did_fullscreen) *did_fullscreen = 1;
   return_to_game_screen();
@@ -9814,31 +10538,154 @@ static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscr
 
 static void run_game_menu(void) {
   char line[INPUT_LINE_MAX];
-  char body[6144];
+  char body[AETER_HELP_BODY_CAP];
   char msg[1024];
 
   for (;;) {
-    int i;
+    int row, j;
+    char hdr_pad[640];
+    char loc_short[48];
+    char left_loc[256], left_turn[160], left_hp[320], left_score[160],
+        left_coin[160], left_id[320];
+    char right_opt[256];
+    char hdr_l[160], hdr_r[160];
+    const char *hp_c;
+    int hp_blocks, k;
+    float hp_ratio;
+
     clear_frame();
-    ui_print_title("AETERNITAS64 MENU");
-    printf("  Location: %s  [%s]\n", resolve_world_title(g_room), world_slug(g_room));
-    printf("  Turn: %d   HP: %d/%d   Score: %d   Coins: %d\n", g_turns,
-           g_health, g_max_health, g_score, g_coins);
+    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
     {
-      char hud[96];
-      pc_format_hud_tag(hud, sizeof hud);
-      printf("  %s\n\n", hud);
+      const char ttl[] = "PAUSE MENU";
+      int pad = (120 - (int)(sizeof ttl - 1)) / 2;
+      if (pad < 0) pad = 0;
+      snprintf(hdr_pad, sizeof hdr_pad, "%s%*s%s%s", C_TITLE, pad, "", ttl,
+               C_RESET);
+      aet_sgr_pad_to(hdr_pad, sizeof hdr_pad, 120);
+      printf("  %s\n", hdr_pad);
     }
-    printf("  1  Resume game\n");
-    printf("  2  Save quicksave\n");
-    printf("  3  Load quicksave\n");
-    printf("  4  Save slot\n");
-    printf("  5  Load slot\n");
-    printf("  6  Save slots\n");
-    printf("  7  Help\n");
-    printf("  8  Title menu\n");
-    printf("  9  Quit game\n\n");
-    printf("Choice (1-9): ");
+    printf("%s%s%s\n\n", C_BORDER, AETER_RULE_120, C_RESET);
+
+    snprintf(loc_short, sizeof loc_short, "%.36s",
+             resolve_world_title(g_room));
+    snprintf(left_loc, sizeof left_loc, "%s  Location : %s%s%s", C_MUTED,
+             C_BOOT_OK, loc_short, C_RESET);
+    snprintf(left_turn, sizeof left_turn, "%s  Turn     : %s%d%s", C_MUTED,
+             C_HEADING, g_turns, C_RESET);
+
+    hp_ratio =
+        g_max_health > 0 ? (float)g_health / (float)g_max_health : 0.f;
+    hp_blocks = (int)(hp_ratio * 10.f + 0.5f);
+    if (hp_blocks > 10) hp_blocks = 10;
+    if (hp_blocks < 0) hp_blocks = 0;
+    if (hp_ratio > 0.6f)
+      hp_c = C_BOOT_OK;
+    else if (hp_ratio > 0.3f)
+      hp_c = C_ITEM;
+    else
+      hp_c = g_use_color ? "\x1b[91;1m" : "";
+
+    {
+      char hb[16];
+      for (k = 0; k < 10; k++) hb[k] = (char)(k < hp_blocks ? '#' : '.');
+      hb[10] = '\0';
+      snprintf(left_hp, sizeof left_hp,
+               "%s  Health   : %s[%s]%s %s%d/%d%s", C_MUTED, hp_c, hb,
+               C_RESET, C_HEADING, g_health, g_max_health, C_RESET);
+    }
+    snprintf(left_score, sizeof left_score, "%s  Score    : %s%d%s", C_MUTED,
+             C_HEADING, g_score, C_RESET);
+    snprintf(left_coin, sizeof left_coin, "%s  Coins    : %s%d%s", C_MUTED,
+             C_ITEM, g_coins, C_RESET);
+    {
+      AetPcSave pcm;
+      pc_capture(&pcm);
+      snprintf(left_id, sizeof left_id, "%s  Identity : %s%s — %s %s%s",
+               C_MUTED, C_HEADING, pc_display_name(),
+               pcm.race[0] ? pcm.race : "Human",
+               pcm.class_[0] ? pcm.class_ : "adventurer", C_RESET);
+    }
+
+    snprintf(hdr_l, sizeof hdr_l, "%s [ CURRENT STATUS ]%s", C_HEADING,
+             C_RESET);
+    snprintf(hdr_r, sizeof hdr_r, "%s [ AVAILABLE ACTIONS ]%s", C_HEADING,
+             C_RESET);
+
+    for (row = 0; row < 12; row++) {
+      const char *lc = "";
+      char div_left[256];
+
+      if (row == 0) {
+        pause_print_row(hdr_l, hdr_r);
+      } else if (row == 1) {
+        pause_print_divider_cell();
+      } else if (row == 2) {
+        lc = left_loc;
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sResume Game%s", C_ITEM, " 1", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      } else if (row == 3) {
+        lc = left_turn;
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sSave Quicksave%s", C_ITEM, " 2", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      } else if (row == 4) {
+        lc = left_hp;
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sLoad Quicksave%s", C_ITEM, " 3", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      } else if (row == 5) {
+        lc = left_score;
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sSave to Slot%s", C_ITEM, " 4", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      } else if (row == 6) {
+        lc = left_coin;
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sLoad from Slot%s", C_ITEM, " 5", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      } else if (row == 7) {
+        snprintf(div_left, sizeof div_left, "%s%*s%s", C_BORDER, PAUSE_CELL_W,
+                 "", C_RESET);
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sSave Manager (A:\\)%s", C_ITEM, " 6", C_HEADING,
+                 C_RESET);
+        pause_print_row(div_left, right_opt);
+      } else if (row == 8) {
+        lc = left_id;
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sSystem Help%s", C_ITEM, " 7", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      } else if (row == 9) {
+        lc = "";
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sSettings%s", C_ITEM, " 8", C_HEADING, C_RESET);
+        pause_print_row(lc, right_opt);
+      } else if (row == 10) {
+        lc = "";
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sReturn to Title%s", C_ITEM, " 9", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      } else {
+        lc = "";
+        snprintf(right_opt, sizeof right_opt,
+                 "%s  [%s] %sQuit to System%s", C_ITEM, "10", C_HEADING,
+                 C_RESET);
+        pause_print_row(lc, right_opt);
+      }
+    }
+
+    printf("\n%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
+    printf(" %sEnter choice (1-10) or command (e.g., SAVE):%s\n", C_MUTED,
+           C_RESET);
+    printf(" %s>>%s ", C_TITLE, C_RESET);
     fflush(stdout);
     if (!fgets(line, sizeof line, stdin)) {
       g_return_to_menu = 1;
@@ -9846,29 +10693,36 @@ static void run_game_menu(void) {
     }
     chomp_line(line);
     strip_trailing_space(line);
-    for (i = 0; line[i]; i++) line[i] = (char)tolower((unsigned char)line[i]);
+    for (j = 0; line[j]; j++)
+      line[j] = (char)tolower((unsigned char)line[j]);
 
-    if (!line[0] || line[0] == '1' || !strcmp(line, "resume") ||
+    if (!strcmp(line, "10") || !strcmp(line, "quit") ||
+        !strcmp(line, "exit") || !strcmp(line, "q")) {
+      printf("Goodbye.\n");
+      exit(0);
+    }
+    if (!line[0] || !strcmp(line, "1") || !strcmp(line, "resume") ||
         !strcmp(line, "back") || !strcmp(line, "return") ||
         !strcmp(line, "game")) {
       return_to_game_screen();
       return;
     }
-    if (line[0] == '2' || !strcmp(line, "save") ||
-        !strcmp(line, "quicksave")) {
+    if (!strcmp(line, "2") || !strcmp(line, "quicksave") ||
+        !strcmp(line, "qsave")) {
       save_game(msg, sizeof msg);
       ui_block_pause("SAVE", msg);
       return_to_game_screen();
       return;
     }
-    if (line[0] == '3' || !strcmp(line, "load") ||
-        !strcmp(line, "quickload")) {
+    if (!strcmp(line, "3") || !strcmp(line, "quickload") ||
+        !strcmp(line, "qload")) {
       load_game(msg, sizeof msg);
       ui_block_pause("LOAD", msg);
       return_to_game_screen();
       return;
     }
-    if (line[0] == '4' || !strcmp(line, "save slot")) {
+    if (!strcmp(line, "4") || !strcmp(line, "save") ||
+        !strcmp(line, "save slot")) {
       int slot;
       printf("\nSave slot (1-%d): ", SAVE_SLOT_COUNT);
       fflush(stdout);
@@ -9878,6 +10732,8 @@ static void run_game_menu(void) {
       }
       chomp_line(line);
       strip_trailing_space(line);
+      for (j = 0; line[j]; j++)
+        line[j] = (char)tolower((unsigned char)line[j]);
       if (!parse_save_slot(line, &slot)) {
         snprintf(msg, sizeof msg, "Use a slot number from 1 to %d.",
                  SAVE_SLOT_COUNT);
@@ -9889,7 +10745,8 @@ static void run_game_menu(void) {
       return_to_game_screen();
       return;
     }
-    if (line[0] == '5' || !strcmp(line, "load slot")) {
+    if (!strcmp(line, "5") || !strcmp(line, "load") ||
+        !strcmp(line, "load slot")) {
       int slot;
       printf("\nLoad slot (1-%d): ", SAVE_SLOT_COUNT);
       fflush(stdout);
@@ -9899,6 +10756,8 @@ static void run_game_menu(void) {
       }
       chomp_line(line);
       strip_trailing_space(line);
+      for (j = 0; line[j]; j++)
+        line[j] = (char)tolower((unsigned char)line[j]);
       if (!parse_save_slot(line, &slot)) {
         snprintf(msg, sizeof msg, "Use a slot number from 1 to %d.",
                  SAVE_SLOT_COUNT);
@@ -9910,35 +10769,39 @@ static void run_game_menu(void) {
       return_to_game_screen();
       return;
     }
-    if (line[0] == '6' || !strcmp(line, "slots") ||
-        !strcmp(line, "saves")) {
-      format_save_slots_body(body, sizeof body);
-      ui_block_pause("SAVE SLOTS", body);
+    if (!strcmp(line, "6") || !strcmp(line, "slots") ||
+        !strcmp(line, "saves") || !strcmp(line, "manager")) {
+      if (run_save_manager_ui(NULL, 1)) {
+        return_to_game_screen();
+        return;
+      }
       continue;
     }
-    if (line[0] == '7' || !strcmp(line, "help") || !strcmp(line, "?")) {
+    if (!strcmp(line, "7") || !strcmp(line, "help") || !strcmp(line, "?")) {
       fill_help_text(body, sizeof body);
       ui_block_pause("HELP", body);
       continue;
     }
-    if (line[0] == '8' || !strcmp(line, "title") ||
+    if (!strcmp(line, "8") || !strcmp(line, "settings")) {
+      run_settings_ui();
+      continue;
+    }
+    if (!strcmp(line, "9") || !strcmp(line, "title") ||
         !strcmp(line, "main") || !strcmp(line, "main menu")) {
       g_return_to_menu = 1;
       return;
     }
-    if (line[0] == '9' || !strcmp(line, "quit") || !strcmp(line, "exit") ||
-        !strcmp(line, "q")) {
-      printf("Goodbye.\n");
-      exit(0);
-    }
-    ui_block_pause("MENU", "Unknown choice. Use 1-9.\n");
+    ui_block_pause(
+        "MENU",
+        "Unknown choice. Use 1-10 or resume | qsave | save | load | manager | "
+        "help | settings | title | quit.\n");
   }
 }
 
 static void process_command(char *line, char *msg, size_t msgcap,
                             int *turn_advance, const char *pending_acc,
                             int *did_fullscreen) {
-  char body[6144];
+  char body[AETER_HELP_BODY_CAP];
   const char *slug;
   static const char *const kQuit[] = {"quit", "q", "exit", NULL};
   static const char *const kMenu[] = {"menu", "mainmenu", "main menu", NULL};
@@ -10145,10 +11008,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
 
   if (line_equals_one_of(line, kInv)) {
     *turn_advance = 0;
-    format_inventory_body(body, sizeof body);
-    append_dlc_mod_to_body(body, sizeof body,
-                           aet_mods_character_inventory_suffix());
-    ui_fullscreen("INVENTORY", body, pending_acc, did_fullscreen);
+    run_equipment_inventory_ui(pending_acc, did_fullscreen);
     return;
   }
 
@@ -10274,16 +11134,8 @@ static void process_command(char *line, char *msg, size_t msgcap,
     return;
   }
 
-  if (!strcmp(line, "loadout")) {
-    *turn_advance = 0;
-    format_loadout_body(body, sizeof body);
-    append_dlc_mod_to_body(body, sizeof body,
-                           aet_mods_character_loadout_suffix());
-    ui_fullscreen("LOADOUT", body, pending_acc, did_fullscreen);
-    return;
-  }
-  if (!strcmp(line, "gear") || !strcmp(line, "equipment") ||
-      !strcmp(line, "outfit")) {
+  if (!strcmp(line, "loadout") || !strcmp(line, "gear") ||
+      !strcmp(line, "equipment") || !strcmp(line, "outfit")) {
     *turn_advance = 0;
     run_equipment_inventory_ui(pending_acc, did_fullscreen);
     return;
@@ -11102,9 +11954,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
   if (!strcmp(line, "saves") || !strcmp(line, "save slots") ||
       !strcmp(line, "slots")) {
     *turn_advance = 0;
-    format_save_slots_body(body, sizeof body);
-    append_dlc_mod_to_body(body, sizeof body, aet_mods_character_saves_suffix());
-    ui_fullscreen("SAVES", body, pending_acc, did_fullscreen);
+    (void)run_save_manager_ui(did_fullscreen, 0);
     return;
   }
   if (!strcmp(line, "save") || !strcmp(line, "quicksave") ||
@@ -11889,7 +12739,7 @@ static void print_main_menu_screen(void) {
 static int run_main_menu(int start_room) {
   char line[INPUT_LINE_MAX];
   char err[512];
-  char h[6144];
+  char h[AETER_HELP_BODY_CAP];
   int i;
 
   for (;;) {
@@ -12035,6 +12885,8 @@ static void usage_stdout(void) {
       "\n"
       "Options:\n"
       "  --save <path>     Quick save / load file (default: beside executable)\n"
+      "                    Dev starter: aeternitas64_dev_save.txt (repo root; then "
+      "load at title)\n"
       "  --mods <dir>      Mod pack root (overrides AETER_MODS and default)\n"
 #if defined(_WIN32) && defined(AETER_WIN_PICKERS)
       "  --pick-save       (Windows) Pick quicksave file in a file dialog\n"
@@ -12110,6 +12962,9 @@ int main(int argc, char **argv) {
   char line[INPUT_LINE_MAX];
   int start;
 
+#if defined(_WIN32)
+  win32_console_utf8_begin();
+#endif
   init_save_path(argv[0]);
   parse_args(argc, argv);
   mods_init_from_env();

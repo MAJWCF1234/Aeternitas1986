@@ -432,6 +432,20 @@ static const char *cc_subject_pronoun(void) {
   return "They";
 }
 
+/** Penis / testicles / fullness prompts only when anatomy includes a penis. */
+static int cc_should_prompt_penis_and_balls(void) {
+  return ieq(g_pc.genitalia, "Penis") || ieq(g_pc.genitalia, "Both");
+}
+
+/**
+ * Breast sizing is omitted for typical cis-male (male + penis-only): later 18+
+ * questions should not appear when that combination cannot apply.
+ */
+static int cc_should_prompt_breasts(void) {
+  if (ieq(g_pc.genitalia, "Penis") && ieq(g_pc.gender, "male")) return 0;
+  return 1;
+}
+
 static void cc_print_created_summary(void) {
   const char *subj = cc_subject_pronoun();
   const char *vposs =
@@ -735,67 +749,77 @@ static void cc_run_interactive(void) {
     copy_s(g_pc.butt, sizeof g_pc.butt, BT[r - 1]);
   }
 
-  cc_cls();
-  puts("=== CHARACTER CREATION — PHYSICAL DETAIL (18+) ===\n\n"
-       "Fine-tunes the full-text portrait (character / sheet).\n"
-       "Choose 1 on any screen to keep the automatic default from your build\n"
-       "and genitalia.\n\n"
-       "Breast size / chest:\n"
-       " 1 Keep automatic\n"
-       " 2 None (flat chest)\n"
-       " 3 Tiny\n"
-       " 4 Small\n"
-       " 5 Average\n"
-       " 6 Large\n"
-       " 7 Huge\n"
-       " 8 Massive\n");
-  {
-    static const char *const BR[] = {
-        "Automatic", "None", "Tiny", "Small", "Average",
-        "Large", "Huge", "Massive"};
-    r = cc_pick_index(8);
-    copy_s(g_pc.breasts, sizeof g_pc.breasts, BR[r - 1]);
+  if (cc_should_prompt_breasts()) {
+    cc_cls();
+    puts("=== CHARACTER CREATION — PHYSICAL DETAIL (18+) ===\n\n"
+         "Fine-tunes the full-text portrait (character / sheet).\n"
+         "Choose 1 on any screen to keep the automatic default from your build\n"
+         "and genitalia.\n\n"
+         "Breast size / chest:\n"
+         " 1 Keep automatic\n"
+         " 2 None (flat chest)\n"
+         " 3 Tiny\n"
+         " 4 Small\n"
+         " 5 Average\n"
+         " 6 Large\n"
+         " 7 Huge\n"
+         " 8 Massive\n");
+    {
+      static const char *const BR[] = {
+          "Automatic", "None", "Tiny", "Small", "Average",
+          "Large", "Huge", "Massive"};
+      r = cc_pick_index(8);
+      copy_s(g_pc.breasts, sizeof g_pc.breasts, BR[r - 1]);
+    }
+  } else {
+    copy_s(g_pc.breasts, sizeof g_pc.breasts, "None");
   }
 
-  cc_cls();
-  puts("=== PHYSICAL DETAIL (18+) ===\n\nPenis size:\n"
-       " 1 Keep automatic\n"
-       " 2 Tiny\n"
-       " 3 Small\n"
-       " 4 Average\n"
-       " 5 Large\n"
-       " 6 Huge\n"
-       " 7 Massive\n");
-  {
-    static const char *const CK[] = {
-        "Automatic", "Tiny", "Small", "Average", "Large", "Huge", "Massive"};
-    r = cc_pick_index(7);
-    copy_s(g_pc.cock, sizeof g_pc.cock, CK[r - 1]);
-  }
+  if (cc_should_prompt_penis_and_balls()) {
+    cc_cls();
+    puts("=== PHYSICAL DETAIL (18+) ===\n\nPenis size:\n"
+         " 1 Keep automatic\n"
+         " 2 Tiny\n"
+         " 3 Small\n"
+         " 4 Average\n"
+         " 5 Large\n"
+         " 6 Huge\n"
+         " 7 Massive\n");
+    {
+      static const char *const CK[] = {
+          "Automatic", "Tiny", "Small", "Average", "Large", "Huge", "Massive"};
+      r = cc_pick_index(7);
+      copy_s(g_pc.cock, sizeof g_pc.cock, CK[r - 1]);
+    }
 
-  cc_cls();
-  puts("=== PHYSICAL DETAIL (18+) ===\n\nTesticles:\n"
-       " 1 Keep automatic\n"
-       " 2 Tiny\n"
-       " 3 Small\n"
-       " 4 Average\n"
-       " 5 Large\n"
-       " 6 Huge\n"
-       " 7 Massive\n");
-  {
-    static const char *const BL[] = {
-        "Automatic", "Tiny", "Small", "Average", "Large", "Huge", "Massive"};
-    r = cc_pick_index(7);
-    copy_s(g_pc.balls, sizeof g_pc.balls, BL[r - 1]);
-  }
+    cc_cls();
+    puts("=== PHYSICAL DETAIL (18+) ===\n\nTesticles:\n"
+         " 1 Keep automatic\n"
+         " 2 Tiny\n"
+         " 3 Small\n"
+         " 4 Average\n"
+         " 5 Large\n"
+         " 6 Huge\n"
+         " 7 Massive\n");
+    {
+      static const char *const BL[] = {
+          "Automatic", "Tiny", "Small", "Average", "Large", "Huge", "Massive"};
+      r = cc_pick_index(7);
+      copy_s(g_pc.balls, sizeof g_pc.balls, BL[r - 1]);
+    }
 
-  cc_cls();
-  puts("=== PHYSICAL DETAIL (18+) ===\n\nBall fullness (portrait):\n"
-       " 1 Normal\n"
-       " 2 Slight\n"
-       " 3 Heavy\n");
-  r = cc_pick_index(3);
-  g_pc.ball_fullness = r - 1;
+    cc_cls();
+    puts("=== PHYSICAL DETAIL (18+) ===\n\nBall fullness (portrait):\n"
+         " 1 Normal\n"
+         " 2 Slight\n"
+         " 3 Heavy\n");
+    r = cc_pick_index(3);
+    g_pc.ball_fullness = r - 1;
+  } else {
+    copy_s(g_pc.cock, sizeof g_pc.cock, "None");
+    copy_s(g_pc.balls, sizeof g_pc.balls, "None");
+    g_pc.ball_fullness = 0;
+  }
 
   cc_apply_stat_defaults();
   pc_fill_narrative_defaults(&g_pc);
