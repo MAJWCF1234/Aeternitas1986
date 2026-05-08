@@ -1,0 +1,2 @@
+[Sample] Epilogue text, quest flags as flavor, or translator notes —
+anything you want after the generated portrait (character / sheet).

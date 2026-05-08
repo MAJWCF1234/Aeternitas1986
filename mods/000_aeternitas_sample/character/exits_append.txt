@@ -1,0 +1,1 @@
+[Sample] %REGION% — signpost lore or route warnings after Exits.

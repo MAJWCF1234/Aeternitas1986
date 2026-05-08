@@ -1,0 +1,1 @@
+[Sample] Support footer after Diagnostics — log paths, known issues.

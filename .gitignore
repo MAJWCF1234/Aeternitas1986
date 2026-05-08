@@ -1,0 +1,20 @@
+# Build outputs
+*.exe
+*.obj
+*.o
+*.pdb
+*.ilk
+
+# Python
+__pycache__/
+*.pyc
+
+# Trace dumps (often hundreds of MB; regenerate from tooling if needed)
+recovery_artifacts/raw_original_path2.txt
+recovery_artifacts/raw_original_turns.txt
+
+# Snapshot trees duplicated under recovery (keep RECOVERY_INDEX / scripts only)
+recovery_artifacts/recovered_*/
+
+# Fat PE-as-C blob from py tools/generate_binary_rehost_c.py (do not commit)
+aeternitas64_binary_rehost_fat.c

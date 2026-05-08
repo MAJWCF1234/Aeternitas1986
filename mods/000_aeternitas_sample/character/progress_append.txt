@@ -1,0 +1,1 @@
+[Sample] %NAME% — %VISITED%/%WORLDROOMS% rooms (%EXPLORE%%), %TRAVELMOOD% routes, scene %SCENETONE%.
