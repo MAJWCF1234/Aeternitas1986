@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
+import json
 import os
 import subprocess
 import sys
@@ -9,6 +11,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+_TOOLS = Path(__file__).resolve().parent
 EXE = ROOT / "aeternitas64.exe"
 
 
@@ -46,6 +49,30 @@ def build() -> None:
         raise SystemExit(p.returncode)
 
 
+def run_script(lines: list[str], *, timeout: int, label: str) -> None:
+    script = "\n".join(lines) + "\n"
+    env = os.environ.copy()
+    env["AETER_AUTOTEST"] = "1"
+    env.setdefault("NO_COLOR", "1")
+    with tempfile.TemporaryDirectory(prefix="aet-autotest-") as td:
+        save_path = Path(td) / "save.txt"
+        p = subprocess.run(
+            [str(EXE), "--save", str(save_path)],
+            input=script,
+            cwd=ROOT,
+            env=env,
+            text=True,
+            capture_output=True,
+            timeout=timeout,
+        )
+    if p.returncode != 0:
+        print(f"RUNTIME FAILED ({label}, {len(lines)} commands)\n")
+        print(p.stdout)
+        print(p.stderr)
+        raise SystemExit(p.returncode)
+    print(f"OK: {label} ({len(lines)} commands, rc=0)")
+
+
 def run_smoke() -> None:
     lines = [
         "new",
@@ -66,31 +93,60 @@ def run_smoke() -> None:
         "quit",
         "y",
     ]
-    script = "\n".join(lines) + "\n"
-    env = os.environ.copy()
-    env["AETER_AUTOTEST"] = "1"
-    env.setdefault("NO_COLOR", "1")
-    with tempfile.TemporaryDirectory(prefix="aet-autotest-") as td:
-        save_path = Path(td) / "save.txt"
-        p = subprocess.run(
-            [str(EXE), "--save", str(save_path)],
-            input=script,
-            cwd=ROOT,
-            env=env,
-            text=True,
-            capture_output=True,
-            timeout=180,
+    run_script(lines, timeout=180, label="smoke")
+
+
+def run_full_playthrough(*, include_all_rooms: bool) -> None:
+    """Global command surface + UI surfaces (forge / equipment / save menus).
+
+    With ``include_all_rooms``, also runs a shallow visit of every room slug from
+    ``recovery_artifacts/world_tables_recovered.json`` (same script as golden harvest).
+    """
+    if str(_TOOLS) not in sys.path:
+        sys.path.insert(0, str(_TOOLS))
+    from harvest_original_playthrough import (
+        build_global_script,
+        build_room_script,
+        build_ui_surfaces_script,
+    )
+
+    run_script(build_global_script(), timeout=360, label="global playthrough")
+    run_script(build_ui_surfaces_script(), timeout=360, label="ui surfaces")
+    if include_all_rooms:
+        data_path = ROOT / "recovery_artifacts" / "world_tables_recovered.json"
+        if not data_path.is_file():
+            print(f"SKIP: all-rooms (missing {data_path})", file=sys.stderr)
+            return
+        data = json.loads(data_path.read_text(encoding="utf-8"))
+        slugs = data.get("slugs") or []
+        run_script(
+            build_room_script(slugs, per_room=False),
+            timeout=900,
+            label=f"all rooms ({len(slugs)} slugs)",
         )
-    if p.returncode != 0:
-        print("RUNTIME SMOKE FAILED\n")
-        print(p.stdout)
-        print(p.stderr)
-        raise SystemExit(p.returncode)
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser(
+        description="Compile aeternitas64.exe and run stdin playthrough tests."
+    )
+    ap.add_argument(
+        "--quick",
+        action="store_true",
+        help="Short smoke only (skip global / UI / rooms)",
+    )
+    ap.add_argument(
+        "--no-rooms",
+        action="store_true",
+        help="Skip the all-room route/look sweep (faster; still runs global + UI surfaces)",
+    )
+    args = ap.parse_args()
+
     build()
-    run_smoke()
+    if args.quick:
+        run_smoke()
+    else:
+        run_full_playthrough(include_all_rooms=not args.no_rooms)
     return 0
 
 
