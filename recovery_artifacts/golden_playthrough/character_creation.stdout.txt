@@ -1,0 +1,2845 @@
+A:\> AETERNITAS.EXE
+Initializing Extended VGA Mode (120x40)... OK
+Checking Base Memory (640K)... OK
+Mounting [FLOPPY_DRIVE:A]...
+  Reading Sector 0x01... DONE
+  Loading Core Engine... OK
+
+SYSTEM READY.
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                            
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                              
+                                                ;                                                            
+                                                                       ,                                     
+                                                                                   E                         
+                               ;                                                                            
+                                                                                                             
+                                                                                                             
+                                            L                                                         L      
+                       #                                                          #                          
+           #                                                                                                 
+                                                                                                             
+                           #                  #               t            E                                 
+                                                                                                             
+                                                                                      ,                      
+                                                                                                              
+                                                ;                                                            
+                                                                       ,                                     
+                                                                                  EE                         
+                               ;                                                                           f
+                                                                                                             
+                                             f                  D                                            
+                  ,                         L                                     #                   L      
+                       #                                 E               E        #           G              
+           #    #                                                   #                                        
+               G                                                                            ,                
+                           #                  #               t            E                                 
+                                                                        #                                    
+                                                                                      ,                      
+                                                                                                              
+                                                ;                                                            
+                          f                                            ,                                     
+                                     E      E                #                    EE                         
+                               ;                                                                           f
+                                                                                                             
+                                             f                  D                                            
+                  ,                E        L          #     #                    #                   L      
+                  ,    #                                 E               E        #         # G              
+           #    #         :                                         #                                        
+               G           ;                                                                ,                
+                           #                  #               t            E                     ,           
+                                                   i                   G#                                    
+                                                                                      ,                      
+                                                                                                              
+                                                ;                                                            
+                          f                                            ,                                     
+                                     E      E                #                    EE                         
+                               ;                                                                           f
+                                                                                                             
+                                             f                  D                                         f  
+               #  ,                E        L          #     #                    #                   LL     
+                  ,    #                                #E          K    E        #         # G         W    
+           #    #        E:                                 E       #                     #      ,           
+               G           ;                                  t                             ,                
+                           #       E          #               t            E                     ,           
+        #                                        D i                   G#                                    
+                                                                                      ,                      
+                                                                                                              
+                                                ;                                                            
+                          f                                            ,   t                                 
+                                     E      E                #                    EE                         
+                         W     ;                                                                           f
+                                                                                                             
+                                   E         f                  D                                         f  
+               #  ,                E        L        t##     #                    #          #        LL     
+                  ,    #                                #E          K:   E        #         # G         W    
+           #    #        E:                                 E       #                     #      ,     #E    
+               G           ;                                  t                             ,                
+                  ,        #       E          #               t      .     E#                    ,           
+        #                                        D i   ,               G#                                    
+                                                                                      ,        ,             
+                                                                                                              
+                                               ,;                                                            
+                          f                                            ,f  t                                 
+                                     E      E                #                    EE                         
+                         W     ;                                                 L                         f
+                                   E                                                                         
+                                   E         f                  D       #                        ,        f  
+               #  ,                E        L        t##     #                    #          #        LL     
+                  ,    #                                #E          K:   E        #         # G         W    
+           #    #        E:                                 E       #                     #      ,     #E.   
+               G           ;                          #       t         #                   ,                
+                 #,        #       E          #;              t      .  #  E#                    ,           
+        #                                        D i   ,               G#               D                    
+                                                                             .        ,        ,             
+                                                                                                              
+                                               ,;                                                            
+                          f                                            ,f  t                                 
+                                     E      E                #                    EE                         
+                         W     ;                                                 L                         f
+                                   E                                       E t                          W    
+                                   E         f                  D       #                        ,        f  
+               #  ,                E        L      t t##     #                    #          #        LL     
+                  ,    #L                               #E        t K:   E        #       ; # G         W    
+           #    ##       E:        E        E               E       #                     #      ,     #E.   
+               G           ;                          #       t         #                   ,       .        
+          K      #,        #       E          #;              t      .  #  E#                    ,           
+        #                                        D i   ,               G#               D                    
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f                                            ,f  t                                 
+                        .            E      E                #                    EE                         
+                         W     ;                            E          t        ;L                         f
+                                   E                 D.                    E t                          W    
+                                   E        ff   E              D       #                        ,        f  
+               #  ,                E        L      t t##f    #                    #          #        LL     
+                  ,    #L                               #E        t K:   E        #       ; # G         W    
+           #    ##       E:        E        E               E       #                     #      ,     #E.   
+               G           ;                  ;       #       t         #                   ,       .        
+        K K      #,        #       E          #;              t      .  #E E#                    ,           
+        #                                        D i   ,               G#               D     L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f                                            ,f  t                                 
+                        .            E     .E                #                    EE                         
+                         W     ;     ;                      E          t        ;L                         f
+                                   E      #          D.      #f            E t                          W    
+                          f        E      W ff   E    W         D       #  E                     ,        f  
+               #  ,     L          E        L      t t##f    #    #               #          #        LL     
+                  ,    #L                               #E        t#K:   E        #       ; # G         W    
+           #    ##       E:        E        E               E       #                     #      ,     #E.   
+               G         W ;                  ;       #       t         #                   ,       .        
+        K K      #,        #       E          #;              t      .  #E E#             :      ,           
+        #                                        D i   ,               G#               D     L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f                         ,f  t                                 
+                        .            E     .E                #                    EE                         
+                         W     ;     ;                      E          t   E    ;L                         f
+                                   E      #          D.      #f            E t                          W    
+                          f        E      W ff   E j  W         D       #  E                     ,        f  
+               #  ,     L          E        L      t t##f    #    #               #          #        LL     
+              D   ,    #L                E              #E        t#K:   E  #     #       ; # G  ,      W    
+           #    ##       E:        E        E               E       #       #             #   W  ,     #E.   
+               G         W ;                 W;     , #       t         #                   ,       .        
+        K K      #,        #       E          #;              t      .  #E E#             :    # ,           
+      ; #                                        D i   ,               G#               D     L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f                         ,f  t                                 
+                        .            E     .E                #              j     EE                         
+                         W     ;     ;                      E #        t   E#   ;L             ;           f
+                        D          E      #          D.      #f            E t                          W    
+                          f        E      W ff   E j  W         D       #  E                     ,        f  
+               #  ,     L          E        L      t t##f    #    #               #          # #      LL  #  
+              D   ,    #L                E              #E        t#K:   E  #     #       ; # G  ,      W    
+           #    ##       E:        E      f E               E       #       #t            #   W  ,     #E.   
+             , G         W ;                WW;     , #       t         #                 # ,       .        
+        K K      #,        #       E          #;              t      .  #E E#             :    # ,           
+      ; #                                        DWi   ,               G#               D.    L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f                         ,f  t                                 
+                        .  t         E     .E                #              j     EE                         
+                         W     ;     ;                      E #        t   E#   ;L             ;           f
+                        D          E      #          D.      #f            E t                          W    
+                          f        E      W ff;  E j  W         D       #  E                     ,        f  
+               #  ,     L          E        L      t t##f    #    #               #E         # #     tLL  #  
+           ;  D   ,    #L        t       E              #E        t#K:   E  #     #       ; # G  ,      W    
+           #    ##       E:        E      f E               E       #       #t            #  DW  ,     #E.   
+             ,,G         W ;       E       ,WW;     , #       t         #                 #i,       .        
+        K K      #,        #       E          #;         :    t      .  #E E#             :    # ,           
+      ; # .                                   t  DWi   ,               G#               D.    L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f                         ,f  t                                 
+                        .  t         E     .E                #              j G   EE                         
+                         W     ;     ;.                     E #        t   E#   ;L             ;           f
+                        D          E      #          D.     E#f            E t                          W    
+                          f        E      W ff;  E j  W      #  D       #  E                     ,        f  
+               #  ,     L  L       E        L      t t##f    #    #               #E         # #     tLL  #  
+           ;  D  #,    #L        t       E             K#E        t#K:   E E#     #       ; # G  ,      W    
+           ##   ##,      E:      t E      f E               E       #       #t            #  DW  ,     #E.   
+             ,,G         W ;       E       ,WW;   # , #     E t         #                 #i,       .        
+        K K      #,        #       E          #;  #      :    t      .  #E E#             :    # ,           
+      ; # .                                   t  DWi   ,               G#               D.    L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f                         ,f  t                                 
+                        .  t         E     .E                #              j G   EE                      f# 
+                         W    ,;     ;.                     E #        t   E#,  ;L             ;           f
+                        D          E      #D.        D.     E#f            E t                          W    
+                        f f        E     #W ff;  E#j  W      #  D       #  E      #              ,        f  
+               #  ,     L LL       E        L      t t##f    #    #     #         #E         # #     tLL  #L 
+           ;  D  #,    #L        t       E             K#E        t#K:   E E#     #       ; # G  ,      W    
+           ##   ##,      E:      t E      f E               E       #       #t            #  DW  ,     #E.   
+             ,,G         W ;       E       ,WW;   # , #     E t         #  E              #i,       .        
+        K K      #,        #       E          #;  #      :    t      .  #E E#             :    # ,           
+      ; # .                                   t  DWi   ,               G#               D.    L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f               W         ,f  t                                 
+                  .     .  t       E E     .E                #              j G   EE                      f# 
+                         W    ,;     ;.           #         E # t      t   E#,  ;L             ;         E f
+                        D          E      #D.        D.     E#f            E t                         iW    
+                        fff        E     #W ff;  E#j  W      #  D       #  E      #              ,        f  
+               #  ,     L LL       E        L      t t##f    #    #     #         #E         # #     tLL  #L 
+           ;  D  #,    #L        t       E             K#E        t#K:   E E#     #       ; #DG  ,      W    
+           ##   ##,     #E:      t E      f E               E       #       #t            ## DW  ,     #E.   
+             ,,G         W ;       E       ,WW;   # , #     E t         #  E     t        #i,       .        
+        K K      #,        #       E          #;  #      :    t      .  #E E#             :    # ,   K       
+      ; # .                 t                 t  DWi   ,               G#               D.    L              
+      ,                                                                 f    .        ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f               W         ,f  t                                 
+                  .     .  t       E E     .E                #              j G   EE                      f# 
+                         W    ,;     ;.           #         E # t      t   E#,  ;L             ;         E f
+                #       D          E      #D.        D.     E#f            E t                 #       iW    
+                  ,     fff        E     #W ff;  E#j  W      #  D#      #  E      #              ,        f  
+               #  ,     L LL       E        L      t t##f   E#    #     #         #E         # #     tLL  #L 
+           ;  D  #,    #L        t       E            :K#E        t#K: t E E#     #       ; #DG  ,      W    
+           ##   ##,     #E:      t E      f#E:              E       #       #t            ## DW  ,     #E.   
+             ,,G         W ;       E       ,WW;   # , #     E t         #  E     t        #i,       .        
+        K K      #,        #       E         D#;  #      :    t      .  #E E#t            :    # ,   K       
+      ; # .                tt      E          t  DWi   ,               G#               D.    L              
+      ,                                                                 f    .     :  ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f               W         ,f  t                                 
+                  .     .  t       E E     .E                #              j G E EE                      f# 
+                 W       W    ,;     ;.   i       #         E # t      t E E#,  ;L             ;         E f
+                #       D          E      #D.     #  D.     E#f            E t                 #       iW    
+              G   ,     fff        E    K#W ff;  E#j  W;     #  D#      #  E      #              ,        f  
+               #  ,     L LL       E        L    E t t##f   E#    #     #         #E         # #     tLL  #L 
+           ;  D  #,    #L        t       E            :K#E        t#K: t E E#     #       ; #DG  ,      W    
+           ##   ##,     #E:      t#E      f#E:              E       #       #t            ## DW  ,     #E.   
+             ,,G#        W ;       E       ,WW;   # , #     E t         #  E     t        #i,       .        
+        K K:     #,        #       E         D#;  #      :    t      .  #E E#t         K  :    # ,   K       
+      ; # .                tt      E          t  DWi   ,               G#               D.    L              
+      ,,                                                                f    .     :  ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f i                f               W         ,f  t                               ; 
+                  .     .  t  G    E E     .E                #              j G E EE E           .        f# 
+                 W       W    ,; L   ;.   i       #         E # t      t E E#,  ;L             ;         E f
+                #       D          E      #D.     #  D.     E#f            E t                 #       iW    
+              G   ,     fff        E    K#W ff;  E#j  W;     #  D#      #  E#     #              ,        f  
+               #  ,     L LL       E        L    E t t##f   E#    #     #         #E         # #     tLL  #L 
+           ;  D  #,    #L        t       E            :K#E        t#K: t E E#     #       ;W#DG  ,      W    
+           ##   ##,     #E:      t#E      f#E:              E       #       #t            ## DW  ,     #E.   
+             ,,G#        W ;       E       ,WW;   # , # i   E t         #  E     t       ##i,    ,  .        
+        K K:     #,        #;      E         D#;  #      :    t      .  #E E#t         K  :    # ,   K       
+      ;## .                tt      E          t  DWi   ,    .          G#               D.    L              
+      ,,        ,                                                       f    .     :  ,        ,             
+                                                                                                              
+                                               ,;            .                                               
+                          f#i                f               W         ,f  t                               ; 
+                  .     .  t  G    E E     .E                #         t    j G E EE E           .        f# 
+                 W       W    ,; L   ;.   i       #         E # t      t E E#,  ;L             ;        .E f
+                #       D          E      #D.     #  D.     E#f            E t                 #       iW    
+              G   ,     fff        E   :K#W ff;  E#j  W;     #  D#     t#  E#t    #              ,        f  
+               #  ,     LLLL       E        L    E t t##f   E#    # .   #         #E         # #     tLL  #L 
+           ;  D  #,    #L        t       E            :K#E        t#K: t E E#     #       ;W#DG  ,      W    
+           ##  W##,     #E:      t#E      f#E:              E       #       #t            ## DW  ,     #E.   
+             ,,G##       W ;       E       ,WW;   # , #Wi   E t         #  E     t E     ##i,    ,  .D       
+        K K:     #,        #;      E         D#;  #      :    t      .  #E E#t         K  :    # ,   K       
+      ;## .                tt      E          t  DWi   ,    .          G#               D.    L              
+      ,,        ,                                                       f    .     :  ,        ,   ,         
+                                                                                                              
+                                               ,;            .                                               
+                          f#i                f               W:        ,f  t                               ; 
+                  .     .  t  G    E E     .E t              #         t    j G E EE E          ..        f# 
+                 W,      W    ,; L   ;.   i       #         E # t      t E E#,  ;L             ;        .E f
+                #       D          E      #D.     #  D.     E#f            E t                 # ,     iW    
+              G   ,     fff       #E   :K#W ff;  E#j  W;     #  D#     t#  E#t    #              ,        f  
+               #  ,     LLLL       E      W L    E t t##f   E#    # .   #         #E         # #     tLL  #L 
+           ;  DG #,    #L        t       E#           :K#E        t#K: t E E#     #       ;W#DG  ,      W    
+           ##  W##,     #E:      t#E      f#E:             iE       #       #t            ## DW  ,     #E.   
+           # ,,G##       W ;       E       ,WW;   # , #Wi   E t         #  E     t E     ##i,    ,  .D       
+        K#K:     #,        #;     #E         D#;  #      :  E t      .  #E E#t         K  :    # ,   K       
+      ;## .                tt      E          t  DWi   ,    .          G#               D.    L              
+      ,,        ,                                                       f    .     :  ,        ,   ,         
+                                                                                                              
+                                               ,;            .                                               
+                          f#i                f               W:        ,f  t                               ; 
+                  .     .  t  G    E E     .E t              #         t    j G E EE E          ..        f# 
+                 W,      W    ,; L   ;.   i       #         E # t      t E E#,  ;L             ;W       .E f
+                #       D          E      #D.     #  D.     E#f            E t    #            # ,     iW    
+              G  #,     fff       #E   :K#Wfff;  E#j  W;     #t D#     t#  E#t    #              ,        f i
+               #  ,     LLLL       E   i  W L    E t t##f   E#    # .   #         #E         # #     tLL  #L 
+           ; #DG #,    #L        t       E#      E    :K#E  E     t#K: t E E#     #       ;W#DG  ,      W    
+           ##  W##,     #E:      t#E      f#E:             iE       #       #t            ## DW  ,     #E.   
+           # ,,G##       W ;       E       ,WW;   # , #Wi   E t         #  E     t E     ##i,    ,  .D#      
+        K#K:     #,        #;     #E         D#;  #   ;  :  E t      .  #E E#t         K  :    # ,   K       
+      ;## .                tt      E          t  DWi   ,    .          G#  E            D.    L              
+      ,,,       ,                                                       f    .     :  ,        ,   ,         
+                                                                                                              
+                                               ,;            .                                               
+                          f#i                f               W:        ,f  t                               ; 
+                  .     .  t  G    E E     .E t              #         t    j G E EEEE          ..        f# 
+                 W,      W,   ,; L   ;.   i       #         E # t      t E E#,  ;L             ;W       .E f
+                #       D        t E      #D.     #  D.     E#f            E t    #            # ,     iW    
+              G  #,     fff       #E   :K#Wfff;  E#j  W;     #t D#     t#  E#t    #              ,       Lf i
+             E #  ,     LLLL       E   i  W L    E t t##f   E#    # .   #         #E         # ##    tLL  #L 
+           ; #DG #,    #L        t       E#      E    :K#E  E     t#K: t E E#     #       ;W#DG  ,      W i  
+           ##  W##,     #E:      t#E      f#E:         D   iE       #  t    #t            ## DW  ,     #E.   
+           # ,,G##       W ;       E       ,WW;   # , #Wi   E t         #  E     t E     ##i,  ##,  .D#      
+        K#K:     #,        #;     #E         D#;  #   ;# :  E t      .  #E E#t         K  :    # ,   K       
+      ;## .                tt      E          t  DWi   ,    .          G#  E t         #D.    L              
+      ,,,       ,                                                       f    .     :  ,        ,   ,         
+                                                                                                              
+                                               ,;            .                                               
+                          f#i                f               W:        ,f  t                               ; 
+                  .     .  t  G    E E     .E t  E           ##        t    j G E EEEE          ..        f# 
+                 W,      W,   ,; L   ;.   i       #         E## t      t E E#,  ;L             ;W       .E f
+                #       D        t E      #D.     #  D.     E#f  f         E t    #            # ,     iW    
+              G  #,     fff       #E   :K#Wfff;  E#j  W;     #t D#     t#  E#t    #              ,       Lf i
+             E #  ,    WLLLL       E   i# W L    E t t##f   E#    # .   #         #E        E# ##    tLL  #L 
+           ; #DG #,    #L        t       E#      E    :K#E  E     t#K: t E E#     #       ;W#DG  ,      W i  
+           ##  W##,     #E:      t#E      f#E:         D   iE       #  t    #t   t E      ## DW  ,     #E.   
+           # ,,G##       W ;       E       ,WW;   # ,t#Wi , E t     :   #  E     t E     ##i,  ##,  .D#      
+        K#K:     #,        #;     #E         D#;  #   ;# :  E t      .  #E E#t         K  :    # ,   K       
+      ;## .                tt      E          t  DWi   ,    .          G#  E t         #D.    L#             
+      ,,,       ,                  :                                    f    .     :  ,        ,   ,         
+                                                                                                              
+                                               ,;            .                                               
+                          f#i                f   j           W:        ,f  t                               ; 
+                  .     .  t  G    E EL    .E t  E           ##        t    j G E EEEE          ..        f# 
+                 W,      W,   ,; L K ;.   i       #         E## t      t E E#,  ;L             ;W       .E f
+                #       D        t E      #D.     #  D.     E#f  f         E t    #            # ,     iW    
+              G  #,     fff       #E   :K#Wfff;  E#j  W;     #t D#     t#  E#t    #           #  ,       Lf i
+             E #  ,    WLLLL       E   i# W L    E t t##f   E#    # .   #  E      #E        E# ##    tLL  #L 
+           ; #DG #,    #L        t       E#      E    :K#E  E     t#K: t E E#     #       ;W#DG  ,     ,W i  
+           ##  W##,     #E:      t#E      f#E:     K   D   iE t     #  t    #t   t E      ## DW  ,     #E.   
+           # ,,G##       W ;       E       ,WW;  E# ,t#Wi , E t     :   #  E     t E     ##i,  ##,  .D#      
+        K#K:     #,        #;     #E         D#;  #   ;# :  E t      .E #E E#t         K  :    # ,  WK,      
+      ;##D.                tt      E          t  DWi   ,    .          G#  E t         #D.    L#             
+      ,,,       ,                  :                                    fE   .     :  ,        ,   ,         
+                                                                                                              
+                                               ,;            .                                               
+                          f#i                f   j           W:        ,f  t                               ; 
+                  .     .  t  G    E EL    .E t  E           ##        t    j G E EEEE          ..        f# 
+                 W,      W,   ,; L#K ;.   i       #         E## t      t E E#,  ;L             ;W       .E f
+                #       D        t E      #D.     #  D.     E#f  f         E t    #E           # ,     iW    
+              G  #,     fff       #E   :K#Wfff;  E#j  W;    E#t D#     t#  E#t    #           #  ,       Lf i
+             E #  ,  # WLLLL       E   i# W L L  E t t##f   E#    # .   #  E      #E        E####    tLL  #L 
+           ; #DG #,    #L        t       E#      E    :K#E  E     t#K: t E E#     #       ;W#DG  ,     ,W i  
+           ##  W##,     #E:      t#E      f#E:     K   D   iE t     #  t    #t   t E      ## DW  ,    j#E.   
+           # ,,G##      ,W ;       E       ,WW;  E# ,t#Wi,, E t     :   #  E     t E     ##i,  ##,  .D#j     
+        K#K:     #,        #;     #E         D#;  #   ;# :  E t      .E #E E#t         K# :    # ,  WK,      
+      ;##D.                tt      E          t  DWi   ,  : .          G#  E t         #D.    L#             
+      ,,,      .,                  :                                    fE   .     :  ,        ,   ,         
+                                                                         ,                                    
+                                               ,;            .                                               
+                          f#i                f   j           W:        ,f  t                               ; 
+                  .     .  t  G    E EL    .E t  EW          ##        t    j G E EEEE          ..        f# 
+                 W,      W,   ,; L#K ;.   i       # j       E## t      t E E#,  ;L             ;W       .E f
+                #       D        t E      #D.    E#  D.     E#f  f         E t    #E           ##,     iWW   
+              G  #,     fff       #E   :K#Wfff;  E#j  W;    E#t D#     t#  E#t    #E          #  ,       Lf i
+             E #  ,  # WLLLL       E   i# W L L  E t t##f   E#    # .   #  E t    #E        E####    tLL  #L 
+           ; #DG #,    #L        t       E#      E    :K#E  E     t#K: t E E#     #       ;W#DG  ,     ,W i  
+           ##  W##,     #E:      t#E      f#E:     K  DD   iE t     #  t    #t   t E      ## DW  ,    j#E.   
+           #i,,G##      ,W ;       E       ,WW;  E# ,t#Wi,, E t     : # #  E     t E     ##i,, ##,  .D#j     
+        K#K:     #,        #;     #E         D#;  #   ;#W:  E t      .E #E E#t         K# :    # ,  WK,      
+      ;##D.                tt      E          t  DWi   ,  : .          G#  E t         #D.    L#     .       
+      ,,,      .,                  :                                    fE   .     :  ,        ,,  ,         
+                                                                         ,                                    
+                                               ,;            .                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                  .     .  t  G    E EL    .E t  EW          ##        t    j G E EEEE          ..        f# 
+                 W,      W,   ,; L#K;;.   i       # j       E## t      t E E#,  ;L             ;W       .E f
+                #       D        t E     L#D.    E# #D.     E#f  f         E t    #E           ##,     iWW   
+              G  #, :   fff       #E   :K#Wfff;  E#j  W;    E#t D#     t#  E#t    #E          #  ,       Lf i
+             E ## ,  # WLLLL       E   i# W L L  E#t t##f   E#    # .   #  E#t    #E        E####,   tLL  #L 
+           ; #DG #,    #L        t       E#      E    :K#E  E     t#K: t E E#     #       ;W#DG  ,     ,W i  
+           ##  W##,     #E:      t#E      f#E:     K  DD   iE t     #  t    #t   t E      ## DW  ,    j#E.   
+           #i,,G##      ,W ;       E       ,WW;  E#f,t#Wi,,,E t     : # #  E     t E     ##i,, ##,  .D#j     
+        K#K:    ##,        #;     #E         D#;  #   ;#W:  E t      .E #E E#t         K# :    # ,  WK,      
+      ;##D.                tt      E          tt DWi   ,  : .          G#E E t         #D.    L#     .       
+      ,,,      .,                  :                                    fE   .     :  ,        ,,  ,         
+                                                                         ,                                    
+                                               ,;            .                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                  .     .  t  G  E E EL    .E t  EW          ##        t#   j G E EEEE          ..        f# 
+                 W,      W,   ,; L#K;;.   i       # j       E## t      t E E#,  ;L             ;W       .E f
+                #     L D        t E     L#D.    E# #D.     E#f #f         E t    #E          j##,     iWW   
+              G  #, : # fff       #E   :K#Wfff;  E#j  W;    E#t D#     t#  E#t    #E          #  ,       Lf i
+             E ## ,  # WLLLL       E   i# W L L  E#t t##f   E#   f# .   #  E#t    #E        E####,   tLL  #L 
+           ; #DG #,  . #L        t       E#      E    :K#E: E     t#K: t E E#     #       ;W#DG  ,     ,W i  
+           ##  W##,     #E:      t#E      f#E:     K  DD  #iE t     #W t    #t   t E      ## DW  ,    j#E.   
+         G #i,,G##      ,W ;       E       ,WW;  E#f,t#Wi,,,E t     : # #  E     t E     ##i,, ##,  .D#j     
+       :K#K:    ##,        #;     #E         D#;  #   ;#W:  E t      .E #E E#t         K#K:    # ,  WK,      
+      ;##D.                tt      E          tt DWi   ,  : .          G#E E t         #D.    L#     .       
+      ,,,      .,                  :                                    fE   .     :  ,        ,,  ,         
+                                                                         ,                                    
+                                               ,;            .                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                  .     .  t  GE E E EL    .E t  EW          ##        t#   j G E EEEE          ..        f# 
+                 W,      W,   ,; L#K;;.   i       # j       E###t      t#E E#,  ;L             ;W       .E f
+                #     L D        t E     L#D.    E# #D.     E#f #f     t   E t   t#E          j##,     iWW   
+              G  #, : # fff       #E   :K#Wfff;  E#j #W;    E#t D#     t#  E#t    #E          #  ,       Lf i
+             E ## ,  # WLLLL     t E   i##W L L  E#t t##f   E#   f# .   #  E#t   t#E        E####,   tLL  #L 
+           ; #DG #,  . #L        t E     E#      E    :K#E: E     t#K: t E E#     #       ;W#DG #,     ,W i  
+           ##  W##,     #E:      t#E      f#E:     K  DD  #iE t     #W t    #t   t E      ## DW  ,    j#E.   
+         G #i,,G##      ,W ;       E       ,WW;  E#f,t#Wi,,,E t     : # #  E     t E     ##i,, ##,  .D#j     
+       :K#K:    ##,      . #;     #E         D#;  #   ;#W:  E t      .E #E E#t         K#K:    ##,  WK,      
+      ;##D.                tt      E          tt DWi   ,  : .          G#E E t         #D.    L#     .       
+      ,,,      .,                  :                                    fE   .     :  ,,       ,,  ,         
+                                                                         ,                                    
+                                               ,;           L.                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                  .     .  t  GE E E EL    .E t  EW          ##        t#  Ej G E EEEEL         ..        f# 
+                 W,      W,   ,; L#K;;.   i       # j       E###t      t#E E#,  ;L  ;          ;W,      .E f
+               j#     L D        t E     L#D.    E# #D.     E#f #f     t   E t   t#E          j##,     iWW   
+              G  #, : # fff       #E   :K#Wfff;  E#j #W;    E#t D#     t#  E#t    #E          #  ,       Lffi
+             E ## ,  # WLLLL     t E   i##W L L  E#t t##f   E#   f#E.   #  E#t   t#E        E####,   tLL ##L 
+           ; #DG #,  . #L        t E     E#      E    :K#E: E     t#K: t E E#     #       ;W#DG #,     ,W i  
+          j##  W##,     #E:      t#E      f#E:     K DDD  #iE t     #W t    #t   t E      ## DW  ,    j#E.   
+         G #i,,G##      ,W ;       E       ,WW;  E#f,t#Wi,,,E t     : # #  E     t#E     ##i,, ##,  .D#j     
+       :K#K:    ##,      . #;     #E         D#;  #   ;#W:  E t      .E #E E#t         K#K:    ##,  WK,      
+      ;##D.                tt     fE          tt DWi   ,  : .          G#E E t    f    #D.    L#     .       
+      ,,,      .,                  :                                    fE   .     :  ,,       ,,  ,         
+                                                                         ,                                    
+                             ;                 ,;           L.                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                  .     .  t  GE E E EL    .E t  EW          ##        t#  Ej G E EEEEL         ..        f# 
+                 W,      W,   ,; L#K;;.   i       # j       E###t      t#E E#,  ;L  ;          ;W,      .E f
+               j#     L D        t E     L#D.    E# #D.     E#f #f     t   E t   t#E          j##,     iWW;  
+              G  #, : # fff       #E   :K#Wfff;  E#jG#W;    E#t D#     t#  E#t    #E          # #,       Lffi
+            :E ## ,  # WLLLL     t E   i##W L L  E#t t##f   E#   f#E.   #E E#t   t#E        E####,   tLL ##L 
+           ; #DG #,  . #L        t E     E#      E t  :K#E: E#    t#K: t#E E#     #       ;W#DG #,     ,W i  
+          j## DW##,     #E:      t#E      f#E:     KDDDD  #iE#t     #W t    #t   t E      ## DW  ,    j#E.   
+         G #i,,G##      ,W ;       E       ,WW;  E#f,t#Wi,,,E t     : # #  E     t#E     ##i,, ##,  .D#j     
+       :K#K:    ##,      . #;     #E         D#;  #   ;#W:  E#t      .E #E E#t         K#K:    ##,  WK,      
+      ;##D.                tt     fE          tt DWi   ,  : .          G#E E t    fE   #D.    L#     .       
+      ,,,      .,                  :                                    fE   .     :  ,,       ,,  ,         
+                                                                         ,                                    
+                             ;                 ,;           L.                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                 ..     .  t  GE E E EL    .E t  EW          ##        t#  Ej G E EEEEL         ..        f# 
+                 W,     #W,   ,; L#K;;.   i       # j       E###t      t#E E#,  ;L  ;          ;W,      .E f
+               j#     L D.       t E     L#D.    E# #D.     E#f #f     t   E#t   t#E          j##,     iWW;  
+              G# #, : # fff       #E   :K#Wfff;  E#jG#W;    E#t D#     t#E E#t    #E         G# #,       Lffi
+            :E ## ,  # WLLLL     t E   i##W L L  E#t t##f   E#   f#E.   #E E#t   t#E        E####,   tLLG##L 
+           ; #DG #,  . #L        t E     E#      E#t  :K#E: E#    t#K: t#E E#     #       ;W#DG #,     ,W i  
+          j## DW##,     #E:      t#E      f#E:    #KDDDD  #iE#t     #W,t    #t   t E      ## DW  ,    j#E.   
+         G #i,,G##      ,W ;       E       ,WW;  E#f,t#Wi,,,E t     : # #  E     t#E     ##i,, ##,  .D#j     
+       :K#K:    ##,      . #;     #E         D#;  #   ;#W:  E#t      .E #E E#t         K#K:    ##,  WK,      
+      ;##D.                tt     fE          tt DWi   ,  : .          G#E E t    fE   #D.    L#     .       
+      ,,,      .,,                 :                                    fE ,;.     :  ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                 ..     .  t  GE E E EL    .E t  EW         E##        t#  Ej G E EEEEL         ..        f#E
+                 W,     #W,   ,;;L#K;;.   i       # j       E###t      t#E E#,  ;L  ;          ;W,      .E f
+               j#     L D.       t E     L#D.    E# #D.     E#f #f     t   E#t   t#E          j##,     iWW;  
+              G# #, : # fff       #E   :K#Wfff;  E#jG#W;    E#t D#     t#E E#t    #E         G# #,       Lffi
+            :E ## ,  # WLLLL     t E   i##W L L  E#t t##f   E#   f#E.   #E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  . #L        t E     E#      E#t  :K#E: E#    t#K: t#E E#t    #       ;W#DG #,     ,W i  
+          j## DW##,     #E:      t#E      f#E:    #KDDDD  #iE#t     #W,t   E#t   t E     j## DW  ,    j#E.   
+         G #i,,G##,     ,W ;       E       ,WW;  E#f,t#Wi,,,E t     :K# #  E     t#E    G##i,, ##,  .D#j     
+       :K#K:    ##,      .D#;     #E         D#;  #   ;#W:  E#t      .E #E E#t   t#    K#K:    ##,  WK,      
+      ;##D.                tt     fE          tt DWi   ,  : .          G#E E t    fE   #D.    L#     .       
+      ,,,      .,,                 :                                    fE ,;.     :  ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                               
+                          f#i                f i j           W:        ,f  t                               ; 
+                 ..     .  t  GE E E EL    .E t  EW         E##        t#  Ej G E EEEEL         ..        f#E
+                 W,     #W,   ,;;L#K;;.   i      E# j       E###t      t#E E#,  ;L  ;          ;W,      .E f
+               j#     L#D.       t E     L#D.    E# #D.     E#fE#f     t   E#t   t#E          j##,     iWW;  
+              G# #, : # fff       #E   :K#Wfff;  E#jG#W;    E#t D#     t#E E#t    #E         G# #,       Lffi
+            :E ## ,  # WLLLL     t E   i##WLLLL  E#t t##f   E#   f#E.  t#E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  . #L        t E     E#      E#t  :K#E: E#    t#K: t#E E#t    #       ;W#DG #,     ,W i  
+          j###DW##,     #E:      t#E      f#E:    #KDDDD ##iE#t     #W,t   E#t   t E     j###DW  ,    j#E.   
+         G #i,,G##,     ,W ;       E       ,WW;  E#f,t#Wi,,,E t     :K# #  E#    t#E    G##i,,G##,  .D#j     
+       :K#K:    ##,      .D#;     #E         D#;  #t  ;#W:  E#t      .E #E E#t   t#    K#K:    ##,  WK,      
+      ;##D.       ,        tt     fE          tt DWi   ,  : .          G#E E t    fE   #D.    L# ,   .       
+      ,,,      .,,                 :                                    fE ,;.     :  ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                               
+                          f#i                f i j.          W:        ,f  t                               ; 
+                 ..     .  t  GEEE E EL    .E t  EW         E##        t#  Ej G E EEEEL         ..        f#E
+                 W,     #W,   ,;;L#K;;.   i      E# j       E###t      t#E E#,  ;L# ;          ;W,      .E f
+               j#     L#D.       t E     L#D.    E# #D.     E#fE#f     t   E#t   t#E          j##,     iWW;  
+              G# #, :K# fff      t#E   :K#Wfff;  E#jG#W;    E#t D#     t#E E#t    #E         G# #,       Lffi
+            :E ###,  ##WLLLL     t#E   i##WLLLL  E#t t##f   E#   f#E.  t#E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  .E#L        t E     E#      E#t  :K#E: E#    t#K: t#E E#t    #       ;W#DG #,     ,W i  
+          j###DW##,    f#E:      t#E      f#E:    #KDDDD ##iE#t     #W,t#  E#t   t E     j###DW  ,    j#E.   
+         G #i,,G##,     ,WW;       E       ,WW;  E#f,t#Wi,,,E t     :K# #  E#    t#E    G##i,,G##,  .D#j     
+       :K#K:    ##,      .D#;     #E         D#;  #t  ;#W:  E#t      .E #E E#t   t#    K#K:    ##,  WK,      
+      ;##D.       ,        tt     fE          tt DWi   ,K : .          G#E E t    fE  ##D.    L# ,   .       
+      ,,,      .,,                 :                                    fE ,;.     :  ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                               
+                          f#i                f i j.          W:        ,f  t                               ; 
+                 ..     . #t  GEEEEE EL    .E t  EW         E##        t#  Ej G E EEEEL         ..        f#E
+                 W,     #W,   ,;;L#K;;.   i  ,   E# j       E###t      t#E E#,  ;L# ;          ;W,      .E f
+               j#     L#D.       t E     L#D.    E# #D.     E#fE#f     t#  E#t   t#E          j##,     iWW;  
+              G# #, :K# fff      t#E   :K#Wfff;  E#jG#W;    E#t D#     t#E E#t    #E         G###,       Lffi
+            :E####,  ##WLLLL     t#E   i##WLLLL  E#t t##f   E#t  f#E.  t#E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  .E#L        t#E    .E#      E#t  :K#E: E#    t#K: t#E E#t    #       ;W#DG #,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:    #KDDDD ##iE#t     #W,t#  E#t   t E     j###DW  ,    j#E.   
+         G #i,,G##,     ,WW;     t E       ,WW;  E#f,t#Wi,,,E t     :K# #  E#    t#E    G##i,,G##,  .D#j     
+       :K#K:    ##,      .D#;    t#E        .D#;  #t  ;#W:  E#t      .E #E E#t   t#    K#K:    ##,  WK,      
+      ;##D.       ,        tt     fE          tt DWi   ,K : .          G#E E t    fE  ##D.    L# , E .       
+      ,,,      .,,                 :                                    fE ,;.     :  ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f i j.          W:        ,f  t                               ;W
+                 ..     . #t  GEEEEE EL    .E t  EW         E##        t#E Ej G E EEEEL         ..        f#E
+                 W,     #W,   ,;;L#K;;.   i  ,   E# j       E###t      t#E E#, ;;L# ;;         ;W,      .E f
+               j#     L#D.       t E     L#D.    E# #D.     E#fE#f     t#  E#t   t#E          j##,     iWW;  
+              G###, :K# fff      t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,      #Lffi
+            :E####,  ##WLLLL     t#E   i##WLLLL  E#t t##f   E#t  f#E.  t#E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  .E#L        t#E    .E#      E#t  :K#E: E#    t#K: t#E E#t    #E      ;W#DG #,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:    #KDDDD ##iE#t     #W,t#  E#t   t E     j###DW  ,    j#E.   
+         G #i,,G##,     ,WW;     t E       ,WW;  E#f,t#Wi,,,E t     :K# #  E#t   t#E    G##i,,G##,  .D#j     
+       :K#K:    ##,      .D#;    t#E        .D#;  #t  ;#W:  E#t      .E##E E#t   t#    K#K:    ##,  WK,      
+      ;##D.       ,        tt     fE          tt DWi   ,K : .          G#E E#t    fE  ##D.    L# , E .       
+      ,,,      .,,                 :                                    fE ,;.     :  ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.          W:        ,ft t                               ;W
+                 ..     .E#t  GEEEEE EL    .E t  EW         E##        t#E Ej G E EEEEL         ..        f#E
+                 W,     #W,   ,;;L#K;;.   i  ,   E##j       E###t      t#E E#, ;;L#K;;         ;W,      .E f
+               j##    L#D.       t E     L#D.    E# #D.     E#fE#f     t#  E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff      t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,    L #Lffi
+            :E####,  ##WLLLL     t#E   i##WLLLL  E#t t##f   E#t  f#E.  t#E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  .E#L        t#E    .E#      E#t  :K#E: E#    t#K: t#E E#t    #E      ;W#DG #,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:   E#KDDDD ##iE#t    ;#W,t#  E#t   t E     j###DW##,    j#E.   
+         G##i,,G##,     ,WW;     t E       ,WW;  E#f,t#Wi,,,E t     :K#D#  E#t   t#E    G##i,,G##,  .D#j     
+       :K#K:    ##,      .D#;    t#E        .D#;  #t  ;#W:  E#t      .E##E E#t   t#    K#K:    ##,  WK,      
+      ;##D.       ,        tt     fE          tt DWi   ,K : .          G#E E#t    fE  ##D.    L# , E .       
+      ,,,      .,,                 :                                    fE ,;.     :  ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEE EL    .E t  EW         E##        t#E Ej G E EEEEL         ..        f#E
+                 W,    i#W,   ,;;L#K;;.   i  ,   E##j       E###t      t#E E#,,;;L#K;;         ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E# #D.     E#fE#f     t#  E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff      t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,    L #Lffi
+            :E####,  ##WLLLLt    t#E   i##WLLLL  E#t t##f   E#t  f#E.  t#E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  .E#L        t#E    .E#      E#t  :K#E: E#    t#K: t#E E#t    #E      ;W#DG##,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:   E#KDDDD ##iE#t    ;#W,t#  E#t   t#E     j###DW##,    j#E.   
+         G##i,,G##,     ,WW;     t#E       ,WW;  E#f,t#Wi,,,E t     :K#D#  E#t   t#E    G##i,,G##,  .D#j     
+       :K#K:    ##,      .D#;    t#E        .D#;  #t  ;#W:  E#t      .E##E E#t   t#    K#K:    ##, ,WK,      
+      ;##D.     # ,        tt     fE          tt DWi   ,K : ..         G#E E#t    fE  ##D.    L# , E .       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEE EL    .E t  EW         E##;       t#E Ej GEE EEEEL         ..        f#E
+                 W,    i#W,   ,;;L#K;;.   i# ,   E##j       E###t      t#E E#,,;;L#K;;         ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E# #D.     E#fE#f     t#  E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff;     t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,    L #Lffi
+            :E####,  ##WLLLLt    t#E   i##WLLLL  E#t t##f   E#t  f#E.  t#E E#t   t#E        E####,   tLLG##L 
+           ; #DG##,  .E#L        t#E    .E#L     E#t  :K#E: E#t   t#K: t#E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:   E#KDDDD###iE#t    ;#W,t#  E#t   t#E     j###DW##,    j#E.   
+         G##i,,G##,     ,WW;     t#E       ,WW;  E#f,t#Wi,,,E#t     :K#D#  E#t   t#E    G##i,,G##,  .D#j     
+       :K#K:    ##,      .D#;    t#E        .D#;  #t  ;#W:  E#t      .E##E E#t   t#   :K#K:   L##, ,WK,      
+      ;##D.     # ,        tt     fE          tt DWi   ,KK: ..         G#E E#t    fE  ##D.    L##, EG.       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEE EL    .E#t  EW         E##;       t#E Ej GEEEEEEEL         ..        f#E
+                ;W,    i#W,   ,;;L#K;;.   i# ,   E##j       E###t      t#E E#,,;;L#K;;.        ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f     t#  E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff;     t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,    L #Lffi
+            :E####,  ##WLLLLt    t#E   i##WLLLLt E#t t##f   E#t  f#E.  t#E E#t   t#E       :E####,   tLLG##L 
+           ;W#DG##,  .E#L        t#E    .E#L     E#t  :K#E: E#t   t#K: t#E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:   E#KDDDD###iE#t    ;#W,t#E E#t   t#E     j###DW##,    j#E.   
+         G##i,,G##,     ,WW;     t#E       ,WW;  E#f,t#Wi,,,E#t     :K#D#E E#t   t#E    G##i,,G##,  .D#j     
+       :K#K:   L##,      .D#;    t#E        .D#; E#t  ;#W:  E#t      .E##E E#t   t#E  :K#K:   L##, ,WK,      
+      ;##D.     ##,        tt     fE          tt DWi   ,KK: ..         G#E E#t    fE  ##D.    L##, EG.       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEEEEL    .E#t  EW,        E##;       t#E Ej GEEEEEEEL         ..        f#E
+                ;W,    i#W,   ,;;L#K;;.   i#W,   E##j       E###t      t#E E#,,;;L#K;;.        ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f     t#E E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff;     t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,    L##Lffi
+            :E####, i##WLLLLt    t#E   i##WLLLLt E#t t##f   E#t  f#E.  t#E E#t   t#E       :E####,   tLLG##L 
+           ;W#DG##,  .E#L        t#E    .E#L     E#t  :K#E: E#t   t#K: t#E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:   E#KDDDD###iE#t    ;#W,t#E E#t   t#E     j###DW##,    j#E.   
+         G##i,,G##,     ,WW;     t#E       ,WW;  E#f,t#Wi,,,E#t     :K#D#E E#t   t#E    G##i,,G##,  .D#j     
+       :K#K:   L##,      .D#;    t#E        .D#; E#t  ;#W:  E#t      .E##E E#t   t#E  :K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DWi   ,KK: ..         G#E E#t    fE ;##D.    L##, EG.       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+
+Press [ENTER] to start...
+                         
+Press [ENTER] to start...
+                         
+Press [ENTER] to start...
+                         
+Press [ENTER] to start...
+===============================================================================
+  18+ ADULT CONTENT
+===============================================================================
+
+Aeternitas is the 18+ edition of this work.
+
+It may include mature themes, strong language, sexual content,
+violence, and other material not suitable for minors.
+
+By continuing you confirm that you are at least 18 years old (or the age
+of majority where you live) and that viewing such content is lawful for
+you. If that is not true, close this program now.
+
+===============================================================================
+[Press Enter]
+        @@@@@@  @@@@@@@@ @@@@@@@ @@@@@@@@ @@@@@@@  @@@  @@@ @@@ @@@@@@@ @@@@@@   @@@@@@ 
+       @@!  @@@ @@!        @!!   @@!      @@!  @@@ @@!@!@@@ @@!   @!!  @@!  @@@ !@@     
+       @!@!@!@! @!!!:!     @!!   @!!!:!   @!@!!@!  @!@@!!@! !!@   @!!  @!@!@!@!  !@@!!  
+       !!:  !!! !!:        !!:   !!:      !!: :!!  !!:  !!! !!:   !!:  !!:  !!!     !:! 
+        :   : : : :: ::     :    : :: ::   :   : : ::    :  :      :    :   : : ::.: :  
+
+==========================================================================================
+   A E T E R N I T A S   S Y S T E M                                            [ v1.3.8 ]
+==========================================================================================
+
+               +----------------------------------------------------------+
+               |                                                          |
+               |[1]Begin a New Journey         ( new  )                   |
+               |                                                          |
+               |[2]Restore a Saved Game        ( load )                   |
+               |                                                          |
+               |[3]System Documentation        ( help )                   |
+               |                                                          |
+               |[4]Manage Game Mods            ( mods )                   |
+               |                                                          |
+               |[5]Exit to Computer            ( quit )                   |
+               |                                                          |
+               +----------------------------------------------------------+
+
+  Select an option from the menu above:
+
+  >> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 79 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+Autotest Hero â€” restored from D:\light\Aeternitas1986\recovery_artifacts\golden_playthrough\character_creation.save.txt.
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 80 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0079 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 81 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0080 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 82 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0081 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 83 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0082 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 84 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0083 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 85 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0084 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 86 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0085 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 87 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0086 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 88 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0087 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 89 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0088 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 90 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0089 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 91 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0090 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 92 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0091 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 93 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0092 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 94 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0093 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 95 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0094 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 96 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0095 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 97 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0096 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 98 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0097 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 99 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0098 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 100 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0099 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 101 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0100 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 102 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0101 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 103 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0102 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 104 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0103 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 105 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0104 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 106 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0105 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 107 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0106 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 108 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0107 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 109 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0108 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 110 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0109 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 111 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0110 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 112 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0111 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 113 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0112 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 114 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0113 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 115 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0114 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 116 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0115 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 117 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0116 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 118 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0117 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 119 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0118 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 120 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0119 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 121 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0120 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 122 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0121 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 123 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0122 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 124 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0123 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 125 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0124 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 126 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0125 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 127 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0126 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 128 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0127 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 129 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0128 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 130 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0129 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 131 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0130 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 132 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0131 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 133 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0132 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 134 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0133 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 135 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0134 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 136 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0135 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 137 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0136 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 138 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0137 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 139 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0138 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 140 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0139 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 141 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0140 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 142 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0141 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 143 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0142 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 144 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0143 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 145 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0144 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 146 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0145 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 147 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0146 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 148 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0147 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 149 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0148 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 150 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0149 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 151 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0150 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 152 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0151 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 153 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0152 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 154 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0153 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 155 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0154 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 156 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0155 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 157 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0156 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 158 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0157 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 159 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0158 [unknown-command] 1
+Try: causality parser
+
+>> Thanks for playing.

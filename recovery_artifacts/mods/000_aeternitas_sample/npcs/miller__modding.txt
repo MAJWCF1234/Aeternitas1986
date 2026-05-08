@@ -1,0 +1,3 @@
+Every serious DLC drops a folder under mods/ with a manifest.txt.
+Higher priority loads later and wins. Ship content, not patches
+to the .exe.

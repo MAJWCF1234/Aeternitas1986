@@ -1,0 +1,171 @@
+===============================================================================
+  18+ ADULT CONTENT
+===============================================================================
+
+Aeternitas is the 18+ edition of this work.
+
+It may include mature themes, strong language, sexual content,
+violence, and other material not suitable for minors.
+
+By continuing you confirm that you are at least 18 years old (or the age
+of majority where you live) and that viewing such content is lawful for
+you. If that is not true, close this program now.
+
+===============================================================================
+[Press Enter]
+        @@@@@@  @@@@@@@@ @@@@@@@ @@@@@@@@ @@@@@@@  @@@  @@@ @@@ @@@@@@@ @@@@@@   @@@@@@
+       @@!  @@@ @@!        @!!   @@!      @@!  @@@ @@!@!@@@ @@!   @!!  @@!  @@@ !@@
+       @!@!@!@! @!!!:!     @!!   @!!!:!   @!@!!@!  @!@@!!@! !!@   @!!  @!@!@!@!  !@@!!
+       !!:  !!! !!:        !!:   !!:      !!: :!!  !!:  !!! !!:   !!:  !!:  !!!     !:!
+        :   : : : :: ::     :    : :: ::   :   : : ::    :  :      :    :   : : ::.: :
+
+==========================================================================================
+   A E T E R N I T A S   S Y S T E M                                            [ v1.3.8 ]
+==========================================================================================
+
+               +----------------------------------------------------------+
+               |                                                          |
+               |[1]Begin a New Journey         ( new  )                   |
+               |                                                          |
+               |[2]Restore a Saved Game        ( load )                   |
+               |                                                          |
+               |[3]System Documentation        ( help )                   |
+               |                                                          |
+               |[4]Manage Game Mods            ( mods )                   |
+               |                                                          |
+               |[5]Exit to Computer            ( quit )                   |
+               |                                                          |
+               +----------------------------------------------------------+
+
+  Select an option from the menu above:
+
+  >> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  W  - west                      |  * lockpick
+  U  - up                        |  * rusty_pick
+  D  - down                      |
+  NE - northeast                 |
+  NW - northwest                 |
+  SE - southeast                 |
+  SW - southwest                 |
+  IN - in                        |
+  OUT- out                       |
+  deeper- deeper                 |
+  upstream- upstream             |
+  downstream- downstream         |
+  fountain- fountain             |
+  stage- stage                   |
+  board- board                   |
+  square- square                 |
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  [adventurer | Human | COR 0]
+===============================================================================
+
+>> ===============================================================================
+  WHERE
+===============================================================================
+
+You are at:
+
+  West of House â€” sample mod active
+
+  [west_of_house]
+
+
+--- DLC / mod ---
+[Sample] Wayfinding DLC after Where / Locate / Find (same hook for all three).
+===============================================================================
+[Press Enter to return]
+===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  W  - west                      |  * lockpick
+  U  - up                        |  * rusty_pick
+  D  - down                      |
+  NE - northeast                 |
+  NW - northwest                 |
+  SE - southeast                 |
+  SW - southwest                 |
+  IN - in                        |
+  OUT- out                       |
+  deeper- deeper                 |
+  upstream- upstream             |
+  downstream- downstream         |
+  fountain- fountain             |
+  stage- stage                   |
+  board- board                   |
+  square- square                 |
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  [adventurer | Human | COR 0]
+===============================================================================
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  W  - west                      |  * lockpick
+  U  - up                        |  * rusty_pick
+  D  - down                      |
+  NE - northeast                 |
+  NW - northwest                 |
+  SE - southeast                 |
+  SW - southwest                 |
+  IN - in                        |
+  OUT- out                       |
+  deeper- deeper                 |
+  upstream- upstream             |
+  downstream- downstream         |
+  fountain- fountain             |
+  stage- stage                   |
+  board- board                   |
+  square- square                 |
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  [adventurer | Human | COR 0]
+===============================================================================
+
+>>

@@ -1,0 +1,39 @@
+{
+  "exe": "D:\\light\\Aeternitas1986\\aeternitas64.exe",
+  "exe_sha256": "e5313f9ea7b60ed79ac570805558fc39953651891b9c804c5258729c9bd40fa6",
+  "out_dir": "D:\\light\\Aeternitas1986\\recovery_artifacts\\golden_playthrough",
+  "mode": "all",
+  "world_room_count": 161,
+  "npc_count": 10,
+  "merchant_count": 7,
+  "jobs": [
+    {
+      "label": "global",
+      "returncode": 0,
+      "commands": 43,
+      "stdout_bytes": 182451,
+      "normalized_sha256": "a899c393514c200a0213f37130e9476d1db98e62964a7933fcb5b68e2e5688e4"
+    },
+    {
+      "label": "rooms",
+      "returncode": 0,
+      "commands": 1132,
+      "stdout_bytes": 2505940,
+      "normalized_sha256": "0315fe4f1beec3debe088167f6886a44c6d3684fd839948e98efffa39472e8ea"
+    },
+    {
+      "label": "npcs_merchants",
+      "returncode": 0,
+      "commands": 305,
+      "stdout_bytes": 556535,
+      "normalized_sha256": "b5e0f506d55fefc160d048f565fbdd2aad7a36dac1a5996451dcb91ff370c04e"
+    },
+    {
+      "label": "items",
+      "returncode": 0,
+      "commands": 663,
+      "stdout_bytes": 1303672,
+      "normalized_sha256": "4b56c226ddeccd0c19d40a5d1df1a5953fd7f67833a115ff6cd33aefd2657e8c"
+    }
+  ]
+}

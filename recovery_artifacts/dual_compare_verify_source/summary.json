@@ -1,0 +1,83 @@
+{
+  "original": "D:\\light\\Aeternitas1986\\aeternitas64.exe",
+  "recovered": "D:\\light\\Aeternitas1986\\recovery_artifacts\\aeternitas64_verify_build.exe",
+  "corpus": "D:\\light\\Aeternitas1986\\recovery_artifacts\\golden_playthrough",
+  "extra_corpus": [
+    "D:\\light\\Aeternitas1986\\recovery_artifacts\\extra_corpus"
+  ],
+  "jobs": [
+    {
+      "label": "global",
+      "original_rc": 0,
+      "recovered_rc": 0,
+      "identical_normalized_stdout": true,
+      "diff_line_count": 0,
+      "paths": {
+        "original_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\global\\original.normalized.txt",
+        "recovered_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\global\\recovered.normalized.txt",
+        "diff": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\global\\stdout.diff"
+      }
+    },
+    {
+      "label": "rooms",
+      "original_rc": 0,
+      "recovered_rc": 0,
+      "identical_normalized_stdout": true,
+      "diff_line_count": 0,
+      "paths": {
+        "original_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\rooms\\original.normalized.txt",
+        "recovered_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\rooms\\recovered.normalized.txt",
+        "diff": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\rooms\\stdout.diff"
+      }
+    },
+    {
+      "label": "npcs_merchants",
+      "original_rc": 0,
+      "recovered_rc": 0,
+      "identical_normalized_stdout": true,
+      "diff_line_count": 0,
+      "paths": {
+        "original_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\npcs_merchants\\original.normalized.txt",
+        "recovered_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\npcs_merchants\\recovered.normalized.txt",
+        "diff": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\npcs_merchants\\stdout.diff"
+      }
+    },
+    {
+      "label": "items",
+      "original_rc": 0,
+      "recovered_rc": 0,
+      "identical_normalized_stdout": true,
+      "diff_line_count": 0,
+      "paths": {
+        "original_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\items\\original.normalized.txt",
+        "recovered_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\items\\recovered.normalized.txt",
+        "diff": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\items\\stdout.diff"
+      }
+    },
+    {
+      "label": "character_creation",
+      "original_rc": 0,
+      "recovered_rc": 0,
+      "identical_normalized_stdout": true,
+      "diff_line_count": 0,
+      "paths": {
+        "original_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\character_creation\\original.normalized.txt",
+        "recovered_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\character_creation\\recovered.normalized.txt",
+        "diff": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\character_creation\\stdout.diff"
+      }
+    },
+    {
+      "label": "surfaces",
+      "original_rc": 0,
+      "recovered_rc": 0,
+      "identical_normalized_stdout": true,
+      "diff_line_count": 0,
+      "paths": {
+        "original_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\surfaces\\original.normalized.txt",
+        "recovered_out": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\surfaces\\recovered.normalized.txt",
+        "diff": "D:\\light\\Aeternitas1986\\recovery_artifacts\\dual_compare_verify_source\\surfaces\\stdout.diff"
+      }
+    }
+  ],
+  "any_differences": false
+}

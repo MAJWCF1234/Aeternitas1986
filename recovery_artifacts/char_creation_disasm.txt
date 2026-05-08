@@ -1,0 +1,3126 @@
+
+aeternitas_char_creation.o:     file format pe-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <cc_skin_pipes_for_race>:
+       0:	55                   	push   %rbp
+       1:	57                   	push   %rdi
+       2:	56                   	push   %rsi
+       3:	53                   	push   %rbx
+       4:	48 83 ec 28          	sub    $0x28,%rsp
+       8:	48 89 cd             	mov    %rcx,%rbp
+       b:	e8 00 00 00 00       	call   10 <cc_skin_pipes_for_race+0x10>
+      10:	48 89 c7             	mov    %rax,%rdi
+      13:	48 85 c0             	test   %rax,%rax
+      16:	0f 84 84 00 00 00    	je     a0 <cc_skin_pipes_for_race+0xa0>
+      1c:	b8 48 00 00 00       	mov    $0x48,%eax
+      21:	48 8d 35 80 1a 00 00 	lea    0x1a80(%rip),%rsi        # 1aa8 <pc_format_summary+0x188>
+      28:	eb 21                	jmp    4b <cc_skin_pipes_for_race+0x4b>
+      2a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+      30:	48 89 d8             	mov    %rbx,%rax
+      33:	48 29 f0             	sub    %rsi,%rax
+      36:	48 39 c7             	cmp    %rax,%rdi
+      39:	73 06                	jae    41 <cc_skin_pipes_for_race+0x41>
+      3b:	80 3c 3e 09          	cmpb   $0x9,(%rsi,%rdi,1)
+      3f:	74 37                	je     78 <cc_skin_pipes_for_race+0x78>
+      41:	0f b6 03             	movzbl (%rbx),%eax
+      44:	48 89 de             	mov    %rbx,%rsi
+      47:	3c 0a                	cmp    $0xa,%al
+      49:	74 65                	je     b0 <cc_skin_pipes_for_race+0xb0>
+      4b:	84 c0                	test   %al,%al
+      4d:	74 51                	je     a0 <cc_skin_pipes_for_race+0xa0>
+      4f:	ba 0a 00 00 00       	mov    $0xa,%edx
+      54:	48 89 f1             	mov    %rsi,%rcx
+      57:	e8 00 00 00 00       	call   5c <cc_skin_pipes_for_race+0x5c>
+      5c:	48 89 c3             	mov    %rax,%rbx
+      5f:	48 85 c0             	test   %rax,%rax
+      62:	75 cc                	jne    30 <cc_skin_pipes_for_race+0x30>
+      64:	48 89 f1             	mov    %rsi,%rcx
+      67:	e8 00 00 00 00       	call   6c <cc_skin_pipes_for_race+0x6c>
+      6c:	48 8d 1c 06          	lea    (%rsi,%rax,1),%rbx
+      70:	eb be                	jmp    30 <cc_skin_pipes_for_race+0x30>
+      72:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+      78:	49 89 f8             	mov    %rdi,%r8
+      7b:	48 89 ea             	mov    %rbp,%rdx
+      7e:	48 89 f1             	mov    %rsi,%rcx
+      81:	e8 00 00 00 00       	call   86 <cc_skin_pipes_for_race+0x86>
+      86:	85 c0                	test   %eax,%eax
+      88:	75 b7                	jne    41 <cc_skin_pipes_for_race+0x41>
+      8a:	48 8d 44 3e 01       	lea    0x1(%rsi,%rdi,1),%rax
+      8f:	48 83 c4 28          	add    $0x28,%rsp
+      93:	5b                   	pop    %rbx
+      94:	5e                   	pop    %rsi
+      95:	5f                   	pop    %rdi
+      96:	5d                   	pop    %rbp
+      97:	c3                   	ret
+      98:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+      9f:	00 
+      a0:	31 c0                	xor    %eax,%eax
+      a2:	48 83 c4 28          	add    $0x28,%rsp
+      a6:	5b                   	pop    %rbx
+      a7:	5e                   	pop    %rsi
+      a8:	5f                   	pop    %rdi
+      a9:	5d                   	pop    %rbp
+      aa:	c3                   	ret
+      ab:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+      b0:	0f b6 43 01          	movzbl 0x1(%rbx),%eax
+      b4:	48 8d 73 01          	lea    0x1(%rbx),%rsi
+      b8:	eb 91                	jmp    4b <cc_skin_pipes_for_race+0x4b>
+      ba:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+
+00000000000000c0 <pc_capture>:
+      c0:	57                   	push   %rdi
+      c1:	56                   	push   %rsi
+      c2:	48 85 c9             	test   %rcx,%rcx
+      c5:	74 3f                	je     106 <pc_capture+0x46>
+      c7:	48 8b 05 00 80 00 00 	mov    0x8000(%rip),%rax        # 80ce <g_pc+0xce>
+      ce:	48 8d 15 00 80 00 00 	lea    0x8000(%rip),%rdx        # 80d5 <g_pc+0xd5>
+      d5:	48 89 01             	mov    %rax,(%rcx)
+      d8:	48 8b 82 a0 02 00 00 	mov    0x2a0(%rdx),%rax
+      df:	48 89 81 a0 02 00 00 	mov    %rax,0x2a0(%rcx)
+      e6:	48 8d 41 08          	lea    0x8(%rcx),%rax
+      ea:	48 83 e0 f8          	and    $0xfffffffffffffff8,%rax
+      ee:	48 29 c1             	sub    %rax,%rcx
+      f1:	48 89 c7             	mov    %rax,%rdi
+      f4:	48 29 ca             	sub    %rcx,%rdx
+      f7:	81 c1 a8 02 00 00    	add    $0x2a8,%ecx
+      fd:	c1 e9 03             	shr    $0x3,%ecx
+     100:	48 89 d6             	mov    %rdx,%rsi
+     103:	f3 48 a5             	rep movsq (%rsi),(%rdi)
+     106:	5e                   	pop    %rsi
+     107:	5f                   	pop    %rdi
+     108:	c3                   	ret
+     109:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+
+0000000000000110 <pc_restore>:
+     110:	57                   	push   %rdi
+     111:	56                   	push   %rsi
+     112:	48 85 c9             	test   %rcx,%rcx
+     115:	74 12                	je     129 <pc_restore+0x19>
+     117:	48 89 ce             	mov    %rcx,%rsi
+     11a:	48 8d 3d 00 80 00 00 	lea    0x8000(%rip),%rdi        # 8121 <g_pc+0x121>
+     121:	b9 55 00 00 00       	mov    $0x55,%ecx
+     126:	f3 48 a5             	rep movsq (%rsi),(%rdi)
+     129:	5e                   	pop    %rsi
+     12a:	5f                   	pop    %rdi
+     12b:	c3                   	ret
+     12c:	0f 1f 40 00          	nopl   0x0(%rax)
+
+0000000000000130 <pc_reset_empty>:
+     130:	57                   	push   %rdi
+     131:	31 c0                	xor    %eax,%eax
+     133:	b9 55 00 00 00       	mov    $0x55,%ecx
+     138:	48 8d 3d 00 80 00 00 	lea    0x8000(%rip),%rdi        # 813f <g_pc+0x13f>
+     13f:	f3 48 ab             	rep stos %rax,(%rdi)
+     142:	5f                   	pop    %rdi
+     143:	c3                   	ret
+     144:	90                   	nop
+     145:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+     14c:	00 00 00 00 
+
+0000000000000150 <pc_fill_narrative_defaults>:
+     150:	56                   	push   %rsi
+     151:	53                   	push   %rbx
+     152:	48 83 ec 38          	sub    $0x38,%rsp
+     156:	48 89 cb             	mov    %rcx,%rbx
+     159:	48 85 c9             	test   %rcx,%rcx
+     15c:	0f 84 37 02 00 00    	je     399 <pc_fill_narrative_defaults+0x249>
+     162:	44 8b 81 a8 01 00 00 	mov    0x1a8(%rcx),%r8d
+     169:	45 85 c0             	test   %r8d,%r8d
+     16c:	0f 85 4e 01 00 00    	jne    2c0 <pc_fill_narrative_defaults+0x170>
+     172:	8b 89 b4 01 00 00    	mov    0x1b4(%rcx),%ecx
+     178:	85 c9                	test   %ecx,%ecx
+     17a:	0f 85 40 01 00 00    	jne    2c0 <pc_fill_narrative_defaults+0x170>
+     180:	b8 05 00 00 00       	mov    $0x5,%eax
+     185:	48 8d b3 c0 00 00 00 	lea    0xc0(%rbx),%rsi
+     18c:	48 c7 83 c8 01 00 00 	movq   $0x5,0x1c8(%rbx)
+     193:	05 00 00 00 
+     197:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # 19e <pc_fill_narrative_defaults+0x4e>
+     19e:	66 0f 6e c0          	movd   %eax,%xmm0
+     1a2:	48 89 f1             	mov    %rsi,%rcx
+     1a5:	66 0f 70 c0 00       	pshufd $0x0,%xmm0,%xmm0
+     1aa:	0f 11 83 a8 01 00 00 	movups %xmm0,0x1a8(%rbx)
+     1b1:	0f 11 83 b8 01 00 00 	movups %xmm0,0x1b8(%rbx)
+     1b8:	e8 00 00 00 00       	call   1bd <pc_fill_narrative_defaults+0x6d>
+     1bd:	85 c0                	test   %eax,%eax
+     1bf:	0f 84 db 03 00 00    	je     5a0 <pc_fill_narrative_defaults+0x450>
+     1c5:	48 8d 15 08 00 00 00 	lea    0x8(%rip),%rdx        # 1d4 <pc_fill_narrative_defaults+0x84>
+     1cc:	48 89 f1             	mov    %rsi,%rcx
+     1cf:	e8 00 00 00 00       	call   1d4 <pc_fill_narrative_defaults+0x84>
+     1d4:	85 c0                	test   %eax,%eax
+     1d6:	0f 84 c4 03 00 00    	je     5a0 <pc_fill_narrative_defaults+0x450>
+     1dc:	48 8d 15 12 00 00 00 	lea    0x12(%rip),%rdx        # 1f5 <pc_fill_narrative_defaults+0xa5>
+     1e3:	48 89 f1             	mov    %rsi,%rcx
+     1e6:	e8 00 00 00 00       	call   1eb <pc_fill_narrative_defaults+0x9b>
+     1eb:	85 c0                	test   %eax,%eax
+     1ed:	0f 84 ad 03 00 00    	je     5a0 <pc_fill_narrative_defaults+0x450>
+     1f3:	48 8d 15 19 00 00 00 	lea    0x19(%rip),%rdx        # 213 <pc_fill_narrative_defaults+0xc3>
+     1fa:	48 89 f1             	mov    %rsi,%rcx
+     1fd:	e8 00 00 00 00       	call   202 <pc_fill_narrative_defaults+0xb2>
+     202:	85 c0                	test   %eax,%eax
+     204:	0f 84 26 05 00 00    	je     730 <pc_fill_narrative_defaults+0x5e0>
+     20a:	48 8d 15 20 00 00 00 	lea    0x20(%rip),%rdx        # 231 <pc_fill_narrative_defaults+0xe1>
+     211:	48 89 f1             	mov    %rsi,%rcx
+     214:	e8 00 00 00 00       	call   219 <pc_fill_narrative_defaults+0xc9>
+     219:	85 c0                	test   %eax,%eax
+     21b:	0f 84 0f 05 00 00    	je     730 <pc_fill_narrative_defaults+0x5e0>
+     221:	48 8d 15 25 00 00 00 	lea    0x25(%rip),%rdx        # 24d <pc_fill_narrative_defaults+0xfd>
+     228:	48 89 f1             	mov    %rsi,%rcx
+     22b:	e8 00 00 00 00       	call   230 <pc_fill_narrative_defaults+0xe0>
+     230:	85 c0                	test   %eax,%eax
+     232:	0f 84 f8 04 00 00    	je     730 <pc_fill_narrative_defaults+0x5e0>
+     238:	48 8d 15 2e 00 00 00 	lea    0x2e(%rip),%rdx        # 26d <pc_fill_narrative_defaults+0x11d>
+     23f:	48 89 f1             	mov    %rsi,%rcx
+     242:	e8 00 00 00 00       	call   247 <pc_fill_narrative_defaults+0xf7>
+     247:	85 c0                	test   %eax,%eax
+     249:	0f 84 e1 04 00 00    	je     730 <pc_fill_narrative_defaults+0x5e0>
+     24f:	48 8d 15 36 00 00 00 	lea    0x36(%rip),%rdx        # 28c <pc_fill_narrative_defaults+0x13c>
+     256:	48 89 f1             	mov    %rsi,%rcx
+     259:	e8 00 00 00 00       	call   25e <pc_fill_narrative_defaults+0x10e>
+     25e:	85 c0                	test   %eax,%eax
+     260:	0f 84 2e 05 00 00    	je     794 <pc_fill_narrative_defaults+0x644>
+     266:	48 8d 15 3c 00 00 00 	lea    0x3c(%rip),%rdx        # 2a9 <pc_fill_narrative_defaults+0x159>
+     26d:	48 89 f1             	mov    %rsi,%rcx
+     270:	e8 00 00 00 00       	call   275 <pc_fill_narrative_defaults+0x125>
+     275:	85 c0                	test   %eax,%eax
+     277:	0f 84 17 05 00 00    	je     794 <pc_fill_narrative_defaults+0x644>
+     27d:	48 8d 15 43 00 00 00 	lea    0x43(%rip),%rdx        # 2c7 <pc_fill_narrative_defaults+0x177>
+     284:	48 89 f1             	mov    %rsi,%rcx
+     287:	e8 00 00 00 00       	call   28c <pc_fill_narrative_defaults+0x13c>
+     28c:	85 c0                	test   %eax,%eax
+     28e:	0f 84 00 05 00 00    	je     794 <pc_fill_narrative_defaults+0x644>
+     294:	48 8d 15 4c 00 00 00 	lea    0x4c(%rip),%rdx        # 2e7 <pc_fill_narrative_defaults+0x197>
+     29b:	48 89 f1             	mov    %rsi,%rcx
+     29e:	e8 00 00 00 00       	call   2a3 <pc_fill_narrative_defaults+0x153>
+     2a3:	85 c0                	test   %eax,%eax
+     2a5:	0f 85 f8 04 00 00    	jne    7a3 <pc_fill_narrative_defaults+0x653>
+     2ab:	c7 83 c4 01 00 00 0f 	movl   $0xf,0x1c4(%rbx)
+     2b2:	00 00 00 
+     2b5:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+     2bc:	00 00 00 00 
+     2c0:	80 bb d0 01 00 00 00 	cmpb   $0x0,0x1d0(%rbx)
+     2c7:	75 37                	jne    300 <pc_fill_narrative_defaults+0x1b0>
+     2c9:	48 8d 8b 10 01 00 00 	lea    0x110(%rbx),%rcx
+     2d0:	48 8d 15 66 00 00 00 	lea    0x66(%rip),%rdx        # 33d <pc_fill_narrative_defaults+0x1ed>
+     2d7:	e8 00 00 00 00       	call   2dc <pc_fill_narrative_defaults+0x18c>
+     2dc:	85 c0                	test   %eax,%eax
+     2de:	0f 84 54 02 00 00    	je     538 <pc_fill_narrative_defaults+0x3e8>
+     2e4:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+     2eb:	67 65 00 
+     2ee:	48 89 83 d0 01 00 00 	mov    %rax,0x1d0(%rbx)
+     2f5:	48 c7 83 d7 01 00 00 	movq   $0x0,0x1d7(%rbx)
+     2fc:	00 00 00 00 
+     300:	80 bb e0 01 00 00 00 	cmpb   $0x0,0x1e0(%rbx)
+     307:	0f 84 93 00 00 00    	je     3a0 <pc_fill_narrative_defaults+0x250>
+     30d:	80 bb f0 01 00 00 00 	cmpb   $0x0,0x1f0(%rbx)
+     314:	0f 84 f6 00 00 00    	je     410 <pc_fill_narrative_defaults+0x2c0>
+     31a:	80 bb 00 02 00 00 00 	cmpb   $0x0,0x200(%rbx)
+     321:	0f 84 12 01 00 00    	je     439 <pc_fill_narrative_defaults+0x2e9>
+     327:	80 bb 10 02 00 00 00 	cmpb   $0x0,0x210(%rbx)
+     32e:	0f 84 2e 01 00 00    	je     462 <pc_fill_narrative_defaults+0x312>
+     334:	80 bb 28 02 00 00 00 	cmpb   $0x0,0x228(%rbx)
+     33b:	0f 84 53 01 00 00    	je     494 <pc_fill_narrative_defaults+0x344>
+     341:	80 bb 38 02 00 00 00 	cmpb   $0x0,0x238(%rbx)
+     348:	0f 84 6f 01 00 00    	je     4bd <pc_fill_narrative_defaults+0x36d>
+     34e:	80 bb 50 02 00 00 00 	cmpb   $0x0,0x250(%rbx)
+     355:	75 19                	jne    370 <pc_fill_narrative_defaults+0x220>
+     357:	80 bb 60 02 00 00 00 	cmpb   $0x0,0x260(%rbx)
+     35e:	75 10                	jne    370 <pc_fill_narrative_defaults+0x220>
+     360:	80 bb 80 02 00 00 00 	cmpb   $0x0,0x280(%rbx)
+     367:	0f 84 53 02 00 00    	je     5c0 <pc_fill_narrative_defaults+0x470>
+     36d:	0f 1f 00             	nopl   (%rax)
+     370:	80 bb 90 02 00 00 00 	cmpb   $0x0,0x290(%rbx)
+     377:	0f 84 93 01 00 00    	je     510 <pc_fill_narrative_defaults+0x3c0>
+     37d:	8b 93 a0 02 00 00    	mov    0x2a0(%rbx),%edx
+     383:	85 d2                	test   %edx,%edx
+     385:	0f 88 55 01 00 00    	js     4e0 <pc_fill_narrative_defaults+0x390>
+     38b:	8b 83 a4 02 00 00    	mov    0x2a4(%rbx),%eax
+     391:	85 c0                	test   %eax,%eax
+     393:	0f 88 5f 01 00 00    	js     4f8 <pc_fill_narrative_defaults+0x3a8>
+     399:	48 83 c4 38          	add    $0x38,%rsp
+     39d:	5b                   	pop    %rbx
+     39e:	5e                   	pop    %rsi
+     39f:	c3                   	ret
+     3a0:	48 8d 8b 10 01 00 00 	lea    0x110(%rbx),%rcx
+     3a7:	48 8d 15 6f 00 00 00 	lea    0x6f(%rip),%rdx        # 41d <pc_fill_narrative_defaults+0x2cd>
+     3ae:	48 89 4c 24 28       	mov    %rcx,0x28(%rsp)
+     3b3:	e8 00 00 00 00       	call   3b8 <pc_fill_narrative_defaults+0x268>
+     3b8:	48 8b 4c 24 28       	mov    0x28(%rsp),%rcx
+     3bd:	85 c0                	test   %eax,%eax
+     3bf:	0f 84 43 03 00 00    	je     708 <pc_fill_narrative_defaults+0x5b8>
+     3c5:	48 8d 15 75 00 00 00 	lea    0x75(%rip),%rdx        # 441 <pc_fill_narrative_defaults+0x2f1>
+     3cc:	e8 00 00 00 00       	call   3d1 <pc_fill_narrative_defaults+0x281>
+     3d1:	85 c0                	test   %eax,%eax
+     3d3:	0f 85 9f 01 00 00    	jne    578 <pc_fill_narrative_defaults+0x428>
+     3d9:	48 b8 56 65 72 79 20 	movabs $0x61654c2079726556,%rax
+     3e0:	4c 65 61 
+     3e3:	48 89 83 e0 01 00 00 	mov    %rax,0x1e0(%rbx)
+     3ea:	48 c7 83 e7 01 00 00 	movq   $0x6e61,0x1e7(%rbx)
+     3f1:	61 6e 00 00 
+     3f5:	80 bb f0 01 00 00 00 	cmpb   $0x0,0x1f0(%rbx)
+     3fc:	0f 85 18 ff ff ff    	jne    31a <pc_fill_narrative_defaults+0x1ca>
+     402:	0f 1f 00             	nopl   (%rax)
+     405:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+     40c:	00 00 00 00 
+     410:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+     417:	67 65 00 
+     41a:	48 89 83 f0 01 00 00 	mov    %rax,0x1f0(%rbx)
+     421:	48 c7 83 f7 01 00 00 	movq   $0x0,0x1f7(%rbx)
+     428:	00 00 00 00 
+     42c:	80 bb 00 02 00 00 00 	cmpb   $0x0,0x200(%rbx)
+     433:	0f 85 ee fe ff ff    	jne    327 <pc_fill_narrative_defaults+0x1d7>
+     439:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+     440:	67 65 00 
+     443:	48 89 83 00 02 00 00 	mov    %rax,0x200(%rbx)
+     44a:	48 c7 83 07 02 00 00 	movq   $0x0,0x207(%rbx)
+     451:	00 00 00 00 
+     455:	80 bb 10 02 00 00 00 	cmpb   $0x0,0x210(%rbx)
+     45c:	0f 85 d2 fe ff ff    	jne    334 <pc_fill_narrative_defaults+0x1e4>
+     462:	48 b8 41 64 75 6c 74 	movabs $0x746c756441,%rax
+     469:	00 00 00 
+     46c:	31 d2                	xor    %edx,%edx
+     46e:	48 89 93 18 02 00 00 	mov    %rdx,0x218(%rbx)
+     475:	48 89 83 10 02 00 00 	mov    %rax,0x210(%rbx)
+     47c:	48 c7 83 1f 02 00 00 	movq   $0x0,0x21f(%rbx)
+     483:	00 00 00 00 
+     487:	80 bb 28 02 00 00 00 	cmpb   $0x0,0x228(%rbx)
+     48e:	0f 85 ad fe ff ff    	jne    341 <pc_fill_narrative_defaults+0x1f1>
+     494:	48 b8 54 65 6e 6f 72 	movabs $0x726f6e6554,%rax
+     49b:	00 00 00 
+     49e:	48 89 83 28 02 00 00 	mov    %rax,0x228(%rbx)
+     4a5:	48 c7 83 2f 02 00 00 	movq   $0x0,0x22f(%rbx)
+     4ac:	00 00 00 00 
+     4b0:	80 bb 38 02 00 00 00 	cmpb   $0x0,0x238(%rbx)
+     4b7:	0f 85 91 fe ff ff    	jne    34e <pc_fill_narrative_defaults+0x1fe>
+     4bd:	48 b8 53 6d 6f 6f 74 	movabs $0x68746f6f6d53,%rax
+     4c4:	68 00 00 
+     4c7:	48 89 83 38 02 00 00 	mov    %rax,0x238(%rbx)
+     4ce:	48 c7 83 3f 02 00 00 	movq   $0x0,0x23f(%rbx)
+     4d5:	00 00 00 00 
+     4d9:	e9 70 fe ff ff       	jmp    34e <pc_fill_narrative_defaults+0x1fe>
+     4de:	66 90                	xchg   %ax,%ax
+     4e0:	c7 83 a0 02 00 00 00 	movl   $0x0,0x2a0(%rbx)
+     4e7:	00 00 00 
+     4ea:	8b 83 a4 02 00 00    	mov    0x2a4(%rbx),%eax
+     4f0:	85 c0                	test   %eax,%eax
+     4f2:	0f 89 a1 fe ff ff    	jns    399 <pc_fill_narrative_defaults+0x249>
+     4f8:	c7 83 a4 02 00 00 00 	movl   $0x0,0x2a4(%rbx)
+     4ff:	00 00 00 
+     502:	48 83 c4 38          	add    $0x38,%rsp
+     506:	5b                   	pop    %rbx
+     507:	5e                   	pop    %rsi
+     508:	c3                   	ret
+     509:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+     510:	48 b8 4e 6f 72 6d 61 	movabs $0x6c616d726f4e,%rax
+     517:	6c 00 00 
+     51a:	48 89 83 90 02 00 00 	mov    %rax,0x290(%rbx)
+     521:	48 c7 83 97 02 00 00 	movq   $0x0,0x297(%rbx)
+     528:	00 00 00 00 
+     52c:	e9 4c fe ff ff       	jmp    37d <pc_fill_narrative_defaults+0x22d>
+     531:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+     538:	83 bb a8 01 00 00 0e 	cmpl   $0xe,0x1a8(%rbx)
+     53f:	0f 8f 9b 01 00 00    	jg     6e0 <pc_fill_narrative_defaults+0x590>
+     545:	48 b8 44 65 66 69 6e 	movabs $0x64656e69666544,%rax
+     54c:	65 64 00 
+     54f:	48 89 83 d0 01 00 00 	mov    %rax,0x1d0(%rbx)
+     556:	48 c7 83 d7 01 00 00 	movq   $0x0,0x1d7(%rbx)
+     55d:	00 00 00 00 
+     561:	80 bb e0 01 00 00 00 	cmpb   $0x0,0x1e0(%rbx)
+     568:	0f 85 9f fd ff ff    	jne    30d <pc_fill_narrative_defaults+0x1bd>
+     56e:	e9 2d fe ff ff       	jmp    3a0 <pc_fill_narrative_defaults+0x250>
+     573:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+     578:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+     57f:	67 65 00 
+     582:	48 89 83 e0 01 00 00 	mov    %rax,0x1e0(%rbx)
+     589:	48 c7 83 e7 01 00 00 	movq   $0x0,0x1e7(%rbx)
+     590:	00 00 00 00 
+     594:	e9 74 fd ff ff       	jmp    30d <pc_fill_narrative_defaults+0x1bd>
+     599:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+     5a0:	c7 83 a8 01 00 00 0f 	movl   $0xf,0x1a8(%rbx)
+     5a7:	00 00 00 
+     5aa:	80 bb d0 01 00 00 00 	cmpb   $0x0,0x1d0(%rbx)
+     5b1:	0f 85 49 fd ff ff    	jne    300 <pc_fill_narrative_defaults+0x1b0>
+     5b7:	e9 0d fd ff ff       	jmp    2c9 <pc_fill_narrative_defaults+0x179>
+     5bc:	0f 1f 40 00          	nopl   0x0(%rax)
+     5c0:	80 bb 70 02 00 00 00 	cmpb   $0x0,0x270(%rbx)
+     5c7:	0f 85 a3 fd ff ff    	jne    370 <pc_fill_narrative_defaults+0x220>
+     5cd:	48 b8 4e 6f 72 6d 61 	movabs $0x6c616d726f4e,%rax
+     5d4:	6c 00 00 
+     5d7:	48 c7 83 50 02 00 00 	movq   $0x656e6f4e,0x250(%rbx)
+     5de:	4e 6f 6e 65 
+     5e2:	48 8d 15 7d 00 00 00 	lea    0x7d(%rip),%rdx        # 666 <pc_fill_narrative_defaults+0x516>
+     5e9:	48 8d 8b b0 00 00 00 	lea    0xb0(%rbx),%rcx
+     5f0:	48 89 83 90 02 00 00 	mov    %rax,0x290(%rbx)
+     5f7:	48 c7 83 60 02 00 00 	movq   $0x656e6f4e,0x260(%rbx)
+     5fe:	4e 6f 6e 65 
+     602:	48 c7 83 70 02 00 00 	movq   $0x656e6f4e,0x270(%rbx)
+     609:	4e 6f 6e 65 
+     60d:	48 c7 83 80 02 00 00 	movq   $0x656e6f4e,0x280(%rbx)
+     614:	4e 6f 6e 65 
+     618:	48 c7 83 97 02 00 00 	movq   $0x0,0x297(%rbx)
+     61f:	00 00 00 00 
+     623:	48 c7 83 57 02 00 00 	movq   $0x0,0x257(%rbx)
+     62a:	00 00 00 00 
+     62e:	48 c7 83 67 02 00 00 	movq   $0x0,0x267(%rbx)
+     635:	00 00 00 00 
+     639:	48 c7 83 77 02 00 00 	movq   $0x0,0x277(%rbx)
+     640:	00 00 00 00 
+     644:	48 c7 83 87 02 00 00 	movq   $0x0,0x287(%rbx)
+     64b:	00 00 00 00 
+     64f:	e8 00 00 00 00       	call   654 <pc_fill_narrative_defaults+0x504>
+     654:	85 c0                	test   %eax,%eax
+     656:	0f 84 e4 00 00 00    	je     740 <pc_fill_narrative_defaults+0x5f0>
+     65c:	48 8d 15 83 00 00 00 	lea    0x83(%rip),%rdx        # 6e6 <pc_fill_narrative_defaults+0x596>
+     663:	48 8d 8b b0 00 00 00 	lea    0xb0(%rbx),%rcx
+     66a:	e8 00 00 00 00       	call   66f <pc_fill_narrative_defaults+0x51f>
+     66f:	85 c0                	test   %eax,%eax
+     671:	0f 84 fc 00 00 00    	je     773 <pc_fill_narrative_defaults+0x623>
+     677:	48 8d 15 8a 00 00 00 	lea    0x8a(%rip),%rdx        # 708 <pc_fill_narrative_defaults+0x5b8>
+     67e:	48 8d 8b b0 00 00 00 	lea    0xb0(%rbx),%rcx
+     685:	e8 00 00 00 00       	call   68a <pc_fill_narrative_defaults+0x53a>
+     68a:	85 c0                	test   %eax,%eax
+     68c:	0f 85 eb fc ff ff    	jne    37d <pc_fill_narrative_defaults+0x22d>
+     692:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+     699:	67 65 00 
+     69c:	48 89 83 60 02 00 00 	mov    %rax,0x260(%rbx)
+     6a3:	48 89 83 70 02 00 00 	mov    %rax,0x270(%rbx)
+     6aa:	48 89 83 80 02 00 00 	mov    %rax,0x280(%rbx)
+     6b1:	48 c7 83 67 02 00 00 	movq   $0x0,0x267(%rbx)
+     6b8:	00 00 00 00 
+     6bc:	48 c7 83 77 02 00 00 	movq   $0x0,0x277(%rbx)
+     6c3:	00 00 00 00 
+     6c7:	48 c7 83 87 02 00 00 	movq   $0x0,0x287(%rbx)
+     6ce:	00 00 00 00 
+     6d2:	e9 a6 fc ff ff       	jmp    37d <pc_fill_narrative_defaults+0x22d>
+     6d7:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+     6de:	00 00 
+     6e0:	48 b8 52 69 70 70 65 	movabs $0x646570706952,%rax
+     6e7:	64 00 00 
+     6ea:	48 89 83 d0 01 00 00 	mov    %rax,0x1d0(%rbx)
+     6f1:	48 c7 83 d7 01 00 00 	movq   $0x0,0x1d7(%rbx)
+     6f8:	00 00 00 00 
+     6fc:	e9 ff fb ff ff       	jmp    300 <pc_fill_narrative_defaults+0x1b0>
+     701:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+     708:	48 b8 43 75 72 76 79 	movabs $0x7976727543,%rax
+     70f:	00 00 00 
+     712:	48 89 83 e0 01 00 00 	mov    %rax,0x1e0(%rbx)
+     719:	48 c7 83 e7 01 00 00 	movq   $0x0,0x1e7(%rbx)
+     720:	00 00 00 00 
+     724:	e9 e4 fb ff ff       	jmp    30d <pc_fill_narrative_defaults+0x1bd>
+     729:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+     730:	c7 83 b4 01 00 00 0f 	movl   $0xf,0x1b4(%rbx)
+     737:	00 00 00 
+     73a:	e9 81 fb ff ff       	jmp    2c0 <pc_fill_narrative_defaults+0x170>
+     73f:	90                   	nop
+     740:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+     747:	67 65 00 
+     74a:	48 89 83 60 02 00 00 	mov    %rax,0x260(%rbx)
+     751:	48 89 83 70 02 00 00 	mov    %rax,0x270(%rbx)
+     758:	48 c7 83 67 02 00 00 	movq   $0x0,0x267(%rbx)
+     75f:	00 00 00 00 
+     763:	48 c7 83 77 02 00 00 	movq   $0x0,0x277(%rbx)
+     76a:	00 00 00 00 
+     76e:	e9 0a fc ff ff       	jmp    37d <pc_fill_narrative_defaults+0x22d>
+     773:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+     77a:	67 65 00 
+     77d:	48 89 83 80 02 00 00 	mov    %rax,0x280(%rbx)
+     784:	48 c7 83 87 02 00 00 	movq   $0x0,0x287(%rbx)
+     78b:	00 00 00 00 
+     78f:	e9 e9 fb ff ff       	jmp    37d <pc_fill_narrative_defaults+0x22d>
+     794:	c7 83 c0 01 00 00 0f 	movl   $0xf,0x1c0(%rbx)
+     79b:	00 00 00 
+     79e:	e9 1d fb ff ff       	jmp    2c0 <pc_fill_narrative_defaults+0x170>
+     7a3:	48 8d 15 51 00 00 00 	lea    0x51(%rip),%rdx        # 7fb <pc_fill_narrative_defaults+0x6ab>
+     7aa:	48 89 f1             	mov    %rsi,%rcx
+     7ad:	e8 00 00 00 00       	call   7b2 <pc_fill_narrative_defaults+0x662>
+     7b2:	85 c0                	test   %eax,%eax
+     7b4:	75 19                	jne    7cf <pc_fill_narrative_defaults+0x67f>
+     7b6:	c7 83 a8 01 00 00 0f 	movl   $0xf,0x1a8(%rbx)
+     7bd:	00 00 00 
+     7c0:	c7 83 bc 01 00 00 0c 	movl   $0xc,0x1bc(%rbx)
+     7c7:	00 00 00 
+     7ca:	e9 f1 fa ff ff       	jmp    2c0 <pc_fill_narrative_defaults+0x170>
+     7cf:	48 8d 15 59 00 00 00 	lea    0x59(%rip),%rdx        # 82f <pc_set_default_adventurer+0x1f>
+     7d6:	48 89 f1             	mov    %rsi,%rcx
+     7d9:	e8 00 00 00 00       	call   7de <pc_fill_narrative_defaults+0x68e>
+     7de:	85 c0                	test   %eax,%eax
+     7e0:	74 17                	je     7f9 <pc_fill_narrative_defaults+0x6a9>
+     7e2:	48 8d 15 60 00 00 00 	lea    0x60(%rip),%rdx        # 849 <pc_set_default_adventurer+0x39>
+     7e9:	48 89 f1             	mov    %rsi,%rcx
+     7ec:	e8 00 00 00 00       	call   7f1 <pc_fill_narrative_defaults+0x6a1>
+     7f1:	85 c0                	test   %eax,%eax
+     7f3:	0f 85 c7 fa ff ff    	jne    2c0 <pc_fill_narrative_defaults+0x170>
+     7f9:	c7 83 b8 01 00 00 0f 	movl   $0xf,0x1b8(%rbx)
+     800:	00 00 00 
+     803:	e9 b8 fa ff ff       	jmp    2c0 <pc_fill_narrative_defaults+0x170>
+     808:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+     80f:	00 
+
+0000000000000810 <pc_set_default_adventurer>:
+     810:	57                   	push   %rdi
+     811:	31 c0                	xor    %eax,%eax
+     813:	b9 55 00 00 00       	mov    $0x55,%ecx
+     818:	48 8d 3d 00 80 00 00 	lea    0x8000(%rip),%rdi        # 881f <g_pc+0x81f>
+     81f:	f3 48 ab             	rep stos %rax,(%rdi)
+     822:	41 bb 65 72 00 00    	mov    $0x7265,%r11d
+     828:	45 31 c9             	xor    %r9d,%r9d
+     82b:	49 ba 41 64 76 65 6e 	movabs $0x7275746e65766441,%r10
+     832:	74 75 72 
+     835:	4c 89 15 00 80 00 00 	mov    %r10,0x8000(%rip)        # 883c <g_pc+0x83c>
+     83c:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # 8843 <g_pc+0x843>
+     843:	49 ba 48 75 6d 61 6e 	movabs $0x6e616d7548,%r10
+     84a:	00 00 00 
+     84d:	49 b8 41 76 65 72 61 	movabs $0x65676172657641,%r8
+     854:	67 65 00 
+     857:	4c 89 1d 08 80 00 00 	mov    %r11,0x8008(%rip)        # 8866 <g_pc+0x866>
+     85e:	45 31 db             	xor    %r11d,%r11d
+     861:	4c 89 15 40 80 00 00 	mov    %r10,0x8040(%rip)        # 88a8 <g_pc+0x8a8>
+     868:	49 ba 61 64 76 65 6e 	movabs $0x7275746e65766461,%r10
+     86f:	74 75 72 
+     872:	4c 89 1d 48 80 00 00 	mov    %r11,0x8048(%rip)        # 88c1 <g_pc+0x8c1>
+     879:	41 bb 65 72 00 00    	mov    $0x7265,%r11d
+     87f:	4c 89 1d c8 80 00 00 	mov    %r11,0x80c8(%rip)        # 894e <g_pc+0x94e>
+     886:	49 bb 28 35 27 20 2d 	movabs $0x2735202d20273528,%r11
+     88d:	20 35 27 
+     890:	4c 89 15 c0 80 00 00 	mov    %r10,0x80c0(%rip)        # 8957 <g_pc+0x957>
+     897:	49 ba 41 76 65 72 61 	movabs $0x2065676172657641,%r10
+     89e:	67 65 20 
+     8a1:	4c 89 0d 18 81 00 00 	mov    %r9,0x8118(%rip)        # 89c0 <g_pc+0x9c0>
+     8a8:	45 31 c9             	xor    %r9d,%r9d
+     8ab:	4c 89 15 d8 80 00 00 	mov    %r10,0x80d8(%rip)        # 898a <g_pc+0x98a>
+     8b2:	49 ba 53 68 6f 72 74 	movabs $0x74726f6853,%r10
+     8b9:	00 00 00 
+     8bc:	4c 89 1d e0 80 00 00 	mov    %r11,0x80e0(%rip)        # 89a3 <g_pc+0x9a3>
+     8c3:	45 31 db             	xor    %r11d,%r11d
+     8c6:	4c 89 05 10 81 00 00 	mov    %r8,0x8110(%rip)        # 89dd <g_pc+0x9dd>
+     8cd:	49 b8 42 72 6f 77 6e 	movabs $0x6e776f7242,%r8
+     8d4:	00 00 00 
+     8d7:	4c 89 0d 30 81 00 00 	mov    %r9,0x8130(%rip)        # 8a0e <g_pc+0xa0e>
+     8de:	c7 05 a4 80 00 00 74 	movl   $0x79656874,0x80a4(%rip)        # 898c <g_pc+0x98c>
+     8e5:	68 65 79 
+     8e8:	48 c7 05 ac 80 00 00 	movq   $0x656e6f6e,0x80ac(%rip)        # 899f <g_pc+0x99f>
+     8ef:	6e 6f 6e 65 
+     8f3:	4c 89 05 28 81 00 00 	mov    %r8,0x8128(%rip)        # 8a22 <g_pc+0xa22>
+     8fa:	4c 89 15 40 81 00 00 	mov    %r10,0x8140(%rip)        # 8a41 <g_pc+0xa41>
+     901:	4c 89 1d 48 81 00 00 	mov    %r11,0x8148(%rip)        # 8a50 <g_pc+0xa50>
+     908:	48 c7 05 2b 80 00 00 	movq   $0x0,0x802b(%rip)        # 893e <g_pc+0x93e>
+     90f:	00 00 00 00 
+     913:	48 c7 05 33 80 00 00 	movq   $0x0,0x8033(%rip)        # 8951 <g_pc+0x951>
+     91a:	00 00 00 00 
+     91e:	48 c7 05 5b 80 00 00 	movq   $0x0,0x805b(%rip)        # 8984 <g_pc+0x984>
+     925:	00 00 00 00 
+     929:	48 c7 05 64 80 00 00 	movq   $0x72696146,0x8064(%rip)        # 8998 <g_pc+0x998>
+     930:	46 61 69 72 
+     934:	48 c7 05 6c 80 00 00 	movq   $0x0,0x806c(%rip)        # 89ab <g_pc+0x9ab>
+     93b:	00 00 00 00 
+     93f:	48 c7 05 93 80 00 00 	movq   $0x0,0x8093(%rip)        # 89dd <g_pc+0x9dd>
+     946:	00 00 00 00 
+     94a:	48 c7 05 9b 80 00 00 	movq   $0x0,0x809b(%rip)        # 89f0 <g_pc+0x9f0>
+     951:	00 00 00 00 
+     955:	c7 05 a7 80 00 00 79 	movl   $0x79,0x80a7(%rip)        # 8a06 <g_pc+0xa06>
+     95c:	00 00 00 
+     95f:	48 c7 05 b3 80 00 00 	movq   $0x0,0x80b3(%rip)        # 8a1d <g_pc+0xa1d>
+     966:	00 00 00 00 
+     96a:	48 c7 05 cb 80 00 00 	movq   $0x0,0x80cb(%rip)        # 8a40 <g_pc+0xa40>
+     971:	00 00 00 00 
+     975:	48 c7 05 e4 80 00 00 	movq   $0x292238,0x80e4(%rip)        # 8a64 <g_pc+0xa64>
+     97c:	38 22 29 00 
+     980:	48 c7 05 ec 80 00 00 	movq   $0x0,0x80ec(%rip)        # 8a77 <g_pc+0xa77>
+     987:	00 00 00 00 
+     98b:	48 c7 05 03 81 00 00 	movq   $0x0,0x8103(%rip)        # 8a99 <g_pc+0xa99>
+     992:	00 00 00 00 
+     996:	48 c7 05 1b 81 00 00 	movq   $0x0,0x811b(%rip)        # 8abc <g_pc+0xabc>
+     99d:	00 00 00 00 
+     9a1:	48 c7 05 33 81 00 00 	movq   $0x0,0x8133(%rip)        # 8adf <g_pc+0xadf>
+     9a8:	00 00 00 00 
+     9ac:	48 c7 05 4b 81 00 00 	movq   $0x0,0x814b(%rip)        # 8b02 <g_pc+0xb02>
+     9b3:	00 00 00 00 
+     9b7:	4c 89 0d 68 81 00 00 	mov    %r9,0x8168(%rip)        # 8b26 <g_pc+0xb26>
+     9be:	48 c7 05 7c 81 00 00 	movq   $0x0,0x817c(%rip)        # 8b45 <g_pc+0xb45>
+     9c5:	00 00 00 00 
+     9c9:	48 c7 05 94 81 00 00 	movq   $0x0,0x8194(%rip)        # 8b68 <g_pc+0xb68>
+     9d0:	00 00 00 00 
+     9d4:	48 c7 05 53 81 00 00 	movq   $0x0,0x8153(%rip)        # 8b32 <g_pc+0xb32>
+     9db:	00 00 00 00 
+     9df:	4c 89 05 60 81 00 00 	mov    %r8,0x8160(%rip)        # 8b46 <g_pc+0xb46>
+     9e6:	48 c7 05 6b 81 00 00 	movq   $0x0,0x816b(%rip)        # 8b5c <g_pc+0xb5c>
+     9ed:	00 00 00 00 
+     9f1:	48 c7 05 74 81 00 00 	movq   $0x656e6f4e,0x8174(%rip)        # 8b70 <g_pc+0xb70>
+     9f8:	4e 6f 6e 65 
+     9fc:	48 c7 05 83 81 00 00 	movq   $0x0,0x8183(%rip)        # 8b8a <g_pc+0xb8a>
+     a03:	00 00 00 00 
+     a07:	48 c7 05 8c 81 00 00 	movq   $0x656e6f4e,0x818c(%rip)        # 8b9e <g_pc+0xb9e>
+     a0e:	4e 6f 6e 65 
+     a12:	48 c7 05 9b 81 00 00 	movq   $0x0,0x819b(%rip)        # 8bb8 <g_pc+0xbb8>
+     a19:	00 00 00 00 
+     a1d:	5f                   	pop    %rdi
+     a1e:	e9 2d f7 ff ff       	jmp    150 <pc_fill_narrative_defaults>
+     a23:	66 90                	xchg   %ax,%ax
+     a25:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+     a2c:	00 00 00 00 
+
+0000000000000a30 <pc_write_save>:
+     a30:	56                   	push   %rsi
+     a31:	53                   	push   %rbx
+     a32:	48 83 ec 28          	sub    $0x28,%rsp
+     a36:	48 89 cb             	mov    %rcx,%rbx
+     a39:	48 85 c9             	test   %rcx,%rcx
+     a3c:	0f 84 be 06 00 00    	je     1100 <pc_write_save+0x6d0>
+     a42:	49 89 c9             	mov    %rcx,%r9
+     a45:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+     a4b:	ba 01 00 00 00       	mov    $0x1,%edx
+     a50:	48 8d 0d 8f 00 00 00 	lea    0x8f(%rip),%rcx        # ae6 <pc_write_save+0xb6>
+     a57:	48 8d 35 00 80 00 00 	lea    0x8000(%rip),%rsi        # 8a5e <g_pc+0xa5e>
+     a5e:	e8 00 00 00 00       	call   a63 <pc_write_save+0x33>
+     a63:	49 89 d9             	mov    %rbx,%r9
+     a66:	41 b8 05 00 00 00    	mov    $0x5,%r8d
+     a6c:	ba 01 00 00 00       	mov    $0x1,%edx
+     a71:	48 8d 0d 9a 00 00 00 	lea    0x9a(%rip),%rcx        # b12 <pc_write_save+0xe2>
+     a78:	e8 00 00 00 00       	call   a7d <pc_write_save+0x4d>
+     a7d:	48 89 da             	mov    %rbx,%rdx
+     a80:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # 8a87 <g_pc+0xa87>
+     a87:	e8 00 00 00 00       	call   a8c <pc_write_save+0x5c>
+     a8c:	48 89 da             	mov    %rbx,%rdx
+     a8f:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     a94:	e8 00 00 00 00       	call   a99 <pc_write_save+0x69>
+     a99:	49 89 d9             	mov    %rbx,%r9
+     a9c:	41 b8 05 00 00 00    	mov    $0x5,%r8d
+     aa2:	ba 01 00 00 00       	mov    $0x1,%edx
+     aa7:	48 8d 0d a0 00 00 00 	lea    0xa0(%rip),%rcx        # b4e <pc_write_save+0x11e>
+     aae:	e8 00 00 00 00       	call   ab3 <pc_write_save+0x83>
+     ab3:	48 8d 4e 40          	lea    0x40(%rsi),%rcx
+     ab7:	48 89 da             	mov    %rbx,%rdx
+     aba:	e8 00 00 00 00       	call   abf <pc_write_save+0x8f>
+     abf:	48 89 da             	mov    %rbx,%rdx
+     ac2:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     ac7:	e8 00 00 00 00       	call   acc <pc_write_save+0x9c>
+     acc:	49 89 d9             	mov    %rbx,%r9
+     acf:	41 b8 05 00 00 00    	mov    $0x5,%r8d
+     ad5:	ba 01 00 00 00       	mov    $0x1,%edx
+     ada:	48 8d 0d a6 00 00 00 	lea    0xa6(%rip),%rcx        # b87 <pc_write_save+0x157>
+     ae1:	e8 00 00 00 00       	call   ae6 <pc_write_save+0xb6>
+     ae6:	48 8d 4e 68          	lea    0x68(%rsi),%rcx
+     aea:	48 89 da             	mov    %rbx,%rdx
+     aed:	e8 00 00 00 00       	call   af2 <pc_write_save+0xc2>
+     af2:	48 89 da             	mov    %rbx,%rdx
+     af5:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     afa:	e8 00 00 00 00       	call   aff <pc_write_save+0xcf>
+     aff:	49 89 d9             	mov    %rbx,%r9
+     b02:	41 b8 07 00 00 00    	mov    $0x7,%r8d
+     b08:	ba 01 00 00 00       	mov    $0x1,%edx
+     b0d:	48 8d 0d ac 00 00 00 	lea    0xac(%rip),%rcx        # bc0 <pc_write_save+0x190>
+     b14:	e8 00 00 00 00       	call   b19 <pc_write_save+0xe9>
+     b19:	48 8d 8e a8 00 00 00 	lea    0xa8(%rsi),%rcx
+     b20:	48 89 da             	mov    %rbx,%rdx
+     b23:	e8 00 00 00 00       	call   b28 <pc_write_save+0xf8>
+     b28:	48 89 da             	mov    %rbx,%rdx
+     b2b:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     b30:	e8 00 00 00 00       	call   b35 <pc_write_save+0x105>
+     b35:	49 89 d9             	mov    %rbx,%r9
+     b38:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+     b3e:	ba 01 00 00 00       	mov    $0x1,%edx
+     b43:	48 8d 0d b4 00 00 00 	lea    0xb4(%rip),%rcx        # bfe <pc_write_save+0x1ce>
+     b4a:	e8 00 00 00 00       	call   b4f <pc_write_save+0x11f>
+     b4f:	48 8d 8e b0 00 00 00 	lea    0xb0(%rsi),%rcx
+     b56:	48 89 da             	mov    %rbx,%rdx
+     b59:	e8 00 00 00 00       	call   b5e <pc_write_save+0x12e>
+     b5e:	48 89 da             	mov    %rbx,%rdx
+     b61:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     b66:	e8 00 00 00 00       	call   b6b <pc_write_save+0x13b>
+     b6b:	49 89 d9             	mov    %rbx,%r9
+     b6e:	41 b8 06 00 00 00    	mov    $0x6,%r8d
+     b74:	ba 01 00 00 00       	mov    $0x1,%edx
+     b79:	48 8d 0d bf 00 00 00 	lea    0xbf(%rip),%rcx        # c3f <pc_write_save+0x20f>
+     b80:	e8 00 00 00 00       	call   b85 <pc_write_save+0x155>
+     b85:	48 8d 8e c0 00 00 00 	lea    0xc0(%rsi),%rcx
+     b8c:	48 89 da             	mov    %rbx,%rdx
+     b8f:	e8 00 00 00 00       	call   b94 <pc_write_save+0x164>
+     b94:	48 89 da             	mov    %rbx,%rdx
+     b97:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     b9c:	e8 00 00 00 00       	call   ba1 <pc_write_save+0x171>
+     ba1:	49 89 d9             	mov    %rbx,%r9
+     ba4:	41 b8 07 00 00 00    	mov    $0x7,%r8d
+     baa:	ba 01 00 00 00       	mov    $0x1,%edx
+     baf:	48 8d 0d c6 00 00 00 	lea    0xc6(%rip),%rcx        # c7c <pc_write_save+0x24c>
+     bb6:	e8 00 00 00 00       	call   bbb <pc_write_save+0x18b>
+     bbb:	48 8d 8e d8 00 00 00 	lea    0xd8(%rsi),%rcx
+     bc2:	48 89 da             	mov    %rbx,%rdx
+     bc5:	e8 00 00 00 00       	call   bca <pc_write_save+0x19a>
+     bca:	48 89 da             	mov    %rbx,%rdx
+     bcd:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     bd2:	e8 00 00 00 00       	call   bd7 <pc_write_save+0x1a7>
+     bd7:	49 89 d9             	mov    %rbx,%r9
+     bda:	41 b8 06 00 00 00    	mov    $0x6,%r8d
+     be0:	ba 01 00 00 00       	mov    $0x1,%edx
+     be5:	48 8d 0d ce 00 00 00 	lea    0xce(%rip),%rcx        # cba <pc_write_save+0x28a>
+     bec:	e8 00 00 00 00       	call   bf1 <pc_write_save+0x1c1>
+     bf1:	48 8d 8e 10 01 00 00 	lea    0x110(%rsi),%rcx
+     bf8:	48 89 da             	mov    %rbx,%rdx
+     bfb:	e8 00 00 00 00       	call   c00 <pc_write_save+0x1d0>
+     c00:	48 89 da             	mov    %rbx,%rdx
+     c03:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     c08:	e8 00 00 00 00       	call   c0d <pc_write_save+0x1dd>
+     c0d:	49 89 d9             	mov    %rbx,%r9
+     c10:	41 b8 0b 00 00 00    	mov    $0xb,%r8d
+     c16:	ba 01 00 00 00       	mov    $0x1,%edx
+     c1b:	48 8d 0d d5 00 00 00 	lea    0xd5(%rip),%rcx        # cf7 <pc_write_save+0x2c7>
+     c22:	e8 00 00 00 00       	call   c27 <pc_write_save+0x1f7>
+     c27:	48 8d 8e 28 01 00 00 	lea    0x128(%rsi),%rcx
+     c2e:	48 89 da             	mov    %rbx,%rdx
+     c31:	e8 00 00 00 00       	call   c36 <pc_write_save+0x206>
+     c36:	48 89 da             	mov    %rbx,%rdx
+     c39:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     c3e:	e8 00 00 00 00       	call   c43 <pc_write_save+0x213>
+     c43:	49 89 d9             	mov    %rbx,%r9
+     c46:	41 b8 0b 00 00 00    	mov    $0xb,%r8d
+     c4c:	ba 01 00 00 00       	mov    $0x1,%edx
+     c51:	48 8d 0d e1 00 00 00 	lea    0xe1(%rip),%rcx        # d39 <pc_write_save+0x309>
+     c58:	e8 00 00 00 00       	call   c5d <pc_write_save+0x22d>
+     c5d:	48 8d 8e 40 01 00 00 	lea    0x140(%rsi),%rcx
+     c64:	48 89 da             	mov    %rbx,%rdx
+     c67:	e8 00 00 00 00       	call   c6c <pc_write_save+0x23c>
+     c6c:	48 89 da             	mov    %rbx,%rdx
+     c6f:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     c74:	e8 00 00 00 00       	call   c79 <pc_write_save+0x249>
+     c79:	49 89 d9             	mov    %rbx,%r9
+     c7c:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+     c82:	ba 01 00 00 00       	mov    $0x1,%edx
+     c87:	48 8d 0d ed 00 00 00 	lea    0xed(%rip),%rcx        # d7b <pc_write_save+0x34b>
+     c8e:	e8 00 00 00 00       	call   c93 <pc_write_save+0x263>
+     c93:	48 8d 8e 60 01 00 00 	lea    0x160(%rsi),%rcx
+     c9a:	48 89 da             	mov    %rbx,%rdx
+     c9d:	e8 00 00 00 00       	call   ca2 <pc_write_save+0x272>
+     ca2:	48 89 da             	mov    %rbx,%rdx
+     ca5:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     caa:	e8 00 00 00 00       	call   caf <pc_write_save+0x27f>
+     caf:	49 89 d9             	mov    %rbx,%r9
+     cb2:	41 b8 06 00 00 00    	mov    $0x6,%r8d
+     cb8:	ba 01 00 00 00       	mov    $0x1,%edx
+     cbd:	48 8d 0d f8 00 00 00 	lea    0xf8(%rip),%rcx        # dbc <pc_write_save+0x38c>
+     cc4:	e8 00 00 00 00       	call   cc9 <pc_write_save+0x299>
+     cc9:	48 8d 8e 78 01 00 00 	lea    0x178(%rsi),%rcx
+     cd0:	48 89 da             	mov    %rbx,%rdx
+     cd3:	e8 00 00 00 00       	call   cd8 <pc_write_save+0x2a8>
+     cd8:	48 89 da             	mov    %rbx,%rdx
+     cdb:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     ce0:	e8 00 00 00 00       	call   ce5 <pc_write_save+0x2b5>
+     ce5:	49 89 d9             	mov    %rbx,%r9
+     ce8:	41 b8 07 00 00 00    	mov    $0x7,%r8d
+     cee:	ba 01 00 00 00       	mov    $0x1,%edx
+     cf3:	48 8d 0d ff 00 00 00 	lea    0xff(%rip),%rcx        # df9 <pc_write_save+0x3c9>
+     cfa:	e8 00 00 00 00       	call   cff <pc_write_save+0x2cf>
+     cff:	48 8d 8e 90 01 00 00 	lea    0x190(%rsi),%rcx
+     d06:	48 89 da             	mov    %rbx,%rdx
+     d09:	e8 00 00 00 00       	call   d0e <pc_write_save+0x2de>
+     d0e:	48 89 da             	mov    %rbx,%rdx
+     d11:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     d16:	e8 00 00 00 00       	call   d1b <pc_write_save+0x2eb>
+     d1b:	44 8b 05 a8 81 00 00 	mov    0x81a8(%rip),%r8d        # 8eca <g_pc+0xeca>
+     d22:	48 89 d9             	mov    %rbx,%rcx
+     d25:	48 8d 15 07 01 00 00 	lea    0x107(%rip),%rdx        # e33 <pc_write_save+0x403>
+     d2c:	e8 00 00 00 00       	call   d31 <pc_write_save+0x301>
+     d31:	44 8b 05 ac 81 00 00 	mov    0x81ac(%rip),%r8d        # 8ee4 <g_pc+0xee4>
+     d38:	48 89 d9             	mov    %rbx,%rcx
+     d3b:	48 8d 15 0f 01 00 00 	lea    0x10f(%rip),%rdx        # e51 <pc_write_save+0x421>
+     d42:	e8 00 00 00 00       	call   d47 <pc_write_save+0x317>
+     d47:	44 8b 05 b0 81 00 00 	mov    0x81b0(%rip),%r8d        # 8efe <g_pc+0xefe>
+     d4e:	48 89 d9             	mov    %rbx,%rcx
+     d51:	48 8d 15 17 01 00 00 	lea    0x117(%rip),%rdx        # e6f <pc_write_save+0x43f>
+     d58:	e8 00 00 00 00       	call   d5d <pc_write_save+0x32d>
+     d5d:	44 8b 05 b4 81 00 00 	mov    0x81b4(%rip),%r8d        # 8f18 <g_pc+0xf18>
+     d64:	48 89 d9             	mov    %rbx,%rcx
+     d67:	48 8d 15 1f 01 00 00 	lea    0x11f(%rip),%rdx        # e8d <pc_write_save+0x45d>
+     d6e:	e8 00 00 00 00       	call   d73 <pc_write_save+0x343>
+     d73:	44 8b 05 b8 81 00 00 	mov    0x81b8(%rip),%r8d        # 8f32 <g_pc+0xf32>
+     d7a:	48 89 d9             	mov    %rbx,%rcx
+     d7d:	48 8d 15 28 01 00 00 	lea    0x128(%rip),%rdx        # eac <pc_write_save+0x47c>
+     d84:	e8 00 00 00 00       	call   d89 <pc_write_save+0x359>
+     d89:	44 8b 05 bc 81 00 00 	mov    0x81bc(%rip),%r8d        # 8f4c <g_pc+0xf4c>
+     d90:	48 89 d9             	mov    %rbx,%rcx
+     d93:	48 8d 15 30 01 00 00 	lea    0x130(%rip),%rdx        # eca <pc_write_save+0x49a>
+     d9a:	e8 00 00 00 00       	call   d9f <pc_write_save+0x36f>
+     d9f:	44 8b 05 c0 81 00 00 	mov    0x81c0(%rip),%r8d        # 8f66 <g_pc+0xf66>
+     da6:	48 89 d9             	mov    %rbx,%rcx
+     da9:	48 8d 15 39 01 00 00 	lea    0x139(%rip),%rdx        # ee9 <pc_write_save+0x4b9>
+     db0:	e8 00 00 00 00       	call   db5 <pc_write_save+0x385>
+     db5:	44 8b 05 c4 81 00 00 	mov    0x81c4(%rip),%r8d        # 8f80 <g_pc+0xf80>
+     dbc:	48 89 d9             	mov    %rbx,%rcx
+     dbf:	48 8d 15 41 01 00 00 	lea    0x141(%rip),%rdx        # f07 <pc_write_save+0x4d7>
+     dc6:	e8 00 00 00 00       	call   dcb <pc_write_save+0x39b>
+     dcb:	44 8b 05 c8 81 00 00 	mov    0x81c8(%rip),%r8d        # 8f9a <g_pc+0xf9a>
+     dd2:	48 89 d9             	mov    %rbx,%rcx
+     dd5:	48 8d 15 49 01 00 00 	lea    0x149(%rip),%rdx        # f25 <pc_write_save+0x4f5>
+     ddc:	e8 00 00 00 00       	call   de1 <pc_write_save+0x3b1>
+     de1:	44 8b 05 cc 81 00 00 	mov    0x81cc(%rip),%r8d        # 8fb4 <g_pc+0xfb4>
+     de8:	48 89 d9             	mov    %rbx,%rcx
+     deb:	48 8d 15 51 01 00 00 	lea    0x151(%rip),%rdx        # f43 <pc_write_save+0x513>
+     df2:	e8 00 00 00 00       	call   df7 <pc_write_save+0x3c7>
+     df7:	49 89 d9             	mov    %rbx,%r9
+     dfa:	41 b8 0c 00 00 00    	mov    $0xc,%r8d
+     e00:	ba 01 00 00 00       	mov    $0x1,%edx
+     e05:	48 8d 0d 59 01 00 00 	lea    0x159(%rip),%rcx        # f65 <pc_write_save+0x535>
+     e0c:	e8 00 00 00 00       	call   e11 <pc_write_save+0x3e1>
+     e11:	48 8d 8e d0 01 00 00 	lea    0x1d0(%rsi),%rcx
+     e18:	48 89 da             	mov    %rbx,%rdx
+     e1b:	e8 00 00 00 00       	call   e20 <pc_write_save+0x3f0>
+     e20:	48 89 da             	mov    %rbx,%rdx
+     e23:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     e28:	e8 00 00 00 00       	call   e2d <pc_write_save+0x3fd>
+     e2d:	49 89 d9             	mov    %rbx,%r9
+     e30:	41 b8 09 00 00 00    	mov    $0x9,%r8d
+     e36:	ba 01 00 00 00       	mov    $0x1,%edx
+     e3b:	48 8d 0d 66 01 00 00 	lea    0x166(%rip),%rcx        # fa8 <pc_write_save+0x578>
+     e42:	e8 00 00 00 00       	call   e47 <pc_write_save+0x417>
+     e47:	48 8d 8e e0 01 00 00 	lea    0x1e0(%rsi),%rcx
+     e4e:	48 89 da             	mov    %rbx,%rdx
+     e51:	e8 00 00 00 00       	call   e56 <pc_write_save+0x426>
+     e56:	48 89 da             	mov    %rbx,%rdx
+     e59:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     e5e:	e8 00 00 00 00       	call   e63 <pc_write_save+0x433>
+     e63:	49 89 d9             	mov    %rbx,%r9
+     e66:	41 b8 05 00 00 00    	mov    $0x5,%r8d
+     e6c:	ba 01 00 00 00       	mov    $0x1,%edx
+     e71:	48 8d 0d 70 01 00 00 	lea    0x170(%rip),%rcx        # fe8 <pc_write_save+0x5b8>
+     e78:	e8 00 00 00 00       	call   e7d <pc_write_save+0x44d>
+     e7d:	48 8d 8e f0 01 00 00 	lea    0x1f0(%rsi),%rcx
+     e84:	48 89 da             	mov    %rbx,%rdx
+     e87:	e8 00 00 00 00       	call   e8c <pc_write_save+0x45c>
+     e8c:	48 89 da             	mov    %rbx,%rdx
+     e8f:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     e94:	e8 00 00 00 00       	call   e99 <pc_write_save+0x469>
+     e99:	49 89 d9             	mov    %rbx,%r9
+     e9c:	41 b8 05 00 00 00    	mov    $0x5,%r8d
+     ea2:	ba 01 00 00 00       	mov    $0x1,%edx
+     ea7:	48 8d 0d 76 01 00 00 	lea    0x176(%rip),%rcx        # 1024 <pc_write_save+0x5f4>
+     eae:	e8 00 00 00 00       	call   eb3 <pc_write_save+0x483>
+     eb3:	48 8d 8e 00 02 00 00 	lea    0x200(%rsi),%rcx
+     eba:	48 89 da             	mov    %rbx,%rdx
+     ebd:	e8 00 00 00 00       	call   ec2 <pc_write_save+0x492>
+     ec2:	48 89 da             	mov    %rbx,%rdx
+     ec5:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     eca:	e8 00 00 00 00       	call   ecf <pc_write_save+0x49f>
+     ecf:	49 89 d9             	mov    %rbx,%r9
+     ed2:	41 b8 04 00 00 00    	mov    $0x4,%r8d
+     ed8:	ba 01 00 00 00       	mov    $0x1,%edx
+     edd:	48 8d 0d 7c 01 00 00 	lea    0x17c(%rip),%rcx        # 1060 <pc_write_save+0x630>
+     ee4:	e8 00 00 00 00       	call   ee9 <pc_write_save+0x4b9>
+     ee9:	48 8d 8e 10 02 00 00 	lea    0x210(%rsi),%rcx
+     ef0:	48 89 da             	mov    %rbx,%rdx
+     ef3:	e8 00 00 00 00       	call   ef8 <pc_write_save+0x4c8>
+     ef8:	48 89 da             	mov    %rbx,%rdx
+     efb:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     f00:	e8 00 00 00 00       	call   f05 <pc_write_save+0x4d5>
+     f05:	49 89 d9             	mov    %rbx,%r9
+     f08:	41 b8 0c 00 00 00    	mov    $0xc,%r8d
+     f0e:	ba 01 00 00 00       	mov    $0x1,%edx
+     f13:	48 8d 0d 81 01 00 00 	lea    0x181(%rip),%rcx        # 109b <pc_write_save+0x66b>
+     f1a:	e8 00 00 00 00       	call   f1f <pc_write_save+0x4ef>
+     f1f:	48 8d 8e 28 02 00 00 	lea    0x228(%rsi),%rcx
+     f26:	48 89 da             	mov    %rbx,%rdx
+     f29:	e8 00 00 00 00       	call   f2e <pc_write_save+0x4fe>
+     f2e:	48 89 da             	mov    %rbx,%rdx
+     f31:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     f36:	e8 00 00 00 00       	call   f3b <pc_write_save+0x50b>
+     f3b:	49 89 d9             	mov    %rbx,%r9
+     f3e:	41 b8 0e 00 00 00    	mov    $0xe,%r8d
+     f44:	ba 01 00 00 00       	mov    $0x1,%edx
+     f49:	48 8d 0d 8e 01 00 00 	lea    0x18e(%rip),%rcx        # 10de <pc_write_save+0x6ae>
+     f50:	e8 00 00 00 00       	call   f55 <pc_write_save+0x525>
+     f55:	48 8d 8e 38 02 00 00 	lea    0x238(%rsi),%rcx
+     f5c:	48 89 da             	mov    %rbx,%rdx
+     f5f:	e8 00 00 00 00       	call   f64 <pc_write_save+0x534>
+     f64:	48 89 da             	mov    %rbx,%rdx
+     f67:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     f6c:	e8 00 00 00 00       	call   f71 <pc_write_save+0x541>
+     f71:	44 8b 05 48 82 00 00 	mov    0x8248(%rip),%r8d        # 91c0 <g_pc+0x11c0>
+     f78:	48 89 d9             	mov    %rbx,%rcx
+     f7b:	48 8d 15 9d 01 00 00 	lea    0x19d(%rip),%rdx        # 111f <pc_read_save+0xf>
+     f82:	e8 00 00 00 00       	call   f87 <pc_write_save+0x557>
+     f87:	44 8b 05 4c 82 00 00 	mov    0x824c(%rip),%r8d        # 91da <g_pc+0x11da>
+     f8e:	48 89 d9             	mov    %rbx,%rcx
+     f91:	48 8d 15 a7 01 00 00 	lea    0x1a7(%rip),%rdx        # 113f <pc_read_save+0x2f>
+     f98:	e8 00 00 00 00       	call   f9d <pc_write_save+0x56d>
+     f9d:	49 89 d9             	mov    %rbx,%r9
+     fa0:	41 b8 08 00 00 00    	mov    $0x8,%r8d
+     fa6:	ba 01 00 00 00       	mov    $0x1,%edx
+     fab:	48 8d 0d b3 01 00 00 	lea    0x1b3(%rip),%rcx        # 1165 <pc_read_save+0x55>
+     fb2:	e8 00 00 00 00       	call   fb7 <pc_write_save+0x587>
+     fb7:	48 8d 8e 50 02 00 00 	lea    0x250(%rsi),%rcx
+     fbe:	48 89 da             	mov    %rbx,%rdx
+     fc1:	e8 00 00 00 00       	call   fc6 <pc_write_save+0x596>
+     fc6:	48 89 da             	mov    %rbx,%rdx
+     fc9:	b9 0a 00 00 00       	mov    $0xa,%ecx
+     fce:	e8 00 00 00 00       	call   fd3 <pc_write_save+0x5a3>
+     fd3:	49 89 d9             	mov    %rbx,%r9
+     fd6:	41 b8 05 00 00 00    	mov    $0x5,%r8d
+     fdc:	ba 01 00 00 00       	mov    $0x1,%edx
+     fe1:	48 8d 0d bc 01 00 00 	lea    0x1bc(%rip),%rcx        # 11a4 <pc_read_save+0x94>
+     fe8:	e8 00 00 00 00       	call   fed <pc_write_save+0x5bd>
+     fed:	48 8d 8e 60 02 00 00 	lea    0x260(%rsi),%rcx
+     ff4:	48 89 da             	mov    %rbx,%rdx
+     ff7:	e8 00 00 00 00       	call   ffc <pc_write_save+0x5cc>
+     ffc:	48 89 da             	mov    %rbx,%rdx
+     fff:	b9 0a 00 00 00       	mov    $0xa,%ecx
+    1004:	e8 00 00 00 00       	call   1009 <pc_write_save+0x5d9>
+    1009:	49 89 d9             	mov    %rbx,%r9
+    100c:	41 b8 06 00 00 00    	mov    $0x6,%r8d
+    1012:	ba 01 00 00 00       	mov    $0x1,%edx
+    1017:	48 8d 0d c2 01 00 00 	lea    0x1c2(%rip),%rcx        # 11e0 <pc_read_save+0xd0>
+    101e:	e8 00 00 00 00       	call   1023 <pc_write_save+0x5f3>
+    1023:	48 8d 8e 70 02 00 00 	lea    0x270(%rsi),%rcx
+    102a:	48 89 da             	mov    %rbx,%rdx
+    102d:	e8 00 00 00 00       	call   1032 <pc_write_save+0x602>
+    1032:	48 89 da             	mov    %rbx,%rdx
+    1035:	b9 0a 00 00 00       	mov    $0xa,%ecx
+    103a:	e8 00 00 00 00       	call   103f <pc_write_save+0x60f>
+    103f:	49 89 d9             	mov    %rbx,%r9
+    1042:	41 b8 06 00 00 00    	mov    $0x6,%r8d
+    1048:	ba 01 00 00 00       	mov    $0x1,%edx
+    104d:	48 8d 0d c9 01 00 00 	lea    0x1c9(%rip),%rcx        # 121d <pc_read_save+0x10d>
+    1054:	e8 00 00 00 00       	call   1059 <pc_write_save+0x629>
+    1059:	48 8d 8e 80 02 00 00 	lea    0x280(%rsi),%rcx
+    1060:	48 89 da             	mov    %rbx,%rdx
+    1063:	e8 00 00 00 00       	call   1068 <pc_write_save+0x638>
+    1068:	48 89 da             	mov    %rbx,%rdx
+    106b:	b9 0a 00 00 00       	mov    $0xa,%ecx
+    1070:	e8 00 00 00 00       	call   1075 <pc_write_save+0x645>
+    1075:	49 89 d9             	mov    %rbx,%r9
+    1078:	41 b8 0c 00 00 00    	mov    $0xc,%r8d
+    107e:	ba 01 00 00 00       	mov    $0x1,%edx
+    1083:	48 8d 0d d0 01 00 00 	lea    0x1d0(%rip),%rcx        # 125a <pc_read_save+0x14a>
+    108a:	e8 00 00 00 00       	call   108f <pc_write_save+0x65f>
+    108f:	48 8d 8e 90 02 00 00 	lea    0x290(%rsi),%rcx
+    1096:	48 89 da             	mov    %rbx,%rdx
+    1099:	e8 00 00 00 00       	call   109e <pc_write_save+0x66e>
+    109e:	48 89 da             	mov    %rbx,%rdx
+    10a1:	b9 0a 00 00 00       	mov    $0xa,%ecx
+    10a6:	e8 00 00 00 00       	call   10ab <pc_write_save+0x67b>
+    10ab:	44 8b 05 a0 82 00 00 	mov    0x82a0(%rip),%r8d        # 9352 <g_pc+0x1352>
+    10b2:	48 89 d9             	mov    %rbx,%rcx
+    10b5:	48 8d 15 dd 01 00 00 	lea    0x1dd(%rip),%rdx        # 1299 <pc_read_save+0x189>
+    10bc:	e8 00 00 00 00       	call   10c1 <pc_write_save+0x691>
+    10c1:	44 8b 05 a4 82 00 00 	mov    0x82a4(%rip),%r8d        # 936c <g_pc+0x136c>
+    10c8:	48 89 d9             	mov    %rbx,%rcx
+    10cb:	48 8d 15 e6 01 00 00 	lea    0x1e6(%rip),%rdx        # 12b8 <pc_read_save+0x1a8>
+    10d2:	e8 00 00 00 00       	call   10d7 <pc_write_save+0x6a7>
+    10d7:	49 89 d9             	mov    %rbx,%r9
+    10da:	41 b8 08 00 00 00    	mov    $0x8,%r8d
+    10e0:	ba 01 00 00 00       	mov    $0x1,%edx
+    10e5:	48 8d 0d f8 01 00 00 	lea    0x1f8(%rip),%rcx        # 12e4 <pc_read_save+0x1d4>
+    10ec:	48 83 c4 28          	add    $0x28,%rsp
+    10f0:	5b                   	pop    %rbx
+    10f1:	5e                   	pop    %rsi
+    10f2:	e9 00 00 00 00       	jmp    10f7 <pc_write_save+0x6c7>
+    10f7:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+    10fe:	00 00 
+    1100:	48 83 c4 28          	add    $0x28,%rsp
+    1104:	5b                   	pop    %rbx
+    1105:	5e                   	pop    %rsi
+    1106:	c3                   	ret
+    1107:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+    110e:	00 00 
+
+0000000000001110 <pc_read_save>:
+    1110:	41 54                	push   %r12
+    1112:	55                   	push   %rbp
+    1113:	57                   	push   %rdi
+    1114:	56                   	push   %rsi
+    1115:	53                   	push   %rbx
+    1116:	48 83 ec 20          	sub    $0x20,%rsp
+    111a:	48 85 d2             	test   %rdx,%rdx
+    111d:	48 89 d3             	mov    %rdx,%rbx
+    1120:	48 89 cd             	mov    %rcx,%rbp
+    1123:	0f 94 c0             	sete   %al
+    1126:	49 83 f8 07          	cmp    $0x7,%r8
+    112a:	0f 96 c2             	setbe  %dl
+    112d:	08 d0                	or     %dl,%al
+    112f:	75 05                	jne    1136 <pc_read_save+0x26>
+    1131:	48 85 c9             	test   %rcx,%rcx
+    1134:	75 12                	jne    1148 <pc_read_save+0x38>
+    1136:	31 c0                	xor    %eax,%eax
+    1138:	48 83 c4 20          	add    $0x20,%rsp
+    113c:	5b                   	pop    %rbx
+    113d:	5e                   	pop    %rsi
+    113e:	5f                   	pop    %rdi
+    113f:	5d                   	pop    %rbp
+    1140:	41 5c                	pop    %r12
+    1142:	c3                   	ret
+    1143:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+    1148:	b9 55 00 00 00       	mov    $0x55,%ecx
+    114d:	48 8d 3d 00 80 00 00 	lea    0x8000(%rip),%rdi        # 9154 <g_pc+0x1154>
+    1154:	31 c0                	xor    %eax,%eax
+    1156:	f3 48 ab             	rep stos %rax,(%rdi)
+    1159:	44 89 c7             	mov    %r8d,%edi
+    115c:	0f 1f 40 00          	nopl   0x0(%rax)
+    1160:	49 89 e8             	mov    %rbp,%r8
+    1163:	89 fa                	mov    %edi,%edx
+    1165:	48 89 d9             	mov    %rbx,%rcx
+    1168:	e8 00 00 00 00       	call   116d <pc_read_save+0x5d>
+    116d:	48 85 c0             	test   %rax,%rax
+    1170:	74 c4                	je     1136 <pc_read_save+0x26>
+    1172:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 137a <pc_read_save+0x26a>
+    1179:	48 89 d9             	mov    %rbx,%rcx
+    117c:	e8 00 00 00 00       	call   1181 <pc_read_save+0x71>
+    1181:	48 8d 15 04 02 00 00 	lea    0x204(%rip),%rdx        # 138c <pc_read_save+0x27c>
+    1188:	48 89 d9             	mov    %rbx,%rcx
+    118b:	c6 04 03 00          	movb   $0x0,(%rbx,%rax,1)
+    118f:	e8 00 00 00 00       	call   1194 <pc_read_save+0x84>
+    1194:	85 c0                	test   %eax,%eax
+    1196:	0f 84 94 04 00 00    	je     1630 <pc_read_save+0x520>
+    119c:	ba 20 00 00 00       	mov    $0x20,%edx
+    11a1:	48 89 d9             	mov    %rbx,%rcx
+    11a4:	e8 00 00 00 00       	call   11a9 <pc_read_save+0x99>
+    11a9:	48 85 c0             	test   %rax,%rax
+    11ac:	74 88                	je     1136 <pc_read_save+0x26>
+    11ae:	c6 00 00             	movb   $0x0,(%rax)
+    11b1:	48 8d 15 0c 02 00 00 	lea    0x20c(%rip),%rdx        # 13c4 <pc_read_save+0x2b4>
+    11b8:	48 89 d9             	mov    %rbx,%rcx
+    11bb:	48 8d 70 01          	lea    0x1(%rax),%rsi
+    11bf:	e8 00 00 00 00       	call   11c4 <pc_read_save+0xb4>
+    11c4:	85 c0                	test   %eax,%eax
+    11c6:	0f 84 84 03 00 00    	je     1550 <pc_read_save+0x440>
+    11cc:	48 8d 15 11 02 00 00 	lea    0x211(%rip),%rdx        # 13e4 <pc_read_save+0x2d4>
+    11d3:	48 89 d9             	mov    %rbx,%rcx
+    11d6:	e8 00 00 00 00       	call   11db <pc_read_save+0xcb>
+    11db:	85 c0                	test   %eax,%eax
+    11dd:	0f 84 8d 03 00 00    	je     1570 <pc_read_save+0x460>
+    11e3:	48 8d 15 16 02 00 00 	lea    0x216(%rip),%rdx        # 1400 <pc_read_save+0x2f0>
+    11ea:	48 89 d9             	mov    %rbx,%rcx
+    11ed:	e8 00 00 00 00       	call   11f2 <pc_read_save+0xe2>
+    11f2:	85 c0                	test   %eax,%eax
+    11f4:	0f 84 96 03 00 00    	je     1590 <pc_read_save+0x480>
+    11fa:	48 8d 15 1b 02 00 00 	lea    0x21b(%rip),%rdx        # 141c <pc_read_save+0x30c>
+    1201:	48 89 d9             	mov    %rbx,%rcx
+    1204:	e8 00 00 00 00       	call   1209 <pc_read_save+0xf9>
+    1209:	85 c0                	test   %eax,%eax
+    120b:	0f 84 9f 03 00 00    	je     15b0 <pc_read_save+0x4a0>
+    1211:	48 8d 15 22 02 00 00 	lea    0x222(%rip),%rdx        # 143a <pc_read_save+0x32a>
+    1218:	48 89 d9             	mov    %rbx,%rcx
+    121b:	e8 00 00 00 00       	call   1220 <pc_read_save+0x110>
+    1220:	85 c0                	test   %eax,%eax
+    1222:	0f 84 c8 03 00 00    	je     15f0 <pc_read_save+0x4e0>
+    1228:	48 8d 15 2c 02 00 00 	lea    0x22c(%rip),%rdx        # 145b <pc_read_save+0x34b>
+    122f:	48 89 d9             	mov    %rbx,%rcx
+    1232:	e8 00 00 00 00       	call   1237 <pc_read_save+0x127>
+    1237:	85 c0                	test   %eax,%eax
+    1239:	0f 84 d1 03 00 00    	je     1610 <pc_read_save+0x500>
+    123f:	48 8d 15 32 02 00 00 	lea    0x232(%rip),%rdx        # 1478 <pc_read_save+0x368>
+    1246:	48 89 d9             	mov    %rbx,%rcx
+    1249:	e8 00 00 00 00       	call   124e <pc_read_save+0x13e>
+    124e:	85 c0                	test   %eax,%eax
+    1250:	0f 84 7a 03 00 00    	je     15d0 <pc_read_save+0x4c0>
+    1256:	48 8d 15 39 02 00 00 	lea    0x239(%rip),%rdx        # 1496 <pc_read_save+0x386>
+    125d:	48 89 d9             	mov    %rbx,%rcx
+    1260:	e8 00 00 00 00       	call   1265 <pc_read_save+0x155>
+    1265:	85 c0                	test   %eax,%eax
+    1267:	0f 84 e3 03 00 00    	je     1650 <pc_read_save+0x540>
+    126d:	48 8d 15 3f 02 00 00 	lea    0x23f(%rip),%rdx        # 14b3 <pc_read_save+0x3a3>
+    1274:	48 89 d9             	mov    %rbx,%rcx
+    1277:	e8 00 00 00 00       	call   127c <pc_read_save+0x16c>
+    127c:	85 c0                	test   %eax,%eax
+    127e:	0f 84 04 04 00 00    	je     1688 <pc_read_save+0x578>
+    1284:	48 8d 15 4a 02 00 00 	lea    0x24a(%rip),%rdx        # 14d5 <pc_read_save+0x3c5>
+    128b:	48 89 d9             	mov    %rbx,%rcx
+    128e:	e8 00 00 00 00       	call   1293 <pc_read_save+0x183>
+    1293:	85 c0                	test   %eax,%eax
+    1295:	0f 84 cf 03 00 00    	je     166a <pc_read_save+0x55a>
+    129b:	48 8d 15 55 02 00 00 	lea    0x255(%rip),%rdx        # 14f7 <pc_read_save+0x3e7>
+    12a2:	48 89 d9             	mov    %rbx,%rcx
+    12a5:	e8 00 00 00 00       	call   12aa <pc_read_save+0x19a>
+    12aa:	85 c0                	test   %eax,%eax
+    12ac:	0f 84 f0 03 00 00    	je     16a2 <pc_read_save+0x592>
+    12b2:	48 8d 15 5f 02 00 00 	lea    0x25f(%rip),%rdx        # 1518 <pc_read_save+0x408>
+    12b9:	48 89 d9             	mov    %rbx,%rcx
+    12bc:	e8 00 00 00 00       	call   12c1 <pc_read_save+0x1b1>
+    12c1:	85 c0                	test   %eax,%eax
+    12c3:	0f 84 f3 03 00 00    	je     16bc <pc_read_save+0x5ac>
+    12c9:	48 8d 15 65 02 00 00 	lea    0x265(%rip),%rdx        # 1535 <pc_read_save+0x425>
+    12d0:	48 89 d9             	mov    %rbx,%rcx
+    12d3:	e8 00 00 00 00       	call   12d8 <pc_read_save+0x1c8>
+    12d8:	85 c0                	test   %eax,%eax
+    12da:	0f 84 f6 03 00 00    	je     16d6 <pc_read_save+0x5c6>
+    12e0:	48 8d 15 6c 02 00 00 	lea    0x26c(%rip),%rdx        # 1553 <pc_read_save+0x443>
+    12e7:	48 89 d9             	mov    %rbx,%rcx
+    12ea:	e8 00 00 00 00       	call   12ef <pc_read_save+0x1df>
+    12ef:	85 c0                	test   %eax,%eax
+    12f1:	0f 84 f9 03 00 00    	je     16f0 <pc_read_save+0x5e0>
+    12f7:	48 8d 15 70 02 00 00 	lea    0x270(%rip),%rdx        # 156e <pc_read_save+0x45e>
+    12fe:	48 89 d9             	mov    %rbx,%rcx
+    1301:	e8 00 00 00 00       	call   1306 <pc_read_save+0x1f6>
+    1306:	85 c0                	test   %eax,%eax
+    1308:	0f 84 f5 03 00 00    	je     1703 <pc_read_save+0x5f3>
+    130e:	48 8d 15 74 02 00 00 	lea    0x274(%rip),%rdx        # 1589 <pc_read_save+0x479>
+    1315:	48 89 d9             	mov    %rbx,%rcx
+    1318:	e8 00 00 00 00       	call   131d <pc_read_save+0x20d>
+    131d:	85 c0                	test   %eax,%eax
+    131f:	0f 84 f1 03 00 00    	je     1716 <pc_read_save+0x606>
+    1325:	48 8d 15 78 02 00 00 	lea    0x278(%rip),%rdx        # 15a4 <pc_read_save+0x494>
+    132c:	48 89 d9             	mov    %rbx,%rcx
+    132f:	e8 00 00 00 00       	call   1334 <pc_read_save+0x224>
+    1334:	85 c0                	test   %eax,%eax
+    1336:	0f 84 ed 03 00 00    	je     1729 <pc_read_save+0x619>
+    133c:	48 8d 15 7d 02 00 00 	lea    0x27d(%rip),%rdx        # 15c0 <pc_read_save+0x4b0>
+    1343:	48 89 d9             	mov    %rbx,%rcx
+    1346:	e8 00 00 00 00       	call   134b <pc_read_save+0x23b>
+    134b:	85 c0                	test   %eax,%eax
+    134d:	0f 84 e9 03 00 00    	je     173c <pc_read_save+0x62c>
+    1353:	48 8d 15 81 02 00 00 	lea    0x281(%rip),%rdx        # 15db <pc_read_save+0x4cb>
+    135a:	48 89 d9             	mov    %rbx,%rcx
+    135d:	e8 00 00 00 00       	call   1362 <pc_read_save+0x252>
+    1362:	85 c0                	test   %eax,%eax
+    1364:	0f 84 e5 03 00 00    	je     174f <pc_read_save+0x63f>
+    136a:	48 8d 15 86 02 00 00 	lea    0x286(%rip),%rdx        # 15f7 <pc_read_save+0x4e7>
+    1371:	48 89 d9             	mov    %rbx,%rcx
+    1374:	e8 00 00 00 00       	call   1379 <pc_read_save+0x269>
+    1379:	85 c0                	test   %eax,%eax
+    137b:	0f 84 e1 03 00 00    	je     1762 <pc_read_save+0x652>
+    1381:	48 8d 15 8a 02 00 00 	lea    0x28a(%rip),%rdx        # 1612 <pc_read_save+0x502>
+    1388:	48 89 d9             	mov    %rbx,%rcx
+    138b:	e8 00 00 00 00       	call   1390 <pc_read_save+0x280>
+    1390:	85 c0                	test   %eax,%eax
+    1392:	0f 84 f0 03 00 00    	je     1788 <pc_read_save+0x678>
+    1398:	48 8d 15 8e 02 00 00 	lea    0x28e(%rip),%rdx        # 162d <pc_read_save+0x51d>
+    139f:	48 89 d9             	mov    %rbx,%rcx
+    13a2:	e8 00 00 00 00       	call   13a7 <pc_read_save+0x297>
+    13a7:	85 c0                	test   %eax,%eax
+    13a9:	0f 84 c6 03 00 00    	je     1775 <pc_read_save+0x665>
+    13af:	48 8d 15 92 02 00 00 	lea    0x292(%rip),%rdx        # 1648 <pc_read_save+0x538>
+    13b6:	48 89 d9             	mov    %rbx,%rcx
+    13b9:	e8 00 00 00 00       	call   13be <pc_read_save+0x2ae>
+    13be:	85 c0                	test   %eax,%eax
+    13c0:	0f 84 84 04 00 00    	je     184a <pc_read_save+0x73a>
+    13c6:	48 8d 15 96 02 00 00 	lea    0x296(%rip),%rdx        # 1663 <pc_read_save+0x553>
+    13cd:	48 89 d9             	mov    %rbx,%rcx
+    13d0:	e8 00 00 00 00       	call   13d5 <pc_read_save+0x2c5>
+    13d5:	85 c0                	test   %eax,%eax
+    13d7:	0f 84 53 04 00 00    	je     1830 <pc_read_save+0x720>
+    13dd:	48 8d 15 a2 02 00 00 	lea    0x2a2(%rip),%rdx        # 1686 <pc_read_save+0x576>
+    13e4:	48 89 d9             	mov    %rbx,%rcx
+    13e7:	e8 00 00 00 00       	call   13ec <pc_read_save+0x2dc>
+    13ec:	85 c0                	test   %eax,%eax
+    13ee:	0f 84 22 04 00 00    	je     1816 <pc_read_save+0x706>
+    13f4:	48 8d 15 ab 02 00 00 	lea    0x2ab(%rip),%rdx        # 16a6 <pc_read_save+0x596>
+    13fb:	48 89 d9             	mov    %rbx,%rcx
+    13fe:	e8 00 00 00 00       	call   1403 <pc_read_save+0x2f3>
+    1403:	85 c0                	test   %eax,%eax
+    1405:	0f 84 f1 03 00 00    	je     17fc <pc_read_save+0x6ec>
+    140b:	48 8d 15 b0 02 00 00 	lea    0x2b0(%rip),%rdx        # 16c2 <pc_read_save+0x5b2>
+    1412:	48 89 d9             	mov    %rbx,%rcx
+    1415:	e8 00 00 00 00       	call   141a <pc_read_save+0x30a>
+    141a:	85 c0                	test   %eax,%eax
+    141c:	0f 84 e3 04 00 00    	je     1905 <pc_read_save+0x7f5>
+    1422:	48 8d 15 b5 02 00 00 	lea    0x2b5(%rip),%rdx        # 16de <pc_read_save+0x5ce>
+    1429:	48 89 d9             	mov    %rbx,%rcx
+    142c:	e8 00 00 00 00       	call   1431 <pc_read_save+0x321>
+    1431:	85 c0                	test   %eax,%eax
+    1433:	0f 84 b2 04 00 00    	je     18eb <pc_read_save+0x7db>
+    1439:	48 8d 15 b9 02 00 00 	lea    0x2b9(%rip),%rdx        # 16f9 <pc_read_save+0x5e9>
+    1440:	48 89 d9             	mov    %rbx,%rcx
+    1443:	e8 00 00 00 00       	call   1448 <pc_read_save+0x338>
+    1448:	85 c0                	test   %eax,%eax
+    144a:	0f 84 81 04 00 00    	je     18d1 <pc_read_save+0x7c1>
+    1450:	48 8d 15 c5 02 00 00 	lea    0x2c5(%rip),%rdx        # 171c <pc_read_save+0x60c>
+    1457:	48 89 d9             	mov    %rbx,%rcx
+    145a:	e8 00 00 00 00       	call   145f <pc_read_save+0x34f>
+    145f:	85 c0                	test   %eax,%eax
+    1461:	0f 84 50 04 00 00    	je     18b7 <pc_read_save+0x7a7>
+    1467:	48 8d 15 d3 02 00 00 	lea    0x2d3(%rip),%rdx        # 1741 <pc_read_save+0x631>
+    146e:	48 89 d9             	mov    %rbx,%rcx
+    1471:	e8 00 00 00 00       	call   1476 <pc_read_save+0x366>
+    1476:	85 c0                	test   %eax,%eax
+    1478:	0f 84 26 04 00 00    	je     18a4 <pc_read_save+0x794>
+    147e:	48 8d 15 d9 02 00 00 	lea    0x2d9(%rip),%rdx        # 175e <pc_read_save+0x64e>
+    1485:	48 89 d9             	mov    %rbx,%rcx
+    1488:	e8 00 00 00 00       	call   148d <pc_read_save+0x37d>
+    148d:	85 c0                	test   %eax,%eax
+    148f:	0f 84 fc 03 00 00    	je     1891 <pc_read_save+0x781>
+    1495:	48 8d 15 e1 02 00 00 	lea    0x2e1(%rip),%rdx        # 177d <pc_read_save+0x66d>
+    149c:	48 89 d9             	mov    %rbx,%rcx
+    149f:	e8 00 00 00 00       	call   14a4 <pc_read_save+0x394>
+    14a4:	85 c0                	test   %eax,%eax
+    14a6:	0f 84 cb 03 00 00    	je     1877 <pc_read_save+0x767>
+    14ac:	48 8d 15 e9 02 00 00 	lea    0x2e9(%rip),%rdx        # 179c <pc_read_save+0x68c>
+    14b3:	48 89 d9             	mov    %rbx,%rcx
+    14b6:	e8 00 00 00 00       	call   14bb <pc_read_save+0x3ab>
+    14bb:	85 c0                	test   %eax,%eax
+    14bd:	0f 84 9a 03 00 00    	je     185d <pc_read_save+0x74d>
+    14c3:	48 8d 15 ee 02 00 00 	lea    0x2ee(%rip),%rdx        # 17b8 <pc_read_save+0x6a8>
+    14ca:	48 89 d9             	mov    %rbx,%rcx
+    14cd:	e8 00 00 00 00       	call   14d2 <pc_read_save+0x3c2>
+    14d2:	85 c0                	test   %eax,%eax
+    14d4:	0f 84 08 03 00 00    	je     17e2 <pc_read_save+0x6d2>
+    14da:	48 8d 15 f4 02 00 00 	lea    0x2f4(%rip),%rdx        # 17d5 <pc_read_save+0x6c5>
+    14e1:	48 89 d9             	mov    %rbx,%rcx
+    14e4:	e8 00 00 00 00       	call   14e9 <pc_read_save+0x3d9>
+    14e9:	85 c0                	test   %eax,%eax
+    14eb:	0f 84 d7 02 00 00    	je     17c8 <pc_read_save+0x6b8>
+    14f1:	48 8d 15 fa 02 00 00 	lea    0x2fa(%rip),%rdx        # 17f2 <pc_read_save+0x6e2>
+    14f8:	48 89 d9             	mov    %rbx,%rcx
+    14fb:	e8 00 00 00 00       	call   1500 <pc_read_save+0x3f0>
+    1500:	85 c0                	test   %eax,%eax
+    1502:	0f 84 a6 02 00 00    	je     17ae <pc_read_save+0x69e>
+    1508:	48 8d 15 06 03 00 00 	lea    0x306(%rip),%rdx        # 1815 <pc_read_save+0x705>
+    150f:	48 89 d9             	mov    %rbx,%rcx
+    1512:	e8 00 00 00 00       	call   1517 <pc_read_save+0x407>
+    1517:	85 c0                	test   %eax,%eax
+    1519:	0f 84 7c 02 00 00    	je     179b <pc_read_save+0x68b>
+    151f:	48 8d 15 0b 03 00 00 	lea    0x30b(%rip),%rdx        # 1831 <pc_read_save+0x721>
+    1526:	48 89 d9             	mov    %rbx,%rcx
+    1529:	e8 00 00 00 00       	call   152e <pc_read_save+0x41e>
+    152e:	85 c0                	test   %eax,%eax
+    1530:	0f 85 2a fc ff ff    	jne    1160 <pc_read_save+0x50>
+    1536:	48 89 f1             	mov    %rsi,%rcx
+    1539:	e8 00 00 00 00       	call   153e <pc_read_save+0x42e>
+    153e:	89 05 a4 82 00 00    	mov    %eax,0x82a4(%rip)        # 97e8 <g_pc+0x17e8>
+    1544:	e9 17 fc ff ff       	jmp    1160 <pc_read_save+0x50>
+    1549:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+    1550:	41 b8 3f 00 00 00    	mov    $0x3f,%r8d
+    1556:	48 89 f2             	mov    %rsi,%rdx
+    1559:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # 9560 <g_pc+0x1560>
+    1560:	e8 00 00 00 00       	call   1565 <pc_read_save+0x455>
+    1565:	e9 f6 fb ff ff       	jmp    1160 <pc_read_save+0x50>
+    156a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1570:	41 b8 27 00 00 00    	mov    $0x27,%r8d
+    1576:	48 89 f2             	mov    %rsi,%rdx
+    1579:	48 8d 0d 40 80 00 00 	lea    0x8040(%rip),%rcx        # 95c0 <g_pc+0x15c0>
+    1580:	e8 00 00 00 00       	call   1585 <pc_read_save+0x475>
+    1585:	e9 d6 fb ff ff       	jmp    1160 <pc_read_save+0x50>
+    158a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1590:	41 b8 3f 00 00 00    	mov    $0x3f,%r8d
+    1596:	48 89 f2             	mov    %rsi,%rdx
+    1599:	48 8d 0d 68 80 00 00 	lea    0x8068(%rip),%rcx        # 9608 <g_pc+0x1608>
+    15a0:	e8 00 00 00 00       	call   15a5 <pc_read_save+0x495>
+    15a5:	e9 b6 fb ff ff       	jmp    1160 <pc_read_save+0x50>
+    15aa:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    15b0:	41 b8 07 00 00 00    	mov    $0x7,%r8d
+    15b6:	48 89 f2             	mov    %rsi,%rdx
+    15b9:	48 8d 0d a8 80 00 00 	lea    0x80a8(%rip),%rcx        # 9668 <g_pc+0x1668>
+    15c0:	e8 00 00 00 00       	call   15c5 <pc_read_save+0x4b5>
+    15c5:	e9 96 fb ff ff       	jmp    1160 <pc_read_save+0x50>
+    15ca:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    15d0:	41 b8 37 00 00 00    	mov    $0x37,%r8d
+    15d6:	48 89 f2             	mov    %rsi,%rdx
+    15d9:	48 8d 0d d8 80 00 00 	lea    0x80d8(%rip),%rcx        # 96b8 <g_pc+0x16b8>
+    15e0:	e8 00 00 00 00       	call   15e5 <pc_read_save+0x4d5>
+    15e5:	e9 76 fb ff ff       	jmp    1160 <pc_read_save+0x50>
+    15ea:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    15f0:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    15f6:	48 89 f2             	mov    %rsi,%rdx
+    15f9:	48 8d 0d b0 80 00 00 	lea    0x80b0(%rip),%rcx        # 96b0 <g_pc+0x16b0>
+    1600:	e8 00 00 00 00       	call   1605 <pc_read_save+0x4f5>
+    1605:	e9 56 fb ff ff       	jmp    1160 <pc_read_save+0x50>
+    160a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1610:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    1616:	48 89 f2             	mov    %rsi,%rdx
+    1619:	48 8d 0d c0 80 00 00 	lea    0x80c0(%rip),%rcx        # 96e0 <g_pc+0x16e0>
+    1620:	e8 00 00 00 00       	call   1625 <pc_read_save+0x515>
+    1625:	e9 36 fb ff ff       	jmp    1160 <pc_read_save+0x50>
+    162a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1630:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # 9637 <g_pc+0x1637>
+    1637:	e8 14 eb ff ff       	call   150 <pc_fill_narrative_defaults>
+    163c:	b8 01 00 00 00       	mov    $0x1,%eax
+    1641:	48 83 c4 20          	add    $0x20,%rsp
+    1645:	5b                   	pop    %rbx
+    1646:	5e                   	pop    %rsi
+    1647:	5f                   	pop    %rdi
+    1648:	5d                   	pop    %rbp
+    1649:	41 5c                	pop    %r12
+    164b:	c3                   	ret
+    164c:	0f 1f 40 00          	nopl   0x0(%rax)
+    1650:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    1656:	48 89 f2             	mov    %rsi,%rdx
+    1659:	48 8d 0d 10 81 00 00 	lea    0x8110(%rip),%rcx        # 9770 <g_pc+0x1770>
+    1660:	e8 00 00 00 00       	call   1665 <pc_read_save+0x555>
+    1665:	e9 f6 fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    166a:	41 b8 1f 00 00 00    	mov    $0x1f,%r8d
+    1670:	48 89 f2             	mov    %rsi,%rdx
+    1673:	48 8d 0d 40 81 00 00 	lea    0x8140(%rip),%rcx        # 97ba <g_pc+0x17ba>
+    167a:	e8 00 00 00 00       	call   167f <pc_read_save+0x56f>
+    167f:	e9 dc fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    1684:	0f 1f 40 00          	nopl   0x0(%rax)
+    1688:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    168e:	48 89 f2             	mov    %rsi,%rdx
+    1691:	48 8d 0d 28 81 00 00 	lea    0x8128(%rip),%rcx        # 97c0 <g_pc+0x17c0>
+    1698:	e8 00 00 00 00       	call   169d <pc_read_save+0x58d>
+    169d:	e9 be fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    16a2:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    16a8:	48 89 f2             	mov    %rsi,%rdx
+    16ab:	48 8d 0d 60 81 00 00 	lea    0x8160(%rip),%rcx        # 9812 <g_pc+0x1812>
+    16b2:	e8 00 00 00 00       	call   16b7 <pc_read_save+0x5a7>
+    16b7:	e9 a4 fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    16bc:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    16c2:	48 89 f2             	mov    %rsi,%rdx
+    16c5:	48 8d 0d 78 81 00 00 	lea    0x8178(%rip),%rcx        # 9844 <g_pc+0x1844>
+    16cc:	e8 00 00 00 00       	call   16d1 <pc_read_save+0x5c1>
+    16d1:	e9 8a fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    16d6:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    16dc:	48 89 f2             	mov    %rsi,%rdx
+    16df:	48 8d 0d 90 81 00 00 	lea    0x8190(%rip),%rcx        # 9876 <g_pc+0x1876>
+    16e6:	e8 00 00 00 00       	call   16eb <pc_read_save+0x5db>
+    16eb:	e9 70 fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    16f0:	48 89 f1             	mov    %rsi,%rcx
+    16f3:	e8 00 00 00 00       	call   16f8 <pc_read_save+0x5e8>
+    16f8:	89 05 a8 81 00 00    	mov    %eax,0x81a8(%rip)        # 98a6 <g_pc+0x18a6>
+    16fe:	e9 5d fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    1703:	48 89 f1             	mov    %rsi,%rcx
+    1706:	e8 00 00 00 00       	call   170b <pc_read_save+0x5fb>
+    170b:	89 05 ac 81 00 00    	mov    %eax,0x81ac(%rip)        # 98bd <g_pc+0x18bd>
+    1711:	e9 4a fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    1716:	48 89 f1             	mov    %rsi,%rcx
+    1719:	e8 00 00 00 00       	call   171e <pc_read_save+0x60e>
+    171e:	89 05 b0 81 00 00    	mov    %eax,0x81b0(%rip)        # 98d4 <g_pc+0x18d4>
+    1724:	e9 37 fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    1729:	48 89 f1             	mov    %rsi,%rcx
+    172c:	e8 00 00 00 00       	call   1731 <pc_read_save+0x621>
+    1731:	89 05 b4 81 00 00    	mov    %eax,0x81b4(%rip)        # 98eb <g_pc+0x18eb>
+    1737:	e9 24 fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    173c:	48 89 f1             	mov    %rsi,%rcx
+    173f:	e8 00 00 00 00       	call   1744 <pc_read_save+0x634>
+    1744:	89 05 b8 81 00 00    	mov    %eax,0x81b8(%rip)        # 9902 <g_pc+0x1902>
+    174a:	e9 11 fa ff ff       	jmp    1160 <pc_read_save+0x50>
+    174f:	48 89 f1             	mov    %rsi,%rcx
+    1752:	e8 00 00 00 00       	call   1757 <pc_read_save+0x647>
+    1757:	89 05 bc 81 00 00    	mov    %eax,0x81bc(%rip)        # 9919 <g_pc+0x1919>
+    175d:	e9 fe f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1762:	48 89 f1             	mov    %rsi,%rcx
+    1765:	e8 00 00 00 00       	call   176a <pc_read_save+0x65a>
+    176a:	89 05 c0 81 00 00    	mov    %eax,0x81c0(%rip)        # 9930 <g_pc+0x1930>
+    1770:	e9 eb f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1775:	48 89 f1             	mov    %rsi,%rcx
+    1778:	e8 00 00 00 00       	call   177d <pc_read_save+0x66d>
+    177d:	89 05 c8 81 00 00    	mov    %eax,0x81c8(%rip)        # 994b <g_pc+0x194b>
+    1783:	e9 d8 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1788:	48 89 f1             	mov    %rsi,%rcx
+    178b:	e8 00 00 00 00       	call   1790 <pc_read_save+0x680>
+    1790:	89 05 c4 81 00 00    	mov    %eax,0x81c4(%rip)        # 995a <g_pc+0x195a>
+    1796:	e9 c5 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    179b:	48 89 f1             	mov    %rsi,%rcx
+    179e:	e8 00 00 00 00       	call   17a3 <pc_read_save+0x693>
+    17a3:	89 05 a0 82 00 00    	mov    %eax,0x82a0(%rip)        # 9a49 <g_pc+0x1a49>
+    17a9:	e9 b2 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    17ae:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    17b4:	48 89 f2             	mov    %rsi,%rdx
+    17b7:	48 8d 0d 90 82 00 00 	lea    0x8290(%rip),%rcx        # 9a4e <g_pc+0x1a4e>
+    17be:	e8 00 00 00 00       	call   17c3 <pc_read_save+0x6b3>
+    17c3:	e9 98 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    17c8:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    17ce:	48 89 f2             	mov    %rsi,%rdx
+    17d1:	48 8d 0d 80 82 00 00 	lea    0x8280(%rip),%rcx        # 9a58 <g_pc+0x1a58>
+    17d8:	e8 00 00 00 00       	call   17dd <pc_read_save+0x6cd>
+    17dd:	e9 7e f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    17e2:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    17e8:	48 89 f2             	mov    %rsi,%rdx
+    17eb:	48 8d 0d 70 82 00 00 	lea    0x8270(%rip),%rcx        # 9a62 <g_pc+0x1a62>
+    17f2:	e8 00 00 00 00       	call   17f7 <pc_read_save+0x6e7>
+    17f7:	e9 64 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    17fc:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    1802:	48 89 f2             	mov    %rsi,%rdx
+    1805:	48 8d 0d f0 81 00 00 	lea    0x81f0(%rip),%rcx        # 99fc <g_pc+0x19fc>
+    180c:	e8 00 00 00 00       	call   1811 <pc_read_save+0x701>
+    1811:	e9 4a f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1816:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    181c:	48 89 f2             	mov    %rsi,%rdx
+    181f:	48 8d 0d e0 81 00 00 	lea    0x81e0(%rip),%rcx        # 9a06 <g_pc+0x1a06>
+    1826:	e8 00 00 00 00       	call   182b <pc_read_save+0x71b>
+    182b:	e9 30 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1830:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    1836:	48 89 f2             	mov    %rsi,%rdx
+    1839:	48 8d 0d d0 81 00 00 	lea    0x81d0(%rip),%rcx        # 9a10 <g_pc+0x1a10>
+    1840:	e8 00 00 00 00       	call   1845 <pc_read_save+0x735>
+    1845:	e9 16 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    184a:	48 89 f1             	mov    %rsi,%rcx
+    184d:	e8 00 00 00 00       	call   1852 <pc_read_save+0x742>
+    1852:	89 05 cc 81 00 00    	mov    %eax,0x81cc(%rip)        # 9a24 <g_pc+0x1a24>
+    1858:	e9 03 f9 ff ff       	jmp    1160 <pc_read_save+0x50>
+    185d:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    1863:	48 89 f2             	mov    %rsi,%rdx
+    1866:	48 8d 0d 60 82 00 00 	lea    0x8260(%rip),%rcx        # 9acd <g_pc+0x1acd>
+    186d:	e8 00 00 00 00       	call   1872 <pc_read_save+0x762>
+    1872:	e9 e9 f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1877:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    187d:	48 89 f2             	mov    %rsi,%rdx
+    1880:	48 8d 0d 50 82 00 00 	lea    0x8250(%rip),%rcx        # 9ad7 <g_pc+0x1ad7>
+    1887:	e8 00 00 00 00       	call   188c <pc_read_save+0x77c>
+    188c:	e9 cf f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1891:	48 89 f1             	mov    %rsi,%rcx
+    1894:	e8 00 00 00 00       	call   1899 <pc_read_save+0x789>
+    1899:	89 05 4c 82 00 00    	mov    %eax,0x824c(%rip)        # 9aeb <g_pc+0x1aeb>
+    189f:	e9 bc f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    18a4:	48 89 f1             	mov    %rsi,%rcx
+    18a7:	e8 00 00 00 00       	call   18ac <pc_read_save+0x79c>
+    18ac:	89 05 48 82 00 00    	mov    %eax,0x8248(%rip)        # 9afa <g_pc+0x1afa>
+    18b2:	e9 a9 f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    18b7:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    18bd:	48 89 f2             	mov    %rsi,%rdx
+    18c0:	48 8d 0d 38 82 00 00 	lea    0x8238(%rip),%rcx        # 9aff <g_pc+0x1aff>
+    18c7:	e8 00 00 00 00       	call   18cc <pc_read_save+0x7bc>
+    18cc:	e9 8f f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    18d1:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    18d7:	48 89 f2             	mov    %rsi,%rdx
+    18da:	48 8d 0d 28 82 00 00 	lea    0x8228(%rip),%rcx        # 9b09 <g_pc+0x1b09>
+    18e1:	e8 00 00 00 00       	call   18e6 <pc_read_save+0x7d6>
+    18e6:	e9 75 f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    18eb:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    18f1:	48 89 f2             	mov    %rsi,%rdx
+    18f4:	48 8d 0d 10 82 00 00 	lea    0x8210(%rip),%rcx        # 9b0b <g_pc+0x1b0b>
+    18fb:	e8 00 00 00 00       	call   1900 <pc_read_save+0x7f0>
+    1900:	e9 5b f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    1905:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    190b:	48 89 f2             	mov    %rsi,%rdx
+    190e:	48 8d 0d 00 82 00 00 	lea    0x8200(%rip),%rcx        # 9b15 <g_pc+0x1b15>
+    1915:	e8 00 00 00 00       	call   191a <pc_read_save+0x80a>
+    191a:	e9 41 f8 ff ff       	jmp    1160 <pc_read_save+0x50>
+    191f:	90                   	nop
+
+0000000000001920 <pc_format_summary>:
+    1920:	56                   	push   %rsi
+    1921:	53                   	push   %rbx
+    1922:	48 81 ec 38 02 00 00 	sub    $0x238,%rsp
+    1929:	48 89 cb             	mov    %rcx,%rbx
+    192c:	48 89 d6             	mov    %rdx,%rsi
+    192f:	48 85 c9             	test   %rcx,%rcx
+    1932:	0f 84 05 02 00 00    	je     1b3d <pc_format_summary+0x21d>
+    1938:	48 83 fa 1f          	cmp    $0x1f,%rdx
+    193c:	0f 86 fb 01 00 00    	jbe    1b3d <pc_format_summary+0x21d>
+    1942:	80 3d a7 80 00 00 00 	cmpb   $0x0,0x80a7(%rip)        # 99f0 <g_pc+0x19f0>
+    1949:	48 8d 05 25 03 00 00 	lea    0x325(%rip),%rax        # 1c75 <pc_format_summary+0x355>
+    1950:	74 26                	je     1978 <pc_format_summary+0x58>
+    1952:	66 81 3d a6 80 00 00 	cmpw   $0x6568,0x80a6(%rip)        # 9a01 <g_pc+0x1a01>
+    1959:	68 65 
+    195b:	0f 84 1f 02 00 00    	je     1b80 <pc_format_summary+0x260>
+    1961:	81 3d a4 80 00 00 73 	cmpl   $0x656873,0x80a4(%rip)        # 9a0f <g_pc+0x1a0f>
+    1968:	68 65 00 
+    196b:	48 8d 05 25 03 00 00 	lea    0x325(%rip),%rax        # 1c97 <pc_format_summary+0x377>
+    1972:	0f 84 e0 03 00 00    	je     1d58 <pc_format_summary+0x438>
+    1978:	80 3d bf 80 00 00 00 	cmpb   $0x0,0x80bf(%rip)        # 9a3e <g_pc+0x1a3e>
+    197f:	0f 85 cb 01 00 00    	jne    1b50 <pc_format_summary+0x230>
+    1985:	80 3d 3f 80 00 00 00 	cmpb   $0x0,0x803f(%rip)        # 99cb <g_pc+0x19cb>
+    198c:	4c 8d 15 2b 03 00 00 	lea    0x32b(%rip),%r10        # 1cbe <pc_format_summary+0x39e>
+    1993:	48 8d 0d c0 80 00 00 	lea    0x80c0(%rip),%rcx        # 9a5a <g_pc+0x1a5a>
+    199a:	0f 84 c7 01 00 00    	je     1b67 <pc_format_summary+0x247>
+    19a0:	48 8d 15 40 80 00 00 	lea    0x8040(%rip),%rdx        # 99e7 <g_pc+0x19e7>
+    19a7:	49 89 d0             	mov    %rdx,%r8
+    19aa:	80 3d ff 7f 00 00 00 	cmpb   $0x0,0x7fff(%rip)        # 99b0 <g_pc+0x19b0>
+    19b1:	4c 8d 0d 3c 03 00 00 	lea    0x33c(%rip),%r9        # 1cf4 <pc_format_summary+0x3d4>
+    19b8:	74 07                	je     19c1 <pc_format_summary+0xa1>
+    19ba:	4c 8d 0d 00 80 00 00 	lea    0x8000(%rip),%r9        # 99c1 <g_pc+0x19c1>
+    19c1:	4c 8d 1d 90 81 00 00 	lea    0x8190(%rip),%r11        # 9b58 <g_pc+0x1b58>
+    19c8:	48 89 4c 24 58       	mov    %rcx,0x58(%rsp)
+    19cd:	4c 89 9c 24 90 00 00 	mov    %r11,0x90(%rsp)
+    19d4:	00 
+    19d5:	49 83 eb 18          	sub    $0x18,%r11
+    19d9:	4c 89 9c 24 88 00 00 	mov    %r11,0x88(%rsp)
+    19e0:	00 
+    19e1:	49 83 eb 18          	sub    $0x18,%r11
+    19e5:	4c 89 9c 24 80 00 00 	mov    %r11,0x80(%rsp)
+    19ec:	00 
+    19ed:	49 83 eb 20          	sub    $0x20,%r11
+    19f1:	4c 89 5c 24 78       	mov    %r11,0x78(%rsp)
+    19f6:	49 83 eb 18          	sub    $0x18,%r11
+    19fa:	4c 89 5c 24 70       	mov    %r11,0x70(%rsp)
+    19ff:	49 83 eb 18          	sub    $0x18,%r11
+    1a03:	4c 89 5c 24 68       	mov    %r11,0x68(%rsp)
+    1a08:	49 83 eb 38          	sub    $0x38,%r11
+    1a0c:	49 8d 4b d8          	lea    -0x28(%r11),%rcx
+    1a10:	4c 89 5c 24 60       	mov    %r11,0x60(%rsp)
+    1a15:	48 89 4c 24 50       	mov    %rcx,0x50(%rsp)
+    1a1a:	49 8d 4b 90          	lea    -0x70(%r11),%rcx
+    1a1e:	48 89 4c 24 40       	mov    %rcx,0x40(%rsp)
+    1a23:	48 89 d9             	mov    %rbx,%rcx
+    1a26:	48 89 54 24 38       	mov    %rdx,0x38(%rsp)
+    1a2b:	48 89 f2             	mov    %rsi,%rdx
+    1a2e:	4c 89 54 24 28       	mov    %r10,0x28(%rsp)
+    1a33:	4c 89 44 24 20       	mov    %r8,0x20(%rsp)
+    1a38:	4c 8d 05 50 03 00 00 	lea    0x350(%rip),%r8        # 1d8f <pc_format_summary+0x46f>
+    1a3f:	48 89 44 24 48       	mov    %rax,0x48(%rsp)
+    1a44:	48 89 44 24 30       	mov    %rax,0x30(%rsp)
+    1a49:	e8 00 00 00 00       	call   1a4e <pc_format_summary+0x12e>
+    1a4e:	48 89 d9             	mov    %rbx,%rcx
+    1a51:	e8 00 00 00 00       	call   1a56 <pc_format_summary+0x136>
+    1a56:	48 83 c0 40          	add    $0x40,%rax
+    1a5a:	48 39 f0             	cmp    %rsi,%rax
+    1a5d:	0f 83 da 00 00 00    	jae    1b3d <pc_format_summary+0x21d>
+    1a63:	80 3d 4f 82 00 00 00 	cmpb   $0x0,0x824f(%rip)        # 9cb9 <g_pc+0x1cb9>
+    1a6a:	c6 84 24 b0 00 00 00 	movb   $0x0,0xb0(%rsp)
+    1a71:	00 
+    1a72:	4c 8d 1d 00 80 00 00 	lea    0x8000(%rip),%r11        # 9a79 <g_pc+0x1a79>
+    1a79:	75 55                	jne    1ad0 <pc_format_summary+0x1b0>
+    1a7b:	41 80 bb b0 00 00 00 	cmpb   $0x0,0xb0(%r11)
+    1a82:	00 
+    1a83:	0f 84 b4 00 00 00    	je     1b3d <pc_format_summary+0x21d>
+    1a89:	45 31 d2             	xor    %r10d,%r10d
+    1a8c:	81 3d ac 80 00 00 70 	cmpl   $0x696e6570,0x80ac(%rip)        # 9b42 <g_pc+0x1b42>
+    1a93:	65 6e 69 
+    1a96:	0f 84 24 01 00 00    	je     1bc0 <pc_format_summary+0x2a0>
+    1a9c:	81 3d ac 80 00 00 62 	cmpl   $0x68746f62,0x80ac(%rip)        # 9b52 <g_pc+0x1b52>
+    1aa3:	6f 74 68 
+    1aa6:	0f 84 d4 02 00 00    	je     1d80 <pc_format_summary+0x460>
+    1aac:	81 3d ac 80 00 00 76 	cmpl   $0x69676176,0x80ac(%rip)        # 9b62 <g_pc+0x1b62>
+    1ab3:	61 67 69 
+    1ab6:	75 59                	jne    1b11 <pc_format_summary+0x1f1>
+    1ab8:	81 3d af 80 00 00 69 	cmpl   $0x616e69,0x80af(%rip)        # 9b71 <g_pc+0x1b71>
+    1abf:	6e 61 00 
+    1ac2:	75 4d                	jne    1b11 <pc_format_summary+0x1f1>
+    1ac4:	e9 fd 01 00 00       	jmp    1cc6 <pc_format_summary+0x3a6>
+    1ac9:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+    1ad0:	41 81 bb 50 02 00 00 	cmpl   $0x656e6f4e,0x250(%r11)
+    1ad7:	4e 6f 6e 65 
+    1adb:	0f 84 bf 00 00 00    	je     1ba0 <pc_format_summary+0x280>
+    1ae1:	48 8d 8c 24 b0 00 00 	lea    0xb0(%rsp),%rcx
+    1ae8:	00 
+    1ae9:	4c 8d 0d 50 82 00 00 	lea    0x8250(%rip),%r9        # 9d40 <g_pc+0x1d40>
+    1af0:	ba 80 01 00 00       	mov    $0x180,%edx
+    1af5:	4c 8d 05 f8 03 00 00 	lea    0x3f8(%rip),%r8        # 1ef4 <run_character_creation+0x124>
+    1afc:	e8 00 00 00 00       	call   1b01 <pc_format_summary+0x1e1>
+    1b01:	80 3d af 80 00 00 00 	cmpb   $0x0,0x80af(%rip)        # 9bb7 <g_pc+0x1bb7>
+    1b08:	4c 63 d0             	movslq %eax,%r10
+    1b0b:	0f 85 7b ff ff ff    	jne    1a8c <pc_format_summary+0x16c>
+    1b11:	4d 85 d2             	test   %r10,%r10
+    1b14:	74 27                	je     1b3d <pc_format_summary+0x21d>
+    1b16:	48 89 d9             	mov    %rbx,%rcx
+    1b19:	e8 00 00 00 00       	call   1b1e <pc_format_summary+0x1fe>
+    1b1e:	4c 8d 8c 24 b0 00 00 	lea    0xb0(%rsp),%r9
+    1b25:	00 
+    1b26:	4c 8d 05 2c 04 00 00 	lea    0x42c(%rip),%r8        # 1f59 <run_character_creation+0x189>
+    1b2d:	48 29 c6             	sub    %rax,%rsi
+    1b30:	48 8d 0c 03          	lea    (%rbx,%rax,1),%rcx
+    1b34:	48 89 f2             	mov    %rsi,%rdx
+    1b37:	e8 00 00 00 00       	call   1b3c <pc_format_summary+0x21c>
+    1b3c:	90                   	nop
+    1b3d:	48 81 c4 38 02 00 00 	add    $0x238,%rsp
+    1b44:	5b                   	pop    %rbx
+    1b45:	5e                   	pop    %rsi
+    1b46:	c3                   	ret
+    1b47:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+    1b4e:	00 00 
+    1b50:	48 8d 0d c0 80 00 00 	lea    0x80c0(%rip),%rcx        # 9c17 <g_pc+0x1c17>
+    1b57:	80 3d 3f 80 00 00 00 	cmpb   $0x0,0x803f(%rip)        # 9b9d <g_pc+0x1b9d>
+    1b5e:	49 89 ca             	mov    %rcx,%r10
+    1b61:	0f 85 39 fe ff ff    	jne    19a0 <pc_format_summary+0x80>
+    1b67:	4c 8d 05 36 03 00 00 	lea    0x336(%rip),%r8        # 1ea4 <run_character_creation+0xd4>
+    1b6e:	48 8d 15 40 80 00 00 	lea    0x8040(%rip),%rdx        # 9bb5 <g_pc+0x1bb5>
+    1b75:	e9 30 fe ff ff       	jmp    19aa <pc_format_summary+0x8a>
+    1b7a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1b80:	80 3d a9 80 00 00 00 	cmpb   $0x0,0x80a9(%rip)        # 9c30 <g_pc+0x1c30>
+    1b87:	48 8d 05 19 03 00 00 	lea    0x319(%rip),%rax        # 1ea7 <run_character_creation+0xd7>
+    1b8e:	0f 84 e4 fd ff ff    	je     1978 <pc_format_summary+0x58>
+    1b94:	e9 c8 fd ff ff       	jmp    1961 <pc_format_summary+0x41>
+    1b99:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+    1ba0:	41 80 bb 54 02 00 00 	cmpb   $0x0,0x254(%r11)
+    1ba7:	00 
+    1ba8:	0f 85 33 ff ff ff    	jne    1ae1 <pc_format_summary+0x1c1>
+    1bae:	80 3d af 80 00 00 00 	cmpb   $0x0,0x80af(%rip)        # 9c64 <g_pc+0x1c64>
+    1bb5:	0f 85 ce fe ff ff    	jne    1a89 <pc_format_summary+0x169>
+    1bbb:	eb 80                	jmp    1b3d <pc_format_summary+0x21d>
+    1bbd:	0f 1f 00             	nopl   (%rax)
+    1bc0:	66 83 3d b3 80 00 00 	cmpw   $0x73,0x80b3(%rip)        # 9c7b <g_pc+0x1c7b>
+    1bc7:	73 
+    1bc8:	0f 85 ce fe ff ff    	jne    1a9c <pc_format_summary+0x17c>
+    1bce:	80 3d 5f 82 00 00 00 	cmpb   $0x0,0x825f(%rip)        # 9e34 <g_pc+0x1e34>
+    1bd5:	0f 84 65 01 00 00    	je     1d40 <pc_format_summary+0x420>
+    1bdb:	81 3d 5c 82 00 00 4e 	cmpl   $0x656e6f4e,0x825c(%rip)        # 9e41 <g_pc+0x1e41>
+    1be2:	6f 6e 65 
+    1be5:	0f 84 45 01 00 00    	je     1d30 <pc_format_summary+0x410>
+    1beb:	48 8d 05 60 82 00 00 	lea    0x8260(%rip),%rax        # 9e52 <g_pc+0x1e52>
+    1bf2:	ba 80 01 00 00       	mov    $0x180,%edx
+    1bf7:	4a 8d 8c 14 b0 00 00 	lea    0xb0(%rsp,%r10,1),%rcx
+    1bfe:	00 
+    1bff:	4c 89 94 24 a8 00 00 	mov    %r10,0xa8(%rsp)
+    1c06:	00 
+    1c07:	48 89 44 24 20       	mov    %rax,0x20(%rsp)
+    1c0c:	4c 29 d2             	sub    %r10,%rdx
+    1c0f:	4c 8d 0d 06 04 00 00 	lea    0x406(%rip),%r9        # 201c <run_character_creation+0x24c>
+    1c16:	4c 8d 05 09 04 00 00 	lea    0x409(%rip),%r8        # 2026 <run_character_creation+0x256>
+    1c1d:	e8 00 00 00 00       	call   1c22 <pc_format_summary+0x302>
+    1c22:	4c 8b 94 24 a8 00 00 	mov    0xa8(%rsp),%r10
+    1c29:	00 
+    1c2a:	48 98                	cltq
+    1c2c:	49 01 c2             	add    %rax,%r10
+    1c2f:	80 3d 6f 82 00 00 00 	cmpb   $0x0,0x826f(%rip)        # 9ea5 <g_pc+0x1ea5>
+    1c36:	74 54                	je     1c8c <pc_format_summary+0x36c>
+    1c38:	81 3d 6c 82 00 00 4e 	cmpl   $0x656e6f4e,0x826c(%rip)        # 9eae <g_pc+0x1eae>
+    1c3f:	6f 6e 65 
+    1c42:	0f 84 50 01 00 00    	je     1d98 <pc_format_summary+0x478>
+    1c48:	48 8d 05 70 82 00 00 	lea    0x8270(%rip),%rax        # 9ebf <g_pc+0x1ebf>
+    1c4f:	ba 80 01 00 00       	mov    $0x180,%edx
+    1c54:	4a 8d 8c 14 b0 00 00 	lea    0xb0(%rsp,%r10,1),%rcx
+    1c5b:	00 
+    1c5c:	4c 89 94 24 a8 00 00 	mov    %r10,0xa8(%rsp)
+    1c63:	00 
+    1c64:	48 89 44 24 20       	mov    %rax,0x20(%rsp)
+    1c69:	4c 29 d2             	sub    %r10,%rdx
+    1c6c:	4c 8d 0d 06 04 00 00 	lea    0x406(%rip),%r9        # 2079 <run_character_creation+0x2a9>
+    1c73:	4c 8d 05 14 04 00 00 	lea    0x414(%rip),%r8        # 208e <run_character_creation+0x2be>
+    1c7a:	e8 00 00 00 00       	call   1c7f <pc_format_summary+0x35f>
+    1c7f:	4c 8b 94 24 a8 00 00 	mov    0xa8(%rsp),%r10
+    1c86:	00 
+    1c87:	48 98                	cltq
+    1c89:	49 01 c2             	add    %rax,%r10
+    1c8c:	80 3d af 80 00 00 00 	cmpb   $0x0,0x80af(%rip)        # 9d42 <g_pc+0x1d42>
+    1c93:	0f 84 78 fe ff ff    	je     1b11 <pc_format_summary+0x1f1>
+    1c99:	81 3d ac 80 00 00 76 	cmpl   $0x69676176,0x80ac(%rip)        # 9d4f <g_pc+0x1d4f>
+    1ca0:	61 67 69 
+    1ca3:	0f 84 bf 00 00 00    	je     1d68 <pc_format_summary+0x448>
+    1ca9:	81 3d ac 80 00 00 62 	cmpl   $0x68746f62,0x80ac(%rip)        # 9d5f <g_pc+0x1d5f>
+    1cb0:	6f 74 68 
+    1cb3:	0f 85 58 fe ff ff    	jne    1b11 <pc_format_summary+0x1f1>
+    1cb9:	80 3d b3 80 00 00 00 	cmpb   $0x0,0x80b3(%rip)        # 9d73 <g_pc+0x1d73>
+    1cc0:	0f 85 4b fe ff ff    	jne    1b11 <pc_format_summary+0x1f1>
+    1cc6:	80 3d 7f 82 00 00 00 	cmpb   $0x0,0x827f(%rip)        # 9f4c <g_pc+0x1f4c>
+    1ccd:	0f 84 3e fe ff ff    	je     1b11 <pc_format_summary+0x1f1>
+    1cd3:	81 3d 7c 82 00 00 4e 	cmpl   $0x656e6f4e,0x827c(%rip)        # 9f59 <g_pc+0x1f59>
+    1cda:	6f 6e 65 
+    1cdd:	0f 84 cd 00 00 00    	je     1db0 <pc_format_summary+0x490>
+    1ce3:	48 8d 05 80 82 00 00 	lea    0x8280(%rip),%rax        # 9f6a <g_pc+0x1f6a>
+    1cea:	ba 80 01 00 00       	mov    $0x180,%edx
+    1cef:	4a 8d 8c 14 b0 00 00 	lea    0xb0(%rsp,%r10,1),%rcx
+    1cf6:	00 
+    1cf7:	4c 89 94 24 a8 00 00 	mov    %r10,0xa8(%rsp)
+    1cfe:	00 
+    1cff:	48 89 44 24 20       	mov    %rax,0x20(%rsp)
+    1d04:	4c 29 d2             	sub    %r10,%rdx
+    1d07:	4c 8d 0d 06 04 00 00 	lea    0x406(%rip),%r9        # 2114 <run_character_creation+0x344>
+    1d0e:	4c 8d 05 20 04 00 00 	lea    0x420(%rip),%r8        # 2135 <run_character_creation+0x365>
+    1d15:	e8 00 00 00 00       	call   1d1a <pc_format_summary+0x3fa>
+    1d1a:	4c 8b 94 24 a8 00 00 	mov    0xa8(%rsp),%r10
+    1d21:	00 
+    1d22:	48 98                	cltq
+    1d24:	49 01 c2             	add    %rax,%r10
+    1d27:	e9 e5 fd ff ff       	jmp    1b11 <pc_format_summary+0x1f1>
+    1d2c:	0f 1f 40 00          	nopl   0x0(%rax)
+    1d30:	80 3d 63 82 00 00 00 	cmpb   $0x0,0x8263(%rip)        # 9f9a <g_pc+0x1f9a>
+    1d37:	0f 85 ae fe ff ff    	jne    1beb <pc_format_summary+0x2cb>
+    1d3d:	0f 1f 00             	nopl   (%rax)
+    1d40:	80 3d 6f 82 00 00 00 	cmpb   $0x0,0x826f(%rip)        # 9fb6 <g_pc+0x1fb6>
+    1d47:	0f 85 eb fe ff ff    	jne    1c38 <pc_format_summary+0x318>
+    1d4d:	e9 47 ff ff ff       	jmp    1c99 <pc_format_summary+0x379>
+    1d52:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1d58:	48 8d 05 1e 03 00 00 	lea    0x31e(%rip),%rax        # 207d <run_character_creation+0x2ad>
+    1d5f:	e9 14 fc ff ff       	jmp    1978 <pc_format_summary+0x58>
+    1d64:	0f 1f 40 00          	nopl   0x0(%rax)
+    1d68:	81 3d af 80 00 00 69 	cmpl   $0x616e69,0x80af(%rip)        # 9e21 <g_pc+0x1e21>
+    1d6f:	6e 61 00 
+    1d72:	0f 85 31 ff ff ff    	jne    1ca9 <pc_format_summary+0x389>
+    1d78:	e9 49 ff ff ff       	jmp    1cc6 <pc_format_summary+0x3a6>
+    1d7d:	0f 1f 00             	nopl   (%rax)
+    1d80:	80 3d b3 80 00 00 00 	cmpb   $0x0,0x80b3(%rip)        # 9e3a <g_pc+0x1e3a>
+    1d87:	0f 84 41 fe ff ff    	je     1bce <pc_format_summary+0x2ae>
+    1d8d:	e9 1a fd ff ff       	jmp    1aac <pc_format_summary+0x18c>
+    1d92:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1d98:	80 3d 73 82 00 00 00 	cmpb   $0x0,0x8273(%rip)        # a012 <g_pc+0x2012>
+    1d9f:	0f 84 e7 fe ff ff    	je     1c8c <pc_format_summary+0x36c>
+    1da5:	e9 9e fe ff ff       	jmp    1c48 <pc_format_summary+0x328>
+    1daa:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    1db0:	80 3d 83 82 00 00 00 	cmpb   $0x0,0x8283(%rip)        # a03a <g_pc+0x203a>
+    1db7:	0f 84 54 fd ff ff    	je     1b11 <pc_format_summary+0x1f1>
+    1dbd:	e9 21 ff ff ff       	jmp    1ce3 <pc_format_summary+0x3c3>
+    1dc2:	0f 1f 00             	nopl   (%rax)
+    1dc5:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+    1dcc:	00 00 00 00 
+
+0000000000001dd0 <run_character_creation>:
+    1dd0:	41 57                	push   %r15
+    1dd2:	b8 f8 0f 00 00       	mov    $0xff8,%eax
+    1dd7:	41 56                	push   %r14
+    1dd9:	41 55                	push   %r13
+    1ddb:	41 54                	push   %r12
+    1ddd:	55                   	push   %rbp
+    1dde:	57                   	push   %rdi
+    1ddf:	56                   	push   %rsi
+    1de0:	53                   	push   %rbx
+    1de1:	e8 00 00 00 00       	call   1de6 <run_character_creation+0x16>
+    1de6:	48 29 c4             	sub    %rax,%rsp
+    1de9:	85 c9                	test   %ecx,%ecx
+    1deb:	0f 85 6d 13 00 00    	jne    315e <run_character_creation+0x138e>
+    1df1:	b9 55 00 00 00       	mov    $0x55,%ecx
+    1df6:	48 8d 3d 00 80 00 00 	lea    0x8000(%rip),%rdi        # 9dfd <g_pc+0x1dfd>
+    1dfd:	31 c0                	xor    %eax,%eax
+    1dff:	48 8b 2d 00 00 00 00 	mov    0x0(%rip),%rbp        # 1e06 <run_character_creation+0x36>
+    1e06:	f3 48 ab             	rep stos %rax,(%rdi)
+    1e09:	4c 8b 2d 00 00 00 00 	mov    0x0(%rip),%r13        # 1e10 <run_character_creation+0x40>
+    1e10:	48 8d 5c 24 40       	lea    0x40(%rsp),%rbx
+    1e15:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+    1e1c:	00 00 00 00 
+    1e20:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2258 <run_character_creation+0x488>
+    1e27:	e8 00 00 00 00       	call   1e2c <run_character_creation+0x5c>
+    1e2c:	48 8d 0d 38 04 00 00 	lea    0x438(%rip),%rcx        # 226b <run_character_creation+0x49b>
+    1e33:	e8 00 00 00 00       	call   1e38 <run_character_creation+0x68>
+    1e38:	b9 01 00 00 00       	mov    $0x1,%ecx
+    1e3d:	ff d5                	call   *%rbp
+    1e3f:	48 89 c1             	mov    %rax,%rcx
+    1e42:	e8 00 00 00 00       	call   1e47 <run_character_creation+0x77>
+    1e47:	31 c9                	xor    %ecx,%ecx
+    1e49:	ff d5                	call   *%rbp
+    1e4b:	ba 00 01 00 00       	mov    $0x100,%edx
+    1e50:	48 89 d9             	mov    %rbx,%rcx
+    1e53:	49 89 c0             	mov    %rax,%r8
+    1e56:	e8 00 00 00 00       	call   1e5b <run_character_creation+0x8b>
+    1e5b:	48 85 c0             	test   %rax,%rax
+    1e5e:	0f 84 4c 11 00 00    	je     2fb0 <run_character_creation+0x11e0>
+    1e64:	48 89 d9             	mov    %rbx,%rcx
+    1e67:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 206f <run_character_creation+0x29f>
+    1e6e:	e8 00 00 00 00       	call   1e73 <run_character_creation+0xa3>
+    1e73:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    1e78:	0f b6 4c 24 40       	movzbl 0x40(%rsp),%ecx
+    1e7d:	84 c9                	test   %cl,%cl
+    1e7f:	75 34                	jne    1eb5 <run_character_creation+0xe5>
+    1e81:	e9 fa 10 00 00       	jmp    2f80 <run_character_creation+0x11b0>
+    1e86:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+    1e8d:	00 00 00 
+    1e90:	48 89 d9             	mov    %rbx,%rcx
+    1e93:	e8 00 00 00 00       	call   1e98 <run_character_creation+0xc8>
+    1e98:	48 89 d9             	mov    %rbx,%rcx
+    1e9b:	48 8d 54 24 41       	lea    0x41(%rsp),%rdx
+    1ea0:	49 89 c0             	mov    %rax,%r8
+    1ea3:	e8 00 00 00 00       	call   1ea8 <run_character_creation+0xd8>
+    1ea8:	0f b6 4c 24 40       	movzbl 0x40(%rsp),%ecx
+    1ead:	84 c9                	test   %cl,%cl
+    1eaf:	0f 84 cb 10 00 00    	je     2f80 <run_character_creation+0x11b0>
+    1eb5:	41 ff d5             	call   *%r13
+    1eb8:	41 89 c4             	mov    %eax,%r12d
+    1ebb:	85 c0                	test   %eax,%eax
+    1ebd:	75 d1                	jne    1e90 <run_character_creation+0xc0>
+    1ebf:	41 b8 3f 00 00 00    	mov    $0x3f,%r8d
+    1ec5:	48 89 da             	mov    %rbx,%rdx
+    1ec8:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # 9ecf <g_pc+0x1ecf>
+    1ecf:	e8 00 00 00 00       	call   1ed4 <run_character_creation+0x104>
+    1ed4:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 230c <run_character_creation+0x53c>
+    1edb:	c6 05 3e 80 00 00 00 	movb   $0x0,0x803e(%rip)        # 9f20 <g_pc+0x1f20>
+    1ee2:	4c 8d bc 24 f0 03 00 	lea    0x3f0(%rsp),%r15
+    1ee9:	00 
+    1eea:	e8 00 00 00 00       	call   1eef <run_character_creation+0x11f>
+    1eef:	ba 35 00 00 00       	mov    $0x35,%edx
+    1ef4:	48 8d 0d 00 11 00 00 	lea    0x1100(%rip),%rcx        # 2ffb <run_character_creation+0x122b>
+    1efb:	e8 00 00 00 00       	call   1f00 <run_character_creation+0x130>
+    1f00:	48 8d 0d 38 11 00 00 	lea    0x1138(%rip),%rcx        # 303f <run_character_creation+0x126f>
+    1f07:	e8 00 00 00 00       	call   1f0c <run_character_creation+0x13c>
+    1f0c:	48 8d 0d 78 11 00 00 	lea    0x1178(%rip),%rcx        # 308b <run_character_creation+0x12bb>
+    1f13:	e8 00 00 00 00       	call   1f18 <run_character_creation+0x148>
+    1f18:	48 8d 0d b8 11 00 00 	lea    0x11b8(%rip),%rcx        # 30d7 <run_character_creation+0x1307>
+    1f1f:	e8 00 00 00 00       	call   1f24 <run_character_creation+0x154>
+    1f24:	48 8d 0d f8 11 00 00 	lea    0x11f8(%rip),%rcx        # 3123 <run_character_creation+0x1353>
+    1f2b:	e8 00 00 00 00       	call   1f30 <run_character_creation+0x160>
+    1f30:	48 8d 0d 38 12 00 00 	lea    0x1238(%rip),%rcx        # 316f <run_character_creation+0x139f>
+    1f37:	e8 00 00 00 00       	call   1f3c <run_character_creation+0x16c>
+    1f3c:	48 8d 0d 78 12 00 00 	lea    0x1278(%rip),%rcx        # 31bb <run_character_creation+0x13eb>
+    1f43:	e8 00 00 00 00       	call   1f48 <run_character_creation+0x178>
+    1f48:	48 8d 0d b8 12 00 00 	lea    0x12b8(%rip),%rcx        # 3207 <run_character_creation+0x1437>
+    1f4f:	e8 00 00 00 00       	call   1f54 <run_character_creation+0x184>
+    1f54:	48 8d 0d f8 12 00 00 	lea    0x12f8(%rip),%rcx        # 3253 <run_character_creation+0x1483>
+    1f5b:	e8 00 00 00 00       	call   1f60 <run_character_creation+0x190>
+    1f60:	48 8d 0d 40 13 00 00 	lea    0x1340(%rip),%rcx        # 32a7 <run_character_creation+0x14d7>
+    1f67:	e8 00 00 00 00       	call   1f6c <run_character_creation+0x19c>
+    1f6c:	48 8d 0d 88 13 00 00 	lea    0x1388(%rip),%rcx        # 32fb <run_character_creation+0x152b>
+    1f73:	e8 00 00 00 00       	call   1f78 <run_character_creation+0x1a8>
+    1f78:	48 8d 0d c8 13 00 00 	lea    0x13c8(%rip),%rcx        # 3347 <run_character_creation+0x1577>
+    1f7f:	e8 00 00 00 00       	call   1f84 <run_character_creation+0x1b4>
+    1f84:	48 8d 0d 08 14 00 00 	lea    0x1408(%rip),%rcx        # 3393 <run_character_creation+0x15c3>
+    1f8b:	e8 00 00 00 00       	call   1f90 <run_character_creation+0x1c0>
+    1f90:	48 8d 0d 48 14 00 00 	lea    0x1448(%rip),%rcx        # 33df <run_character_creation+0x160f>
+    1f97:	e8 00 00 00 00       	call   1f9c <run_character_creation+0x1cc>
+    1f9c:	48 8d 0d 83 14 00 00 	lea    0x1483(%rip),%rcx        # 3426 <run_character_creation+0x1656>
+    1fa3:	e8 00 00 00 00       	call   1fa8 <run_character_creation+0x1d8>
+    1fa8:	b9 01 00 00 00       	mov    $0x1,%ecx
+    1fad:	ff d5                	call   *%rbp
+    1faf:	48 89 c1             	mov    %rax,%rcx
+    1fb2:	e8 00 00 00 00       	call   1fb7 <run_character_creation+0x1e7>
+    1fb7:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+    1fbe:	00 00 
+    1fc0:	31 c9                	xor    %ecx,%ecx
+    1fc2:	ff d5                	call   *%rbp
+    1fc4:	ba 00 01 00 00       	mov    $0x100,%edx
+    1fc9:	48 89 d9             	mov    %rbx,%rcx
+    1fcc:	49 89 c0             	mov    %rax,%r8
+    1fcf:	e8 00 00 00 00       	call   1fd4 <run_character_creation+0x204>
+    1fd4:	48 85 c0             	test   %rax,%rax
+    1fd7:	0f 84 c3 0f 00 00    	je     2fa0 <run_character_creation+0x11d0>
+    1fdd:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 21e5 <run_character_creation+0x415>
+    1fe4:	48 89 d9             	mov    %rbx,%rcx
+    1fe7:	e8 00 00 00 00       	call   1fec <run_character_creation+0x21c>
+    1fec:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    1ff1:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    1ff6:	0f 84 58 0f 00 00    	je     2f54 <run_character_creation+0x1184>
+    1ffc:	4c 89 fa             	mov    %r15,%rdx
+    1fff:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2005:	48 89 d9             	mov    %rbx,%rcx
+    2008:	e8 00 00 00 00       	call   200d <run_character_creation+0x23d>
+    200d:	48 8b 94 24 f0 03 00 	mov    0x3f0(%rsp),%rdx
+    2014:	00 
+    2015:	48 39 da             	cmp    %rbx,%rdx
+    2018:	0f 84 36 0f 00 00    	je     2f54 <run_character_creation+0x1184>
+    201e:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2021:	0f 85 2d 0f 00 00    	jne    2f54 <run_character_creation+0x1184>
+    2027:	83 e8 01             	sub    $0x1,%eax
+    202a:	83 f8 34             	cmp    $0x34,%eax
+    202d:	0f 87 21 0f 00 00    	ja     2f54 <run_character_creation+0x1184>
+    2033:	48 98                	cltq
+    2035:	48 8d 15 a0 29 00 00 	lea    0x29a0(%rip),%rdx        # 49dc <CC_RACES+0x203c>
+    203c:	41 b8 27 00 00 00    	mov    $0x27,%r8d
+    2042:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    2046:	48 8d 0d 40 80 00 00 	lea    0x8040(%rip),%rcx        # a08d <g_pc+0x208d>
+    204d:	e8 00 00 00 00       	call   2052 <run_character_creation+0x282>
+    2052:	48 8d 0d 40 80 00 00 	lea    0x8040(%rip),%rcx        # a099 <g_pc+0x2099>
+    2059:	c6 05 66 80 00 00 00 	movb   $0x0,0x8066(%rip)        # a0c6 <g_pc+0x20c6>
+    2060:	e8 9b df ff ff       	call   0 <cc_skin_pipes_for_race>
+    2065:	48 89 c6             	mov    %rax,%rsi
+    2068:	48 85 c0             	test   %rax,%rax
+    206b:	0f 84 3f 18 00 00    	je     38b0 <run_character_creation+0x1ae0>
+    2071:	4d 89 fd             	mov    %r15,%r13
+    2074:	4d 89 f8             	mov    %r15,%r8
+    2077:	45 31 f6             	xor    %r14d,%r14d
+    207a:	eb 7f                	jmp    20fb <run_character_creation+0x32b>
+    207c:	0f 1f 40 00          	nopl   0x0(%rax)
+    2080:	41 83 fe 20          	cmp    $0x20,%r14d
+    2084:	4c 8b 44 24 28       	mov    0x28(%rsp),%r8
+    2089:	0f 84 ff 00 00 00    	je     218e <run_character_creation+0x3be>
+    208f:	48 29 f0             	sub    %rsi,%rax
+    2092:	ba 5f 00 00 00       	mov    $0x5f,%edx
+    2097:	4d 89 c3             	mov    %r8,%r11
+    209a:	48 39 d0             	cmp    %rdx,%rax
+    209d:	48 0f 47 c2          	cmova  %rdx,%rax
+    20a1:	41 89 c2             	mov    %eax,%r10d
+    20a4:	83 f8 08             	cmp    $0x8,%eax
+    20a7:	72 0e                	jb     20b7 <run_character_creation+0x2e7>
+    20a9:	89 c1                	mov    %eax,%ecx
+    20ab:	4c 89 c7             	mov    %r8,%rdi
+    20ae:	c1 e9 03             	shr    $0x3,%ecx
+    20b1:	f3 48 a5             	rep movsq (%rsi),(%rdi)
+    20b4:	49 89 fb             	mov    %rdi,%r11
+    20b7:	31 d2                	xor    %edx,%edx
+    20b9:	41 f6 c2 04          	test   $0x4,%r10b
+    20bd:	74 0a                	je     20c9 <run_character_creation+0x2f9>
+    20bf:	8b 16                	mov    (%rsi),%edx
+    20c1:	41 89 13             	mov    %edx,(%r11)
+    20c4:	ba 04 00 00 00       	mov    $0x4,%edx
+    20c9:	41 f6 c2 02          	test   $0x2,%r10b
+    20cd:	74 0d                	je     20dc <run_character_creation+0x30c>
+    20cf:	0f b7 0c 16          	movzwl (%rsi,%rdx,1),%ecx
+    20d3:	66 41 89 0c 13       	mov    %cx,(%r11,%rdx,1)
+    20d8:	48 83 c2 02          	add    $0x2,%rdx
+    20dc:	41 83 e2 01          	and    $0x1,%r10d
+    20e0:	74 08                	je     20ea <run_character_creation+0x31a>
+    20e2:	0f b6 0c 16          	movzbl (%rsi,%rdx,1),%ecx
+    20e6:	41 88 0c 13          	mov    %cl,(%r11,%rdx,1)
+    20ea:	41 c6 04 00 00       	movb   $0x0,(%r8,%rax,1)
+    20ef:	41 83 c6 01          	add    $0x1,%r14d
+    20f3:	49 8d 71 01          	lea    0x1(%r9),%rsi
+    20f7:	49 83 c0 60          	add    $0x60,%r8
+    20fb:	ba 7c 00 00 00       	mov    $0x7c,%edx
+    2100:	48 89 f1             	mov    %rsi,%rcx
+    2103:	4c 89 44 24 28       	mov    %r8,0x28(%rsp)
+    2108:	e8 00 00 00 00       	call   210d <run_character_creation+0x33d>
+    210d:	49 89 c1             	mov    %rax,%r9
+    2110:	48 85 c0             	test   %rax,%rax
+    2113:	0f 85 67 ff ff ff    	jne    2080 <run_character_creation+0x2b0>
+    2119:	41 83 fe 20          	cmp    $0x20,%r14d
+    211d:	74 6f                	je     218e <run_character_creation+0x3be>
+    211f:	48 89 f1             	mov    %rsi,%rcx
+    2122:	e8 00 00 00 00       	call   2127 <run_character_creation+0x357>
+    2127:	ba 5f 00 00 00       	mov    $0x5f,%edx
+    212c:	48 39 d0             	cmp    %rdx,%rax
+    212f:	48 0f 47 c2          	cmova  %rdx,%rax
+    2133:	49 63 d6             	movslq %r14d,%rdx
+    2136:	48 8d 14 52          	lea    (%rdx,%rdx,2),%rdx
+    213a:	48 c1 e2 05          	shl    $0x5,%rdx
+    213e:	4c 01 fa             	add    %r15,%rdx
+    2141:	49 89 d0             	mov    %rdx,%r8
+    2144:	83 f8 08             	cmp    $0x8,%eax
+    2147:	72 0e                	jb     2157 <run_character_creation+0x387>
+    2149:	89 c1                	mov    %eax,%ecx
+    214b:	48 89 d7             	mov    %rdx,%rdi
+    214e:	c1 e9 03             	shr    $0x3,%ecx
+    2151:	f3 48 a5             	rep movsq (%rsi),(%rdi)
+    2154:	49 89 f8             	mov    %rdi,%r8
+    2157:	31 c9                	xor    %ecx,%ecx
+    2159:	a8 04                	test   $0x4,%al
+    215b:	74 0a                	je     2167 <run_character_creation+0x397>
+    215d:	8b 0e                	mov    (%rsi),%ecx
+    215f:	41 89 08             	mov    %ecx,(%r8)
+    2162:	b9 04 00 00 00       	mov    $0x4,%ecx
+    2167:	a8 02                	test   $0x2,%al
+    2169:	74 0e                	je     2179 <run_character_creation+0x3a9>
+    216b:	44 0f b7 0c 0e       	movzwl (%rsi,%rcx,1),%r9d
+    2170:	66 45 89 0c 08       	mov    %r9w,(%r8,%rcx,1)
+    2175:	48 83 c1 02          	add    $0x2,%rcx
+    2179:	a8 01                	test   $0x1,%al
+    217b:	74 09                	je     2186 <run_character_creation+0x3b6>
+    217d:	44 0f b6 0c 0e       	movzbl (%rsi,%rcx,1),%r9d
+    2182:	45 88 0c 08          	mov    %r9b,(%r8,%rcx,1)
+    2186:	c6 04 02 00          	movb   $0x0,(%rdx,%rax,1)
+    218a:	41 83 c6 01          	add    $0x1,%r14d
+    218e:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 25c6 <run_character_creation+0x7f6>
+    2195:	31 f6                	xor    %esi,%esi
+    2197:	e8 00 00 00 00       	call   219c <run_character_creation+0x3cc>
+    219c:	48 8d 15 40 80 00 00 	lea    0x8040(%rip),%rdx        # a1e3 <g_pc+0x21e3>
+    21a3:	48 8d 0d a8 04 00 00 	lea    0x4a8(%rip),%rcx        # 2652 <run_character_creation+0x882>
+    21aa:	e8 00 00 00 00       	call   21af <run_character_creation+0x3df>
+    21af:	90                   	nop
+    21b0:	83 c6 01             	add    $0x1,%esi
+    21b3:	4d 89 e8             	mov    %r13,%r8
+    21b6:	48 8d 0d e7 04 00 00 	lea    0x4e7(%rip),%rcx        # 26a4 <run_character_creation+0x8d4>
+    21bd:	49 83 c5 60          	add    $0x60,%r13
+    21c1:	89 f2                	mov    %esi,%edx
+    21c3:	e8 00 00 00 00       	call   21c8 <run_character_creation+0x3f8>
+    21c8:	44 39 f6             	cmp    %r14d,%esi
+    21cb:	75 e3                	jne    21b0 <run_character_creation+0x3e0>
+    21cd:	48 8d 0d f1 04 00 00 	lea    0x4f1(%rip),%rcx        # 26c5 <run_character_creation+0x8f5>
+    21d4:	4c 8d ac 24 40 01 00 	lea    0x140(%rsp),%r13
+    21db:	00 
+    21dc:	e8 00 00 00 00       	call   21e1 <run_character_creation+0x411>
+    21e1:	b9 01 00 00 00       	mov    $0x1,%ecx
+    21e6:	ff d5                	call   *%rbp
+    21e8:	48 89 c1             	mov    %rax,%rcx
+    21eb:	e8 00 00 00 00       	call   21f0 <run_character_creation+0x420>
+    21f0:	31 c9                	xor    %ecx,%ecx
+    21f2:	ff d5                	call   *%rbp
+    21f4:	ba 00 01 00 00       	mov    $0x100,%edx
+    21f9:	48 89 d9             	mov    %rbx,%rcx
+    21fc:	49 89 c0             	mov    %rax,%r8
+    21ff:	e8 00 00 00 00       	call   2204 <run_character_creation+0x434>
+    2204:	48 85 c0             	test   %rax,%rax
+    2207:	0f 84 33 0f 00 00    	je     3140 <run_character_creation+0x1370>
+    220d:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 2415 <run_character_creation+0x645>
+    2214:	48 89 d9             	mov    %rbx,%rcx
+    2217:	e8 00 00 00 00       	call   221c <run_character_creation+0x44c>
+    221c:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    2221:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    2226:	0f 84 26 0e 00 00    	je     3052 <run_character_creation+0x1282>
+    222c:	4c 89 ea             	mov    %r13,%rdx
+    222f:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2235:	48 89 d9             	mov    %rbx,%rcx
+    2238:	e8 00 00 00 00       	call   223d <run_character_creation+0x46d>
+    223d:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    2244:	00 
+    2245:	48 39 da             	cmp    %rbx,%rdx
+    2248:	0f 84 04 0e 00 00    	je     3052 <run_character_creation+0x1282>
+    224e:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2251:	0f 85 fb 0d 00 00    	jne    3052 <run_character_creation+0x1282>
+    2257:	85 c0                	test   %eax,%eax
+    2259:	0f 8e f3 0d 00 00    	jle    3052 <run_character_creation+0x1282>
+    225f:	41 39 c6             	cmp    %eax,%r14d
+    2262:	0f 8c ea 0d 00 00    	jl     3052 <run_character_creation+0x1282>
+    2268:	83 e8 01             	sub    $0x1,%eax
+    226b:	41 b8 3f 00 00 00    	mov    $0x3f,%r8d
+    2271:	48 8d 0d 68 80 00 00 	lea    0x8068(%rip),%rcx        # a2e0 <g_pc+0x22e0>
+    2278:	48 98                	cltq
+    227a:	48 8d 14 40          	lea    (%rax,%rax,2),%rdx
+    227e:	48 c1 e2 05          	shl    $0x5,%rdx
+    2282:	4c 01 fa             	add    %r15,%rdx
+    2285:	e8 00 00 00 00       	call   228a <run_character_creation+0x4ba>
+    228a:	c6 05 a6 80 00 00 00 	movb   $0x0,0x80a6(%rip)        # a337 <g_pc+0x2337>
+    2291:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 26c9 <run_character_creation+0x8f9>
+    2298:	e8 00 00 00 00       	call   229d <run_character_creation+0x4cd>
+    229d:	48 8d 0d 18 05 00 00 	lea    0x518(%rip),%rcx        # 27bc <run_character_creation+0x9ec>
+    22a4:	e8 00 00 00 00       	call   22a9 <run_character_creation+0x4d9>
+    22a9:	48 8d 0d 48 05 00 00 	lea    0x548(%rip),%rcx        # 27f8 <run_character_creation+0xa28>
+    22b0:	e8 00 00 00 00       	call   22b5 <run_character_creation+0x4e5>
+    22b5:	b9 01 00 00 00       	mov    $0x1,%ecx
+    22ba:	ff d5                	call   *%rbp
+    22bc:	48 89 c1             	mov    %rax,%rcx
+    22bf:	e8 00 00 00 00       	call   22c4 <run_character_creation+0x4f4>
+    22c4:	31 c9                	xor    %ecx,%ecx
+    22c6:	ff d5                	call   *%rbp
+    22c8:	ba 00 01 00 00       	mov    $0x100,%edx
+    22cd:	48 89 d9             	mov    %rbx,%rcx
+    22d0:	49 89 c0             	mov    %rax,%r8
+    22d3:	e8 00 00 00 00       	call   22d8 <run_character_creation+0x508>
+    22d8:	48 85 c0             	test   %rax,%rax
+    22db:	0f 84 97 0d 00 00    	je     3078 <run_character_creation+0x12a8>
+    22e1:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 24e9 <run_character_creation+0x719>
+    22e8:	48 89 d9             	mov    %rbx,%rcx
+    22eb:	e8 00 00 00 00       	call   22f0 <run_character_creation+0x520>
+    22f0:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    22f5:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    22fa:	0f 84 ba 0c 00 00    	je     2fba <run_character_creation+0x11ea>
+    2300:	4c 89 ea             	mov    %r13,%rdx
+    2303:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2309:	48 89 d9             	mov    %rbx,%rcx
+    230c:	e8 00 00 00 00       	call   2311 <run_character_creation+0x541>
+    2311:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    2318:	00 
+    2319:	48 39 da             	cmp    %rbx,%rdx
+    231c:	0f 84 98 0c 00 00    	je     2fba <run_character_creation+0x11ea>
+    2322:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2325:	0f 85 8f 0c 00 00    	jne    2fba <run_character_creation+0x11ea>
+    232b:	8d 50 ff             	lea    -0x1(%rax),%edx
+    232e:	83 fa 02             	cmp    $0x2,%edx
+    2331:	0f 87 83 0c 00 00    	ja     2fba <run_character_creation+0x11ea>
+    2337:	83 f8 01             	cmp    $0x1,%eax
+    233a:	0f 84 d3 10 00 00    	je     3413 <run_character_creation+0x1643>
+    2340:	83 f8 02             	cmp    $0x2,%eax
+    2343:	0f 84 fc 14 00 00    	je     3845 <run_character_creation+0x1a75>
+    2349:	c7 05 a4 80 00 00 74 	movl   $0x79656874,0x80a4(%rip)        # a3f7 <g_pc+0x23f7>
+    2350:	68 65 79 
+    2353:	c7 05 a7 80 00 00 79 	movl   $0x79,0x80a7(%rip)        # a404 <g_pc+0x2404>
+    235a:	00 00 00 
+    235d:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2795 <run_character_creation+0x9c5>
+    2364:	c6 05 ae 80 00 00 00 	movb   $0x0,0x80ae(%rip)        # a419 <g_pc+0x2419>
+    236b:	e8 00 00 00 00       	call   2370 <run_character_creation+0x5a0>
+    2370:	48 8d 0d 90 05 00 00 	lea    0x590(%rip),%rcx        # 2907 <run_character_creation+0xb37>
+    2377:	e8 00 00 00 00       	call   237c <run_character_creation+0x5ac>
+    237c:	48 8d 0d c0 05 00 00 	lea    0x5c0(%rip),%rcx        # 2943 <run_character_creation+0xb73>
+    2383:	66 90                	xchg   %ax,%ax
+    2385:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+    238c:	00 00 00 00 
+    2390:	e8 00 00 00 00       	call   2395 <run_character_creation+0x5c5>
+    2395:	b9 01 00 00 00       	mov    $0x1,%ecx
+    239a:	ff d5                	call   *%rbp
+    239c:	48 89 c1             	mov    %rax,%rcx
+    239f:	e8 00 00 00 00       	call   23a4 <run_character_creation+0x5d4>
+    23a4:	31 c9                	xor    %ecx,%ecx
+    23a6:	ff d5                	call   *%rbp
+    23a8:	ba 00 01 00 00       	mov    $0x100,%edx
+    23ad:	48 89 d9             	mov    %rbx,%rcx
+    23b0:	49 89 c0             	mov    %rax,%r8
+    23b3:	e8 00 00 00 00       	call   23b8 <run_character_creation+0x5e8>
+    23b8:	48 85 c0             	test   %rax,%rax
+    23bb:	0f 84 57 0d 00 00    	je     3118 <run_character_creation+0x1348>
+    23c1:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 25c9 <run_character_creation+0x7f9>
+    23c8:	48 89 d9             	mov    %rbx,%rcx
+    23cb:	e8 00 00 00 00       	call   23d0 <run_character_creation+0x600>
+    23d0:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    23d5:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    23da:	0f 84 66 0c 00 00    	je     3046 <run_character_creation+0x1276>
+    23e0:	4c 89 ea             	mov    %r13,%rdx
+    23e3:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    23e9:	48 89 d9             	mov    %rbx,%rcx
+    23ec:	e8 00 00 00 00       	call   23f1 <run_character_creation+0x621>
+    23f1:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    23f8:	00 
+    23f9:	48 39 da             	cmp    %rbx,%rdx
+    23fc:	0f 84 44 0c 00 00    	je     3046 <run_character_creation+0x1276>
+    2402:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2405:	0f 85 3b 0c 00 00    	jne    3046 <run_character_creation+0x1276>
+    240b:	83 e8 01             	sub    $0x1,%eax
+    240e:	83 f8 03             	cmp    $0x3,%eax
+    2411:	0f 87 2f 0c 00 00    	ja     3046 <run_character_creation+0x1276>
+    2417:	48 98                	cltq
+    2419:	48 8d 15 60 1a 00 00 	lea    0x1a60(%rip),%rdx        # 3e80 <CC_RACES+0x14e0>
+    2420:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    2426:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    242a:	48 8d 0d b0 80 00 00 	lea    0x80b0(%rip),%rcx        # a4e1 <g_pc+0x24e1>
+    2431:	e8 00 00 00 00       	call   2436 <run_character_creation+0x666>
+    2436:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 286e <run_character_creation+0xa9e>
+    243d:	c6 05 be 80 00 00 00 	movb   $0x0,0x80be(%rip)        # a502 <g_pc+0x2502>
+    2444:	e8 00 00 00 00       	call   2449 <run_character_creation+0x679>
+    2449:	48 8d 0d 10 06 00 00 	lea    0x610(%rip),%rcx        # 2a60 <run_character_creation+0xc90>
+    2450:	e8 00 00 00 00       	call   2455 <run_character_creation+0x685>
+    2455:	48 8d 0d 3a 06 00 00 	lea    0x63a(%rip),%rcx        # 2a96 <run_character_creation+0xcc6>
+    245c:	e8 00 00 00 00       	call   2461 <run_character_creation+0x691>
+    2461:	48 8d 0d 54 06 00 00 	lea    0x654(%rip),%rcx        # 2abc <run_character_creation+0xcec>
+    2468:	e8 00 00 00 00       	call   246d <run_character_creation+0x69d>
+    246d:	48 8d 0d 70 06 00 00 	lea    0x670(%rip),%rcx        # 2ae4 <run_character_creation+0xd14>
+    2474:	e8 00 00 00 00       	call   2479 <run_character_creation+0x6a9>
+    2479:	48 8d 0d 8d 06 00 00 	lea    0x68d(%rip),%rcx        # 2b0d <run_character_creation+0xd3d>
+    2480:	e8 00 00 00 00       	call   2485 <run_character_creation+0x6b5>
+    2485:	48 8d 0d aa 06 00 00 	lea    0x6aa(%rip),%rcx        # 2b36 <run_character_creation+0xd66>
+    248c:	e8 00 00 00 00       	call   2491 <run_character_creation+0x6c1>
+    2491:	48 8d 0d c5 06 00 00 	lea    0x6c5(%rip),%rcx        # 2b5d <run_character_creation+0xd8d>
+    2498:	e8 00 00 00 00       	call   249d <run_character_creation+0x6cd>
+    249d:	48 8d 0d e3 06 00 00 	lea    0x6e3(%rip),%rcx        # 2b87 <run_character_creation+0xdb7>
+    24a4:	e8 00 00 00 00       	call   24a9 <run_character_creation+0x6d9>
+    24a9:	48 8d 0d fc 06 00 00 	lea    0x6fc(%rip),%rcx        # 2bac <run_character_creation+0xddc>
+    24b0:	e8 00 00 00 00       	call   24b5 <run_character_creation+0x6e5>
+    24b5:	b9 01 00 00 00       	mov    $0x1,%ecx
+    24ba:	ff d5                	call   *%rbp
+    24bc:	48 89 c1             	mov    %rax,%rcx
+    24bf:	e8 00 00 00 00       	call   24c4 <run_character_creation+0x6f4>
+    24c4:	31 c9                	xor    %ecx,%ecx
+    24c6:	ff d5                	call   *%rbp
+    24c8:	ba 00 01 00 00       	mov    $0x100,%edx
+    24cd:	48 89 d9             	mov    %rbx,%rcx
+    24d0:	49 89 c0             	mov    %rax,%r8
+    24d3:	e8 00 00 00 00       	call   24d8 <run_character_creation+0x708>
+    24d8:	48 85 c0             	test   %rax,%rax
+    24db:	0f 84 07 0c 00 00    	je     30e8 <run_character_creation+0x1318>
+    24e1:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 26e9 <run_character_creation+0x919>
+    24e8:	48 89 d9             	mov    %rbx,%rcx
+    24eb:	e8 00 00 00 00       	call   24f0 <run_character_creation+0x720>
+    24f0:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    24f5:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    24fa:	0f 84 3a 0b 00 00    	je     303a <run_character_creation+0x126a>
+    2500:	4c 89 ea             	mov    %r13,%rdx
+    2503:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2509:	48 89 d9             	mov    %rbx,%rcx
+    250c:	e8 00 00 00 00       	call   2511 <run_character_creation+0x741>
+    2511:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    2518:	00 
+    2519:	48 39 da             	cmp    %rbx,%rdx
+    251c:	0f 84 18 0b 00 00    	je     303a <run_character_creation+0x126a>
+    2522:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2525:	0f 85 0f 0b 00 00    	jne    303a <run_character_creation+0x126a>
+    252b:	83 e8 01             	sub    $0x1,%eax
+    252e:	83 f8 0e             	cmp    $0xe,%eax
+    2531:	0f 87 03 0b 00 00    	ja     303a <run_character_creation+0x126a>
+    2537:	48 98                	cltq
+    2539:	48 8d 15 e0 19 00 00 	lea    0x19e0(%rip),%rdx        # 3f20 <CC_RACES+0x1580>
+    2540:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    2546:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    254a:	48 8d 0d c0 80 00 00 	lea    0x80c0(%rip),%rcx        # a611 <g_pc+0x2611>
+    2551:	e8 00 00 00 00       	call   2556 <run_character_creation+0x786>
+    2556:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 298e <run_character_creation+0xbbe>
+    255d:	c6 05 d6 80 00 00 00 	movb   $0x0,0x80d6(%rip)        # a63a <g_pc+0x263a>
+    2564:	e8 00 00 00 00       	call   2569 <run_character_creation+0x799>
+    2569:	48 8d 0d 28 07 00 00 	lea    0x728(%rip),%rcx        # 2c98 <run_character_creation+0xec8>
+    2570:	e8 00 00 00 00       	call   2575 <run_character_creation+0x7a5>
+    2575:	48 8d 0d 53 07 00 00 	lea    0x753(%rip),%rcx        # 2ccf <run_character_creation+0xeff>
+    257c:	e8 00 00 00 00       	call   2581 <run_character_creation+0x7b1>
+    2581:	48 8d 0d 66 07 00 00 	lea    0x766(%rip),%rcx        # 2cee <run_character_creation+0xf1e>
+    2588:	e8 00 00 00 00       	call   258d <run_character_creation+0x7bd>
+    258d:	48 8d 0d 7a 07 00 00 	lea    0x77a(%rip),%rcx        # 2d0e <run_character_creation+0xf3e>
+    2594:	e8 00 00 00 00       	call   2599 <run_character_creation+0x7c9>
+    2599:	48 8d 0d 92 07 00 00 	lea    0x792(%rip),%rcx        # 2d32 <run_character_creation+0xf62>
+    25a0:	e8 00 00 00 00       	call   25a5 <run_character_creation+0x7d5>
+    25a5:	48 8d 0d a7 07 00 00 	lea    0x7a7(%rip),%rcx        # 2d53 <run_character_creation+0xf83>
+    25ac:	e8 00 00 00 00       	call   25b1 <run_character_creation+0x7e1>
+    25b1:	48 8d 0d c0 07 00 00 	lea    0x7c0(%rip),%rcx        # 2d78 <run_character_creation+0xfa8>
+    25b8:	e8 00 00 00 00       	call   25bd <run_character_creation+0x7ed>
+    25bd:	b9 01 00 00 00       	mov    $0x1,%ecx
+    25c2:	ff d5                	call   *%rbp
+    25c4:	48 89 c1             	mov    %rax,%rcx
+    25c7:	e8 00 00 00 00       	call   25cc <run_character_creation+0x7fc>
+    25cc:	31 c9                	xor    %ecx,%ecx
+    25ce:	ff d5                	call   *%rbp
+    25d0:	ba 00 01 00 00       	mov    $0x100,%edx
+    25d5:	48 89 d9             	mov    %rbx,%rcx
+    25d8:	49 89 c0             	mov    %rax,%r8
+    25db:	e8 00 00 00 00       	call   25e0 <run_character_creation+0x810>
+    25e0:	48 85 c0             	test   %rax,%rax
+    25e3:	0f 84 ef 0a 00 00    	je     30d8 <run_character_creation+0x1308>
+    25e9:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 27f1 <run_character_creation+0xa21>
+    25f0:	48 89 d9             	mov    %rbx,%rcx
+    25f3:	e8 00 00 00 00       	call   25f8 <run_character_creation+0x828>
+    25f8:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    25fd:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    2602:	0f 84 26 0a 00 00    	je     302e <run_character_creation+0x125e>
+    2608:	4c 89 ea             	mov    %r13,%rdx
+    260b:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2611:	48 89 d9             	mov    %rbx,%rcx
+    2614:	e8 00 00 00 00       	call   2619 <run_character_creation+0x849>
+    2619:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    2620:	00 
+    2621:	48 39 da             	cmp    %rbx,%rdx
+    2624:	0f 84 04 0a 00 00    	je     302e <run_character_creation+0x125e>
+    262a:	80 3a 00             	cmpb   $0x0,(%rdx)
+    262d:	0f 85 fb 09 00 00    	jne    302e <run_character_creation+0x125e>
+    2633:	83 e8 01             	sub    $0x1,%eax
+    2636:	83 f8 05             	cmp    $0x5,%eax
+    2639:	0f 87 ef 09 00 00    	ja     302e <run_character_creation+0x125e>
+    263f:	48 98                	cltq
+    2641:	48 8d 15 a0 19 00 00 	lea    0x19a0(%rip),%rdx        # 3fe8 <CC_RACES+0x1648>
+    2648:	41 b8 37 00 00 00    	mov    $0x37,%r8d
+    264e:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    2652:	48 8d 0d d8 80 00 00 	lea    0x80d8(%rip),%rcx        # a731 <g_pc+0x2731>
+    2659:	e8 00 00 00 00       	call   265e <run_character_creation+0x88e>
+    265e:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2a96 <run_character_creation+0xcc6>
+    2665:	c6 05 0e 81 00 00 00 	movb   $0x0,0x810e(%rip)        # a77a <g_pc+0x277a>
+    266c:	e8 00 00 00 00       	call   2671 <run_character_creation+0x8a1>
+    2671:	48 8d 0d f8 07 00 00 	lea    0x7f8(%rip),%rcx        # 2e70 <run_character_creation+0x10a0>
+    2678:	e8 00 00 00 00       	call   267d <run_character_creation+0x8ad>
+    267d:	48 8d 0d 28 08 00 00 	lea    0x828(%rip),%rcx        # 2eac <run_character_creation+0x10dc>
+    2684:	e8 00 00 00 00       	call   2689 <run_character_creation+0x8b9>
+    2689:	48 8d 0d 50 08 00 00 	lea    0x850(%rip),%rcx        # 2ee0 <run_character_creation+0x1110>
+    2690:	e8 00 00 00 00       	call   2695 <run_character_creation+0x8c5>
+    2695:	b9 01 00 00 00       	mov    $0x1,%ecx
+    269a:	ff d5                	call   *%rbp
+    269c:	48 89 c1             	mov    %rax,%rcx
+    269f:	e8 00 00 00 00       	call   26a4 <run_character_creation+0x8d4>
+    26a4:	31 c9                	xor    %ecx,%ecx
+    26a6:	ff d5                	call   *%rbp
+    26a8:	ba 00 01 00 00       	mov    $0x100,%edx
+    26ad:	48 89 d9             	mov    %rbx,%rcx
+    26b0:	49 89 c0             	mov    %rax,%r8
+    26b3:	e8 00 00 00 00       	call   26b8 <run_character_creation+0x8e8>
+    26b8:	48 85 c0             	test   %rax,%rax
+    26bb:	0f 84 07 0a 00 00    	je     30c8 <run_character_creation+0x12f8>
+    26c1:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 28c9 <run_character_creation+0xaf9>
+    26c8:	48 89 d9             	mov    %rbx,%rcx
+    26cb:	e8 00 00 00 00       	call   26d0 <run_character_creation+0x900>
+    26d0:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    26d5:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    26da:	0f 84 42 09 00 00    	je     3022 <run_character_creation+0x1252>
+    26e0:	4c 89 ea             	mov    %r13,%rdx
+    26e3:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    26e9:	48 89 d9             	mov    %rbx,%rcx
+    26ec:	e8 00 00 00 00       	call   26f1 <run_character_creation+0x921>
+    26f1:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    26f8:	00 
+    26f9:	48 39 da             	cmp    %rbx,%rdx
+    26fc:	0f 84 20 09 00 00    	je     3022 <run_character_creation+0x1252>
+    2702:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2705:	0f 85 17 09 00 00    	jne    3022 <run_character_creation+0x1252>
+    270b:	83 e8 01             	sub    $0x1,%eax
+    270e:	83 f8 05             	cmp    $0x5,%eax
+    2711:	0f 87 0b 09 00 00    	ja     3022 <run_character_creation+0x1252>
+    2717:	48 98                	cltq
+    2719:	48 8d 15 00 19 00 00 	lea    0x1900(%rip),%rdx        # 4020 <CC_RACES+0x1680>
+    2720:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    2726:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    272a:	48 8d 0d 10 81 00 00 	lea    0x8110(%rip),%rcx        # a841 <g_pc+0x2841>
+    2731:	e8 00 00 00 00       	call   2736 <run_character_creation+0x966>
+    2736:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2b6e <run_character_creation+0xd9e>
+    273d:	c6 05 26 81 00 00 00 	movb   $0x0,0x8126(%rip)        # a86a <g_pc+0x286a>
+    2744:	e8 00 00 00 00       	call   2749 <run_character_creation+0x979>
+    2749:	48 8d 0d 88 08 00 00 	lea    0x888(%rip),%rcx        # 2fd8 <run_character_creation+0x1208>
+    2750:	e8 00 00 00 00       	call   2755 <run_character_creation+0x985>
+    2755:	48 8d 0d b8 08 00 00 	lea    0x8b8(%rip),%rcx        # 3014 <run_character_creation+0x1244>
+    275c:	e8 00 00 00 00       	call   2761 <run_character_creation+0x991>
+    2761:	48 8d 0d e0 08 00 00 	lea    0x8e0(%rip),%rcx        # 3048 <run_character_creation+0x1278>
+    2768:	e8 00 00 00 00       	call   276d <run_character_creation+0x99d>
+    276d:	48 8d 0d 08 09 00 00 	lea    0x908(%rip),%rcx        # 307c <run_character_creation+0x12ac>
+    2774:	e8 00 00 00 00       	call   2779 <run_character_creation+0x9a9>
+    2779:	48 8d 0d 30 09 00 00 	lea    0x930(%rip),%rcx        # 30b0 <run_character_creation+0x12e0>
+    2780:	e8 00 00 00 00       	call   2785 <run_character_creation+0x9b5>
+    2785:	48 8d 0d 58 09 00 00 	lea    0x958(%rip),%rcx        # 30e4 <run_character_creation+0x1314>
+    278c:	e8 00 00 00 00       	call   2791 <run_character_creation+0x9c1>
+    2791:	48 8d 0d 80 09 00 00 	lea    0x980(%rip),%rcx        # 3118 <run_character_creation+0x1348>
+    2798:	e8 00 00 00 00       	call   279d <run_character_creation+0x9cd>
+    279d:	b9 01 00 00 00       	mov    $0x1,%ecx
+    27a2:	ff d5                	call   *%rbp
+    27a4:	48 89 c1             	mov    %rax,%rcx
+    27a7:	e8 00 00 00 00       	call   27ac <run_character_creation+0x9dc>
+    27ac:	31 c9                	xor    %ecx,%ecx
+    27ae:	ff d5                	call   *%rbp
+    27b0:	ba 00 01 00 00       	mov    $0x100,%edx
+    27b5:	48 89 d9             	mov    %rbx,%rcx
+    27b8:	49 89 c0             	mov    %rax,%r8
+    27bb:	e8 00 00 00 00       	call   27c0 <run_character_creation+0x9f0>
+    27c0:	48 85 c0             	test   %rax,%rax
+    27c3:	0f 84 ef 08 00 00    	je     30b8 <run_character_creation+0x12e8>
+    27c9:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 29d1 <run_character_creation+0xc01>
+    27d0:	48 89 d9             	mov    %rbx,%rcx
+    27d3:	e8 00 00 00 00       	call   27d8 <run_character_creation+0xa08>
+    27d8:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    27dd:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    27e2:	0f 84 2e 08 00 00    	je     3016 <run_character_creation+0x1246>
+    27e8:	4c 89 ea             	mov    %r13,%rdx
+    27eb:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    27f1:	48 89 d9             	mov    %rbx,%rcx
+    27f4:	e8 00 00 00 00       	call   27f9 <run_character_creation+0xa29>
+    27f9:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    2800:	00 
+    2801:	48 39 da             	cmp    %rbx,%rdx
+    2804:	0f 84 0c 08 00 00    	je     3016 <run_character_creation+0x1246>
+    280a:	80 3a 00             	cmpb   $0x0,(%rdx)
+    280d:	0f 85 03 08 00 00    	jne    3016 <run_character_creation+0x1246>
+    2813:	83 e8 01             	sub    $0x1,%eax
+    2816:	83 f8 11             	cmp    $0x11,%eax
+    2819:	0f 87 f7 07 00 00    	ja     3016 <run_character_creation+0x1246>
+    281f:	48 98                	cltq
+    2821:	48 8d 15 60 18 00 00 	lea    0x1860(%rip),%rdx        # 4088 <CC_RACES+0x16e8>
+    2828:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    282e:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    2832:	48 8d 0d 28 81 00 00 	lea    0x8128(%rip),%rcx        # a961 <g_pc+0x2961>
+    2839:	e8 00 00 00 00       	call   283e <run_character_creation+0xa6e>
+    283e:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2c76 <run_character_creation+0xea6>
+    2845:	c6 05 3e 81 00 00 00 	movb   $0x0,0x813e(%rip)        # a98a <g_pc+0x298a>
+    284c:	e8 00 00 00 00       	call   2851 <run_character_creation+0xa81>
+    2851:	48 8d 0d d0 09 00 00 	lea    0x9d0(%rip),%rcx        # 3228 <run_character_creation+0x1458>
+    2858:	e8 00 00 00 00       	call   285d <run_character_creation+0xa8d>
+    285d:	48 8d 0d 00 0a 00 00 	lea    0xa00(%rip),%rcx        # 3264 <run_character_creation+0x1494>
+    2864:	e8 00 00 00 00       	call   2869 <run_character_creation+0xa99>
+    2869:	48 8d 0d 38 0a 00 00 	lea    0xa38(%rip),%rcx        # 32a8 <run_character_creation+0x14d8>
+    2870:	e8 00 00 00 00       	call   2875 <run_character_creation+0xaa5>
+    2875:	b9 01 00 00 00       	mov    $0x1,%ecx
+    287a:	ff d5                	call   *%rbp
+    287c:	48 89 c1             	mov    %rax,%rcx
+    287f:	e8 00 00 00 00       	call   2884 <run_character_creation+0xab4>
+    2884:	31 c9                	xor    %ecx,%ecx
+    2886:	ff d5                	call   *%rbp
+    2888:	ba 00 01 00 00       	mov    $0x100,%edx
+    288d:	48 89 d9             	mov    %rbx,%rcx
+    2890:	49 89 c0             	mov    %rax,%r8
+    2893:	e8 00 00 00 00       	call   2898 <run_character_creation+0xac8>
+    2898:	48 85 c0             	test   %rax,%rax
+    289b:	0f 84 07 08 00 00    	je     30a8 <run_character_creation+0x12d8>
+    28a1:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 2aa9 <run_character_creation+0xcd9>
+    28a8:	48 89 d9             	mov    %rbx,%rcx
+    28ab:	e8 00 00 00 00       	call   28b0 <run_character_creation+0xae0>
+    28b0:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    28b5:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    28ba:	0f 84 4a 07 00 00    	je     300a <run_character_creation+0x123a>
+    28c0:	4c 89 ea             	mov    %r13,%rdx
+    28c3:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    28c9:	48 89 d9             	mov    %rbx,%rcx
+    28cc:	e8 00 00 00 00       	call   28d1 <run_character_creation+0xb01>
+    28d1:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    28d8:	00 
+    28d9:	48 39 da             	cmp    %rbx,%rdx
+    28dc:	0f 84 28 07 00 00    	je     300a <run_character_creation+0x123a>
+    28e2:	80 3a 00             	cmpb   $0x0,(%rdx)
+    28e5:	0f 85 1f 07 00 00    	jne    300a <run_character_creation+0x123a>
+    28eb:	83 e8 01             	sub    $0x1,%eax
+    28ee:	83 f8 07             	cmp    $0x7,%eax
+    28f1:	0f 87 13 07 00 00    	ja     300a <run_character_creation+0x123a>
+    28f7:	48 98                	cltq
+    28f9:	48 8d 15 a0 17 00 00 	lea    0x17a0(%rip),%rdx        # 40a0 <CC_RACES+0x1700>
+    2900:	41 b8 1f 00 00 00    	mov    $0x1f,%r8d
+    2906:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    290a:	48 8d 0d 40 81 00 00 	lea    0x8140(%rip),%rcx        # aa51 <g_pc+0x2a51>
+    2911:	e8 00 00 00 00       	call   2916 <run_character_creation+0xb46>
+    2916:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2d4e <run_character_creation+0xf7e>
+    291d:	c6 05 5e 81 00 00 00 	movb   $0x0,0x815e(%rip)        # aa82 <g_pc+0x2a82>
+    2924:	e8 00 00 00 00       	call   2929 <run_character_creation+0xb59>
+    2929:	48 8d 0d 88 0a 00 00 	lea    0xa88(%rip),%rcx        # 33b8 <run_character_creation+0x15e8>
+    2930:	e8 00 00 00 00       	call   2935 <run_character_creation+0xb65>
+    2935:	48 8d 0d b8 0a 00 00 	lea    0xab8(%rip),%rcx        # 33f4 <run_character_creation+0x1624>
+    293c:	e8 00 00 00 00       	call   2941 <run_character_creation+0xb71>
+    2941:	48 8d 0d e8 0a 00 00 	lea    0xae8(%rip),%rcx        # 3430 <run_character_creation+0x1660>
+    2948:	e8 00 00 00 00       	call   294d <run_character_creation+0xb7d>
+    294d:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2952:	ff d5                	call   *%rbp
+    2954:	48 89 c1             	mov    %rax,%rcx
+    2957:	e8 00 00 00 00       	call   295c <run_character_creation+0xb8c>
+    295c:	31 c9                	xor    %ecx,%ecx
+    295e:	ff d5                	call   *%rbp
+    2960:	ba 00 01 00 00       	mov    $0x100,%edx
+    2965:	48 89 d9             	mov    %rbx,%rcx
+    2968:	49 89 c0             	mov    %rax,%r8
+    296b:	e8 00 00 00 00       	call   2970 <run_character_creation+0xba0>
+    2970:	48 85 c0             	test   %rax,%rax
+    2973:	0f 84 1f 07 00 00    	je     3098 <run_character_creation+0x12c8>
+    2979:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 2b81 <run_character_creation+0xdb1>
+    2980:	48 89 d9             	mov    %rbx,%rcx
+    2983:	e8 00 00 00 00       	call   2988 <run_character_creation+0xbb8>
+    2988:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    298d:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    2992:	0f 84 66 06 00 00    	je     2ffe <run_character_creation+0x122e>
+    2998:	4c 89 ea             	mov    %r13,%rdx
+    299b:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    29a1:	48 89 d9             	mov    %rbx,%rcx
+    29a4:	e8 00 00 00 00       	call   29a9 <run_character_creation+0xbd9>
+    29a9:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    29b0:	00 
+    29b1:	48 39 da             	cmp    %rbx,%rdx
+    29b4:	0f 84 44 06 00 00    	je     2ffe <run_character_creation+0x122e>
+    29ba:	80 3a 00             	cmpb   $0x0,(%rdx)
+    29bd:	0f 85 3b 06 00 00    	jne    2ffe <run_character_creation+0x122e>
+    29c3:	83 e8 01             	sub    $0x1,%eax
+    29c6:	83 f8 07             	cmp    $0x7,%eax
+    29c9:	0f 87 2f 06 00 00    	ja     2ffe <run_character_creation+0x122e>
+    29cf:	48 98                	cltq
+    29d1:	48 8d 15 00 17 00 00 	lea    0x1700(%rip),%rdx        # 40d8 <CC_RACES+0x1738>
+    29d8:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    29de:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    29e2:	48 8d 0d 60 81 00 00 	lea    0x8160(%rip),%rcx        # ab49 <g_pc+0x2b49>
+    29e9:	e8 00 00 00 00       	call   29ee <run_character_creation+0xc1e>
+    29ee:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2e26 <run_character_creation+0x1056>
+    29f5:	c6 05 76 81 00 00 00 	movb   $0x0,0x8176(%rip)        # ab72 <g_pc+0x2b72>
+    29fc:	e8 00 00 00 00       	call   2a01 <run_character_creation+0xc31>
+    2a01:	48 8d 0d 28 0b 00 00 	lea    0xb28(%rip),%rcx        # 3530 <run_character_creation+0x1760>
+    2a08:	e8 00 00 00 00       	call   2a0d <run_character_creation+0xc3d>
+    2a0d:	48 8d 0d 58 0b 00 00 	lea    0xb58(%rip),%rcx        # 356c <run_character_creation+0x179c>
+    2a14:	e8 00 00 00 00       	call   2a19 <run_character_creation+0xc49>
+    2a19:	48 8d 0d 8f 0b 00 00 	lea    0xb8f(%rip),%rcx        # 35af <run_character_creation+0x17df>
+    2a20:	e8 00 00 00 00       	call   2a25 <run_character_creation+0xc55>
+    2a25:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2a2a:	ff d5                	call   *%rbp
+    2a2c:	48 89 c1             	mov    %rax,%rcx
+    2a2f:	e8 00 00 00 00       	call   2a34 <run_character_creation+0xc64>
+    2a34:	31 c9                	xor    %ecx,%ecx
+    2a36:	ff d5                	call   *%rbp
+    2a38:	ba 00 01 00 00       	mov    $0x100,%edx
+    2a3d:	48 89 d9             	mov    %rbx,%rcx
+    2a40:	49 89 c0             	mov    %rax,%r8
+    2a43:	e8 00 00 00 00       	call   2a48 <run_character_creation+0xc78>
+    2a48:	48 85 c0             	test   %rax,%rax
+    2a4b:	0f 84 b7 06 00 00    	je     3108 <run_character_creation+0x1338>
+    2a51:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 2c59 <run_character_creation+0xe89>
+    2a58:	48 89 d9             	mov    %rbx,%rcx
+    2a5b:	e8 00 00 00 00       	call   2a60 <run_character_creation+0xc90>
+    2a60:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    2a65:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    2a6a:	0f 84 82 05 00 00    	je     2ff2 <run_character_creation+0x1222>
+    2a70:	4c 89 ea             	mov    %r13,%rdx
+    2a73:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2a79:	48 89 d9             	mov    %rbx,%rcx
+    2a7c:	e8 00 00 00 00       	call   2a81 <run_character_creation+0xcb1>
+    2a81:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    2a88:	00 
+    2a89:	48 39 da             	cmp    %rbx,%rdx
+    2a8c:	0f 84 60 05 00 00    	je     2ff2 <run_character_creation+0x1222>
+    2a92:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2a95:	0f 85 57 05 00 00    	jne    2ff2 <run_character_creation+0x1222>
+    2a9b:	83 e8 01             	sub    $0x1,%eax
+    2a9e:	83 f8 05             	cmp    $0x5,%eax
+    2aa1:	0f 87 4b 05 00 00    	ja     2ff2 <run_character_creation+0x1222>
+    2aa7:	48 98                	cltq
+    2aa9:	48 8d 15 a0 16 00 00 	lea    0x16a0(%rip),%rdx        # 4150 <CC_RACES+0x17b0>
+    2ab0:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    2ab6:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    2aba:	48 8d 0d 78 81 00 00 	lea    0x8178(%rip),%rcx        # ac39 <g_pc+0x2c39>
+    2ac1:	e8 00 00 00 00       	call   2ac6 <run_character_creation+0xcf6>
+    2ac6:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2efe <run_character_creation+0x112e>
+    2acd:	c6 05 8e 81 00 00 00 	movb   $0x0,0x818e(%rip)        # ac62 <g_pc+0x2c62>
+    2ad4:	e8 00 00 00 00       	call   2ad9 <run_character_creation+0xd09>
+    2ad9:	48 8d 0d b0 0b 00 00 	lea    0xbb0(%rip),%rcx        # 3690 <run_character_creation+0x18c0>
+    2ae0:	e8 00 00 00 00       	call   2ae5 <run_character_creation+0xd15>
+    2ae5:	48 8d 0d e0 0b 00 00 	lea    0xbe0(%rip),%rcx        # 36cc <run_character_creation+0x18fc>
+    2aec:	e8 00 00 00 00       	call   2af1 <run_character_creation+0xd21>
+    2af1:	48 8d 0d 10 0c 00 00 	lea    0xc10(%rip),%rcx        # 3708 <run_character_creation+0x1938>
+    2af8:	e8 00 00 00 00       	call   2afd <run_character_creation+0xd2d>
+    2afd:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2b02:	ff d5                	call   *%rbp
+    2b04:	48 89 c1             	mov    %rax,%rcx
+    2b07:	e8 00 00 00 00       	call   2b0c <run_character_creation+0xd3c>
+    2b0c:	31 c9                	xor    %ecx,%ecx
+    2b0e:	ff d5                	call   *%rbp
+    2b10:	ba 00 01 00 00       	mov    $0x100,%edx
+    2b15:	48 89 d9             	mov    %rbx,%rcx
+    2b18:	49 89 c0             	mov    %rax,%r8
+    2b1b:	e8 00 00 00 00       	call   2b20 <run_character_creation+0xd50>
+    2b20:	48 85 c0             	test   %rax,%rax
+    2b23:	0f 84 cf 05 00 00    	je     30f8 <run_character_creation+0x1328>
+    2b29:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 2d31 <run_character_creation+0xf61>
+    2b30:	48 89 d9             	mov    %rbx,%rcx
+    2b33:	e8 00 00 00 00       	call   2b38 <run_character_creation+0xd68>
+    2b38:	c6 44 04 40 00       	movb   $0x0,0x40(%rsp,%rax,1)
+    2b3d:	80 7c 24 40 00       	cmpb   $0x0,0x40(%rsp)
+    2b42:	0f 84 9e 04 00 00    	je     2fe6 <run_character_creation+0x1216>
+    2b48:	4c 89 ea             	mov    %r13,%rdx
+    2b4b:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2b51:	48 89 d9             	mov    %rbx,%rcx
+    2b54:	e8 00 00 00 00       	call   2b59 <run_character_creation+0xd89>
+    2b59:	48 8b 94 24 40 01 00 	mov    0x140(%rsp),%rdx
+    2b60:	00 
+    2b61:	48 39 da             	cmp    %rbx,%rdx
+    2b64:	0f 84 7c 04 00 00    	je     2fe6 <run_character_creation+0x1216>
+    2b6a:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2b6d:	0f 85 73 04 00 00    	jne    2fe6 <run_character_creation+0x1216>
+    2b73:	83 e8 01             	sub    $0x1,%eax
+    2b76:	83 f8 08             	cmp    $0x8,%eax
+    2b79:	0f 87 67 04 00 00    	ja     2fe6 <run_character_creation+0x1216>
+    2b7f:	48 98                	cltq
+    2b81:	48 8d 15 20 16 00 00 	lea    0x1620(%rip),%rdx        # 41a8 <CC_RACES+0x1808>
+    2b88:	41 b8 17 00 00 00    	mov    $0x17,%r8d
+    2b8e:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    2b92:	48 8d 0d 90 81 00 00 	lea    0x8190(%rip),%rcx        # ad29 <g_pc+0x2d29>
+    2b99:	48 8d 74 24 38       	lea    0x38(%rsp),%rsi
+    2b9e:	e8 00 00 00 00       	call   2ba3 <run_character_creation+0xdd3>
+    2ba3:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # abaa <g_pc+0x2baa>
+    2baa:	c6 05 a6 81 00 00 00 	movb   $0x0,0x81a6(%rip)        # ad57 <g_pc+0x2d57>
+    2bb1:	e8 9a d5 ff ff       	call   150 <pc_fill_narrative_defaults>
+    2bb6:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 2fee <run_character_creation+0x121e>
+    2bbd:	e8 00 00 00 00       	call   2bc2 <run_character_creation+0xdf2>
+    2bc2:	48 8d 0d 68 0c 00 00 	lea    0xc68(%rip),%rcx        # 3831 <run_character_creation+0x1a61>
+    2bc9:	e8 00 00 00 00       	call   2bce <run_character_creation+0xdfe>
+    2bce:	48 8d 0d a0 0c 00 00 	lea    0xca0(%rip),%rcx        # 3875 <run_character_creation+0x1aa5>
+    2bd5:	e8 00 00 00 00       	call   2bda <run_character_creation+0xe0a>
+    2bda:	48 8d 0d 2c 0d 00 00 	lea    0xd2c(%rip),%rcx        # 390d <run_character_creation+0x1b3d>
+    2be1:	e8 00 00 00 00       	call   2be6 <run_character_creation+0xe16>
+    2be6:	48 8d 0d 48 0d 00 00 	lea    0xd48(%rip),%rcx        # 3935 <run_character_creation+0x1b65>
+    2bed:	e8 00 00 00 00       	call   2bf2 <run_character_creation+0xe22>
+    2bf2:	48 8d 0d 80 0d 00 00 	lea    0xd80(%rip),%rcx        # 3979 <CC_RACES+0xfd9>
+    2bf9:	e8 00 00 00 00       	call   2bfe <run_character_creation+0xe2e>
+    2bfe:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2c03:	ff d5                	call   *%rbp
+    2c05:	48 89 c1             	mov    %rax,%rcx
+    2c08:	e8 00 00 00 00       	call   2c0d <run_character_creation+0xe3d>
+    2c0d:	31 c9                	xor    %ecx,%ecx
+    2c0f:	ff d5                	call   *%rbp
+    2c11:	ba 00 01 00 00       	mov    $0x100,%edx
+    2c16:	4c 89 e9             	mov    %r13,%rcx
+    2c19:	49 89 c0             	mov    %rax,%r8
+    2c1c:	e8 00 00 00 00       	call   2c21 <run_character_creation+0xe51>
+    2c21:	48 85 c0             	test   %rax,%rax
+    2c24:	0f 84 5e 04 00 00    	je     3088 <run_character_creation+0x12b8>
+    2c2a:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 2e32 <run_character_creation+0x1062>
+    2c31:	4c 89 e9             	mov    %r13,%rcx
+    2c34:	e8 00 00 00 00       	call   2c39 <run_character_creation+0xe69>
+    2c39:	c6 84 04 40 01 00 00 	movb   $0x0,0x140(%rsp,%rax,1)
+    2c40:	00 
+    2c41:	80 bc 24 40 01 00 00 	cmpb   $0x0,0x140(%rsp)
+    2c48:	00 
+    2c49:	0f 84 77 03 00 00    	je     2fc6 <run_character_creation+0x11f6>
+    2c4f:	48 89 f2             	mov    %rsi,%rdx
+    2c52:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2c58:	4c 89 e9             	mov    %r13,%rcx
+    2c5b:	e8 00 00 00 00       	call   2c60 <run_character_creation+0xe90>
+    2c60:	48 8b 54 24 38       	mov    0x38(%rsp),%rdx
+    2c65:	4c 39 ea             	cmp    %r13,%rdx
+    2c68:	0f 84 58 03 00 00    	je     2fc6 <run_character_creation+0x11f6>
+    2c6e:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2c71:	0f 85 4f 03 00 00    	jne    2fc6 <run_character_creation+0x11f6>
+    2c77:	8d 50 ff             	lea    -0x1(%rax),%edx
+    2c7a:	83 fa 07             	cmp    $0x7,%edx
+    2c7d:	0f 87 43 03 00 00    	ja     2fc6 <run_character_creation+0x11f6>
+    2c83:	83 f8 01             	cmp    $0x1,%eax
+    2c86:	74 29                	je     2cb1 <run_character_creation+0xee1>
+    2c88:	83 e8 02             	sub    $0x2,%eax
+    2c8b:	48 8d 15 a0 15 00 00 	lea    0x15a0(%rip),%rdx        # 4232 <CC_RACES+0x1892>
+    2c92:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    2c98:	48 98                	cltq
+    2c9a:	48 8d 0d 50 82 00 00 	lea    0x8250(%rip),%rcx        # aef1 <g_pc+0x2ef1>
+    2ca1:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    2ca5:	e8 00 00 00 00       	call   2caa <run_character_creation+0xeda>
+    2caa:	c6 05 5e 82 00 00 00 	movb   $0x0,0x825e(%rip)        # af0f <g_pc+0x2f0f>
+    2cb1:	80 3d 4f 82 00 00 00 	cmpb   $0x0,0x824f(%rip)        # af07 <g_pc+0x2f07>
+    2cb8:	0f 84 99 04 00 00    	je     3157 <run_character_creation+0x1387>
+    2cbe:	81 3d 4c 82 00 00 4e 	cmpl   $0x656e6f4e,0x824c(%rip)        # af14 <g_pc+0x2f14>
+    2cc5:	6f 6e 65 
+    2cc8:	0f 84 7c 04 00 00    	je     314a <run_character_creation+0x137a>
+    2cce:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 3106 <run_character_creation+0x1336>
+    2cd5:	e8 00 00 00 00       	call   2cda <run_character_creation+0xf0a>
+    2cda:	48 8d 0d c0 0d 00 00 	lea    0xdc0(%rip),%rcx        # 3aa1 <CC_RACES+0x1101>
+    2ce1:	e8 00 00 00 00       	call   2ce6 <run_character_creation+0xf16>
+    2ce6:	48 8d 0d e8 0d 00 00 	lea    0xde8(%rip),%rcx        # 3ad5 <CC_RACES+0x1135>
+    2ced:	e8 00 00 00 00       	call   2cf2 <run_character_creation+0xf22>
+    2cf2:	48 8d 0d 20 0e 00 00 	lea    0xe20(%rip),%rcx        # 3b19 <CC_RACES+0x1179>
+    2cf9:	e8 00 00 00 00       	call   2cfe <run_character_creation+0xf2e>
+    2cfe:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2d03:	ff d5                	call   *%rbp
+    2d05:	48 89 c1             	mov    %rax,%rcx
+    2d08:	e8 00 00 00 00       	call   2d0d <run_character_creation+0xf3d>
+    2d0d:	31 c9                	xor    %ecx,%ecx
+    2d0f:	ff d5                	call   *%rbp
+    2d11:	ba 00 01 00 00       	mov    $0x100,%edx
+    2d16:	4c 89 e9             	mov    %r13,%rcx
+    2d19:	49 89 c0             	mov    %rax,%r8
+    2d1c:	e8 00 00 00 00       	call   2d21 <run_character_creation+0xf51>
+    2d21:	48 85 c0             	test   %rax,%rax
+    2d24:	0f 84 dc 06 00 00    	je     3406 <run_character_creation+0x1636>
+    2d2a:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 2f32 <run_character_creation+0x1162>
+    2d31:	4c 89 e9             	mov    %r13,%rcx
+    2d34:	e8 00 00 00 00       	call   2d39 <run_character_creation+0xf69>
+    2d39:	c6 84 04 40 01 00 00 	movb   $0x0,0x140(%rsp,%rax,1)
+    2d40:	00 
+    2d41:	80 bc 24 40 01 00 00 	cmpb   $0x0,0x140(%rsp)
+    2d48:	00 
+    2d49:	0f 84 d3 03 00 00    	je     3122 <run_character_creation+0x1352>
+    2d4f:	48 89 f2             	mov    %rsi,%rdx
+    2d52:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2d58:	4c 89 e9             	mov    %r13,%rcx
+    2d5b:	e8 00 00 00 00       	call   2d60 <run_character_creation+0xf90>
+    2d60:	48 8b 54 24 38       	mov    0x38(%rsp),%rdx
+    2d65:	4c 39 ea             	cmp    %r13,%rdx
+    2d68:	0f 84 b4 03 00 00    	je     3122 <run_character_creation+0x1352>
+    2d6e:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2d71:	0f 85 ab 03 00 00    	jne    3122 <run_character_creation+0x1352>
+    2d77:	8d 50 ff             	lea    -0x1(%rax),%edx
+    2d7a:	83 fa 05             	cmp    $0x5,%edx
+    2d7d:	0f 87 9f 03 00 00    	ja     3122 <run_character_creation+0x1352>
+    2d83:	83 f8 01             	cmp    $0x1,%eax
+    2d86:	74 29                	je     2db1 <run_character_creation+0xfe1>
+    2d88:	83 e8 02             	sub    $0x2,%eax
+    2d8b:	48 8d 15 60 15 00 00 	lea    0x1560(%rip),%rdx        # 42f2 <CC_RACES+0x1952>
+    2d92:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    2d98:	48 98                	cltq
+    2d9a:	48 8d 0d 90 82 00 00 	lea    0x8290(%rip),%rcx        # b031 <g_pc+0x3031>
+    2da1:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    2da5:	e8 00 00 00 00       	call   2daa <run_character_creation+0xfda>
+    2daa:	c6 05 9e 82 00 00 00 	movb   $0x0,0x829e(%rip)        # b04f <g_pc+0x304f>
+    2db1:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 31e9 <run_character_creation+0x1419>
+    2db8:	e8 00 00 00 00       	call   2dbd <run_character_creation+0xfed>
+    2dbd:	48 8d 0d 48 0e 00 00 	lea    0xe48(%rip),%rcx        # 3c0c <CC_RACES+0x126c>
+    2dc4:	e8 00 00 00 00       	call   2dc9 <run_character_creation+0xff9>
+    2dc9:	48 8d 0d 90 0e 00 00 	lea    0xe90(%rip),%rcx        # 3c60 <CC_RACES+0x12c0>
+    2dd0:	e8 00 00 00 00       	call   2dd5 <run_character_creation+0x1005>
+    2dd5:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2dda:	ff d5                	call   *%rbp
+    2ddc:	48 89 c1             	mov    %rax,%rcx
+    2ddf:	e8 00 00 00 00       	call   2de4 <run_character_creation+0x1014>
+    2de4:	31 c9                	xor    %ecx,%ecx
+    2de6:	ff d5                	call   *%rbp
+    2de8:	ba 00 01 00 00       	mov    $0x100,%edx
+    2ded:	4c 89 e9             	mov    %r13,%rcx
+    2df0:	49 89 c0             	mov    %rax,%r8
+    2df3:	e8 00 00 00 00       	call   2df8 <run_character_creation+0x1028>
+    2df8:	48 85 c0             	test   %rax,%rax
+    2dfb:	0f 84 f8 05 00 00    	je     33f9 <run_character_creation+0x1629>
+    2e01:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 3009 <run_character_creation+0x1239>
+    2e08:	4c 89 e9             	mov    %r13,%rcx
+    2e0b:	e8 00 00 00 00       	call   2e10 <run_character_creation+0x1040>
+    2e10:	c6 84 04 40 01 00 00 	movb   $0x0,0x140(%rsp,%rax,1)
+    2e17:	00 
+    2e18:	80 bc 24 40 01 00 00 	cmpb   $0x0,0x140(%rsp)
+    2e1f:	00 
+    2e20:	0f 84 08 03 00 00    	je     312e <run_character_creation+0x135e>
+    2e26:	48 89 f2             	mov    %rsi,%rdx
+    2e29:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    2e2f:	4c 89 e9             	mov    %r13,%rcx
+    2e32:	e8 00 00 00 00       	call   2e37 <run_character_creation+0x1067>
+    2e37:	48 8b 54 24 38       	mov    0x38(%rsp),%rdx
+    2e3c:	4c 39 ea             	cmp    %r13,%rdx
+    2e3f:	0f 84 e9 02 00 00    	je     312e <run_character_creation+0x135e>
+    2e45:	80 3a 00             	cmpb   $0x0,(%rdx)
+    2e48:	0f 85 e0 02 00 00    	jne    312e <run_character_creation+0x135e>
+    2e4e:	8d 50 ff             	lea    -0x1(%rax),%edx
+    2e51:	83 fa 01             	cmp    $0x1,%edx
+    2e54:	0f 87 d4 02 00 00    	ja     312e <run_character_creation+0x135e>
+    2e5a:	ba 01 00 00 00       	mov    $0x1,%edx
+    2e5f:	83 f8 01             	cmp    $0x1,%eax
+    2e62:	0f 84 ef 02 00 00    	je     3157 <run_character_creation+0x1387>
+    2e68:	81 3d ac 80 00 00 70 	cmpl   $0x696e6570,0x80ac(%rip)        # af1e <g_pc+0x2f1e>
+    2e6f:	65 6e 69 
+    2e72:	89 15 a0 82 00 00    	mov    %edx,0x82a0(%rip)        # b118 <g_pc+0x3118>
+    2e78:	0f 84 ae 05 00 00    	je     342c <run_character_creation+0x165c>
+    2e7e:	81 3d ac 80 00 00 62 	cmpl   $0x68746f62,0x80ac(%rip)        # af34 <g_pc+0x2f34>
+    2e85:	6f 74 68 
+    2e88:	0f 84 9f 0a 00 00    	je     392d <run_character_creation+0x1b5d>
+    2e8e:	81 3d ac 80 00 00 76 	cmpl   $0x69676176,0x80ac(%rip)        # af44 <g_pc+0x2f44>
+    2e95:	61 67 69 
+    2e98:	0f 84 c0 09 00 00    	je     385e <run_character_creation+0x1a8e>
+    2e9e:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # aea5 <g_pc+0x2ea5>
+    2ea5:	4c 89 ef             	mov    %r13,%rdi
+    2ea8:	48 8d 35 00 80 00 00 	lea    0x8000(%rip),%rsi        # aeaf <g_pc+0x2eaf>
+    2eaf:	e8 9c d2 ff ff       	call   150 <pc_fill_narrative_defaults>
+    2eb4:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 32ec <run_character_creation+0x151c>
+    2ebb:	e8 00 00 00 00       	call   2ec0 <run_character_creation+0x10f0>
+    2ec0:	48 8d 0d 93 10 00 00 	lea    0x1093(%rip),%rcx        # 3f5a <CC_RACES+0x15ba>
+    2ec7:	e8 00 00 00 00       	call   2ecc <run_character_creation+0x10fc>
+    2ecc:	b9 55 00 00 00       	mov    $0x55,%ecx
+    2ed1:	41 b8 00 80 00 00    	mov    $0x8000,%r8d
+    2ed7:	48 8d 15 00 00 00 00 	lea    0x0(%rip),%rdx        # 2ede <run_character_creation+0x110e>
+    2ede:	f3 48 a5             	rep movsq (%rsi),(%rdi)
+    2ee1:	48 8d 8c 24 40 01 00 	lea    0x140(%rsp),%rcx
+    2ee8:	00 
+    2ee9:	e8 00 00 00 00       	call   2eee <run_character_creation+0x111e>
+    2eee:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2ef3:	ff d5                	call   *%rbp
+    2ef5:	48 8d 0d 00 00 00 00 	lea    0x0(%rip),%rcx        # 2efc <run_character_creation+0x112c>
+    2efc:	48 89 c2             	mov    %rax,%rdx
+    2eff:	e8 00 00 00 00       	call   2f04 <run_character_creation+0x1134>
+    2f04:	48 8d 0d b0 10 00 00 	lea    0x10b0(%rip),%rcx        # 3fbb <CC_RACES+0x161b>
+    2f0b:	e8 00 00 00 00       	call   2f10 <run_character_creation+0x1140>
+    2f10:	48 8d 0d e7 10 00 00 	lea    0x10e7(%rip),%rcx        # 3ffe <CC_RACES+0x165e>
+    2f17:	e8 00 00 00 00       	call   2f1c <run_character_creation+0x114c>
+    2f1c:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2f21:	ff d5                	call   *%rbp
+    2f23:	48 89 c1             	mov    %rax,%rcx
+    2f26:	e8 00 00 00 00       	call   2f2b <run_character_creation+0x115b>
+    2f2b:	31 c9                	xor    %ecx,%ecx
+    2f2d:	ff d5                	call   *%rbp
+    2f2f:	ba 00 01 00 00       	mov    $0x100,%edx
+    2f34:	48 89 d9             	mov    %rbx,%rcx
+    2f37:	49 89 c0             	mov    %rax,%r8
+    2f3a:	e8 00 00 00 00       	call   2f3f <run_character_creation+0x116f>
+    2f3f:	90                   	nop
+    2f40:	48 81 c4 f8 0f 00 00 	add    $0xff8,%rsp
+    2f47:	5b                   	pop    %rbx
+    2f48:	5e                   	pop    %rsi
+    2f49:	5f                   	pop    %rdi
+    2f4a:	5d                   	pop    %rbp
+    2f4b:	41 5c                	pop    %r12
+    2f4d:	41 5d                	pop    %r13
+    2f4f:	41 5e                	pop    %r14
+    2f51:	41 5f                	pop    %r15
+    2f53:	c3                   	ret
+    2f54:	ba 35 00 00 00       	mov    $0x35,%edx
+    2f59:	48 8d 0d 87 04 00 00 	lea    0x487(%rip),%rcx        # 33e7 <run_character_creation+0x1617>
+    2f60:	e8 00 00 00 00       	call   2f65 <run_character_creation+0x1195>
+    2f65:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2f6a:	ff d5                	call   *%rbp
+    2f6c:	48 89 c1             	mov    %rax,%rcx
+    2f6f:	e8 00 00 00 00       	call   2f74 <run_character_creation+0x11a4>
+    2f74:	e9 47 f0 ff ff       	jmp    1fc0 <run_character_creation+0x1f0>
+    2f79:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+    2f80:	48 8d 0d 71 04 00 00 	lea    0x471(%rip),%rcx        # 33f8 <run_character_creation+0x1628>
+    2f87:	e8 00 00 00 00       	call   2f8c <run_character_creation+0x11bc>
+    2f8c:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2f91:	ff d5                	call   *%rbp
+    2f93:	48 89 c1             	mov    %rax,%rcx
+    2f96:	e8 00 00 00 00       	call   2f9b <run_character_creation+0x11cb>
+    2f9b:	e9 80 ee ff ff       	jmp    1e20 <run_character_creation+0x50>
+    2fa0:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    2fa5:	e9 33 f0 ff ff       	jmp    1fdd <run_character_creation+0x20d>
+    2faa:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    2fb0:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    2fb5:	e9 aa ee ff ff       	jmp    1e64 <run_character_creation+0x94>
+    2fba:	48 8d 0d 7a 05 00 00 	lea    0x57a(%rip),%rcx        # 353b <run_character_creation+0x176b>
+    2fc1:	e9 ea f2 ff ff       	jmp    22b0 <run_character_creation+0x4e0>
+    2fc6:	48 8d 0d 79 0a 00 00 	lea    0xa79(%rip),%rcx        # 3a46 <CC_RACES+0x10a6>
+    2fcd:	e8 00 00 00 00       	call   2fd2 <run_character_creation+0x1202>
+    2fd2:	b9 01 00 00 00       	mov    $0x1,%ecx
+    2fd7:	ff d5                	call   *%rbp
+    2fd9:	48 89 c1             	mov    %rax,%rcx
+    2fdc:	e8 00 00 00 00       	call   2fe1 <run_character_creation+0x1211>
+    2fe1:	e9 27 fc ff ff       	jmp    2c0d <run_character_creation+0xe3d>
+    2fe6:	48 8d 0d 55 0c 00 00 	lea    0xc55(%rip),%rcx        # 3c42 <CC_RACES+0x12a2>
+    2fed:	e9 06 fb ff ff       	jmp    2af8 <run_character_creation+0xd28>
+    2ff2:	48 8d 0d e7 07 00 00 	lea    0x7e7(%rip),%rcx        # 37e0 <run_character_creation+0x1a10>
+    2ff9:	e9 22 fa ff ff       	jmp    2a20 <run_character_creation+0xc50>
+    2ffe:	48 8d 0d 79 0a 00 00 	lea    0xa79(%rip),%rcx        # 3a7e <CC_RACES+0x10de>
+    3005:	e9 3e f9 ff ff       	jmp    2948 <run_character_creation+0xb78>
+    300a:	48 8d 0d 79 0a 00 00 	lea    0xa79(%rip),%rcx        # 3a8a <CC_RACES+0x10ea>
+    3011:	e9 5a f8 ff ff       	jmp    2870 <run_character_creation+0xaa0>
+    3016:	48 8d 0d ba 09 00 00 	lea    0x9ba(%rip),%rcx        # 39d7 <CC_RACES+0x1037>
+    301d:	e9 76 f7 ff ff       	jmp    2798 <run_character_creation+0x9c8>
+    3022:	48 8d 0d e7 07 00 00 	lea    0x7e7(%rip),%rcx        # 3810 <run_character_creation+0x1a40>
+    3029:	e9 62 f6 ff ff       	jmp    2690 <run_character_creation+0x8c0>
+    302e:	48 8d 0d e7 07 00 00 	lea    0x7e7(%rip),%rcx        # 381c <run_character_creation+0x1a4c>
+    3035:	e9 7e f5 ff ff       	jmp    25b8 <run_character_creation+0x7e8>
+    303a:	48 8d 0d 19 07 00 00 	lea    0x719(%rip),%rcx        # 375a <run_character_creation+0x198a>
+    3041:	e9 6a f4 ff ff       	jmp    24b0 <run_character_creation+0x6e0>
+    3046:	48 8d 0d fb 05 00 00 	lea    0x5fb(%rip),%rcx        # 3648 <run_character_creation+0x1878>
+    304d:	e9 3e f3 ff ff       	jmp    2390 <run_character_creation+0x5c0>
+    3052:	44 89 f2             	mov    %r14d,%edx
+    3055:	48 8d 0d 05 05 00 00 	lea    0x505(%rip),%rcx        # 3561 <run_character_creation+0x1791>
+    305c:	e8 00 00 00 00       	call   3061 <run_character_creation+0x1291>
+    3061:	b9 01 00 00 00       	mov    $0x1,%ecx
+    3066:	ff d5                	call   *%rbp
+    3068:	48 89 c1             	mov    %rax,%rcx
+    306b:	e8 00 00 00 00       	call   3070 <run_character_creation+0x12a0>
+    3070:	e9 7b f1 ff ff       	jmp    21f0 <run_character_creation+0x420>
+    3075:	0f 1f 00             	nopl   (%rax)
+    3078:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    307d:	e9 5f f2 ff ff       	jmp    22e1 <run_character_creation+0x511>
+    3082:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    3088:	c6 84 24 40 01 00 00 	movb   $0x0,0x140(%rsp)
+    308f:	00 
+    3090:	e9 95 fb ff ff       	jmp    2c2a <run_character_creation+0xe5a>
+    3095:	0f 1f 00             	nopl   (%rax)
+    3098:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    309d:	e9 d7 f8 ff ff       	jmp    2979 <run_character_creation+0xba9>
+    30a2:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    30a8:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    30ad:	e9 ef f7 ff ff       	jmp    28a1 <run_character_creation+0xad1>
+    30b2:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    30b8:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    30bd:	e9 07 f7 ff ff       	jmp    27c9 <run_character_creation+0x9f9>
+    30c2:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    30c8:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    30cd:	e9 ef f5 ff ff       	jmp    26c1 <run_character_creation+0x8f1>
+    30d2:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    30d8:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    30dd:	e9 07 f5 ff ff       	jmp    25e9 <run_character_creation+0x819>
+    30e2:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    30e8:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    30ed:	e9 ef f3 ff ff       	jmp    24e1 <run_character_creation+0x711>
+    30f2:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    30f8:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    30fd:	e9 27 fa ff ff       	jmp    2b29 <run_character_creation+0xd59>
+    3102:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    3108:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    310d:	e9 3f f9 ff ff       	jmp    2a51 <run_character_creation+0xc81>
+    3112:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    3118:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    311d:	e9 9f f2 ff ff       	jmp    23c1 <run_character_creation+0x5f1>
+    3122:	48 8d 0d e7 07 00 00 	lea    0x7e7(%rip),%rcx        # 3910 <run_character_creation+0x1b40>
+    3129:	e9 cb fb ff ff       	jmp    2cf9 <run_character_creation+0xf29>
+    312e:	48 8d 0d b1 0e 00 00 	lea    0xeb1(%rip),%rcx        # 3fe6 <CC_RACES+0x1646>
+    3135:	e9 96 fc ff ff       	jmp    2dd0 <run_character_creation+0x1000>
+    313a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    3140:	c6 44 24 40 00       	movb   $0x0,0x40(%rsp)
+    3145:	e9 c3 f0 ff ff       	jmp    220d <run_character_creation+0x43d>
+    314a:	80 3d 53 82 00 00 00 	cmpb   $0x0,0x8253(%rip)        # b3a4 <g_pc+0x33a4>
+    3151:	0f 85 77 fb ff ff    	jne    2cce <run_character_creation+0xefe>
+    3157:	31 d2                	xor    %edx,%edx
+    3159:	e9 0a fd ff ff       	jmp    2e68 <run_character_creation+0x1098>
+    315e:	e8 ad d6 ff ff       	call   810 <pc_set_default_adventurer>
+    3163:	31 ed                	xor    %ebp,%ebp
+    3165:	48 8d 0d 00 80 00 00 	lea    0x8000(%rip),%rcx        # b16c <g_pc+0x316c>
+    316c:	48 b8 41 75 74 6f 74 	movabs $0x747365746f747541,%rax
+    3173:	65 73 74 
+    3176:	48 ba 20 48 65 72 6f 	movabs $0x6f72654820,%rdx
+    317d:	00 00 00 
+    3180:	48 89 05 00 80 00 00 	mov    %rax,0x8000(%rip)        # b187 <g_pc+0x3187>
+    3187:	48 b8 48 75 6d 61 6e 	movabs $0x6e616d7548,%rax
+    318e:	00 00 00 
+    3191:	48 bf 53 68 6f 72 74 	movabs $0x74726f6853,%rdi
+    3198:	00 00 00 
+    319b:	48 89 15 08 80 00 00 	mov    %rdx,0x8008(%rip)        # b1aa <g_pc+0x31aa>
+    31a2:	31 d2                	xor    %edx,%edx
+    31a4:	48 89 05 40 80 00 00 	mov    %rax,0x8040(%rip)        # b1eb <g_pc+0x31eb>
+    31ab:	48 b8 61 64 76 65 6e 	movabs $0x7275746e65766461,%rax
+    31b2:	74 75 72 
+    31b5:	48 89 15 48 80 00 00 	mov    %rdx,0x8048(%rip)        # b204 <g_pc+0x3204>
+    31bc:	ba 65 72 00 00       	mov    $0x7265,%edx
+    31c1:	48 89 15 c8 80 00 00 	mov    %rdx,0x80c8(%rip)        # b290 <g_pc+0x3290>
+    31c8:	48 ba 28 35 27 20 2d 	movabs $0x2735202d20273528,%rdx
+    31cf:	20 35 27 
+    31d2:	48 89 05 c0 80 00 00 	mov    %rax,0x80c0(%rip)        # b299 <g_pc+0x3299>
+    31d9:	48 b8 41 76 65 72 61 	movabs $0x2065676172657641,%rax
+    31e0:	67 65 20 
+    31e3:	48 89 05 d8 80 00 00 	mov    %rax,0x80d8(%rip)        # b2c2 <g_pc+0x32c2>
+    31ea:	48 b8 41 76 65 72 61 	movabs $0x65676172657641,%rax
+    31f1:	67 65 00 
+    31f4:	48 89 15 e0 80 00 00 	mov    %rdx,0x80e0(%rip)        # b2db <g_pc+0x32db>
+    31fb:	31 d2                	xor    %edx,%edx
+    31fd:	48 c7 05 24 80 00 00 	movq   $0x0,0x8024(%rip)        # b22c <g_pc+0x322c>
+    3204:	00 00 00 00 
+    3208:	48 c7 05 54 80 00 00 	movq   $0x0,0x8054(%rip)        # b267 <g_pc+0x3267>
+    320f:	00 00 00 00 
+    3213:	48 c7 05 8c 80 00 00 	movq   $0x0,0x808c(%rip)        # b2aa <g_pc+0x32aa>
+    321a:	00 00 00 00 
+    321e:	c7 05 a4 80 00 00 74 	movl   $0x79656874,0x80a4(%rip)        # b2cc <g_pc+0x32cc>
+    3225:	68 65 79 
+    3228:	48 c7 05 ac 80 00 00 	movq   $0x656e6f6e,0x80ac(%rip)        # b2df <g_pc+0x32df>
+    322f:	6e 6f 6e 65 
+    3233:	48 c7 05 0c 80 00 00 	movq   $0x0,0x800c(%rip)        # b24a <g_pc+0x324a>
+    323a:	00 00 00 00 
+    323e:	48 c7 05 14 80 00 00 	movq   $0x0,0x8014(%rip)        # b25d <g_pc+0x325d>
+    3245:	00 00 00 00 
+    3249:	48 c7 05 1c 80 00 00 	movq   $0x0,0x801c(%rip)        # b270 <g_pc+0x3270>
+    3250:	00 00 00 00 
+    3254:	48 c7 05 2b 80 00 00 	movq   $0x0,0x802b(%rip)        # b28a <g_pc+0x328a>
+    325b:	00 00 00 00 
+    325f:	48 c7 05 33 80 00 00 	movq   $0x0,0x8033(%rip)        # b29d <g_pc+0x329d>
+    3266:	00 00 00 00 
+    326a:	48 c7 05 4c 80 00 00 	movq   $0x0,0x804c(%rip)        # b2c1 <g_pc+0x32c1>
+    3271:	00 00 00 00 
+    3275:	48 c7 05 5b 80 00 00 	movq   $0x0,0x805b(%rip)        # b2db <g_pc+0x32db>
+    327c:	00 00 00 00 
+    3280:	48 c7 05 64 80 00 00 	movq   $0x72696146,0x8064(%rip)        # b2ef <g_pc+0x32ef>
+    3287:	46 61 69 72 
+    328b:	48 c7 05 6c 80 00 00 	movq   $0x0,0x806c(%rip)        # b302 <g_pc+0x3302>
+    3292:	00 00 00 00 
+    3296:	48 c7 05 74 80 00 00 	movq   $0x0,0x8074(%rip)        # b315 <g_pc+0x3315>
+    329d:	00 00 00 00 
+    32a1:	48 c7 05 7c 80 00 00 	movq   $0x0,0x807c(%rip)        # b328 <g_pc+0x3328>
+    32a8:	00 00 00 00 
+    32ac:	48 c7 05 84 80 00 00 	movq   $0x0,0x8084(%rip)        # b33b <g_pc+0x333b>
+    32b3:	00 00 00 00 
+    32b7:	48 c7 05 93 80 00 00 	movq   $0x0,0x8093(%rip)        # b355 <g_pc+0x3355>
+    32be:	00 00 00 00 
+    32c2:	48 c7 05 9b 80 00 00 	movq   $0x0,0x809b(%rip)        # b368 <g_pc+0x3368>
+    32c9:	00 00 00 00 
+    32cd:	c7 05 a7 80 00 00 79 	movl   $0x79,0x80a7(%rip)        # b37e <g_pc+0x337e>
+    32d4:	00 00 00 
+    32d7:	48 c7 05 b3 80 00 00 	movq   $0x0,0x80b3(%rip)        # b395 <g_pc+0x3395>
+    32de:	00 00 00 00 
+    32e2:	48 c7 05 cb 80 00 00 	movq   $0x0,0x80cb(%rip)        # b3b8 <g_pc+0x33b8>
+    32e9:	00 00 00 00 
+    32ed:	48 c7 05 e4 80 00 00 	movq   $0x292238,0x80e4(%rip)        # b3dc <g_pc+0x33dc>
+    32f4:	38 22 29 00 
+    32f8:	48 c7 05 ec 80 00 00 	movq   $0x0,0x80ec(%rip)        # b3ef <g_pc+0x33ef>
+    32ff:	00 00 00 00 
+    3303:	48 c7 05 f4 80 00 00 	movq   $0x0,0x80f4(%rip)        # b402 <g_pc+0x3402>
+    330a:	00 00 00 00 
+    330e:	48 89 15 18 81 00 00 	mov    %rdx,0x8118(%rip)        # b42d <g_pc+0x342d>
+    3315:	31 d2                	xor    %edx,%edx
+    3317:	48 89 05 10 81 00 00 	mov    %rax,0x8110(%rip)        # b42e <g_pc+0x342e>
+    331e:	48 b8 42 72 6f 77 6e 	movabs $0x6e776f7242,%rax
+    3325:	00 00 00 
+    3328:	48 c7 05 fc 80 00 00 	movq   $0x0,0x80fc(%rip)        # b42f <g_pc+0x342f>
+    332f:	00 00 00 00 
+    3333:	48 89 15 30 81 00 00 	mov    %rdx,0x8130(%rip)        # b46a <g_pc+0x346a>
+    333a:	48 89 2d 48 81 00 00 	mov    %rbp,0x8148(%rip)        # b489 <g_pc+0x3489>
+    3341:	48 89 15 68 81 00 00 	mov    %rdx,0x8168(%rip)        # b4b0 <g_pc+0x34b0>
+    3348:	48 c7 05 7c 81 00 00 	movq   $0x0,0x817c(%rip)        # b4cf <g_pc+0x34cf>
+    334f:	00 00 00 00 
+    3353:	48 c7 05 94 81 00 00 	movq   $0x0,0x8194(%rip)        # b4f2 <g_pc+0x34f2>
+    335a:	00 00 00 00 
+    335e:	48 c7 05 03 81 00 00 	movq   $0x0,0x8103(%rip)        # b46c <g_pc+0x346c>
+    3365:	00 00 00 00 
+    3369:	48 c7 05 1b 81 00 00 	movq   $0x0,0x811b(%rip)        # b48f <g_pc+0x348f>
+    3370:	00 00 00 00 
+    3374:	48 89 05 28 81 00 00 	mov    %rax,0x8128(%rip)        # b4a3 <g_pc+0x34a3>
+    337b:	48 c7 05 33 81 00 00 	movq   $0x0,0x8133(%rip)        # b4b9 <g_pc+0x34b9>
+    3382:	00 00 00 00 
+    3386:	48 89 3d 40 81 00 00 	mov    %rdi,0x8140(%rip)        # b4cd <g_pc+0x34cd>
+    338d:	48 c7 05 4b 81 00 00 	movq   $0x0,0x814b(%rip)        # b4e3 <g_pc+0x34e3>
+    3394:	00 00 00 00 
+    3398:	48 c7 05 53 81 00 00 	movq   $0x0,0x8153(%rip)        # b4f6 <g_pc+0x34f6>
+    339f:	00 00 00 00 
+    33a3:	48 89 05 60 81 00 00 	mov    %rax,0x8160(%rip)        # b50a <g_pc+0x350a>
+    33aa:	48 c7 05 6b 81 00 00 	movq   $0x0,0x816b(%rip)        # b520 <g_pc+0x3520>
+    33b1:	00 00 00 00 
+    33b5:	48 c7 05 74 81 00 00 	movq   $0x656e6f4e,0x8174(%rip)        # b534 <g_pc+0x3534>
+    33bc:	4e 6f 6e 65 
+    33c0:	48 c7 05 83 81 00 00 	movq   $0x0,0x8183(%rip)        # b54e <g_pc+0x354e>
+    33c7:	00 00 00 00 
+    33cb:	48 c7 05 8c 81 00 00 	movq   $0x656e6f4e,0x818c(%rip)        # b562 <g_pc+0x3562>
+    33d2:	4e 6f 6e 65 
+    33d6:	48 c7 05 9b 81 00 00 	movq   $0x0,0x819b(%rip)        # b57c <g_pc+0x357c>
+    33dd:	00 00 00 00 
+    33e1:	48 81 c4 f8 0f 00 00 	add    $0xff8,%rsp
+    33e8:	5b                   	pop    %rbx
+    33e9:	5e                   	pop    %rsi
+    33ea:	5f                   	pop    %rdi
+    33eb:	5d                   	pop    %rbp
+    33ec:	41 5c                	pop    %r12
+    33ee:	41 5d                	pop    %r13
+    33f0:	41 5e                	pop    %r14
+    33f2:	41 5f                	pop    %r15
+    33f4:	e9 57 cd ff ff       	jmp    150 <pc_fill_narrative_defaults>
+    33f9:	c6 84 24 40 01 00 00 	movb   $0x0,0x140(%rsp)
+    3400:	00 
+    3401:	e9 fb f9 ff ff       	jmp    2e01 <run_character_creation+0x1031>
+    3406:	c6 84 24 40 01 00 00 	movb   $0x0,0x140(%rsp)
+    340d:	00 
+    340e:	e9 17 f9 ff ff       	jmp    2d2a <run_character_creation+0xf5a>
+    3413:	c7 05 a4 80 00 00 68 	movl   $0x6568,0x80a4(%rip)        # b4c1 <g_pc+0x34c1>
+    341a:	65 00 00 
+    341d:	c7 05 a7 80 00 00 00 	movl   $0x0,0x80a7(%rip)        # b4ce <g_pc+0x34ce>
+    3424:	00 00 00 
+    3427:	e9 31 ef ff ff       	jmp    235d <run_character_creation+0x58d>
+    342c:	66 83 3d b3 80 00 00 	cmpw   $0x73,0x80b3(%rip)        # b4e7 <g_pc+0x34e7>
+    3433:	73 
+    3434:	0f 85 44 fa ff ff    	jne    2e7e <run_character_creation+0x10ae>
+    343a:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 3872 <run_character_creation+0x1aa2>
+    3441:	e8 00 00 00 00       	call   3446 <run_character_creation+0x1676>
+    3446:	48 8d 0d c0 0e 00 00 	lea    0xec0(%rip),%rcx        # 430d <CC_RACES+0x196d>
+    344d:	e8 00 00 00 00       	call   3452 <run_character_creation+0x1682>
+    3452:	48 8d 0d f0 0e 00 00 	lea    0xef0(%rip),%rcx        # 4349 <CC_RACES+0x19a9>
+    3459:	e8 00 00 00 00       	call   345e <run_character_creation+0x168e>
+    345e:	48 8d 0d 28 0f 00 00 	lea    0xf28(%rip),%rcx        # 438d <CC_RACES+0x19ed>
+    3465:	e8 00 00 00 00       	call   346a <run_character_creation+0x169a>
+    346a:	b9 01 00 00 00       	mov    $0x1,%ecx
+    346f:	ff d5                	call   *%rbp
+    3471:	48 89 c1             	mov    %rax,%rcx
+    3474:	e8 00 00 00 00       	call   3479 <run_character_creation+0x16a9>
+    3479:	31 c9                	xor    %ecx,%ecx
+    347b:	ff d5                	call   *%rbp
+    347d:	ba 00 01 00 00       	mov    $0x100,%edx
+    3482:	4c 89 e9             	mov    %r13,%rcx
+    3485:	49 89 c0             	mov    %rax,%r8
+    3488:	e8 00 00 00 00       	call   348d <run_character_creation+0x16bd>
+    348d:	48 85 c0             	test   %rax,%rax
+    3490:	0f 84 92 03 00 00    	je     3828 <run_character_creation+0x1a58>
+    3496:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 369e <run_character_creation+0x18ce>
+    349d:	4c 89 e9             	mov    %r13,%rcx
+    34a0:	e8 00 00 00 00       	call   34a5 <run_character_creation+0x16d5>
+    34a5:	c6 84 04 40 01 00 00 	movb   $0x0,0x140(%rsp,%rax,1)
+    34ac:	00 
+    34ad:	80 bc 24 40 01 00 00 	cmpb   $0x0,0x140(%rsp)
+    34b4:	00 
+    34b5:	0f 84 4e 03 00 00    	je     3809 <run_character_creation+0x1a39>
+    34bb:	48 89 f2             	mov    %rsi,%rdx
+    34be:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    34c4:	4c 89 e9             	mov    %r13,%rcx
+    34c7:	e8 00 00 00 00       	call   34cc <run_character_creation+0x16fc>
+    34cc:	48 8b 54 24 38       	mov    0x38(%rsp),%rdx
+    34d1:	4c 39 ea             	cmp    %r13,%rdx
+    34d4:	0f 84 2f 03 00 00    	je     3809 <run_character_creation+0x1a39>
+    34da:	80 3a 00             	cmpb   $0x0,(%rdx)
+    34dd:	0f 85 26 03 00 00    	jne    3809 <run_character_creation+0x1a39>
+    34e3:	8d 50 ff             	lea    -0x1(%rax),%edx
+    34e6:	83 fa 06             	cmp    $0x6,%edx
+    34e9:	0f 87 1a 03 00 00    	ja     3809 <run_character_creation+0x1a39>
+    34ef:	83 f8 01             	cmp    $0x1,%eax
+    34f2:	74 29                	je     351d <run_character_creation+0x174d>
+    34f4:	83 e8 02             	sub    $0x2,%eax
+    34f7:	48 8d 15 00 15 00 00 	lea    0x1500(%rip),%rdx        # 49fe <CC_RACES+0x205e>
+    34fe:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    3504:	48 98                	cltq
+    3506:	48 8d 0d 60 82 00 00 	lea    0x8260(%rip),%rcx        # b76d <g_pc+0x376d>
+    350d:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    3511:	e8 00 00 00 00       	call   3516 <run_character_creation+0x1746>
+    3516:	c6 05 6e 82 00 00 00 	movb   $0x0,0x826e(%rip)        # b78b <g_pc+0x378b>
+    351d:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 3955 <CC_RACES+0xfb5>
+    3524:	e8 00 00 00 00       	call   3529 <run_character_creation+0x1759>
+    3529:	48 8d 0d 60 0f 00 00 	lea    0xf60(%rip),%rcx        # 4490 <CC_RACES+0x1af0>
+    3530:	e8 00 00 00 00       	call   3535 <run_character_creation+0x1765>
+    3535:	48 8d 0d f0 0e 00 00 	lea    0xef0(%rip),%rcx        # 442c <CC_RACES+0x1a8c>
+    353c:	e8 00 00 00 00       	call   3541 <run_character_creation+0x1771>
+    3541:	48 8d 0d 28 0f 00 00 	lea    0xf28(%rip),%rcx        # 4470 <CC_RACES+0x1ad0>
+    3548:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+    354f:	00 
+    3550:	e8 00 00 00 00       	call   3555 <run_character_creation+0x1785>
+    3555:	b9 01 00 00 00       	mov    $0x1,%ecx
+    355a:	ff d5                	call   *%rbp
+    355c:	48 89 c1             	mov    %rax,%rcx
+    355f:	e8 00 00 00 00       	call   3564 <run_character_creation+0x1794>
+    3564:	31 c9                	xor    %ecx,%ecx
+    3566:	ff d5                	call   *%rbp
+    3568:	ba 00 01 00 00       	mov    $0x100,%edx
+    356d:	4c 89 e9             	mov    %r13,%rcx
+    3570:	49 89 c0             	mov    %rax,%r8
+    3573:	e8 00 00 00 00       	call   3578 <run_character_creation+0x17a8>
+    3578:	48 85 c0             	test   %rax,%rax
+    357b:	0f 84 b7 02 00 00    	je     3838 <run_character_creation+0x1a68>
+    3581:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 3789 <run_character_creation+0x19b9>
+    3588:	4c 89 e9             	mov    %r13,%rcx
+    358b:	e8 00 00 00 00       	call   3590 <run_character_creation+0x17c0>
+    3590:	c6 84 04 40 01 00 00 	movb   $0x0,0x140(%rsp,%rax,1)
+    3597:	00 
+    3598:	80 bc 24 40 01 00 00 	cmpb   $0x0,0x140(%rsp)
+    359f:	00 
+    35a0:	0f 84 57 02 00 00    	je     37fd <run_character_creation+0x1a2d>
+    35a6:	48 89 f2             	mov    %rsi,%rdx
+    35a9:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    35af:	4c 89 e9             	mov    %r13,%rcx
+    35b2:	e8 00 00 00 00       	call   35b7 <run_character_creation+0x17e7>
+    35b7:	48 8b 54 24 38       	mov    0x38(%rsp),%rdx
+    35bc:	4c 39 ea             	cmp    %r13,%rdx
+    35bf:	0f 84 38 02 00 00    	je     37fd <run_character_creation+0x1a2d>
+    35c5:	80 3a 00             	cmpb   $0x0,(%rdx)
+    35c8:	0f 85 2f 02 00 00    	jne    37fd <run_character_creation+0x1a2d>
+    35ce:	8d 50 ff             	lea    -0x1(%rax),%edx
+    35d1:	83 fa 06             	cmp    $0x6,%edx
+    35d4:	0f 87 23 02 00 00    	ja     37fd <run_character_creation+0x1a2d>
+    35da:	83 f8 01             	cmp    $0x1,%eax
+    35dd:	74 29                	je     3608 <run_character_creation+0x1838>
+    35df:	83 e8 02             	sub    $0x2,%eax
+    35e2:	48 8d 15 00 15 00 00 	lea    0x1500(%rip),%rdx        # 4ae9 <CC_RACES+0x2149>
+    35e9:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    35ef:	48 98                	cltq
+    35f1:	48 8d 0d 70 82 00 00 	lea    0x8270(%rip),%rcx        # b868 <g_pc+0x3868>
+    35f8:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    35fc:	e8 00 00 00 00       	call   3601 <run_character_creation+0x1831>
+    3601:	c6 05 7e 82 00 00 00 	movb   $0x0,0x827e(%rip)        # b886 <g_pc+0x3886>
+    3608:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 3a40 <CC_RACES+0x10a0>
+    360f:	e8 00 00 00 00       	call   3614 <run_character_creation+0x1844>
+    3614:	48 8d 0d 90 0f 00 00 	lea    0xf90(%rip),%rcx        # 45ab <CC_RACES+0x1c0b>
+    361b:	e8 00 00 00 00       	call   3620 <run_character_creation+0x1850>
+    3620:	48 8d 0d d0 0f 00 00 	lea    0xfd0(%rip),%rcx        # 45f7 <CC_RACES+0x1c57>
+    3627:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+    362e:	00 00 
+    3630:	e8 00 00 00 00       	call   3635 <run_character_creation+0x1865>
+    3635:	b9 01 00 00 00       	mov    $0x1,%ecx
+    363a:	ff d5                	call   *%rbp
+    363c:	48 89 c1             	mov    %rax,%rcx
+    363f:	e8 00 00 00 00       	call   3644 <run_character_creation+0x1874>
+    3644:	31 c9                	xor    %ecx,%ecx
+    3646:	ff d5                	call   *%rbp
+    3648:	ba 00 01 00 00       	mov    $0x100,%edx
+    364d:	4c 89 e9             	mov    %r13,%rcx
+    3650:	49 89 c0             	mov    %rax,%r8
+    3653:	e8 00 00 00 00       	call   3658 <run_character_creation+0x1888>
+    3658:	48 85 c0             	test   %rax,%rax
+    365b:	0f 84 b7 01 00 00    	je     3818 <run_character_creation+0x1a48>
+    3661:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 3869 <run_character_creation+0x1a99>
+    3668:	4c 89 e9             	mov    %r13,%rcx
+    366b:	e8 00 00 00 00       	call   3670 <run_character_creation+0x18a0>
+    3670:	c6 84 04 40 01 00 00 	movb   $0x0,0x140(%rsp,%rax,1)
+    3677:	00 
+    3678:	80 bc 24 40 01 00 00 	cmpb   $0x0,0x140(%rsp)
+    367f:	00 
+    3680:	0f 84 6b 01 00 00    	je     37f1 <run_character_creation+0x1a21>
+    3686:	48 89 f2             	mov    %rsi,%rdx
+    3689:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    368f:	4c 89 e9             	mov    %r13,%rcx
+    3692:	e8 00 00 00 00       	call   3697 <run_character_creation+0x18c7>
+    3697:	48 8b 54 24 38       	mov    0x38(%rsp),%rdx
+    369c:	4c 39 ea             	cmp    %r13,%rdx
+    369f:	0f 84 4c 01 00 00    	je     37f1 <run_character_creation+0x1a21>
+    36a5:	80 3a 00             	cmpb   $0x0,(%rdx)
+    36a8:	0f 85 43 01 00 00    	jne    37f1 <run_character_creation+0x1a21>
+    36ae:	8d 50 ff             	lea    -0x1(%rax),%edx
+    36b1:	83 fa 02             	cmp    $0x2,%edx
+    36b4:	0f 87 37 01 00 00    	ja     37f1 <run_character_creation+0x1a21>
+    36ba:	83 f8 01             	cmp    $0x1,%eax
+    36bd:	74 12                	je     36d1 <run_character_creation+0x1901>
+    36bf:	83 f8 02             	cmp    $0x2,%eax
+    36c2:	41 bc 19 00 00 00    	mov    $0x19,%r12d
+    36c8:	b8 4b 00 00 00       	mov    $0x4b,%eax
+    36cd:	44 0f 45 e0          	cmovne %eax,%r12d
+    36d1:	81 3d ac 80 00 00 76 	cmpl   $0x69676176,0x80ac(%rip)        # b787 <g_pc+0x3787>
+    36d8:	61 67 69 
+    36db:	44 89 25 a4 82 00 00 	mov    %r12d,0x82a4(%rip)        # b986 <g_pc+0x3986>
+    36e2:	0f 84 ad 01 00 00    	je     3895 <run_character_creation+0x1ac5>
+    36e8:	81 3d ac 80 00 00 62 	cmpl   $0x68746f62,0x80ac(%rip)        # b79e <g_pc+0x379e>
+    36ef:	6f 74 68 
+    36f2:	0f 85 a6 f7 ff ff    	jne    2e9e <run_character_creation+0x10ce>
+    36f8:	80 3d b3 80 00 00 00 	cmpb   $0x0,0x80b3(%rip)        # b7b2 <g_pc+0x37b2>
+    36ff:	0f 85 99 f7 ff ff    	jne    2e9e <run_character_creation+0x10ce>
+    3705:	48 8d 0d 31 04 00 00 	lea    0x431(%rip),%rcx        # 3b3d <CC_RACES+0x119d>
+    370c:	e8 00 00 00 00       	call   3711 <run_character_creation+0x1941>
+    3711:	48 8d 0d 10 10 00 00 	lea    0x1010(%rip),%rcx        # 4728 <CC_RACES+0x1d88>
+    3718:	e8 00 00 00 00       	call   371d <run_character_creation+0x194d>
+    371d:	48 8d 0d 38 10 00 00 	lea    0x1038(%rip),%rcx        # 475c <CC_RACES+0x1dbc>
+    3724:	e8 00 00 00 00       	call   3729 <run_character_creation+0x1959>
+    3729:	48 8d 0d 72 10 00 00 	lea    0x1072(%rip),%rcx        # 47a2 <CC_RACES+0x1e02>
+    3730:	e8 00 00 00 00       	call   3735 <run_character_creation+0x1965>
+    3735:	b9 01 00 00 00       	mov    $0x1,%ecx
+    373a:	ff d5                	call   *%rbp
+    373c:	48 89 c1             	mov    %rax,%rcx
+    373f:	e8 00 00 00 00       	call   3744 <run_character_creation+0x1974>
+    3744:	31 c9                	xor    %ecx,%ecx
+    3746:	ff d5                	call   *%rbp
+    3748:	ba 00 01 00 00       	mov    $0x100,%edx
+    374d:	4c 89 e9             	mov    %r13,%rcx
+    3750:	49 89 c0             	mov    %rax,%r8
+    3753:	e8 00 00 00 00       	call   3758 <run_character_creation+0x1988>
+    3758:	48 85 c0             	test   %rax,%rax
+    375b:	0f 84 27 01 00 00    	je     3888 <run_character_creation+0x1ab8>
+    3761:	48 8d 15 01 02 00 00 	lea    0x201(%rip),%rdx        # 3969 <CC_RACES+0xfc9>
+    3768:	4c 89 e9             	mov    %r13,%rcx
+    376b:	e8 00 00 00 00       	call   3770 <run_character_creation+0x19a0>
+    3770:	c6 84 04 40 01 00 00 	movb   $0x0,0x140(%rsp,%rax,1)
+    3777:	00 
+    3778:	80 bc 24 40 01 00 00 	cmpb   $0x0,0x140(%rsp)
+    377f:	00 
+    3780:	0f 84 f2 00 00 00    	je     3878 <run_character_creation+0x1aa8>
+    3786:	48 89 f2             	mov    %rsi,%rdx
+    3789:	41 b8 0a 00 00 00    	mov    $0xa,%r8d
+    378f:	4c 89 e9             	mov    %r13,%rcx
+    3792:	e8 00 00 00 00       	call   3797 <run_character_creation+0x19c7>
+    3797:	48 8b 54 24 38       	mov    0x38(%rsp),%rdx
+    379c:	4c 39 ea             	cmp    %r13,%rdx
+    379f:	0f 84 d3 00 00 00    	je     3878 <run_character_creation+0x1aa8>
+    37a5:	80 3a 00             	cmpb   $0x0,(%rdx)
+    37a8:	0f 85 ca 00 00 00    	jne    3878 <run_character_creation+0x1aa8>
+    37ae:	8d 50 ff             	lea    -0x1(%rax),%edx
+    37b1:	83 fa 04             	cmp    $0x4,%edx
+    37b4:	0f 87 be 00 00 00    	ja     3878 <run_character_creation+0x1aa8>
+    37ba:	83 f8 01             	cmp    $0x1,%eax
+    37bd:	0f 84 db f6 ff ff    	je     2e9e <run_character_creation+0x10ce>
+    37c3:	83 e8 02             	sub    $0x2,%eax
+    37c6:	48 8d 15 c0 14 00 00 	lea    0x14c0(%rip),%rdx        # 4c8d <CC_RACES+0x22ed>
+    37cd:	41 b8 0f 00 00 00    	mov    $0xf,%r8d
+    37d3:	48 98                	cltq
+    37d5:	48 8d 0d 80 82 00 00 	lea    0x8280(%rip),%rcx        # ba5c <g_pc+0x3a5c>
+    37dc:	48 8b 14 c2          	mov    (%rdx,%rax,8),%rdx
+    37e0:	e8 00 00 00 00       	call   37e5 <run_character_creation+0x1a15>
+    37e5:	c6 05 8e 82 00 00 00 	movb   $0x0,0x828e(%rip)        # ba7a <g_pc+0x3a7a>
+    37ec:	e9 ad f6 ff ff       	jmp    2e9e <run_character_creation+0x10ce>
+    37f1:	48 8d 0d 01 10 00 00 	lea    0x1001(%rip),%rcx        # 47f9 <CC_RACES+0x1e59>
+    37f8:	e9 33 fe ff ff       	jmp    3630 <run_character_creation+0x1860>
+    37fd:	48 8d 0d 4f 0f 00 00 	lea    0xf4f(%rip),%rcx        # 4753 <CC_RACES+0x1db3>
+    3804:	e9 47 fd ff ff       	jmp    3550 <run_character_creation+0x1780>
+    3809:	48 8d 0d 4f 0f 00 00 	lea    0xf4f(%rip),%rcx        # 475f <CC_RACES+0x1dbf>
+    3810:	e9 50 fc ff ff       	jmp    3465 <run_character_creation+0x1695>
+    3815:	0f 1f 00             	nopl   (%rax)
+    3818:	c6 84 24 40 01 00 00 	movb   $0x0,0x140(%rsp)
+    381f:	00 
+    3820:	e9 3c fe ff ff       	jmp    3661 <run_character_creation+0x1891>
+    3825:	0f 1f 00             	nopl   (%rax)
+    3828:	c6 84 24 40 01 00 00 	movb   $0x0,0x140(%rsp)
+    382f:	00 
+    3830:	e9 61 fc ff ff       	jmp    3496 <run_character_creation+0x16c6>
+    3835:	0f 1f 00             	nopl   (%rax)
+    3838:	c6 84 24 40 01 00 00 	movb   $0x0,0x140(%rsp)
+    383f:	00 
+    3840:	e9 3c fd ff ff       	jmp    3581 <run_character_creation+0x17b1>
+    3845:	c7 05 a4 80 00 00 73 	movl   $0x656873,0x80a4(%rip)        # b8f3 <g_pc+0x38f3>
+    384c:	68 65 00 
+    384f:	c7 05 a7 80 00 00 00 	movl   $0x0,0x80a7(%rip)        # b900 <g_pc+0x3900>
+    3856:	00 00 00 
+    3859:	e9 ff ea ff ff       	jmp    235d <run_character_creation+0x58d>
+    385e:	81 3d af 80 00 00 69 	cmpl   $0x616e69,0x80af(%rip)        # b917 <g_pc+0x3917>
+    3865:	6e 61 00 
+    3868:	0f 85 30 f6 ff ff    	jne    2e9e <run_character_creation+0x10ce>
+    386e:	e9 92 fe ff ff       	jmp    3705 <run_character_creation+0x1935>
+    3873:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+    3878:	48 8d 0d 85 10 00 00 	lea    0x1085(%rip),%rcx        # 4904 <CC_RACES+0x1f64>
+    387f:	e9 ac fe ff ff       	jmp    3730 <run_character_creation+0x1960>
+    3884:	0f 1f 40 00          	nopl   0x0(%rax)
+    3888:	c6 84 24 40 01 00 00 	movb   $0x0,0x140(%rsp)
+    388f:	00 
+    3890:	e9 cc fe ff ff       	jmp    3761 <run_character_creation+0x1991>
+    3895:	81 3d af 80 00 00 69 	cmpl   $0x616e69,0x80af(%rip)        # b94e <g_pc+0x394e>
+    389c:	6e 61 00 
+    389f:	0f 85 43 fe ff ff    	jne    36e8 <run_character_creation+0x1918>
+    38a5:	e9 5b fe ff ff       	jmp    3705 <run_character_creation+0x1935>
+    38aa:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+    38b0:	48 8d 0d 36 03 00 00 	lea    0x336(%rip),%rcx        # 3bed <CC_RACES+0x124d>
+    38b7:	e8 44 c7 ff ff       	call   0 <cc_skin_pipes_for_race>
+    38bc:	48 89 c6             	mov    %rax,%rsi
+    38bf:	48 85 c0             	test   %rax,%rax
+    38c2:	0f 85 a9 e7 ff ff    	jne    2071 <run_character_creation+0x2a1>
+    38c8:	48 c7 05 8c 80 00 00 	movq   $0x0,0x808c(%rip)        # b95f <g_pc+0x395f>
+    38cf:	00 00 00 00 
+    38d3:	4c 8d ac 24 40 01 00 	lea    0x140(%rsp),%r13
+    38da:	00 
+    38db:	48 c7 05 64 80 00 00 	movq   $0x72696146,0x8064(%rip)        # b94a <g_pc+0x394a>
+    38e2:	46 61 69 72 
+    38e6:	48 c7 05 6c 80 00 00 	movq   $0x0,0x806c(%rip)        # b95d <g_pc+0x395d>
+    38ed:	00 00 00 00 
+    38f1:	48 c7 05 74 80 00 00 	movq   $0x0,0x8074(%rip)        # b970 <g_pc+0x3970>
+    38f8:	00 00 00 00 
+    38fc:	48 c7 05 7c 80 00 00 	movq   $0x0,0x807c(%rip)        # b983 <g_pc+0x3983>
+    3903:	00 00 00 00 
+    3907:	48 c7 05 84 80 00 00 	movq   $0x0,0x8084(%rip)        # b996 <g_pc+0x3996>
+    390e:	00 00 00 00 
+    3912:	48 c7 05 93 80 00 00 	movq   $0x0,0x8093(%rip)        # b9b0 <g_pc+0x39b0>
+    3919:	00 00 00 00 
+    391d:	48 c7 05 9b 80 00 00 	movq   $0x0,0x809b(%rip)        # b9c3 <g_pc+0x39c3>
+    3924:	00 00 00 00 
+    3928:	e9 64 e9 ff ff       	jmp    2291 <run_character_creation+0x4c1>
+    392d:	80 3d b3 80 00 00 00 	cmpb   $0x0,0x80b3(%rip)        # b9e7 <g_pc+0x39e7>
+    3934:	0f 84 00 fb ff ff    	je     343a <run_character_creation+0x166a>
+    393a:	e9 4f f5 ff ff       	jmp    2e8e <run_character_creation+0x10be>
+    393f:	90                   	nop

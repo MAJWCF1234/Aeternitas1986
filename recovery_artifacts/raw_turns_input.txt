@@ -1,0 +1,12 @@
+
+
+1
+look
+inventory
+
+status
+
+save
+load
+quit
+5

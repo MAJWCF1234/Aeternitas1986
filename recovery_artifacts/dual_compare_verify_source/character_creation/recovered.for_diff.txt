@@ -1,0 +1,2232 @@
+===============================================================================
+  18+ ADULT CONTENT
+===============================================================================
+
+Aeternitas is the 18+ edition of this work.
+
+It may include mature themes, strong language, sexual content,
+violence, and other material not suitable for minors.
+
+By continuing you confirm that you are at least 18 years old (or the age
+of majority where you live) and that viewing such content is lawful for
+you. If that is not true, close this program now.
+
+===============================================================================
+[Press Enter]
+        @@@@@@  @@@@@@@@ @@@@@@@ @@@@@@@@ @@@@@@@  @@@  @@@ @@@ @@@@@@@ @@@@@@   @@@@@@
+       @@!  @@@ @@!        @!!   @@!      @@!  @@@ @@!@!@@@ @@!   @!!  @@!  @@@ !@@
+       @!@!@!@! @!!!:!     @!!   @!!!:!   @!@!!@!  @!@@!!@! !!@   @!!  @!@!@!@!  !@@!!
+       !!:  !!! !!:        !!:   !!:      !!: :!!  !!:  !!! !!:   !!:  !!:  !!!     !:!
+        :   : : : :: ::     :    : :: ::   :   : : ::    :  :      :    :   : : ::.: :
+
+==========================================================================================
+   A E T E R N I T A S   S Y S T E M                                            [ v1.3.8 ]
+==========================================================================================
+
+               +----------------------------------------------------------+
+               |                                                          |
+               |[1]Begin a New Journey         ( new  )                   |
+               |                                                          |
+               |[2]Restore a Saved Game        ( load )                   |
+               |                                                          |
+               |[3]System Documentation        ( help )                   |
+               |                                                          |
+               |[4]Manage Game Mods            ( mods )                   |
+               |                                                          |
+               |[5]Exit to Computer            ( quit )                   |
+               |                                                          |
+               +----------------------------------------------------------+
+
+  Select an option from the menu above:
+
+  >> ===============================================================================
+  LOAD FAILED
+===============================================================================
+
+No save at <AETER_TMP>
+===============================================================================
+[Press Enter]
+        @@@@@@  @@@@@@@@ @@@@@@@ @@@@@@@@ @@@@@@@  @@@  @@@ @@@ @@@@@@@ @@@@@@   @@@@@@
+       @@!  @@@ @@!        @!!   @@!      @@!  @@@ @@!@!@@@ @@!   @!!  @@!  @@@ !@@
+       @!@!@!@! @!!!:!     @!!   @!!!:!   @!@!!@!  @!@@!!@! !!@   @!!  @!@!@!@!  !@@!!
+       !!:  !!! !!:        !!:   !!:      !!: :!!  !!:  !!! !!:   !!:  !!:  !!!     !:!
+        :   : : : :: ::     :    : :: ::   :   : : ::    :  :      :    :   : : ::.: :
+
+==========================================================================================
+   A E T E R N I T A S   S Y S T E M                                            [ v1.3.8 ]
+==========================================================================================
+
+               +----------------------------------------------------------+
+               |                                                          |
+               |[1]Begin a New Journey         ( new  )                   |
+               |                                                          |
+               |[2]Restore a Saved Game        ( load )                   |
+               |                                                          |
+               |[3]System Documentation        ( help )                   |
+               |                                                          |
+               |[4]Manage Game Mods            ( mods )                   |
+               |                                                          |
+               |[5]Exit to Computer            ( quit )                   |
+               |                                                          |
+               +----------------------------------------------------------+
+
+  Select an option from the menu above:
+
+  >> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 1 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0000 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 2 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0001 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 3 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0002 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 4 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0003 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 5 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0004 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 6 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0005 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 7 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0006 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 8 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0007 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 9 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0008 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 10 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0009 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 11 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0010 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 12 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0011 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 13 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0012 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 14 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0013 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 15 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0014 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 16 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0015 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 17 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0016 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 18 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0017 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 19 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0018 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 20 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0019 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 21 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0020 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 22 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0021 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 23 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0022 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 24 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0023 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 25 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0024 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 26 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0025 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 27 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0026 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 28 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0027 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 29 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0028 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 30 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0029 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 31 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0030 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 32 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0031 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 33 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0032 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 34 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0033 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 35 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0034 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 36 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0035 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 37 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0036 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 38 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0037 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 39 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0038 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 40 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0039 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 41 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0040 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 42 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0041 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 43 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0042 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 44 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0043 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 45 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0044 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 46 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0045 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 47 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0046 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 48 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0047 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 49 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0048 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 50 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0049 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 51 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0050 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 52 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0051 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 53 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0052 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 54 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0053 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 55 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0054 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 56 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0055 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 57 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0056 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 58 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0057 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 59 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0058 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 60 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0059 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 61 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0060 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 62 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0061 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 63 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0062 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 64 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0063 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 65 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0064 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 66 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0065 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 67 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0066 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 68 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0067 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 69 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0068 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 70 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0069 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 71 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0070 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 72 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0071 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 73 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0072 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 74 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0073 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 75 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0074 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 76 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0075 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 77 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0076 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 78 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0077 [unknown-command] 1
+Try: causality parser
+
+>> ===============================================================================
+  West of House â€” sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder â€” a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  â€” Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox
+  S  - south                     |  * scrap_metal
+  E  - east                      |  * wood_scrap
+  D  - down                      |  * lockpick
+                                 |  * rusty_pick
+===============================================================================
+[ Turn: 79 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Autotest Hero â€” Human adventurer
+===============================================================================
+You do not recognize that command. Try 'help'.
+Because: T0078 [unknown-command] 1
+Try: causality parser
+
+>> Thanks for playing.

@@ -1,0 +1,1 @@
+[Sample] %NAME%, pack fiction: curses, quest items, weight notes; social read %NPCPRESENCE% with %NPCDISPLAY% (%NPCROLE/%NPCDANGER%), last contact %LASTNPCDISPLAY% (%LASTNPCROLE%), stance %LASTNPCATTITUDE% (%LASTNPCDANGER%).

@@ -1,0 +1,14 @@
+1
+loadout
+equipment
+done
+forge
+clear
+done
+saves
+save
+load
+save 1
+load 1
+quit
+5

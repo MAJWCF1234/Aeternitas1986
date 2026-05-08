@@ -1,0 +1,83 @@
+
+aeternitas_char_creation.o:     file format pe-x86-64
+
+SYMBOL TABLE:
+[  0](sec -2)(fl 0x00)(ty    0)(scl 103) (nx 1) 0x0000000000000000 aeternitas_char_creation.c
+File 
+[  2](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x0000000000000000 cc_skin_pipes_for_race
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 5
+[  4](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001a80 CC_SKIN_TSV
+[  5](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x00000000000000c0 pc_capture
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 8
+[  7](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000008000 g_pc
+[  8](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000000110 pc_restore
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 10
+[ 10](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000000130 pc_reset_empty
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 12
+[ 12](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000000150 pc_fill_narrative_defaults
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 14
+[ 14](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000000810 pc_set_default_adventurer
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 16
+[ 16](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000000a30 pc_write_save
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 18
+[ 18](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000001110 pc_read_save
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 20
+[ 20](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000001920 pc_format_summary
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 22
+[ 22](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000001dd0 run_character_creation
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 0
+[ 24](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x00000000000029a0 CC_RACES
+[ 25](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001a60 G.14
+[ 26](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x00000000000019e0 CL.13
+[ 27](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x00000000000019a0 H.12
+[ 28](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001900 B.11
+[ 29](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001860 HC.10
+[ 30](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x00000000000017a0 HS.9
+[ 31](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001700 EC.8
+[ 32](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x00000000000016a0 AR.7
+[ 33](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001620 W.6
+[ 34](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x00000000000015a0 BR.4
+[ 35](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001560 NT.3
+[ 36](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000000 portrait.5
+[ 37](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001500 CK.2
+[ 38](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000001500 BL.1
+[ 39](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x00000000000014c0 PV.0
+[ 40](sec  1)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .text
+AUX scnlen 0x393f nreloc 982 nlnno 0
+[ 42](sec  2)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .data
+AUX scnlen 0x0 nreloc 0 nlnno 0
+[ 44](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .bss
+AUX scnlen 0x82a8 nreloc 0 nlnno 0
+[ 46](sec  4)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .xdata
+AUX scnlen 0x7c nreloc 0 nlnno 0
+[ 48](sec  5)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .pdata
+AUX scnlen 0x78 nreloc 30 nlnno 0
+[ 50](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .rdata
+AUX scnlen 0x2b48 nreloc 155 nlnno 0
+[ 52](sec  7)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .rdata$zzz
+AUX scnlen 0x4b nreloc 0 nlnno 0
+[ 54](sec  0)(fl 0x00)(ty    0)(scl   2) (nx 0) 0x0000000000000000 ___chkstk_ms
+[ 55](sec  0)(fl 0x00)(ty    0)(scl   2) (nx 0) 0x0000000000000000 __imp___acrt_iob_func
+[ 56](sec  0)(fl 0x00)(ty    0)(scl   2) (nx 0) 0x0000000000000000 __imp_isspace
+[ 57](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strlen
+[ 58](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strchr
+[ 59](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strncmp
+[ 60](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strcmp
+[ 61](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fwrite
+[ 62](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fputs
+[ 63](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fputc
+[ 64](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fprintf
+[ 65](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fgets
+[ 66](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strcspn
+[ 67](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 atoi
+[ 68](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strncpy
+[ 69](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 snprintf
+[ 70](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 system
+[ 71](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 puts
+[ 72](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 fflush
+[ 73](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 memmove
+[ 74](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 printf
+[ 75](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strtol
+[ 76](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 aet_describe_pc
+
+

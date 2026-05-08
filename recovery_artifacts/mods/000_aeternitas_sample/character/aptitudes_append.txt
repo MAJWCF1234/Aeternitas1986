@@ -1,0 +1,2 @@
+[Sample] Extra training notes, guild ranks, or perk reminders for the
+aptitudes panel (skills / aptitudes).

@@ -1,0 +1,28 @@
+
+.\aeternitas64.exe:     file format pei-x86-64
+
+Contents of the .debug_line section:
+
+cygwin.S:
+File name                        Line number    Starting address    View    Stmt
+cygwin.S                                 117         0x140043270               x
+cygwin.S                                 119         0x140043271               x
+cygwin.S                                 121         0x140043272               x
+cygwin.S                                 122         0x140043278               x
+cygwin.S                                 123         0x14004327d               x
+cygwin.S                                 125         0x14004327f               x
+cygwin.S                                 126         0x140043286               x
+cygwin.S                                 127         0x14004328a               x
+cygwin.S                                 128         0x140043290               x
+cygwin.S                                 129         0x140043296               x
+cygwin.S                                 131         0x140043298               x
+cygwin.S                                 132         0x14004329b               x
+cygwin.S                                 134         0x14004329f               x
+cygwin.S                                 136         0x1400432a0               x
+cygwin.S                                 138         0x1400432a1               x
+cygwin.S                                   -         0x1400432a2
+
+
+libgcc2.c:
+File name                        Line number    Starting address    View    Stmt
+

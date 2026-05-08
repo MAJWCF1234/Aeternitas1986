@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Material Forge — Aeternitas (UI prototype, 120 columns)</title>
+  <style>
+    /**
+     * This file is a visual/behavioral reference for aeternitas64_ascii.c
+     * run_material_forge() and the shared tripanel width (40 + 37 + 29 + padding
+     * ≈ 120). It is not loaded by the game; keep it in sync when you change
+     * the in-game forge layout.
+     */
+    * { box-sizing: border-box; }
+    body {
+      background: #000; color: #aaa; font: 16px/1.2 "Courier New", monospace;
+      margin: 0; min-height: 100vh; display: flex; justify-content: center;
+      align-items: center; overflow-x: auto;
+    }
+    .terminal { width: 120ch; white-space: pre; }
+    .header { color: #5ff; font-weight: bold; }
+    .border { color: #555; }
+    .white { color: #fff; font-weight: bold; }
+    .green { color: #5f5; font-weight: bold; }
+    .yellow { color: #ff5; font-weight: bold; }
+    .red { color: #f55; font-weight: bold; }
+    .dark { color: #777; }
+    .prompt { color: #5ff; font-weight: bold; }
+    .scanlines {
+      position: fixed; inset: 0; pointer-events: none; z-index: 10;
+      background: linear-gradient(rgba(255,255,255,0) 50%, rgba(0,0,0,.25) 50%);
+      background-size: 100% 4px;
+    }
+    .input-row { display: flex; align-items: baseline; margin-top: 0.25em; }
+    input {
+      flex: 1; background: transparent; border: none; color: #fff;
+      font: inherit; font-weight: bold; outline: none; text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+<div class="scanlines"></div>
+<pre class="terminal" id="screen"></pre>
+<div class="input-row"><span class="prompt">&gt;&gt;</span><input id="cmd" autofocus spellcheck="false" autocomplete="off" maxlength="80"></div>
+
+<script>
+/*
+ * =============================================================================
+ * DYNAMIC MATERIAL-BASED CRAFTING (design summary — mirrors C implementation)
+ * =============================================================================
+ *
+ * Not fixed recipes. Each material contributes attributes (hardness, sharpness,
+ * flexibility, durability, weight, grip, binding, utility, …). Up to six bench
+ * slots sum into one blended profile (CraftAttr in C). The game then:
+ *
+ *   (A) UPGRADE PATH — if a "base tool" (is_base_tool) is on the bench, the
+ *       result modifies that item (Wrapped / Reinforced / Honed prefixes in
+ *       craft_predict), applying deltas from cord, spike, rod, etc.
+ *
+ *   (B) DISCOVERY PATH — otherwise craft_predict sums profiles, finds the
+ *       nearest archetype (Axe, Spear, Knife, Torch, Bandage, …) using a
+ *       weighted distance (sharpness weighted ~1.5× like in C), applies quality
+ *       prefixes (Flimsy / Heavy Scrap / Reliable / …), and names the output.
+ *
+ * Crafting proficiency (1–10) feeds craft_compute_stats: better durability,
+ * handling, quality ceiling — not a substitute for bad materials.
+ *
+ * Substitution: reed vs stick vs branch changes the same summed archetype
+ * match but shifts durability/weight/flx so the *name* and stats reflect weaker
+ * or stronger handles.
+ *
+ * Input echo penalty: single-item upgrade path refuses ok_out unless modifiers
+ * are present (bench_n > 1), so you cannot "craft" an unchanged base tool alone.
+ *
+ * See: craft_profile_for_item, craft_predict, craft_compute_stats,
+ *      run_material_forge, CRAFT_PROFILES / CRAFT_ARCHETYPES in aeternitas64_ascii.c
+ * =============================================================================
+ */
+
+const PROF_MAX = 10;
+let proficiency = 1;
+
+/** Flat item profiles — align with CRAFT_PROFILES + bone-tipped spear upgrade demo */
+const inventory = [
+  { id: 1,  key: "stick",             type: 0, hrd: 4, shp: 0, flx: 3, dur: 5, wgt: 3, grp: 4, bnd: 1, utl: 7, cls: "Wood" },
+  { id: 2,  key: "reed",              type: 0, hrd: 1, shp: 0, flx: 7, dur: 2, wgt: 1, grp: 2, bnd: 2, utl: 5, cls: "Plant" },
+  { id: 3,  key: "hardwood_branch",   type: 0, hrd: 6, shp: 0, flx: 2, dur: 8, wgt: 5, grp: 5, bnd: 1, utl: 8, cls: "Wood" },
+  { id: 4,  key: "metal_rod",         type: 0, hrd: 9, shp: 0, flx: 1, dur: 9, wgt: 8, grp: 3, bnd: 1, utl: 7, cls: "Metal" },
+  { id: 5,  key: "flint",             type: 0, hrd: 8, shp: 9, flx: 0, dur: 6, wgt: 4, grp: 2, bnd: 0, utl: 6, cls: "Stone" },
+  { id: 6,  key: "sharp_stone",       type: 0, hrd: 6, shp: 5, flx: 0, dur: 4, wgt: 5, grp: 1, bnd: 0, utl: 5, cls: "Stone" },
+  { id: 7,  key: "vine",              type: 0, hrd: 1, shp: 0, flx: 8, dur: 3, wgt: 1, grp: 2, bnd: 9, utl: 6, cls: "Plant" },
+  { id: 8,  key: "leather_cord",      type: 0, hrd: 2, shp: 0, flx: 9, dur: 7, wgt: 2, grp: 3, bnd: 7, utl: 8, cls: "Animal" },
+  { id: 9,  key: "grass_fiber",       type: 0, hrd: 0, shp: 0, flx: 6, dur: 1, wgt: 0, grp: 1, bnd: 5, utl: 4, cls: "Plant" },
+  { id: 10, key: "long_stick",        type: 0, hrd: 4, shp: 0, flx: 4, dur: 5, wgt: 4, grp: 4, bnd: 1, utl: 7, cls: "Wood" },
+  { id: 11, key: "bone_shard",        type: 0, hrd: 5, shp: 6, flx: 1, dur: 3, wgt: 2, grp: 1, bnd: 0, utl: 4, cls: "Bone" },
+  { id: 12, key: "stone_blade",       type: 0, hrd: 7, shp: 7, flx: 0, dur: 5, wgt: 5, grp: 1, bnd: 0, utl: 5, cls: "Stone" },
+  { id: 13, key: "iron_spike",        type: 0, hrd: 9, shp: 8, flx: 0, dur: 8, wgt: 3, grp: 1, bnd: 0, utl: 6, cls: "Metal" },
+  { id: 14, key: "leather_wrap",      type: 0, hrd: 1, shp: 0, flx: 9, dur: 7, wgt: 1, grp: 9, bnd: 6, utl: 8, cls: "Animal" },
+  { id: 15, key: "bone-tipped_spear", type: 1, hrd: 6, shp: 6, flx: 4, dur: 5, wgt: 5, grp: 4, bnd: 0, utl: 8, cls: "Tool/Weapon" },
+];
+
+const archetypes = [
+  { type: "Axe",   req_hrd: 10, req_shp: 6, req_dur: 7, req_bnd: 4, req_grp: 4, req_flx: 1 },
+  { type: "Spear", req_hrd: 8,  req_shp: 6, req_dur: 5, req_bnd: 3, req_grp: 3, req_flx: 4 },
+  { type: "Knife", req_hrd: 6,  req_shp: 8, req_dur: 4, req_bnd: 2, req_grp: 3, req_flx: 1 },
+];
+
+let bench = [];
+
+function displayName(it) {
+  if (!it) return "";
+  return it.key.replace(/_/g, " ");
+}
+
+function bar10(v) {
+  v = Math.max(0, Math.min(10, v | 0));
+  return "#".repeat(v) + ".".repeat(10 - v);
+}
+
+function sumBench() {
+  const sum = { hrd: 0, shp: 0, flx: 0, dur: 0, wgt: 0, grp: 0, bnd: 0, utl: 0 };
+  for (const it of bench) {
+    sum.hrd += it.hrd; sum.shp += it.shp; sum.flx += it.flx; sum.dur += it.dur;
+    sum.wgt += it.wgt; sum.grp += it.grp; sum.bnd += it.bnd; sum.utl += it.utl;
+  }
+  return sum;
+}
+
+/** Simplified clone of craft_predict + craft_compute_stats for the demo */
+function predict() {
+  const sum = sumBench();
+  let outName = "Unknown / Debris";
+  let d1 = "Add items to the bench.", d2 = "Use add # from listed inventory.", d3 = "";
+  let ok = false;
+  let hasBase = bench.find(it => it.type === 1);
+
+  if (bench.length === 0) return {
+    sum, outName, d1, d2, d3, ok,
+    dur: 0, shp: 0, hnd: 0, wgt: 0, q: 0,
+  };
+
+  if (hasBase) {
+    const base = hasBase.key;
+    outName = base.replace(/_/g, " ");
+    d1 = "Existing tool detected.";
+    d2 = "Applying material deltas.";
+    let mods = 0;
+    for (const it of bench) {
+      if (it.key === base) continue;
+      const k = it.key;
+      if (k === "leather_wrap" || k === "leather_cord") {
+        sum.grp += 3; sum.dur += 2; mods++;
+      }
+      if (k === "iron_spike" || k === "metal_rod" || (it.hrd >= 6 && it.shp >= 4)) {
+        sum.shp += 2; sum.dur += 3; if (it.wgt >= 6) sum.wgt += 2; mods++;
+      }
+      if (it.shp >= 6) { sum.shp += 1; mods++; }
+    }
+    if (bench.some(it => it.key !== base && ("leather_wrap" === it.key || "leather_cord" === it.key)))
+      outName = "Wrapped " + outName;
+    if (bench.some(it => it.key !== base && ("iron_spike" === it.key || "metal_rod" === it.key)))
+      outName = "Reinforced " + outName;
+    d2 = `Applying ${mods} material modifier(s).`;
+    if (bench.length <= 1) {
+      d1 = "No improvement materials supplied.";
+      d2 = "Add wrap, spike, rod, or binding.";
+      ok = false;
+    } else ok = true;
+  } else {
+    let best = 9999, bestType = "Debris";
+    for (const arc of archetypes) {
+      let dist = 0;
+      dist += Math.abs(arc.req_hrd - sum.hrd);
+      dist += 1.5 * Math.abs(arc.req_shp - sum.shp);
+      dist += Math.abs(arc.req_bnd - sum.bnd);
+      dist += Math.abs(arc.req_flx - sum.flx) / 2;
+      if (dist < best) { best = dist; bestType = arc.type; }
+    }
+    if (bench.length < 2 || best > 18) {
+      outName = "Worthless Debris";
+      d1 = "Lacks required structure.";
+      d2 = "Try stronger handle + edge + binding.";
+      ok = false;
+    } else {
+      let prefix = "Crude", mat = "";
+      if (bench.some(it => it.key === "reed") && sum.flx >= 7 && sum.dur <= 4) prefix = "Flimsy";
+      if (sum.hrd >= 10 && sum.wgt >= 8) prefix = "Heavy Scrap";
+      if (sum.dur >= 10 && sum.grp >= 6) prefix = "Reliable";
+      if (sum.hrd >= 8 && sum.shp >= 7 && sum.bnd >= 3) mat = "Flint";
+      outName = `${prefix} ${mat} ${bestType}`.replace(/\s+/g, " ").trim();
+      d1 = `${prefix} form interpreted from`;
+      d2 = `match score: ${best} (lower is better)`;
+      d3 = prefix === "Flimsy" ? "Fast but fragile." : "Improvised but functional.";
+      ok = true;
+    }
+  }
+
+  const profB = Math.floor(proficiency / 3);
+  let dur = Math.min(10, Math.max(1, Math.floor((sum.hrd + sum.dur + sum.bnd) / 4) + profB));
+  let shp = Math.min(10, Math.max(0, sum.shp));
+  let hnd = Math.min(10, Math.max(1, 6 + Math.floor(sum.grp / 2) - Math.floor(sum.wgt / 3) + profB));
+  let wgt = Math.min(10, Math.max(1, Math.floor(sum.wgt / 2)));
+  if (outName.includes("Flimsy")) dur = Math.min(dur, 3);
+  const q = Math.min(100, Math.max(1,
+    (sum.hrd + sum.shp + sum.dur + sum.grp + sum.bnd + sum.utl) * 2 +
+    Math.floor(sum.flx / 2) - sum.wgt + proficiency * 3));
+
+  return { sum, outName, d1, d2, d3, ok, dur, shp, hnd, wgt, q };
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+}
+
+function updateUI() {
+  const p = predict();
+  const rows = 15;
+  const invLines = [];
+  for (let i = 0; i < inventory.length; i++) {
+    const it = inventory[i];
+    const lab = displayName(it).substring(0, 20).padEnd(20, " ");
+    invLines.push(` <span class="border">|</span> <span class="yellow">[${it.id}]</span> ${lab} <span class="dark">(${it.cls})</span>${" ".repeat(Math.max(0, 40 - 28 - lab.length))}<span class="border">|</span>`);
+  }
+
+  const midLines = [];
+  const rightLines = [];
+  for (let i = 0; i < rows; i++) {
+    let mid = `<span class="border">|</span>${"".padEnd(39)}<span class="border">|</span>`;
+    if (i < 6) {
+      if (i < bench.length) {
+        const nm = displayName(bench[i]).substring(0, 27).padEnd(27, " ");
+        mid = `<span class="border">|</span> <span class="white">${i + 1}. ${nm}</span><span class="border">|</span>`;
+      } else {
+        mid = `<span class="border">|</span> <span class="white">${i + 1}.</span> <span class="dark">[ Empty ]${" ".repeat(18)}</span><span class="border">|</span>`;
+      }
+    } else if (bench.length > 0) {
+      if (i === 7) mid = `<span class="border">|</span> <span class="header">COMBINED MATERIAL ATTRIBUTES:</span>${"".padEnd(8)}<span class="border">|</span>`;
+      if (i === 8) mid = `<span class="border">|</span>  <span class="white">Hrd:${String(p.sum.hrd).padStart(2,"0")} Shp:${String(p.sum.shp).padStart(2,"0")} Flx:${String(p.sum.flx).padStart(2,"0")} Dur:${String(p.sum.dur).padStart(2,"0")}</span>${" ".repeat(8)}<span class="border">|</span>`;
+      if (i === 9) mid = `<span class="border">|</span>  <span class="white">Wgt:${String(p.sum.wgt).padStart(2,"0")} Grp:${String(p.sum.grp).padStart(2,"0")} Bnd:${String(p.sum.bnd).padStart(2,"0")} Utl:${String(p.sum.utl).padStart(2,"0")}</span>${" ".repeat(8)}<span class="border">|</span>`;
+    }
+
+    const nameShort = esc(p.outName.substring(0, 22));
+    let rt = `<span class="border">|</span>${"".padEnd(28)}<span class="border">|</span>`;
+    if (i === 0) rt = `<span class="border">|</span> <span class="header">RESULT:</span> <span class="white">${nameShort}</span>${" ".repeat(Math.max(0, 28 - 9 - nameShort.length))}<span class="border">|</span>`;
+    else if (i === 2) rt = `<span class="border">|</span> <span class="white">BASE STATS:</span>${"".padEnd(17)}<span class="border">|</span>`;
+    else if (i === 3) rt = `<span class="border">|</span>  D:[<span class="green">${bar10(p.dur)}</span>] <span class="white">${String(p.dur).padStart(2,"0")}</span>${"".padEnd(6)}<span class="border">|</span>`;
+    else if (i === 4) rt = `<span class="border">|</span>  S:[<span class="red">${bar10(p.shp)}</span>] <span class="white">${String(p.shp).padStart(2,"0")}</span>${"".padEnd(6)}<span class="border">|</span>`;
+    else if (i === 5) rt = `<span class="border">|</span>  H:[<span class="yellow">${bar10(p.hnd)}</span>] <span class="white">${String(p.hnd).padStart(2,"0")}</span>${"".padEnd(6)}<span class="border">|</span>`;
+    else if (i === 6) rt = `<span class="border">|</span>  W:[<span class="dark">${bar10(p.wgt)}</span>] <span class="white">${String(p.wgt).padStart(2,"0")}</span>${"".padEnd(6)}<span class="border">|</span>`;
+    else if (i === 8) rt = `<span class="border">|</span> <span class="white">ANALYSIS:</span>${"".padEnd(18)}<span class="border">|</span>`;
+    else if (i === 9) rt = `<span class="border">|</span> <span class="dark">${esc(p.d1).substring(0, 29).padEnd(29, " ")}</span><span class="border">|</span>`;
+    else if (i === 10) rt = `<span class="border">|</span> <span class="dark">${esc(p.d2).substring(0, 29).padEnd(29, " ")}</span><span class="border">|</span>`;
+    else if (i === 11) rt = `<span class="border">|</span> <span class="dark">${esc(p.d3).substring(0, 29).padEnd(29, " ")}</span><span class="border">|</span>`;
+    else if (i === 12) {
+      const tier = p.q >= 75 ? "(fine)" : (p.q >= 50 ? "(solid)" : "(rough)");
+      rt = `<span class="border">|</span> <span class="white">Q:${p.q} ${tier}</span>${"".padEnd(Math.max(0, 29 - 4 - String(p.q).length - tier.length))}<span class="border">|</span>`;
+    }
+    else if (i === 13) rt = `<span class="border">|</span> <span class="green">PROF:${String(proficiency).padStart(2,"0")} Add REM Craft</span>${"".padEnd(4)}<span class="border">|</span>`;
+
+    midLines.push(mid);
+    rightLines.push(rt);
+  }
+
+  let out = `<span class="border">${"=".repeat(120)}</span>\n`;
+  out += `   <span class="header">M A T E R I A L   F O R G E</span>${"".padEnd(22)} <span class="green">[ PROFICIENCY: <span id="pv">${proficiency}</span> ]</span>\n`;
+  out += `<span class="border">${"=".repeat(120)}</span>\n`;
+  out += ` <span class="white">[ INVENTORY ]</span>                              <span class="white">[ WORKBENCH : ${bench.length}/6 ]</span>                      <span class="white">[ PREDICTED OUTCOME ]</span>\n`;
+  out += ` <span class="border">+----------------------------------------+ +----------------------------------------+ +-----------------------------+</span>\n`;
+
+  for (let i = 0; i < rows; i++) {
+    const left = invLines[i] || ` <span class="border">|</span>${"".padEnd(38)}<span class="border">|</span>`;
+    out += left + `    ${midLines[i]}    ${rightLines[i]}\n`;
+  }
+
+  out += ` <span class="border">+----------------------------------------+ +----------------------------------------+ +-----------------------------+</span>\n`;
+  out += ` <span class="dark">ADD #  REM #  PROF # (1-10)  CRAFT  CLEAR  DONE — properties blend; no fixed recipes.</span>\n`;
+  document.getElementById("screen").innerHTML = out;
+}
+
+document.getElementById("cmd").addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  const raw = document.getElementById("cmd").value.trim().toLowerCase();
+  const tok = raw.split(/\s+/);
+  const cmd = tok[0];
+  const n = parseInt(tok[1], 10);
+
+  if (cmd === "add" && n >= 1 && n <= inventory.length && bench.length < 6) {
+    const it = inventory[n - 1];
+    if (it.type === 1 && bench.some(x => x.type === 1))
+      alert("Cannot combine two base weapons/tools.");
+    else bench.push(Object.assign({}, it));
+  } else if (cmd === "rem" && n >= 1 && n <= 6 && n - 1 < bench.length) {
+    bench.splice(n - 1, 1);
+  } else if (cmd === "prof" && n >= 1 && n <= PROF_MAX) {
+    proficiency = n;
+  } else if (cmd === "clear") {
+    bench = [];
+  } else if (cmd === "craft") {
+    const p = predict();
+    if (!p.ok || p.outName.includes("Debris"))
+      alert("The combination collapses into useless debris.");
+    else alert(`Forged: ${p.outName}`);
+    bench = [];
+  } else if (cmd === "done" || cmd === "exit") {
+    alert("In-game this closes the forge.");
+  } else if (raw) {
+    document.getElementById("cmd").style.color = "#f55";
+    setTimeout(() => document.getElementById("cmd").style.color = "#fff", 300);
+  }
+  document.getElementById("cmd").value = "";
+  updateUI();
+});
+
+updateUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Assistant temp recovery bundle
+Created: 2026-05-07T21:18:29
+
+Contents:
+- live_sources/: current high-value source files + autotest
+- snapshot_sources/: recovered_2026-05-07_1444/sources full snapshot
+- mods_snapshot/: recovered sample character overlays
+- aeternitas64.exe (if present)

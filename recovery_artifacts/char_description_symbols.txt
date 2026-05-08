@@ -1,0 +1,51 @@
+
+aeternitas_char_description.o:     file format pe-x86-64
+
+SYMBOL TABLE:
+[  0](sec -2)(fl 0x00)(ty    0)(scl 103) (nx 1) 0x0000000000000000 aeternitas_char_description.c
+File 
+[  2](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x0000000000000000 get_skin_type
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 4
+[  4](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x00000000000002b0 feat_push
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 6
+[  6](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x0000000000000300 d_apf
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 8
+[  8](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x0000000000000370 get_title
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 11
+[ 10](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000000000 tbuf.0
+[ 11](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x0000000000000660 legs_append
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 13
+[ 13](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x0000000000000d70 face_desc_append
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 15
+[ 15](sec  1)(fl 0x00)(ty   20)(scl   3) (nx 1) 0x00000000000013e0 naked_body_append
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 17
+[ 17](sec  1)(fl 0x00)(ty   20)(scl   2) (nx 1) 0x0000000000001d80 aet_describe_pc
+AUX tagndx 0 ttlsiz 0x0 lnnos 0 next 0
+[ 19](sec  4)(fl 0x00)(ty    0)(scl   3) (nx 0) 0x0000000000002fe0 lip_opt.1
+[ 20](sec  1)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .text
+AUX scnlen 0x6cfb nreloc 823 nlnno 0
+[ 22](sec  2)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .data
+AUX scnlen 0x0 nreloc 0 nlnno 0
+[ 24](sec  3)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .bss
+AUX scnlen 0x28 nreloc 0 nlnno 0
+[ 26](sec  4)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .rdata
+AUX scnlen 0x3030 nreloc 5 nlnno 0
+[ 28](sec  5)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .xdata
+AUX scnlen 0x94 nreloc 0 nlnno 0
+[ 30](sec  6)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .pdata
+AUX scnlen 0x60 nreloc 24 nlnno 0
+[ 32](sec  7)(fl 0x00)(ty    0)(scl   3) (nx 1) 0x0000000000000000 .rdata$zzz
+AUX scnlen 0x4b nreloc 0 nlnno 0
+[ 34](sec  0)(fl 0x00)(ty    0)(scl   2) (nx 0) 0x0000000000000000 __imp_tolower
+[ 35](sec  0)(fl 0x00)(ty    0)(scl   2) (nx 0) 0x0000000000000000 __imp_toupper
+[ 36](sec  0)(fl 0x00)(ty    0)(scl   2) (nx 0) 0x0000000000000000 ___chkstk_ms
+[ 37](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 vsnprintf
+[ 38](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strncpy
+[ 39](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 snprintf
+[ 40](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 pc_fill_narrative_defaults
+[ 41](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strlen
+[ 42](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strstr
+[ 43](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strcmp
+[ 44](sec  0)(fl 0x00)(ty   20)(scl   2) (nx 0) 0x0000000000000000 strncat
+
+

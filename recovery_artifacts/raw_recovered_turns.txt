@@ -1,0 +1,849 @@
+A:\> AETERNITAS.EXE
+Initializing Extended VGA Mode (120x40)... OK
+Checking Base Memory (640K)... OK
+Mounting [FLOPPY_DRIVE:A]...
+  Reading Sector 0x01... DONE
+  Loading Core Engine... OK
+
+SYSTEM READY.
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                            
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                                                                                                              
+                                                                                                             
+                                                                                                             
+                                                                                                             
+                         W                  W                                                               
+                                                                                                             
+                                                                D                                     L      
+                                                                 f                                           
+           ; #                                   E                                                           
+                                                  #                                          D               
+                                                           ,                 t                  #            
+                                                                     .                                       
+                                                                                                             
+                                                                                                             
+                                                                                                              
+                                                                                                             
+                                                                                                             
+                                 E                                                                           
+                         W                  W                                                               
+                                                                                                             
+                       W                                        D                  E                  L # f  
+                                        #      t                 f               t                    L      
+           ; #                                   E#                                                          
+                                                  #                                         #D               
+                                                           ,          #      t                  #            
+                                                                     .                   K     #             
+                                                                                                             
+                                                                                                             
+                                                                                                              
+                                                                                                            .
+                                              #                                                              
+                                 E           #                                                               
+                         W                  W                                                               
+                                                                                                             
+                       W                                        D           #      E         G        L # f  
+                                        #      t                 f E             t                    L      
+           ; #                           E       E#                                                          
+                         E                        #   D                                     #D               
+           #               ;                               ,          #      t                  #            
+                                                                     .                   K     #   ,         
+                                                                            #        ;                       
+                                                                                                             
+                                                                                                              
+                                                                                                            .
+                                              #                                                              
+                                 E          E#                                                               
+                         W                  W                                                    ,          
+                                         L                                                                   
+                  ,    W                  W           W         D           #      E         G        L # f  
+                                        # W  L t                 f E             t                    L      
+           ; #                           E       E#                                                          
+                         E                        #   D      #                              #D  #            
+           #               ;                               ,  t       #      t                  #            
+                                                                     .                   K     #   ,         
+       #                                                     .              #        ;                       
+                                                                           ,                                 
+                                                                                                              
+                                                                                                            .
+                                              #                                                              
+                                 E          E#                                    E                          
+                         W                  W                                                    ,          
+                                         L                                                                   
+                  ,    W                  W           W         D           #      E         G #      L # f  
+                    i       t           # W  L t                 f E             t               ,    L      
+           ; # G                         E       E#                                       ;                  
+                         E                        #   D #    #       W                      #D  #            
+           #            ,  ;                               ,  t       #      t             i    #            
+                                                                     .   E               K     #   ,         
+       #                                                     .              #        ;                       
+                 ,                                                         ,           ,                     
+                                                                                                              
+                                                                                                            .
+                                              #                                                              
+                         E       E          E#                                    E                          
+                         W         K        W               E                                    ,          
+                                         L                      #                                            
+                  ,    W                 #W           W         D           #      E         G #      L # f  
+                    i       t           # W LL t                 f E    #        t            #  ,    L      
+           ; # G                         E       E#                                       ;  D          W    
+                         E                        #   D #    #       W                      #D  #            
+           #            ,  ;                               ,  t       #      t             i,   #            
+                                                                     .   E               K     #   ,         
+       #                                                  :  .             E#        ;             E         
+                 ,                                                         ,           ,                     
+                                                                                                              
+                                                                                                            .
+                           #                  #                                                              
+                         E       E          E#     ,                              E                          
+                         W         K        W       j       E                                    ,          
+                                         L                      #            t                               
+                  ,    W                 #W      E    W         D           #      E         G #      L # f  
+                    i       t           # W LL t                 f E.   #        t E          #  ,    L      
+           ; # G  ,                      E       E#    K                                  ;  D          W    
+          j   D          E                        #K  D #    #       W                      #D  #            
+           #            ,  ;                            i  ,  t       #      t             i,   #            
+                                                                     .   E               K     #   ,         
+       #                                                  :  .             E#        ;             E         
+      ,          ,                                                         ,           ,                     
+                                                                                                              
+                                                                                                            .
+                           #                  #                                                              
+                         E       EE  E      E#     ,                              E                          
+                         W         K        W     # j       E                  ;                 ,      .   
+                                         L                      #            t   t                           
+                # ,    Wf                #W      E    W         D           #      E         G # ,    L # f  
+                    i       t           # W LL t                 f E.   #        t E          #  ,    L      
+           ; # G  ,                      E       E#    K                                  ;  D          W    
+          j   D          E         E       #      #K  D #    #       W             E        #D  #            
+           #            ,  ;                            i  ,  t       # #    t             i,   #            
+                                                                     .   E               K     #   ,         
+       #                                      t           :  .             E#        ;             E         
+      ,          ,                                                         ,           ,                     
+                                                                                                              
+                             ;                                                                              .
+                           #                  #                                                              
+                         E       EE  E      E#     ,                     E        E E                        
+                         W         K        W     # j       E                  ;                 ,      .E  
+                                         L                      #            t   t                           
+                # ,    Wf                #W   ;  E    W         D           #      E         G # ,    L # f  
+            :       i       t           # W LL t                 f E.   #        t E          #  ,    L      
+           ; # G  ,                      E       E#    K             :                    ;  D          W    
+          j   D          E         E       #      #K  D #    #       W t#          E        #D  #            
+           #            ,  ;                            i  ,  t       # #    t     E       i,   #     #      
+                                                                     .   E               K     #   ,         
+       #                                      t         K :  .             E#        ;             E         
+      ,          ,                 :                                       ,           ,        ,            
+                                                                                                              
+                             ;                                                                              .
+                           #                  #                                                              
+                  .     .E       EE  E      E#     ,                     E        E E                      # 
+                         W         K        W     # j       E                  ;  #              ,      .E  
+                                         L                      #            t   t                           
+                # ,    Wf                #W   ;  E    W         D        E  #      E         G # ,    L # f  
+            :       i       t           # W LL t        f        f E.   #        t E          #  ,    L  #   
+           ; # G  ,                      E       E#    K     #       :                    ; #D          W    
+          j   D          E         E       #      #K  D #    #       W t#          E        #D  #            
+           #i           ,  ;                            i  ,  t       # #  E t     E       i,   #     #      
+                                                                     .   E               K     ##  ,         
+       #                                      t         K :  .             E#        ;             E         
+      ,          ,                 :                                       ,          ,,       ,,            
+                                                                                                              
+                             ;                                                                              .
+                           #                  #                                                              
+                  .     .E       EE  E      E#     ,                     E        E E                      # 
+                       i W         K        W     ##j       E              E   ;  #              ,      .E  
+                                         L                    f #            t   t                           
+                # ,    Wf                #W   ;  E    W         D        E  #      E         G # ,    L # f  
+            :       i       t      E    # W LL t        f        f E.   #        t E          #  ,    LL #   
+           ; # G  ,                      E       E#    K     #       :             E      ; #D          W i  
+          j   D          E:        E       #      #K  D #    #       W t#E         E        #D  #            
+           #i           ,  ;       E                    i  ,  t       # #  E t     E       i,   #     #      
+                                                                     .   E   t         K K     ##  ,         
+       #                                      t         K :  .         G   E#        ;             E         
+      ,          ,                 :                                       ,          ,,       ,,            
+                                                                                                              
+                             ;                 ,                                                            .
+                           #                  #                                                              
+                  .     .E       EE  E      E#   E ,                     E        E E                      # 
+                       i W         K        W     ##j       E              E   ;  #              ,      .E  
+                                         L        #           f #            t   t                           
+                # ,   #Wf                #W  f;  E    W         D        E  #      E         G # ,    L # f  
+            :       i##     t      E    # W LL t        f        f E.   #        t E          #  ,    LL #   
+           ; # G  ,                      E       E#    K     #       :             E      ; #D          W i  
+          j # D          E:        E       # :    #K  D #    #       W t#E         E        #D  #            
+           #i           ,  ;       E                    i, ,  t       # #  E t   t E       i,   #     #      
+                                                                     .   E   t         K K     ##  ,         
+       #                           E          t         K : ..         G E E#        ;             E         
+      ,          ,                 :                                       ,          ,,       ,,            
+                                                                                                              
+                             ;                 ,                                                            .
+                           #                  #              W                                               
+                  .     .E       EE  E      E#   E ,                     E        E E                      # 
+                       i W         K        W     ##j       E              E   ;  #              ,      .E  
+                                         L        #           f #            t   t                           
+                # ,   #Wf                #W  f;  E    W         D        E  #      E         G # ,    L #Lf  
+            :       i##     t      E    # W LL t        f        f E.   #        t E          #  ,    LL #   
+           ; # G  ,              t       E       E#    K     #    t  :  #          E      ; #D         ,W i  
+          j # D          E:        E       # :    #K  D # #  #       W t#E         E        #D ##       E    
+           #i           ,  ;       E                   Wi, ,  t       # #  E t   t E       i,   #     #      
+                ##                                                   .E  E   t         K K     ##  ,         
+       #                           E          t         K : ..         G E E#        ;             E         
+      ,         ,,                 :                                       ,          ,,       ,,            
+                                                                                                              
+                             ;                 ,                                                            .
+                           #                  #              W          f                                    
+                  .     .E       EE  E      E#   E ,                     E        E E                      # 
+                       i W         K        W     ##j       E              E   ;  #  ;           ,      .E  
+                 #                       L        #  D        f #            t   t                           
+                # ,   #Wf                #W  f;  E    W      #  D        E  #t     E         G # ,    L #Lf  
+            :       i##     t      E    # W LL t        f        f E.   #        t E          ## ,    LLG#   
+           ; # G  ,              t       E       E#    K     #    t  :  #          E      ; #D         ,W i  
+          j # D          E:        E       # :    #K  D # #  #       W t#E         E        #D ##       E    
+           #i           ,  ;       E                   Wi, ,  t       # #  E t   t E       i,  ##     #      
+                ##                                     #    E        .E  E   t         K K     ##  ,         
+       #         #                 E          t         K : ..         G E E#        ;          #, E         
+      ,         ,,                 :                                       ,          ,,       ,,            
+                                                                                                              
+                             ;                 ,                                                            .
+                           #i                 #i             W          f                                    
+                  .     .E       EE  E     .E#   E ,                     E        E E                      # 
+                       i W         K        W     ##j       E            E E   ;  #  ;           ,      .E  
+                 #                       L        #  D        f #            t   t            j              
+                # ,   #Wf  ;             #W  f;  E    W      #  D        E  #t     E         G ##,    L##Lf  
+            :       i##     t     #E    # W LLLt        f     t  f E.   #        t E          ## ,    LLG#   
+           ; # G  ,              t       E       E#    K     #    t  :  #          E      ; #D         ,W i  
+          j # D          E:        E       # :    #K  D # #  #       W t#E         E        #D ##       E    
+           #i           ,  ;       E                 t Wi, ,  t       # #  E t   t E       i,  ##     #      
+                ##                                     #    E        .E  E   t         K K     ##  ,         
+       #         #                 E          t  D      K : ..         G E E#        ;          #, E         
+      ,         ,,                 :                                       ,          ,,       ,,  ,         
+                                                                                                              
+                             ;                 ,                                                            .
+                          f#i                 #i             W          f                                  ; 
+                  .     .E       EE  E     .E#   E ,                     E        E E                      # 
+                       i W     ;   K        W     ##j       E            E E   ;  #  ;           ,      .E  
+                 #                       L        #  D        f #            t   t            j#             
+                # ,   #Wf  ;             #W  f;  E    W      #  D        E  #t     E         G ##,    L##Lf  
+            :       i##     t     #E    # W LLLt        f    #t  f E.   #        t E          ## ,    LLG#   
+           ; # G  ,              t       E       E#    K     #    t  :  #          E      ; #D   ,     ,W i  
+          j # D          E:        E       #E:    #K  DD# #  #       W t#E         E        #D ##       E    
+           #i           ,  ;       E       ,         t Wi, ,  t       # #  E t   t#E       i,  ##     #      
+                ##                                     #    E        .E  E   t         K#K:    ##  ,         
+       #         #,                E          t  D      K : ..         G E E#        ;          #, E         
+      ,         ,,                 :                                    f  ,          ,,       ,,  ,         
+                                                                                                              
+                             ;                 ,                                                            .
+                          f#i                 #i             W          f                                  ; 
+                  .     .E       EE  E     .E#   E ,                     E        E E                      # 
+                       i W     ;   K        W     ##j       E            E E   ;  #  ;           ,      .E  
+                 #                       L  .     #  D        f #            t   t            j#             
+                # ,   #Wf  ;             #W  f;  E    W      #  D        E  #t     E         G ##,    L##Lf  
+            :    #  i##     t     #E    # W LLLt        f    #t  f E.   #        t E          ## ,    LLG#   
+           ; # G  ,              t       E       E#    K     #    t K:  #          E      ; #DG  ,     ,W i  
+          j # D        f E:        E       #E:    #K  DD# #  #       W t#E         E        #D ##       E    
+           #i           ,WW;      #E       ,         t#Wi, ,  t       # #  E t   t#E       i,  ##     #      
+          K     ##                                     #    E        .E  E E t         K#K:    ##  ,  ,      
+       #         #,                E          t  D      K : ..         G E E#        ;#         #, E         
+      ,         ,,                 :                                    f  ,          ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                 #i             W:         f                                  ; 
+                  .     .E       EE EE     .E#   E ,                     E        E E                      # 
+                       i W     ;   K        W     ##j       E            E E   ; L#  ;           ,      .E  
+                 #                       L  .     #  D        f #            t   t            j#             
+                ##,   #Wf  ;             #W  f;  E    W      #  D        E  #t     E         G ##,    L##Lf i
+            :    #  i##     t     #E    # W LLLt        f    #t  f E.   #        t E       :  ## ,    LLG#   
+           ; # G  ,              t       E       E#    K     #    t K:  #          E      ; #DG  ,     ,W i  
+          j # D        f E:        E       #E:    #K DDD# #i #       W t#E         E      # #D ##       E    
+           #i           ,WW;      #E       ,       f t#Wi, ,  t       # #  E t   t#E    G  i,  ##     #      
+          K     ##          ;                          #    E        .E  E E t         K#K:    ##  ,  ,      
+       #         #,                E          t  D      K : ..         G E E#        ;##        #, E         
+      ,         ,,                 :                                    f  ,          ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                 #i             W:         f                                  ; 
+                  .     .E       EE EE     .E#   E ,         ##          E        E E                      # 
+                       i W     ;   K        W     ##j       E            E E   ; L#  ;           ,      .E  
+               j #                       L  .     #  D      E f #            t   t            j#             
+                ##,   #Wf  ;            K#W  f;  E    W      #  D        E  #t     E         G ##,    L##Lf i
+            :    #  i##     t     #E    # W LLLt     t  f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G  ,              t      .E       E#    K     #    t K:  #          E      ; #DG  ,     ,W i  
+          j # D        f E:        E       #E:    #K DDD# #i #       W t#E         E      # #D ##      #E    
+           #i,          ,WW;      #E       ,       f t#Wi,,,  t       # #  E t   t#E    G  i,  ##     #      
+          K     ##          ;                          #    E        .E  E E t         K#K:    ##  ,  ,      
+       # D       #,                E          t  D      K : ..         G E E#        ;##        #, EG        
+      ,         ,,                 :                                    fE ,          ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                 #i             W:         f                                  ; 
+                  .     .E       EE EE     .E#   E ,         ##          E       EE E                      # 
+                       i W     ;   K        W     ##j       E            E E#  ; L#  ;         ; ,      .E  
+               j##                       L  .     #  D      E f #f           t   t            j#             
+                ##,   #Wf  ;            K#W  f;  E    W      #  D        E  #t     E         G ##,    L##Lf i
+            :    #  i##     t     #E    # W LLLt     t  f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G  ,     L        t      .E       E#    K     #    t K:  #          E      ; #DG  ,     ,W i  
+          j # D        f E:        E       #E:    #K DDD# #i #     ; W t#E         E      # #D ##      #E.   
+           #i,          ,WW;      #E       ,      #f t#Wi,,,  t       # #  E t   t#E    G  i,  ##     #      
+          K     ##          ;                          #    E        .E  E E t     E   K#K:    ##  ,  ,      
+      ;# D       #,               fE          tt DW     K : ..         G E E#        ;##        #, EG        
+      ,         ,,                 :                                    fE ,          ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                 #i             W:        ,f                                  ; 
+                  .     .E       EE EE     .E#   E ,         ##         #E  j  E EE E                      # 
+                       i W    ,;  #K        W     ##j       E            E E#  ; L#  ;         ; ,      .E  
+               j##                       L  .     #  D      E f #f           t   t            j#             
+                ##,   #Wf  ;            K#W  f;  E#   W      #  D        E  #t     E         G ##,    L##Lf i
+            :    #  i## L   t     #E    # W LLLt     t  f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G# ,     L        t E    .E       E#    K     #    t K:  #          E      ; #DG  ,     ,W i  
+          j # D        f E:        E       #E:    #K DDD# #i #     ; W t#E   t     E      # #D ##      #E.   
+           #i,          ,WW;      #E       ,      #f t#Wi,,,  t       # #  E t   t#E    G  i,  ##     #      
+          K     ##       .  ;                    E     #    E        .E  E E t     E   K#K:    ##, ,  ,      
+      ;# D       #,               fE          tt DW     K : ..         G E E#        ;##        #, EG        
+      ,         ,,                 :                                    fE ,          ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                 #i             W:        ,f                                  ; 
+                  .     .E       EE EE     .E#   E ,        E##         #E  j  E EE E                      # 
+                       i W    ,;  #K;       W     ##j       E  #         E E#  ; L#  ;         ; ,      .E  
+               j##                #      L  .     #  D      E f #f           t   t            j# ,     i     
+                ##,   #Wf  ;            K#W  f;  E#   W      #  D        E  #t     E         G ##,    L##Lf i
+            :    #  i## LL Lt     #E    # W LLLt     t  f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G# ,    #L        t E    .E       E#    K     #    t K:  #          E      ; #DG# ,     ,W i  
+          j # D        f E:      t E       #E:    #K DDD# #i #     ; W t#E   t     E      # #D ##      #E.   
+           #i,          ,WW;      #E       , W    #f t#Wi,,,  t       # #  E t   t#E    G  i,  ##   . #      
+          K     ##       .  ;                    E     #    E        .E  E E t     E   K#K:    ##, ,  ,      
+      ;# D       #,               fE          tt DW     K : ..         G E E#        ;##        #, EG        
+      ,         ,,                 :                                    fE ,;         ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                 #i             W:        ,f                                  ; 
+                  .     .E       EE EE     .E#   E ,        E##         #E  j  E EE E            .        f# 
+                       i W    ,;  #K;       W,    ##j       E  #         E E#  ; L#  ;         ; ,      .E  
+               j##                #      L  .     #  D      E f #f           t   t E          j# ,     i     
+                ##,   #Wf  ;            K#W ff;  E#   W      #  D        E  #t     E         G ##,    L##Lf i
+            : #  #  i## LL Lt     #E    # W LLLt     t  f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G# ,    #L        t E    .E       E#    K E   #    t K:  #          E      ; #DG# ,     ,W i  
+          j # D        f E:      t E       #E:    #K DDD###i #     ; W t#E E t     E      # #D ##      #E.   
+           #i,          ,WW;      #E       , W    #f t#Wi,,,  t       # #  E t   t#E    G  i, G##   . #      
+          K:    ##       .  ;                    E     # :  E        .E #E E t     E   K#K:    ##, ,  ,      
+      ;# D       #,               fE          tt DW     K : ..         G E E#t       ;##        #, EG        
+      ,         ,,                 :                                    fE ,;         ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                f#i             W:        ,f                                  ; 
+                  .     .E       EE EE     .E#   E ,        E##         #E  j  E EE E            .        f# 
+                       i W    ,;  #K;       W,    ##j       E# #         E E#  ; L#  ;         ; ,      .E  
+               j##      D        t#      L  .     #  D      E f #f           t   t E          j# ,     i  ;  
+              G ##,   #Wf f;            K#W ff;  E#   W      #  D        E  #t     E         G ##,    L##Lf i
+            : #  #  i## LL Lt     #E    # W LLLt     t  f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G# ,    #L        t E    .E       E#    K E   #    t K:  #          E      ; #DG# ,     ,W i  
+          j## D        f E:      t E       #E:    #K DDD###i #     ; W t#E E t     E      # #D ##,     #E.   
+           #i,          ,WW;      #E       , W    #f t#Wi,,,  t       # #  E t   t#E    G  i, G##   . #      
+          K:    ##       .  ;                    E     # :  E        .E #E E t     E   K#K:    ##, ,  ,      
+      ;# D       #,        t      fE          tt DW     K : ..         G E E#t    fE ;##       ##, EG        
+      ,         ,,                 :                                    fE ,;.        ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                f#i             W:        ,f                                  ; 
+                  .     .E       EE EE     .E#   E ,        E##         #E  j  E EE E            .        f# 
+                       i W    ,;  #K;       W,    ##j       E# #         E E#  ; L#  ;         ; ,      .E# 
+               j##      D        t#      L  .     #  D      E fE#f       E   t   t E          j# ,     i W;  
+              G ##,   #Wf f;           :K#W ff;  E#   W      #  D        E  #t     E         G ##,    L##Lf i
+            : #  #  i##WLL Lt     #E    # WLLLLt  #  t# f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G# ,    #L        t E    .E       E#    K E:  #    t K:  #          E      ; #DG# ,     ,W i  
+          j## D        f E:      t E       #E:    #K DDD###i #     ; W t#E E t     E      # #D ##,     #E.   
+          ##i,          ,WW;      #E       , W    #f t#Wi,,,  t       # #  E t   t#E    G  i, G##   . #      
+       :  K:    ##       .  ;                    E     # :  E        .E #E E t     E   K#K:    ##, ,  ,      
+      ;# D     L #,        t      fE          tt DW     K : ..         G E E#t    fE ;##D      ##, EG        
+      ,         ,,                 :                                    fE ,;.        ,,       ,,  ,         
+                                                                         ,                                    
+                            ,;                 ,                                                            .
+                          f#i                f#i             W:        ,f                                  ; 
+                  .     .E       EE EE     .E#   E ,        E##         #E  j  E EE E            .        f# 
+                       i W,   ,;  #K; .     W,    ##j       E# #         E E#  ; L#  ;         ; ,      .E# 
+               j##      D        t#      L  .     #  D      E fE#f      #E   t   t E          j# ,     iWW;  
+              G###,   #Wfff;           :K#W ff;  E#   W      #  D        E  #t    #E         G ##,    L##Lf i
+            :E#  #  i##WLL Lt     #E    # WLLLLt  #  t# f    #t  f E.   #        t#E       :  ## ,    LLG#   
+           ; # G# ,    #L        t E    .E       E#    K#E:  #    t K:  #          E      ; #DG# ,     ,W i  
+          j## D        f E:      t E       #E:   E#K DDD###i #     ; W t#E E t     E      # #D ##,     #E.   
+          ##i,          ,WW;      #E       , W    #f t#Wi,,,  t      K# #  E t   t#E    G  i, G##   . #      
+       :  K:    ##       .  ;                    E t   # :  E        .E #E E t     E   K#K:    ##, ,W ,      
+      ;# D     L #,        t      fE          tt DW     K : ..         G E E#t    fE ;##D      ##, EG        
+      ,         ,,                 :                                    fE ,;.        ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j           W:        ,f                                  ; 
+                  .     .E       EE EE     .E#   E ,        E##         #E  j  E EE E            .        f# 
+                       i W,   ,;  #K; .     W,    ##j       E# #         E E# ,; L#  ;         ; ,      .E# 
+               j##      D        t#      L  .     #  D      E fE#f      #E   t   t E          j# ,     iWW;  
+              G###,   #Wfff;           :K#W ff;  E#   W;     #  D#       E  #t    #E         G ##,    L##Lf i
+            :E#  #  i##WLL Lt     #E    # WLLLLt  #  t# f    #t  f E.   #E       t#E       :E ## ,    LLG#   
+           ;W# G# ,    #L        t E    .E#      E#    K#E:  #    t K:  #         #E      ; #DG# ,     ,W i  
+          j## D   ,    f E:      t E       #E:   E#K DDD###i #     ; W t#E E t     E     j# #D ##,     #E.   
+          ##i,          ,WW;      #E       , W    #f t#Wi,,,  t      K# #  E t   t#E    G  i, G##   . #      
+       :  K:    ##       .  ;                    E t   # :  E        .E #E E t     E   K#K:   L##, ,WK,      
+      ;# D     L #,        t      fE          tt DW     K : ..         G E E#t    fE ;##D      ##, EG        
+      ,         ,,                 :                                    fE ,;.        ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j           W:        ,ft                                 ; 
+                  .     .E       EEEEE     .E#   E ,        E##         #E  j  E EE E            .        f# 
+                       i W,   ,;  #K; .     W,    ##j       E# #         E E# ,; L#  ;         ; ,      .E# 
+               j##      D        t#      L  .     ## D      E fE#f      #E   t   t#E          j# ,     iWW;  
+              G###, : #Wfff;           :K#W ff;  E# G#W;     #  D#       E  #t    #E         G ##,    L##Lf i
+            :E#  #  i##WLL Lt     #E    # WLLLLt  #  t# f    #t  f E.   #E       t#E       :E ## ,    LLG#   
+           ;W# G# ,    #L        t E    .E#      E#    K#E:  #    t K:  #         #E      ; #DG# ,     ,W i  
+          j## D   ,    f E:      t E       #E:   E#K DDD###i #     ;#W t#E E#t     E     j###D ##,     #E.   
+          ##i,          ,WW;      #E       , W    #f t#Wi,,,  t     :K# #  E t   t#E    G  i, G##   . #      
+       :  K:    ##       .  ;                    E t   # :  E        .E #E E#t     E   K#K:   L##, ,WK,      
+      ;##D     L #,        t      fE          tt DW    ,K : ..         G E E#t    fE ;##D      ##, EG        
+      ,         ,,                 :                                    fE ,;.        ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j           W:        ,ft                                 ; 
+                  .     .E       EEEEE     .E#   EW,        E##         #E  j  E EE EE          ..        f# 
+                       i W,   ,;  #K; .     W,    ##j       E# #         E E# ,; L#  ;         ; ,      .E# 
+               j##      D        t#      L  .     ## D      E fE#f      #E E t   t#E          j# ,     iWW;  
+              G###, : #Wfff;           :K#Wfff;  E# G#W;     #  D#       E E#t    #E         G ##,    L##Lf i
+            :E# ##  i##WLL Lt     #E    ##WLLLLt  #  t# f    #t  f E.   #E       t#E       :E ## ,    LLG#   
+           ;W# G# ,    #L        t E    .E#      E#   :K#E:  #    t K:  #   #     #E      ; #DG# ,     ,W i  
+          j## D   ,    f E:      t E       #E:   E#K DDD###i #     ;#W t#E E#t     E     j###D ##,     #E.   
+          ##i,          ,WW;      #E       , W;   #f t#Wi,,,  t     :K#D#  E t   t#E    G  i, G##   . #      
+       :  K:    ##       .  ;                    E t   # :  E        .E #E E#t     E   K#K:   L##, ,WK,      
+      ;##D     L #,        t      fE          tt DW    ,K : ..         G E E#t    fE ;##D      ##, EG.       
+      ,         ,,                 :                                    fE ,;.     :  ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j           W:        ,ft                                 ; 
+                  .     .E t     EEEEE     .E#   EW,        E##         #E  j  E EE EE          ..        f# 
+                       i W,   ,;  #K; .     W,    ##j       E# #       t#E E# ,; L#  ;         ; ,      .E# 
+               j##      D        t#      L  .     ## D      E fE#f      #E E#t   t#E          j# ,     iWW;  
+              G###, : #Wfff;           :K#Wfff;  E# G#W;     #  D#G      E E#t    #E         G ##,    L##Lf i
+            :E# ##  i##WLL Lt     #E    ##WLLLLt  #  t# f    #t  f E.   #E       t#E       :E ## ,    LLG#   
+           ;W# G# ,    #L        t E    .E#      E#   :K#E:  #    t K:  #   #    t#E      ; #DG# ,     ,W i  
+          j###D # ,    f E:      t E       #E:   E#K DDD###i #     ;#W t#E E#t     E     j###DW##,     #E.   
+          ##i,          ,WW;      #E       , W;   #f t#Wi,,,  t     :K#D#E E t   t#E    G  i, G##   . #      
+       :  K:    ##       .  ;    t               E t   # :  E        .E #E E#t     E   K#K:   L##, ,WK,      
+      ;##D     L #,        tt     fE          tt DW    ,K : ..         G#E E#t    fE ;##D      ##, EG.       
+      ,        .,,                 :                                    fE ,;.     :  ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j           W:        ,ft t                               ;W
+                  .     .E t     EEEEE     .E#   EW,        E##         #E  j  E EE EE          ..        f# 
+                ;      i W,   ,;  #K; .     W,    ##j       E# #       t#E E# ,; L#  ;         ; ,      .E# 
+               j##,   L D        t#      L  .    E## D      E fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;           :K#Wfff;  E# G#W;     #  D#G      E E#t    #E         G ##,    L##Lf i
+            :E# ##  i##WLL Lt     #E    ##WLLLLt  #  t# f    #t  f#E.   #E       t#E       :E ## ,   tLLG#   
+           ;W# G##,    #L        t E    .E#      E#   :K#E:  #    t K:  #   #    t#E      ; #DG# ,     ,W i  
+          j###D # ,    f E:      t E       #E:   E#K DDD###i #     ;#W t#E E#t     E     j###DW##,     #E.   
+          ##i,          ,WW;      #E       ,WW;   #f t#Wi,,,  t     :K#D#E E t   t#E    G  i, G##   . #      
+       :  K:    ##       .D ;    t E             E t   # :  E        .E #E E#t     E   K#K:   L##, ,WK,      
+      ;##D     L #,        tt     fE          tt DW    ,K : ..         G#E E#t    fE ;##D     L##, EG.       
+      ,        .,,                 :                                    fE ,;.     :  ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j           W:        ,ft t                               ;W
+                  .     .E t  G  EEEEE     .E#   EW,        E##         #E  j  E EE EEL         ..        f# 
+                ;      i W,   ,; L#K; .     W,    ##j       E# #       t#E E#,,; L#  ;         ; ,      .E# 
+               j##,   L D        t#      L  .    E###D      E fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;       E   :K#Wfff;  E# G#W;     #  D#G      E E#t    #E         G ##,    L##Lf i
+            :E# ##  i##WLL Lt     #E    ##WLLLLt  #  t##f    #t  f#E.   #E       t#E       :E ## ,   tLLG#   
+           ;W# G##,    #L        t E    .E#      E#   :K#E:  #    t K:  #   #    t#E      ; #DG# ,     ,W i  
+          j###D # ,    f E:      t E       #E:   E#K DDD###i #     ;#W,t#E E#t     E     j###DW##,     #E.   
+          ##i,   #      ,WW;      #E       ,WW;   #f t#Wi,,,  t     :K#D#E E#t   t#E    G  i, G##,  . #      
+       :  K:    ##       .D ;    t E        .    E t   # :  E t      .E #E E#t    #E   K#K:   L##, ,WK,      
+      ;##D     L #,        tt     fE          tt DW    ,K : ..         G#E E#t    fE ;##D     L##, EG.       
+      ,        .,,                 :                                    fE ,;.     :  ,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j.          W:        ,ft t                               ;W
+                  .     .E t  G  EEEEE     .E#   EW,        E##         #E  j GE EE EEL         ..        f# 
+                ;      i W,   ,;;L#K;;.     W,    ##j       E# #       t#E E#,,; L# ;;         ; ,      .E# 
+               j##,   L D        t#E     L D.    E###D      E#fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;       E   :K#Wfff;  E# G#W;     #  D#G      E E#t    #E         G ##,    L##Lf i
+            :E####  i##WLL Lt     #E    ##WLLLLt  #  t##f    #t  f#E.   #E       t#E       :E ## ,   tLLG#   
+           ;W# G##,    #L        t E    .E#      E#   :K#E:  #    t K:  #  E#    t#E      ; #DG# ,     ,W i  
+          j###D # ,    f E:      t E       #E:   E#K DDD###i #     ;#W,t#E E#t     E     j###DW##,     #E.   
+          ##i,  ##      ,WW;      #E       ,WW;   #f t#Wi,,,  t     :K#D#E E#t   t#E    G  i, G##,  . #      
+       :  K:    ##       .D ;    t E        .    E#t   # :  E t      .E #E E#t    #E   K#K:   L##, ,WK,      
+      ;##D     L #,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D     L##, EG.       
+      ,        .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                  .     .E t  G  EEEEE     .E#   EW,        E##         #E  j GE EE EEL         ..        f# 
+                ;      i W,   ,;;L#K;;.    #W,    ##j       E# #       t#E E#,,; L# ;;         ;W,      .E# 
+               j##,   L D        t#E     L D.    E###D      E#fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;     t E   :K#Wfff;  E# G#W;     #t D#G      E E#t    #E         G ##,    L##Lf i
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #  t##f    #t  f#E.   #E  #    t#E       :E ## ,   tLLG#   
+           ;W# G##,  . #L        t E    .E#      E#   :K#E:  #    t K:  #  E#    t#E      ; #DG# ,     ,W#i  
+          j###D # ,    f E:      t E       #E:   E#K DDD###i #     ;#W,t#E E#t     E     j###DW##,     #E.   
+          ##i, G##      ,WW;      #E       ,WW;   #f t#Wi,,,  t     :K#D#E E#t   t#E    G  i, G##,  . #      
+       :K K:    ##       .D ;    t#E        .    E#t   # :  E t      .E #E E#t    #E   K#K:   L##, ,WK,      
+      ;##D.    L #,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D     L##, EG.       
+      ,        .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                  .     .E t  G  EEEEE     .E#   EW,        E##         #E  j GE EE EEL         ..        f# 
+                ;      i W,   ,;;L#K;;.   i#W,    ##j       E# #       t#E E#,,; L# ;;         ;W,      .E# 
+               j##,   L D.       t#E     L D.    E###D      E#fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;     t E   :K#Wfff;  E# G#W;    E#t D#G      E E#t    #E         G ##,    L##Lf i
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #t t##f    #t  f#E.   #E  #    t#E       :E### ,   tLLG#   
+           ;W#DG##,  . #L        t E    .E#      E#t  :K#E:  #    t K:  #  E#    t#E      ;W#DG# ,     ,W#i  
+          j###D # ,    f#E:      t E       #E:   E#K DDD###i #     ;#W,t#E E#t   t E     j###DW##,     #E.   
+          ##i, G##      ,WW;      #E       ,WW;  E#f t#Wi,,,  t     :K#D#E E#t   t#E    G  i, G##,  . #      
+       :K K:    ##,      .D ;    t#E        .D   E#t   # :  E t      .E #E E#t    #E   K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D     L##, EG.       
+      ,        .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,            L                                               .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                  .     .E t  G  EEEEE     .E#   EW,        E##         #E  j GE EE EEL         ..        f# 
+                ;W     i W,   ,;;L#K;;.   i#W,    ##j       E# #       t#E E#,,; L# ;;         ;W,      .E# 
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;     t E   :K#Wfff;  E# G#W;    E#t D#G      E E#t    #E         G###,    L##Lf i
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #t t##f   E#t  f#E.   #E  #    t#E       :E####,   tLLG#   
+           ;W#DG##,  .E#L        t E    .E#      E#t  :K#E:  #    t K:  #  E#    t#E      ;W#DG# ,     ,W#i  
+          j###D # ,    f#E:      t E      f#E:   E#K DDD###i #     ;#W,t#E E#t   t#E     j###DW##,     #E.   
+          ##i, G##      ,WW;      #E       ,WW;  E#f t#Wi,,, #t     :K#D#E E#t   t#E    G##i, G##,  . #      
+       :K K:    ##,      .D ;    t#E        .D#  E#t   # :  E t      .E #E E#t    #E   K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D     L##, EG.       
+      ,        .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L                                               .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                  .     .E#t  GEEEEEEEL    .E#   EW,        E##         #E  j GE EE EEL         ..        f# 
+                ;W     i W,   ,;;L#K;;.   i#W,    ##j       E# #       t#E E#,,;;L# ;;.        ;W,      .E# 
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;     t E   :K#Wfff;  E# G#W;    E#t D#G      E E#t    #E         G###,    L##Lf i
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #t t##f   E#t  f#E.  t#E  #t   t#E       :E####,   tLLG#   
+           ;W#DG##,  .E#L        t#E    .E#      E#t  :K#E:  #    t K:  #E E#t   t#E      ;W#DG##,     ,W#i  
+          j###D # ,    f#E:      t E      f#E:   E#K DDD###i #     ;#W,t#E E#t   t#E     j###DW##,     #E.   
+          ##i, G##      ,WW;      #E       ,WW;  E#f t#Wi,,, #t     :K#D#E E#t   t#E    G##i,,G##,  . #      
+       :K K:    ##,      .D ;    t#E        .D#  E#t   # :  E t      .E #E E#t    #E   K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D     L##, EG.       
+      ,        .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L                                               .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                  .     .E#t  GEEEEEEEL    .E#t  EW,        E##         #E  j GEEEE EEL         ..        f# 
+                ;W     i#W,   ,;;L#K;;.   i#W,   E##j       E# #       t#E E#,,;;L# ;;.        ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, : #Wfff;     t E   :K#Wfff;  E# G#W;    E#t D#G      E E#t   t#E         G###,    L##Lffi
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #t t##f   E#t  f#E.  t#E  #t   t#E       :E####,   tLLG#   
+           ;W#DG##,  .E#L        t#E    .E#      E#t  :K#E:  #    t K:  #E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW# ,    f#E:      t E      f#E:   E#K DDD###i #t    ;#W,t#E E#t   t#E     j###DW##,     #E.   
+          ##i,,G##,     ,WW;      #E       ,WW;  E#f,t#Wi,,, #t     :K#D#E E#t   t#E    G##i,,G##,  . #      
+       :K K:    ##,      .D ;    t#E        .D#  E#t   #W:  E t      .E #E E#t    #E   K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D     L##, EG.       
+      , ,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L                                               .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEEEEL    .E#t  EW,        E##;       t#E Ej GEEEE EEL         ..        f# 
+                ;W     i#W,   ,;;L#K;;.   i#W,   E##j       E# #t      t#E E#,,;;L#K;;.        ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f      #E E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff;     t E   :K#Wfff;  E# G#W;    E#t D#G      E E#t   t#E         G###,    L##Lffi
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #t t##f   E#t  f#E.  t#E E#t   t#E       :E####,   tLLG#   
+           ;W#DG##,  .E#L        t#E    .E#      E#t  :K#E: E#t   t K:  #E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW# ,    f#E:      t#E      f#E:   E#K DDD###i #t    ;#W,t#E E#t   t#E     j###DW##,     #E.   
+          ##i,,G##,     ,WW;      #E       ,WW;  E#f,t#Wi,,, #t     :K#D#E E#t   t#E    G##i,,G##,  . #      
+       :K K:    ##,      .D ;    t#E        .D#  E#t   #W:  E t      .E #E E#t   t#E  :K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D     L##, EG.       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEEEEL    .E#t  EW,        E##;       t#E Ej GEEEE EEL         ..        f# 
+                ;W,    i#W,   ,;;L#K;;.   i#W,   E##j       E# #t      t#E E#,,;;L#K;;.        ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f     t#E E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff;     t E   :K#Wfff;  E# G#W;    E#t D#G    t#E E#t   t#E         G###,    L##Lffi
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #t t##f   E#t  f#E.  t#E E#t   t#E       :E####,   tLLG# L 
+           ;W#DG##,  .E#L        t#E    .E#L     E#t  :K#E: E#t   t K:  #E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW# ,    f#E:      t#E      f#E:   E#K DDD###iE#t    ;#W,t#E E#t   t#E     j###DW##,    j#E.   
+          ##i,,G##,     ,WW;      #E       ,WW;  E#f,t#Wi,,,E#t     :K#D#E E#t   t#E    G##i,,G##,  . #j     
+       :K#K:   L##,      .D ;    t#E        .D#  E#t   #W:  E t      .E #E E#t   t#E  :K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DW    ,KK: ..         G#E E#t    fE ;##D.    L##, EG.       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEEEEL    .E#t  EW,        E##;       t#E Ej GEEEEEEEL         ..        f#E
+                ;W,    i#W,   ,;;L#K;;.   i#W,   E##j       E###t      t#E E#,,;;L#K;;.        ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f     t#E E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff;     t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,    L##Lffi
+            :E####  i##WLL Lt    t#E   i##WLLLLt  #t t##f   E#t  f#E.  t#E E#t   t#E       :E####,   tLLG# L 
+           ;W#DG##,  .E#L        t#E    .E#L     E#t  :K#E: E#t   t#K:  #E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:   E#K DDD###iE#t    ;#W,t#E E#t   t#E     j###DW##,    j#E.   
+          ##i,,G##,     ,WW;     t#E       ,WW;  E#f,t#Wi,,,E#t     :K#D#E E#t   t#E    G##i,,G##,  . #j     
+       :K#K:   L##,      .D#;    t#E        .D#; E#t  ;#W:  E#t      .E##E E#t   t#E  :K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DWi   ,KK: ..         G#E E#t    fE ;##D.    L##, EG.       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+                            ,;                 ,;           L.                                              .
+                          f#i                f#i j.         EW:        ,ft t                               ;W
+                 ..     .E#t  GEEEEEEEL    .E#t  EW,        E##;       t#E Ej GEEEEEEEL         ..        f#E
+                ;W,    i#W,   ,;;L#K;;.   i#W,   E##j       E###t      t#E E#,,;;L#K;;.        ;W,      .E#f
+               j##,   L#D.       t#E     L#D.    E###D.     E#fE#f     t#E E#t   t#E          j##,     iWW;  
+              G###, :K#Wfff;     t#E   :K#Wfff;  E#jG#W;    E#t D#G    t#E E#t   t#E         G###,    L##Lffi
+            :E####, i##WLLLLt    t#E   i##WLLLLt E#t t##f   E#t  f#E.  t#E E#t   t#E       :E####,   tLLG##L 
+           ;W#DG##,  .E#L        t#E    .E#L     E#t  :K#E: E#t   t#K: t#E E#t   t#E      ;W#DG##,     ,W#i  
+          j###DW##,    f#E:      t#E      f#E:   E#KDDDD###iE#t    ;#W,t#E E#t   t#E     j###DW##,    j#E.   
+         G##i,,G##,     ,WW;     t#E       ,WW;  E#f,t#Wi,,,E#t     :K#D#E E#t   t#E    G##i,,G##,  .D#j     
+       :K#K:   L##,      .D#;    t#E        .D#; E#t  ;#W:  E#t      .E##E E#t   t#E  :K#K:   L##, ,WK,      
+      ;##D.    L##,        tt     fE          tt DWi   ,KK: ..         G#E E#t    fE ;##D.    L##, EG.       
+      ,,,      .,,                 :                                    fE ,;.     : ,,,      .,,  ,         
+                                                                         ,                                    
+
+Press [ENTER] to start...                         Press [ENTER] to start...                         Press [ENTER] to start...                         Press [ENTER] to start...
+===============================================================================
+  18+ ADULT CONTENT
+===============================================================================
+
+Aeternitas is the 18+ edition of this work.
+
+It may include mature themes, strong language, sexual content,
+violence, and other material not suitable for minors.
+
+By continuing you confirm that you are at least 18 years old (or the age
+of majority where you live) and that viewing such content is lawful for
+you. If that is not true, close this program now.
+
+===============================================================================
+[Press Enter]
+        @@@@@@  @@@@@@@@ @@@@@@@ @@@@@@@@ @@@@@@@  @@@  @@@ @@@ @@@@@@@ @@@@@@   @@@@@@ 
+       @@!  @@@ @@!        @!!   @@!      @@!  @@@ @@!@!@@@ @@!   @!!  @@!  @@@ !@@     
+       @!@!@!@! @!!!:!     @!!   @!!!:!   @!@!!@!  @!@@!!@! !!@   @!!  @!@!@!@!  !@@!!  
+       !!:  !!! !!:        !!:   !!:      !!: :!!  !!:  !!! !!:   !!:  !!:  !!!     !:! 
+        :   : : : :: ::     :    : :: ::   :   : : ::    :  :      :    :   : : ::.: :  
+
+==========================================================================================
+   A E T E R N I T A S   S Y S T E M                                            [ v1.3.8 ]
+==========================================================================================
+
+               +----------------------------------------------------------+
+               |                                                          |
+               |[1]Begin a New Journey         ( new  )                   |
+               |                                                          |
+               |[2]Restore a Saved Game        ( load )                   |
+               |                                                          |
+               |[3]System Documentation        ( help )                   |
+               |                                                          |
+               |[4]Manage Game Mods            ( mods )                   |
+               |                                                          |
+               |[5]Exit to Computer            ( quit )                   |
+               |                                                          |
+               +----------------------------------------------------------+
+
+  Select an option from the menu above:
+
+  >> ===============================================================================
+  West of House — sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder — a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  — Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Wanderer — Human adventurer
+===============================================================================
+
+>> ===============================================================================
+  West of House — sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder — a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  — Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Wanderer — Human adventurer
+===============================================================================
+
+>> ===============================================================================
+  INVENTORY
+===============================================================================
+
+Wanderer — a Human adventurer · they / them / their
+Health: 100 / 100
+Coins: 50
+Pack: 3 / 128 slots
+You are carrying:
+  - club
+  - bandage
+  - flint
+
+
+--- DLC / mod ---
+[Sample] Wanderer, pack fiction: curses, quest items, weight notes; social read unknown with — (%NPCROLE/none), last contact — (none), stance unknown (none).
+===============================================================================
+[Press Enter to return]
+===============================================================================
+  West of House — sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder — a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  — Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Wanderer — Human adventurer
+===============================================================================
+
+>> ===============================================================================
+  STATUS
+===============================================================================
+
+Character: Wanderer (Human adventurer)
+Pronouns: they / them / their
+Location: West of House — sample mod active  [west_of_house]
+Region: Hollow Ridge
+Time: 12:00 PM (afternoon), day 1, spring
+Weather: rain, 21C
+Lighting: light OK
+Room text: full (verbose)
+Readied: —
+It / last examined: —
+Inventory slots: 3
+Health: 100 / 100
+Coins: 50
+Score: 0
+Turns: 0
+
+Causal overlay:
+  blocker: none
+  parser:  none
+  social:  none
+  save:    none
+
+
+--- DLC / mod ---
+[Sample] Wanderer at West of House — sample mod active — measured stance, upright vector, plain voice.
+===============================================================================
+[Press Enter to return]
+===============================================================================
+  West of House — sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder — a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  — Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Wanderer — Human adventurer
+===============================================================================
+
+>> ===============================================================================
+  West of House — sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder — a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  — Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Wanderer — Human adventurer
+===============================================================================
+Wanderer — saved recovery_artifacts\raw_recovered_turns.save.txt (161 rooms of item state).
+
+>> ===============================================================================
+  West of House — sample mod active
+===============================================================================
+  [ Region: Hollow Ridge ]
+
+  You stand west of a modest house that seems to have misplaced its
+  century. The path is honest dirt; the mailbox is stubborn metal.
+  [000_aeternitas_sample] This blurb comes from your mods folder — a
+  tutorial pack the game created on first run. Delete mods/000_aeternitas_sample
+  to restore the original description, or
+  add a higher-priority DLC folder to override this one.
+  — Appended by west_of_house.append.txt (layered blurbs for DLC).
+--------------------------------------------------------------------------------
+  [ EXITS ]                       |  [ VISIBLE ITEMS ]
+  N  - north                     |  * mailbox                     
+  S  - south                     |  * scrap_metal                 
+  E  - east                      |  * wood_scrap                  
+  D  - down                      |  * lockpick                    
+                                 |  * rusty_pick                  
+===============================================================================
+[ Turn: 0 | HP: 100/100 | Score: 0 | Light: ON | Rooms: 161 | [help] [menu] [recap] ]
+  Playing as: Wanderer — Human adventurer
+===============================================================================
+Wanderer — restored from recovery_artifacts\raw_recovered_turns.save.txt.
+
+>> Thanks for playing.

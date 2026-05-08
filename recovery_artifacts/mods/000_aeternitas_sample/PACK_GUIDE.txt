@@ -1,0 +1,29 @@
+PACK_GUIDE — 000_aeternitas_sample
+====================================
+This pack demonstrates data-only mods:
+  • rooms/west_of_house.txt — full blurb replacement
+  • rooms/west_of_house.append.txt — text appended after blurb
+  • titles/west_of_house.txt — title tweak
+  • items/mailbox.txt, leaflet.txt — examine text
+  • npcs/miller.greeting.txt, miller__modding.txt — NPC lines (optional
+    placeholders %NAME% %RACE% %CLASS% %ROLE% %PRONOUNS% in greetings/topics)
+  • character/sheet_append.txt, portrait_append.txt,
+    aptitudes_append.txt, reputation_append.txt,
+    loadout_append.txt, traits_append.txt,
+    momentum_append.txt, perks_append.txt,
+    voice_append.txt, bio_append.txt,
+    tainting_append.txt, rapport_append.txt,
+    objectives_append.txt, journal_append.txt, progress_append.txt,
+    inventory_append.txt, waypoints_append.txt, status_append.txt,
+    score_append.txt, time_append.txt, weather_append.txt, room_append.txt,
+    recap_append.txt, help_append.txt, about_append.txt, lights_append.txt,
+    exits_append.txt, scan_append.txt, trail_append.txt, nearby_append.txt,
+    lockcheck_append.txt, noise_append.txt, nav_append.txt, route_append.txt,
+    loot_append.txt, compare_append.txt, people_append.txt,
+    diagnostics_append.txt, wares_append.txt, saves_append.txt,
+    vitals_append.txt, examine_append.txt, notes_append.txt, hints_append.txt,
+    notes_panel_append.txt, hints_panel_append.txt — PC overlays
+
+For DLC: copy this tree, rename the folder, raise manifest priority,
+and replace slugs/ids with your content. Full reference:
+  help modding   mods list   (in-game)

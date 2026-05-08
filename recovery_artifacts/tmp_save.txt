@@ -1,0 +1,771 @@
+AET64SAVE1
+worldcnt 161
+room 158
+turns 0
+score 0
+coins 50
+hp 100
+hpmax 100
+front 0
+shed 0
+roomv 1
+craftprof 1
+histn 0
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100
+invn 3
+club
+bandage
+flint
+ROOMS
+R 0 1 0
+abandoned_furniture
+R 1 4 0
+water_wheel
+rusty_gears
+ladder
+rope_pulley
+R 2 3 0
+ancient_gate
+stone_carvings
+moss_covered_stone
+R 3 4 1
+stone_altar
+ancient_symbols
+moss
+standing_stones
+grove_offering
+R 4 3 0
+ancient_artifacts
+magical_items
+rare_curiosities
+R 5 2 1
+chest
+dust_sheet
+loose_tile
+R 6 4 0
+swing
+vegetable_garden
+stone_path
+wildflowers
+R 7 5 0
+rake
+shovel
+gardening_tools
+seeds
+pots
+R 8 3 0
+fresh_bread
+pastries
+sweet_treats
+R 9 2 0
+balcony
+kingdom_view
+R 10 3 0
+performance_stage
+musical_instruments
+acoustic_design
+R 11 1 0
+old_box
+R 12 5 0
+sink
+toilet
+shower
+towel_rack
+medicine_cabinet
+R 13 2 0
+hallway_window
+door_frames
+R 14 3 0
+hammer
+tongs
+water_trough
+R 15 1 0
+smithing_tools
+R 16 3 0
+waystone_monolith
+elysium_crystal
+glowing_runes
+R 17 3 0
+royal_banner
+castle_gate
+guard_post
+R 18 4 0
+cooking_hearths
+copper_pots
+preparation_tables
+fresh_ingredients
+R 19 3 1
+watchtower
+battlements
+signal_flags
+hidden_scroll
+R 20 3 0
+ancient_markings
+more_crystals
+hidden_chamber
+R 21 3 1
+glowing_crystal
+ancient_map
+mineral_ore
+crystal_heart
+R 22 2 0
+overgrown_vegetation
+cave_opening
+R 23 4 0
+stalactites
+water_pool
+glowing_crystals
+stone_formations
+R 24 1 0
+wine_bottle
+R 25 3 0
+cellar_tunnel
+dim_lighting
+mysterious_passage
+R 26 2 0
+administrative_buildings
+official_notices
+R 27 1 0
+rubble
+R 28 3 0
+notice_boards
+announcements
+job_postings
+R 29 2 0
+private_booths
+comfortable_seating
+R 30 3 0
+workshops
+craft_studios
+tool_sounds
+R 31 3 0
+glowing_crystals
+burial_niches
+crystal_embedded_walls
+R 32 4 0
+crystal_pond
+koi_fish
+water_lilies
+pond_bridge
+R 33 2 0
+dark_symbols
+ritual_markers
+R 34 4 0
+glowing_mushrooms
+moss
+fallen_leaves
+ancient_tree_bark
+R 35 3 0
+sanctum_chamber
+glowing_symbols
+ancient_carvings
+R 36 7 0
+dining_table
+chairs
+place_settings
+chandelier
+sideboard
+silverware
+portraits
+R 37 3 0
+coffee_bar
+fresh_roasts
+cozy_atmosphere
+R 38 1 0
+shed_door
+R 39 3 0
+pet_cages
+exotic_animals
+pet_supplies
+R 40 4 0
+wheat_field
+corn_field
+chicken_coop
+cow_pen
+R 41 3 0
+ferry_boat
+ferryman_station
+waiting_area
+R 42 2 0
+performance_stage
+festival_decorations
+R 43 3 0
+fishing_piers
+fishing_equipment
+fish_baskets
+R 44 3 1
+altar_stone
+journal
+mysterious_gem
+hollow_stump
+R 45 2 0
+stone_marker
+fallen_branch
+R 46 2 0
+ancient_weapons
+old_armor
+R 47 4 0
+crystal_ball
+tarot_cards
+mystical_symbols
+candles
+R 48 3 0
+magical_fountain
+floating_rings
+cascading_water
+R 49 3 0
+fresh_fruits
+vegetables
+produce_baskets
+R 50 1 0
+door
+R 51 3 0
+fountain
+herbs
+house_key
+R 52 4 0
+store_counter
+shelves
+barrels
+display_case
+R 53 3 0
+guard_station
+weapon_racks
+report_desk
+R 54 5 0
+bed
+desk
+chair
+window
+wardrobe
+R 55 3 0
+ancient_tome
+herb_bundle
+mysterious_artifact
+R 56 2 0
+hidden_alcove
+private_seating
+R 57 4 0
+old_wine
+preserved_foods
+dusty_jars
+ancient_tome
+R 58 3 0
+ancient_temple_ruins
+crystal_pool
+carved_stone
+R 59 2 0
+hidden_panel
+secret_space
+R 60 3 0
+rare_herbs
+glowing_mushrooms
+ancient_tree
+R 61 4 3
+stone_altar
+ancient_pillars
+wildflowers
+stream
+shrine_offering
+ancient_prayer_beads
+skeleton_key
+R 62 2 0
+path_markers
+wildflowers
+R 63 3 0
+boulder
+wild_grasses
+viewpoint
+R 64 3 1
+weathered_stone
+ancient_carving
+crystal_fragment
+ridge_treasure
+R 65 3 1
+cave_crystal
+ancient_symbol
+clear_water
+ancient_artifact
+R 66 3 0
+docks
+boats
+fishing_equipment
+R 67 3 0
+ancient_trees
+forest_paths
+mystical_atmosphere
+R 68 3 0
+bed
+table
+window
+R 69 5 0
+table
+book
+lantern
+coat_rack
+mirror
+R 70 7 0
+stove
+sink
+cupboards
+butcher_block
+drying_herbs
+pots
+pans
+R 71 11 0
+bookshelves
+ladder
+reading_lamp
+open_books
+reading_nook
+linguistics_textbook
+lore_scroll
+crafting_manual
+armor_crafting_manual
+advanced_crafting_tome
+herbalism_guide
+R 72 7 0
+armchair
+coffee_table
+vase
+bookshelf
+fireplace
+old_rug
+curtains
+R 73 2 0
+cave_entrance
+ancient_passages
+R 74 2 0
+apartment_buildings
+ground_floor_shops
+R 75 3 0
+main_tables
+tavern_bar
+fireplace
+R 76 3 0
+elegant_furniture
+large_windows
+tasteful_decorations
+R 77 3 0
+market_stalls
+colorful_awnings
+merchant_carts
+R 78 5 0
+bathtub
+sink
+mirror
+towel_rack
+medicine_cabinet
+R 79 6 0
+four_poster_bed
+bed_curtains
+wardrobe
+vanity_table
+personal_items
+dresser
+R 80 3 0
+hedge_maze
+reflection_mirrors
+contemplation_benches
+R 81 3 0
+wildflowers
+butterflies
+tall_grass
+R 82 4 0
+miller_journal
+engineering_tools
+rope_pulley
+workbench
+R 83 2 0
+moonlight_clearing
+silvery_light
+R 84 2 0
+cave_painting
+mineral_crystals
+R 85 3 0
+ancient_carvings
+tinderbox
+obsidian_shard
+R 86 3 0
+mushroom_circle
+glowing_mushrooms
+magical_energy
+R 87 4 0
+nexus_monolith
+dimensional_rune
+energy_crystal
+bucket
+R 88 3 0
+nexus_monolith
+elysium_crystal
+dimensional_runes
+R 89 0 0
+R 90 3 0
+notice_board
+announcements
+job_postings
+R 91 1 1
+well_bucket
+ancient_coin
+R 92 2 0
+luxury_apartment
+premium_accommodations
+R 93 4 0
+empty_jars
+preserved_foods
+storage_containers
+shelves
+R 94 4 0
+water_lilies
+reeds
+wooden_dock
+fishing_spot
+R 95 4 0
+potions
+elixirs
+alchemical_ingredients
+glass_bottles
+R 96 3 0
+private_rooms
+comfortable_beds
+traveler_accommodations
+R 97 3 0
+residential_homes
+community_gardens
+street_lamps
+R 98 3 0
+stone_pillars
+broken_rope_bridge
+river_treasure
+R 99 3 0
+makeshift_raft
+rope
+vines
+R 100 4 0
+rowboat
+wooden_dock
+fishing_hook
+river_stones
+R 101 1 0
+coffee_beans
+R 102 4 0
+boulders
+lichen
+moss
+rock_crevices
+R 103 3 0
+rooftop
+panoramic_views
+rooftop_garden
+R 104 2 0
+rooftop_seating
+morning_views
+R 105 3 0
+rose_archway
+climbing_roses
+garden_tunnel
+R 106 2 0
+connected_houses
+decorative_gardens
+R 107 3 0
+garden_paths
+flowering_plants
+landscaped_areas
+R 108 4 0
+ancient_tomes
+scrolls
+reading_chairs
+fireplace
+R 109 2 0
+sealed_door
+mysterious_room
+R 110 2 0
+secret_room
+private_meeting_space
+R 111 3 0
+simple_beds
+personal_belongings
+storage_chests
+R 112 3 1
+tools
+rope
+tension_wrench
+loose_floorboard
+R 113 2 0
+hidden_nooks
+shadowy_corners
+R 114 3 0
+songbird_trees
+bird_songs
+grove_benches
+R 115 1 0
+gate
+R 116 3 0
+stone_bridge
+quality_homes
+stream
+R 117 3 0
+smooth_stones
+stream_water
+fish
+R 118 4 0
+natural_spring
+waterfall
+ferns
+moss
+R 119 10 0
+desk
+inkwell
+quill
+papers
+globe
+reading_chair
+old_books
+engineering_tome
+merchant_ledger
+fine_lockpick
+R 120 2 0
+rotten_plank
+marsh_gas
+R 121 2 0
+bog_fungi
+twisted_root
+R 122 2 1
+ancient_tree
+mysterious_shovel
+buried_treasure
+R 123 2 0
+fabrics
+finished_garments
+R 124 3 0
+barrels
+crates
+delivery_door
+R 125 4 1
+comfortable_chairs
+old_maps
+nautical_artifacts
+candles
+sheet_candlelight_reel
+R 126 5 0
+ale_barrel
+wine_barrel
+preserved_foods
+pickled_vegetables
+dried_meat
+R 127 13 1
+bar
+barstool
+mug
+fireplace
+tables
+chairs
+tavern_piano
+ale
+mead
+wine
+roasted_meat
+bread
+cheese
+tavern_secret
+R 128 3 0
+tavern_sign
+hitching_post
+lantern
+R 129 2 0
+hallway_window
+number_plates
+R 130 7 0
+hearth
+cooking_pot
+spit
+prep_table
+flour_barrel
+salt_barrel
+stew
+R 131 4 0
+private_table
+chairs
+lantern
+locked_chest
+R 132 2 0
+privy_seat
+latch
+R 133 5 0
+bed
+straw_mattress
+table
+chair
+window
+R 134 4 0
+bed
+washbasin
+chest
+window
+R 135 4 0
+bed
+comfortable_mattress
+writing_desk
+window
+R 136 4 0
+bed
+wardrobe
+table
+balcony
+R 137 4 0
+horse_stalls
+hay
+water_trough
+tack
+R 138 2 0
+portraits
+tapestries
+R 139 3 1
+flowers
+fountain
+meditation_bench
+sheet_last_call_etude
+R 140 4 0
+altar
+incense_burner
+prayer_cushions
+holy_symbols
+R 141 3 0
+weapon_rack
+training_dummy
+practice_weapons
+R 142 3 0
+hidden_bridge
+overhanging_plants
+secluded_area
+R 143 2 0
+tables
+warm_atmosphere
+R 144 3 0
+royal_throne
+ornate_tapestries
+stained_glass_windows
+R 145 3 0
+meeting_hall
+official_documents
+public_forum
+R 146 3 0
+fountain_of_the_sky_rings
+festival_stage
+notice_board
+R 147 3 0
+practice_dummies
+weapon_racks
+training_equipment
+R 148 3 0
+exotic_goods
+rare_items
+traveling_merchant_stalls
+R 149 2 0
+treasure
+ancient_scroll
+R 150 3 0
+underground_lake
+dark_water
+small_boat
+R 151 3 0
+ancient_artifacts
+iron_doors
+torches
+R 152 3 0
+fireplace
+inn_table
+inn_chair
+R 153 2 0
+signpost
+roadside_stone
+R 154 2 0
+well
+market_stall
+R 155 4 0
+war_table
+tactical_maps
+battle_standards
+weapon_display
+R 156 3 1
+spyglass
+signal_fire_pit
+observation_table
+tower_logbook
+R 157 3 0
+waterfall
+echoing_sounds
+pool
+R 158 5 2
+mailbox
+scrap_metal
+wood_scrap
+lockpick
+rusty_pick
+hidden_cash
+buried_coin
+R 159 2 0
+whispering_trees
+mystical_path
+R 160 2 0
+furniture
+wood_supplies
+NOTES
+0
+READIED
+
+EQUIP
+
+
+
+
+
+
+
+
+REP 0 0 0 0 0 0 0
+CHARACTER 
+name Wanderer
+race Human
+skin Fair
+gender they
+genitalia none
+class adventurer
+height Average
+build Average
+hair_color Brown
+hair_style Short
+eye_color Brown
+armor None
+weapon None
+str 10
+tou 10
+spe 10
+intl 10
+wis 10
+will 10
+agi 10
+cha 10
+per 10
+cor 0
+muscle_tone Average
+body_fat Average
+hips Average
+butt Average
+age Adult
+voice_pitch Mid
+voice_quality Clear
+scars 0
+tattoos 0
+breasts None
+cock None
+balls None
+pussy None
+nipple_type Normal
+milk 0
+ball_fullness 0
+ENDCHAR
+FOCUS
+
+TOPIC
+

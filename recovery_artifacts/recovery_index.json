@@ -1,0 +1,1155 @@
+{
+  "original_pe": {
+    "path": "D:\\light\\Aeternitas1986\\aeternitas64.exe",
+    "size": 622028,
+    "machine": "0x8664",
+    "image_base": "0x140000000",
+    "entry_point": "0x14000105f",
+    "size_of_image": 3887104,
+    "subsystem": 3,
+    "sections": [
+      {
+        "name": ".text",
+        "virtual_size": 275568,
+        "virtual_address": 4096,
+        "raw_size": 275968,
+        "raw_pointer": 1536
+      },
+      {
+        "name": ".data",
+        "virtual_size": 320,
+        "virtual_address": 282624,
+        "raw_size": 512,
+        "raw_pointer": 277504
+      },
+      {
+        "name": ".rdata",
+        "virtual_size": 226360,
+        "virtual_address": 286720,
+        "raw_size": 226816,
+        "raw_pointer": 278016
+      },
+      {
+        "name": "/4",
+        "virtual_size": 4,
+        "virtual_address": 516096,
+        "raw_size": 512,
+        "raw_pointer": 504832
+      },
+      {
+        "name": ".pdata",
+        "virtual_size": 4272,
+        "virtual_address": 520192,
+        "raw_size": 4608,
+        "raw_pointer": 505344
+      },
+      {
+        "name": ".xdata",
+        "virtual_size": 4984,
+        "virtual_address": 528384,
+        "raw_size": 5120,
+        "raw_pointer": 509952
+      },
+      {
+        "name": ".bss",
+        "virtual_size": 3295200,
+        "virtual_address": 536576,
+        "raw_size": 0,
+        "raw_pointer": 0
+      },
+      {
+        "name": ".idata",
+        "virtual_size": 4508,
+        "virtual_address": 3833856,
+        "raw_size": 4608,
+        "raw_pointer": 515072
+      },
+      {
+        "name": ".tls",
+        "virtual_size": 16,
+        "virtual_address": 3842048,
+        "raw_size": 512,
+        "raw_pointer": 519680
+      },
+      {
+        "name": ".reloc",
+        "virtual_size": 5660,
+        "virtual_address": 3846144,
+        "raw_size": 6144,
+        "raw_pointer": 520192
+      },
+      {
+        "name": "/14",
+        "virtual_size": 80,
+        "virtual_address": 3854336,
+        "raw_size": 512,
+        "raw_pointer": 526336
+      },
+      {
+        "name": "/29",
+        "virtual_size": 4516,
+        "virtual_address": 3858432,
+        "raw_size": 4608,
+        "raw_pointer": 526848
+      },
+      {
+        "name": "/41",
+        "virtual_size": 181,
+        "virtual_address": 3866624,
+        "raw_size": 512,
+        "raw_pointer": 531456
+      },
+      {
+        "name": "/55",
+        "virtual_size": 164,
+        "virtual_address": 3870720,
+        "raw_size": 512,
+        "raw_pointer": 531968
+      },
+      {
+        "name": "/67",
+        "virtual_size": 72,
+        "virtual_address": 3874816,
+        "raw_size": 512,
+        "raw_pointer": 532480
+      },
+      {
+        "name": "/80",
+        "virtual_size": 126,
+        "virtual_address": 3878912,
+        "raw_size": 512,
+        "raw_pointer": 532992
+      },
+      {
+        "name": "/91",
+        "virtual_size": 378,
+        "virtual_address": 3883008,
+        "raw_size": 512,
+        "raw_pointer": 533504
+      }
+    ]
+  },
+  "recovered_pe": {
+    "path": "D:\\light\\Aeternitas1986\\aeternitas64_recovered.exe",
+    "size": 1170921,
+    "machine": "0x8664",
+    "image_base": "0x140000000",
+    "entry_point": "0x14000105f",
+    "size_of_image": 4378624,
+    "subsystem": 3,
+    "sections": [
+      {
+        "name": ".text",
+        "virtual_size": 230480,
+        "virtual_address": 4096,
+        "raw_size": 230912,
+        "raw_pointer": 1536
+      },
+      {
+        "name": ".data",
+        "virtual_size": 320,
+        "virtual_address": 237568,
+        "raw_size": 512,
+        "raw_pointer": 232448
+      },
+      {
+        "name": ".rdata",
+        "virtual_size": 170696,
+        "virtual_address": 241664,
+        "raw_size": 171008,
+        "raw_pointer": 232960
+      },
+      {
+        "name": "/4",
+        "virtual_size": 4,
+        "virtual_address": 413696,
+        "raw_size": 512,
+        "raw_pointer": 403968
+      },
+      {
+        "name": ".pdata",
+        "virtual_size": 4116,
+        "virtual_address": 417792,
+        "raw_size": 4608,
+        "raw_pointer": 404480
+      },
+      {
+        "name": ".xdata",
+        "virtual_size": 4680,
+        "virtual_address": 425984,
+        "raw_size": 5120,
+        "raw_pointer": 409088
+      },
+      {
+        "name": ".bss",
+        "virtual_size": 3238080,
+        "virtual_address": 434176,
+        "raw_size": 0,
+        "raw_pointer": 0
+      },
+      {
+        "name": ".idata",
+        "virtual_size": 4420,
+        "virtual_address": 3674112,
+        "raw_size": 4608,
+        "raw_pointer": 414208
+      },
+      {
+        "name": ".tls",
+        "virtual_size": 16,
+        "virtual_address": 3682304,
+        "raw_size": 512,
+        "raw_pointer": 418816
+      },
+      {
+        "name": ".reloc",
+        "virtual_size": 4292,
+        "virtual_address": 3686400,
+        "raw_size": 4608,
+        "raw_pointer": 419328
+      },
+      {
+        "name": "/14",
+        "virtual_size": 432,
+        "virtual_address": 3694592,
+        "raw_size": 512,
+        "raw_pointer": 423936
+      },
+      {
+        "name": "/29",
+        "virtual_size": 335762,
+        "virtual_address": 3698688,
+        "raw_size": 335872,
+        "raw_pointer": 424448
+      },
+      {
+        "name": "/41",
+        "virtual_size": 6199,
+        "virtual_address": 4034560,
+        "raw_size": 6656,
+        "raw_pointer": 760320
+      },
+      {
+        "name": "/55",
+        "virtual_size": 148326,
+        "virtual_address": 4042752,
+        "raw_size": 148480,
+        "raw_pointer": 766976
+      },
+      {
+        "name": "/67",
+        "virtual_size": 21664,
+        "virtual_address": 4194304,
+        "raw_size": 22016,
+        "raw_pointer": 915456
+      },
+      {
+        "name": "/80",
+        "virtual_size": 841,
+        "virtual_address": 4218880,
+        "raw_size": 1024,
+        "raw_pointer": 937472
+      },
+      {
+        "name": "/91",
+        "virtual_size": 3185,
+        "virtual_address": 4222976,
+        "raw_size": 3584,
+        "raw_pointer": 938496
+      },
+      {
+        "name": "/107",
+        "virtual_size": 130699,
+        "virtual_address": 4227072,
+        "raw_size": 131072,
+        "raw_pointer": 942080
+      },
+      {
+        "name": "/123",
+        "virtual_size": 16641,
+        "virtual_address": 4358144,
+        "raw_size": 16896,
+        "raw_pointer": 1073152
+      }
+    ]
+  },
+  "toolchain": {
+    "compiler_hint": "GNU C23 / MinGW-W64 GCC 15.2.0; debug and COFF symbols present",
+    "evidence_files": [
+      "recovery_artifacts/exe_symbols.txt",
+      "recovery_artifacts/exe_disasm_all.txt",
+      "recovery_artifacts/dwarf_info_index.txt",
+      "recovery_artifacts/dwarf_decoded_lines.txt",
+      "recovery_artifacts/exe_strings.txt"
+    ]
+  },
+  "source_units": [
+    "CRT_fp10.c",
+    "__initenv.c",
+    "__p___initenv.c",
+    "_newmode.c",
+    "aeternitas64_ascii.c",
+    "aeternitas_char_creation.c",
+    "aeternitas_char_description.c",
+    "aeternitas_mod_bootstrap.c",
+    "aeternitas_mod_guide.c",
+    "aeternitas_mods.c",
+    "aeternitas_world_generated.c",
+    "cinitexe.c",
+    "crt_handler.c",
+    "crtexe.c",
+    "cygming-crtbegin.c",
+    "cygming-crtend.c",
+    "dllargv.c",
+    "fake",
+    "gccmain.c",
+    "libgcc2.c",
+    "merr.c",
+    "mingw_helpers.c",
+    "mingw_matherr.c",
+    "natstart.c",
+    "pesect.c",
+    "pseudo-reloc-list.c",
+    "pseudo-reloc.c",
+    "strtok_r.c",
+    "tlsmcrt.c",
+    "tlssup.c",
+    "tlsthrd.c",
+    "ucrt___local_stdio_printf_options.c",
+    "ucrt___local_stdio_scanf_options.c",
+    "ucrt__getmainargs.c",
+    "ucrt_amsg_exit.c",
+    "ucrt_fprintf.c",
+    "ucrt_printf.c",
+    "ucrt_snprintf.c",
+    "ucrt_sscanf.c",
+    "ucrt_vfprintf.c",
+    "ucrt_vsnprintf.c",
+    "usermatherr.c",
+    "wildcard.c",
+    "xncommod.c",
+    "xthdloc.c",
+    "xtxtmode.c"
+  ],
+  "symbol_counts": {
+    "original_defined": 2465,
+    "recovered_defined": 2279,
+    "public_game_like_original": 958,
+    "missing_from_recovered_by_name": 423,
+    "extra_in_recovered_by_name": 200
+  },
+  "world_tables": {
+    "room_count": 161,
+    "dir_count": 19,
+    "has_slugs": true,
+    "has_titles": true,
+    "has_blurbs": true,
+    "has_regions": true,
+    "has_entities": true,
+    "visible_item_room_count": 160,
+    "visible_item_count": 512,
+    "hidden_item_room_count": 16,
+    "hidden_item_count": 19,
+    "npc_count": 10,
+    "merchant_count": 7,
+    "has_exits": true,
+    "known_table_symbols": [
+      "WORLD_SLUGS",
+      "WORLD_TITLES",
+      "WORLD_BLURBS",
+      "WORLD_REGIONS",
+      "WORLD_ROOM_DARK",
+      "WORLD_ROOM_ENTITIES",
+      "WORLD_EXITS",
+      "WORLD_ITEM_LISTS",
+      "WORLD_HIDDEN_ITEM_LISTS"
+    ]
+  },
+  "notable_symbols": [
+    {
+      "address": "0x14003ca00",
+      "kind": "T",
+      "name": "aet_describe_pc"
+    },
+    {
+      "address": "0x140035930",
+      "kind": "T",
+      "name": "aet_merchant_count"
+    },
+    {
+      "address": "0x140035970",
+      "kind": "T",
+      "name": "aet_merchant_index"
+    },
+    {
+      "address": "0x140035940",
+      "kind": "T",
+      "name": "aet_merchant_slug_at"
+    },
+    {
+      "address": "0x1400358b0",
+      "kind": "T",
+      "name": "aet_merchant_trades"
+    },
+    {
+      "address": "0x1400356b0",
+      "kind": "T",
+      "name": "aet_mod_bootstrap_prepare_runtime"
+    },
+    {
+      "address": "0x1400356a0",
+      "kind": "T",
+      "name": "aet_mod_bootstrap_sample_pack"
+    },
+    {
+      "address": "0x140033e40",
+      "kind": "T",
+      "name": "aet_mod_guide_full_text"
+    },
+    {
+      "address": "0x140030130",
+      "kind": "T",
+      "name": "aet_mods_build_default_path"
+    },
+    {
+      "address": "0x140033b40",
+      "kind": "T",
+      "name": "aet_mods_character_about_suffix"
+    },
+    {
+      "address": "0x1400337c0",
+      "kind": "T",
+      "name": "aet_mods_character_aptitudes_suffix"
+    },
+    {
+      "address": "0x1400338a0",
+      "kind": "T",
+      "name": "aet_mods_character_bio_suffix"
+    },
+    {
+      "address": "0x140033ca0",
+      "kind": "T",
+      "name": "aet_mods_character_compare_suffix"
+    },
+    {
+      "address": "0x140033ce0",
+      "kind": "T",
+      "name": "aet_mods_character_diagnostics_suffix"
+    },
+    {
+      "address": "0x140033940",
+      "kind": "T",
+      "name": "aet_mods_character_examine_suffix"
+    },
+    {
+      "address": "0x140033b80",
+      "kind": "T",
+      "name": "aet_mods_character_exits_suffix"
+    },
+    {
+      "address": "0x140033b20",
+      "kind": "T",
+      "name": "aet_mods_character_help_suffix"
+    },
+    {
+      "address": "0x1400339a0",
+      "kind": "T",
+      "name": "aet_mods_character_hints_panel_suffix"
+    },
+    {
+      "address": "0x140033980",
+      "kind": "T",
+      "name": "aet_mods_character_hints_suffix"
+    },
+    {
+      "address": "0x140033a20",
+      "kind": "T",
+      "name": "aet_mods_character_inventory_suffix"
+    },
+    {
+      "address": "0x1400339e0",
+      "kind": "T",
+      "name": "aet_mods_character_journal_suffix"
+    },
+    {
+      "address": "0x140033b60",
+      "kind": "T",
+      "name": "aet_mods_character_lights_suffix"
+    },
+    {
+      "address": "0x140033800",
+      "kind": "T",
+      "name": "aet_mods_character_loadout_suffix"
+    },
+    {
+      "address": "0x140033c00",
+      "kind": "T",
+      "name": "aet_mods_character_lockcheck_suffix"
+    },
+    {
+      "address": "0x140033c80",
+      "kind": "T",
+      "name": "aet_mods_character_loot_suffix"
+    },
+    {
+      "address": "0x140033840",
+      "kind": "T",
+      "name": "aet_mods_character_momentum_suffix"
+    },
+    {
+      "address": "0x140033c40",
+      "kind": "T",
+      "name": "aet_mods_character_nav_suffix"
+    },
+    {
+      "address": "0x140033be0",
+      "kind": "T",
+      "name": "aet_mods_character_nearby_suffix"
+    },
+    {
+      "address": "0x140033c20",
+      "kind": "T",
+      "name": "aet_mods_character_noise_suffix"
+    },
+    {
+      "address": "0x1400339c0",
+      "kind": "T",
+      "name": "aet_mods_character_notes_panel_suffix"
+    },
+    {
+      "address": "0x140033960",
+      "kind": "T",
+      "name": "aet_mods_character_notes_suffix"
+    },
+    {
+      "address": "0x140033900",
+      "kind": "T",
+      "name": "aet_mods_character_objectives_suffix"
+    },
+    {
+      "address": "0x140033cc0",
+      "kind": "T",
+      "name": "aet_mods_character_people_suffix"
+    },
+    {
+      "address": "0x140033860",
+      "kind": "T",
+      "name": "aet_mods_character_perks_suffix"
+    },
+    {
+      "address": "0x1400337a0",
+      "kind": "T",
+      "name": "aet_mods_character_portrait_suffix"
+    },
+    {
+      "address": "0x140033a00",
+      "kind": "T",
+      "name": "aet_mods_character_progress_suffix"
+    },
+    {
+      "address": "0x1400338e0",
+      "kind": "T",
+      "name": "aet_mods_character_rapport_suffix"
+    },
+    {
+      "address": "0x140033b00",
+      "kind": "T",
+      "name": "aet_mods_character_recap_suffix"
+    },
+    {
+      "address": "0x1400337e0",
+      "kind": "T",
+      "name": "aet_mods_character_reputation_suffix"
+    },
+    {
+      "address": "0x140033ae0",
+      "kind": "T",
+      "name": "aet_mods_character_room_suffix"
+    },
+    {
+      "address": "0x140033c60",
+      "kind": "T",
+      "name": "aet_mods_character_route_suffix"
+    },
+    {
+      "address": "0x140033d20",
+      "kind": "T",
+      "name": "aet_mods_character_saves_suffix"
+    },
+    {
+      "address": "0x140033ba0",
+      "kind": "T",
+      "name": "aet_mods_character_scan_suffix"
+    },
+    {
+      "address": "0x140033a80",
+      "kind": "T",
+      "name": "aet_mods_character_score_suffix"
+    },
+    {
+      "address": "0x140033780",
+      "kind": "T",
+      "name": "aet_mods_character_sheet_suffix"
+    },
+    {
+      "address": "0x140033a60",
+      "kind": "T",
+      "name": "aet_mods_character_status_suffix"
+    },
+    {
+      "address": "0x1400338c0",
+      "kind": "T",
+      "name": "aet_mods_character_tainting_suffix"
+    },
+    {
+      "address": "0x140033aa0",
+      "kind": "T",
+      "name": "aet_mods_character_time_suffix"
+    },
+    {
+      "address": "0x140033bc0",
+      "kind": "T",
+      "name": "aet_mods_character_trail_suffix"
+    },
+    {
+      "address": "0x140033820",
+      "kind": "T",
+      "name": "aet_mods_character_traits_suffix"
+    },
+    {
+      "address": "0x140033920",
+      "kind": "T",
+      "name": "aet_mods_character_vitals_suffix"
+    },
+    {
+      "address": "0x140033880",
+      "kind": "T",
+      "name": "aet_mods_character_voice_suffix"
+    },
+    {
+      "address": "0x140033d00",
+      "kind": "T",
+      "name": "aet_mods_character_wares_suffix"
+    },
+    {
+      "address": "0x140033a40",
+      "kind": "T",
+      "name": "aet_mods_character_waypoints_suffix"
+    },
+    {
+      "address": "0x140033ac0",
+      "kind": "T",
+      "name": "aet_mods_character_weather_suffix"
+    },
+    {
+      "address": "0x140033680",
+      "kind": "T",
+      "name": "aet_mods_crafting_archetype_count"
+    },
+    {
+      "address": "0x140033690",
+      "kind": "T",
+      "name": "aet_mods_crafting_archetype_get"
+    },
+    {
+      "address": "0x1400334e0",
+      "kind": "T",
+      "name": "aet_mods_crafting_profile"
+    },
+    {
+      "address": "0x140033d40",
+      "kind": "T",
+      "name": "aet_mods_format_load_order"
+    },
+    {
+      "address": "0x140033740",
+      "kind": "T",
+      "name": "aet_mods_format_status"
+    },
+    {
+      "address": "0x140030200",
+      "kind": "T",
+      "name": "aet_mods_init"
+    },
+    {
+      "address": "0x1400331c0",
+      "kind": "T",
+      "name": "aet_mods_item_description"
+    },
+    {
+      "address": "0x1400332d0",
+      "kind": "T",
+      "name": "aet_mods_npc_greeting"
+    },
+    {
+      "address": "0x140033390",
+      "kind": "T",
+      "name": "aet_mods_npc_topic_response"
+    },
+    {
+      "address": "0x140033150",
+      "kind": "T",
+      "name": "aet_mods_reload"
+    },
+    {
+      "address": "0x140033160",
+      "kind": "T",
+      "name": "aet_mods_room_blurb"
+    },
+    {
+      "address": "0x140033190",
+      "kind": "T",
+      "name": "aet_mods_room_title"
+    },
+    {
+      "address": "0x140033140",
+      "kind": "T",
+      "name": "aet_mods_shutdown"
+    },
+    {
+      "address": "0x140035830",
+      "kind": "T",
+      "name": "aet_npc_lines"
+    },
+    {
+      "address": "0x140014280",
+      "kind": "t",
+      "name": "cmd_compare.constprop.0"
+    },
+    {
+      "address": "0x140012580",
+      "kind": "t",
+      "name": "cmd_consume.constprop.0"
+    },
+    {
+      "address": "0x1400176c0",
+      "kind": "t",
+      "name": "cmd_equip.constprop.0"
+    },
+    {
+      "address": "0x1400146c0",
+      "kind": "t",
+      "name": "cmd_give.constprop.0"
+    },
+    {
+      "address": "0x140008000",
+      "kind": "t",
+      "name": "cmd_loot.constprop.0"
+    },
+    {
+      "address": "0x14000ea40",
+      "kind": "t",
+      "name": "cmd_scan.constprop.0"
+    },
+    {
+      "address": "0x140015890",
+      "kind": "t",
+      "name": "cmd_talk.constprop.0"
+    },
+    {
+      "address": "0x140013a00",
+      "kind": "t",
+      "name": "cmd_trade_buy.constprop.0"
+    },
+    {
+      "address": "0x1400162b0",
+      "kind": "t",
+      "name": "cmd_trade_sell.constprop.0"
+    },
+    {
+      "address": "0x140016f40",
+      "kind": "t",
+      "name": "cmd_waypoint_travel.constprop.0"
+    },
+    {
+      "address": "0x140005820",
+      "kind": "t",
+      "name": "format_aptitudes_body.constprop.0"
+    },
+    {
+      "address": "0x140005390",
+      "kind": "t",
+      "name": "format_causality_body.constprop.0"
+    },
+    {
+      "address": "0x140004f80",
+      "kind": "t",
+      "name": "format_causality_explain_body.constprop.0"
+    },
+    {
+      "address": "0x140004c20",
+      "kind": "t",
+      "name": "format_causality_recent_body.constprop.0"
+    },
+    {
+      "address": "0x140005200",
+      "kind": "t",
+      "name": "format_causality_turn_body.constprop.0"
+    },
+    {
+      "address": "0x1400065c0",
+      "kind": "t",
+      "name": "format_clock_time.isra.0"
+    },
+    {
+      "address": "0x14001ff50",
+      "kind": "t",
+      "name": "format_contextual_hints_body.part.0.constprop.0"
+    },
+    {
+      "address": "0x14000efc0",
+      "kind": "t",
+      "name": "format_diag_health_body.constprop.0"
+    },
+    {
+      "address": "0x14000df20",
+      "kind": "t",
+      "name": "format_exits_screen.constprop.0"
+    },
+    {
+      "address": "0x140014af0",
+      "kind": "t",
+      "name": "format_find_item_body.constprop.0"
+    },
+    {
+      "address": "0x140003850",
+      "kind": "t",
+      "name": "format_intent_suffix.part.0"
+    },
+    {
+      "address": "0x14000d5f0",
+      "kind": "t",
+      "name": "format_inventory_body.constprop.0"
+    },
+    {
+      "address": "0x140004100",
+      "kind": "t",
+      "name": "format_item_choices.constprop.0"
+    },
+    {
+      "address": "0x14000c4f0",
+      "kind": "t",
+      "name": "format_journal_body.constprop.0"
+    },
+    {
+      "address": "0x140007570",
+      "kind": "t",
+      "name": "format_lights_body.constprop.0"
+    },
+    {
+      "address": "0x140013260",
+      "kind": "t",
+      "name": "format_locate_body.constprop.0"
+    },
+    {
+      "address": "0x14000c970",
+      "kind": "t",
+      "name": "format_lockcheck_body.constprop.0"
+    },
+    {
+      "address": "0x14000bdd0",
+      "kind": "t",
+      "name": "format_merchant_wares.constprop.0"
+    },
+    {
+      "address": "0x140006aa0",
+      "kind": "t",
+      "name": "format_momentum_body.constprop.0"
+    },
+    {
+      "address": "0x140011bb0",
+      "kind": "t",
+      "name": "format_nearby_body.constprop.0"
+    },
+    {
+      "address": "0x14000d860",
+      "kind": "t",
+      "name": "format_noise_body.constprop.0"
+    },
+    {
+      "address": "0x140020370",
+      "kind": "t",
+      "name": "format_notes_filtered_body.constprop.0"
+    },
+    {
+      "address": "0x14000f4b0",
+      "kind": "t",
+      "name": "format_objectives_body.constprop.0"
+    },
+    {
+      "address": "0x140010110",
+      "kind": "t",
+      "name": "format_progress_body.constprop.0"
+    },
+    {
+      "address": "0x14000cbf0",
+      "kind": "t",
+      "name": "format_rapport_body.constprop.0"
+    },
+    {
+      "address": "0x140007880",
+      "kind": "t",
+      "name": "format_reputation_body.constprop.0"
+    },
+    {
+      "address": "0x14000c340",
+      "kind": "t",
+      "name": "format_room_description_body.constprop.0"
+    },
+    {
+      "address": "0x140007af0",
+      "kind": "t",
+      "name": "format_route_body.constprop.0"
+    },
+    {
+      "address": "0x140013620",
+      "kind": "t",
+      "name": "format_save_slots_body.constprop.0"
+    },
+    {
+      "address": "0x1400119a0",
+      "kind": "t",
+      "name": "format_temperature_msg.constprop.0"
+    },
+    {
+      "address": "0x140016940",
+      "kind": "t",
+      "name": "format_traits_body.constprop.0"
+    },
+    {
+      "address": "0x140005b40",
+      "kind": "t",
+      "name": "format_vitals_body.constprop.0"
+    },
+    {
+      "address": "0x14000a8d0",
+      "kind": "t",
+      "name": "format_voice_body.constprop.0"
+    },
+    {
+      "address": "0x14000fed0",
+      "kind": "t",
+      "name": "format_waypoints_body.constprop.0"
+    },
+    {
+      "address": "0x14000ac80",
+      "kind": "t",
+      "name": "format_weather_body.constprop.0"
+    },
+    {
+      "address": "0x140004a90",
+      "kind": "t",
+      "name": "format_why_blocked_body.constprop.0"
+    },
+    {
+      "address": "0x140021170",
+      "kind": "t",
+      "name": "load_game_path"
+    },
+    {
+      "address": "0x140043a90",
+      "kind": "T",
+      "name": "main"
+    },
+    {
+      "address": "0x140001be0",
+      "kind": "t",
+      "name": "main_menu_box_row"
+    },
+    {
+      "address": "0x14000105f",
+      "kind": "T",
+      "name": "mainCRTStartup"
+    },
+    {
+      "address": "0x140035dc0",
+      "kind": "T",
+      "name": "pc_capture"
+    },
+    {
+      "address": "0x140036670",
+      "kind": "T",
+      "name": "pc_display_name"
+    },
+    {
+      "address": "0x140036880",
+      "kind": "T",
+      "name": "pc_expand_world_placeholders"
+    },
+    {
+      "address": "0x140035e50",
+      "kind": "T",
+      "name": "pc_fill_narrative_defaults"
+    },
+    {
+      "address": "0x140036820",
+      "kind": "T",
+      "name": "pc_format_hud_tag"
+    },
+    {
+      "address": "0x140036540",
+      "kind": "t",
+      "name": "pc_format_hud_tag.part.0"
+    },
+    {
+      "address": "0x140036840",
+      "kind": "T",
+      "name": "pc_format_identity_banner"
+    },
+    {
+      "address": "0x140036760",
+      "kind": "t",
+      "name": "pc_format_identity_banner.part.0"
+    },
+    {
+      "address": "0x140036690",
+      "kind": "T",
+      "name": "pc_format_pronouns_short"
+    },
+    {
+      "address": "0x140036860",
+      "kind": "T",
+      "name": "pc_format_role_phrase"
+    },
+    {
+      "address": "0x1400365e0",
+      "kind": "t",
+      "name": "pc_format_role_phrase.part.0"
+    },
+    {
+      "address": "0x140037c40",
+      "kind": "T",
+      "name": "pc_format_summary"
+    },
+    {
+      "address": "0x140037410",
+      "kind": "T",
+      "name": "pc_read_save"
+    },
+    {
+      "address": "0x140035ce0",
+      "kind": "t",
+      "name": "pc_replace_token_pass.constprop.0.isra.0"
+    },
+    {
+      "address": "0x140035e30",
+      "kind": "T",
+      "name": "pc_reset_empty"
+    },
+    {
+      "address": "0x140035e10",
+      "kind": "T",
+      "name": "pc_restore"
+    },
+    {
+      "address": "0x140036b10",
+      "kind": "T",
+      "name": "pc_set_default_adventurer"
+    },
+    {
+      "address": "0x140035cc0",
+      "kind": "t",
+      "name": "pc_str_field.part.0"
+    },
+    {
+      "address": "0x140036d30",
+      "kind": "T",
+      "name": "pc_write_save"
+    },
+    {
+      "address": "0x1400383c0",
+      "kind": "T",
+      "name": "run_character_creation"
+    },
+    {
+      "address": "0x14001b900",
+      "kind": "t",
+      "name": "run_equipment_inventory_ui"
+    },
+    {
+      "address": "0x140023f40",
+      "kind": "t",
+      "name": "run_game_menu"
+    },
+    {
+      "address": "0x140022c80",
+      "kind": "t",
+      "name": "run_main_menu"
+    },
+    {
+      "address": "0x140019260",
+      "kind": "t",
+      "name": "run_material_forge"
+    },
+    {
+      "address": "0x1400066e0",
+      "kind": "t",
+      "name": "save_game.isra.0"
+    },
+    {
+      "address": "0x140006630",
+      "kind": "t",
+      "name": "save_game_slot.isra.0"
+    },
+    {
+      "address": "0x140074e20",
+      "kind": "r",
+      "name": "WORLD_BLURBS"
+    },
+    {
+      "address": "0x140067d00",
+      "kind": "r",
+      "name": "WORLD_EXITS"
+    },
+    {
+      "address": "0x1400639c0",
+      "kind": "r",
+      "name": "WORLD_HIDDEN_ITEM_LISTS"
+    },
+    {
+      "address": "0x14005cd60",
+      "kind": "r",
+      "name": "WORLD_HINT_DRINK"
+    },
+    {
+      "address": "0x14005cf00",
+      "kind": "r",
+      "name": "WORLD_HINT_FOOD"
+    },
+    {
+      "address": "0x140063ee0",
+      "kind": "r",
+      "name": "WORLD_ITEM_LISTS"
+    },
+    {
+      "address": "0x140069ae0",
+      "kind": "r",
+      "name": "WORLD_REGIONS"
+    },
+    {
+      "address": "0x140076f48",
+      "kind": "R",
+      "name": "WORLD_ROOM_COUNT"
+    },
+    {
+      "address": "0x140069a20",
+      "kind": "r",
+      "name": "WORLD_ROOM_DARK"
+    },
+    {
+      "address": "0x140069500",
+      "kind": "r",
+      "name": "WORLD_ROOM_ENTITIES"
+    },
+    {
+      "address": "0x140076a40",
+      "kind": "r",
+      "name": "WORLD_SLUGS"
+    },
+    {
+      "address": "0x140075ce0",
+      "kind": "r",
+      "name": "WORLD_TITLES"
+    }
+  ]
+}

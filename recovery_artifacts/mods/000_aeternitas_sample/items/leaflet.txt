@@ -1,0 +1,2 @@
+[Sample mod] The leaflet now mentions arrow-key help: type
+  help modding  after closing the main help screen.

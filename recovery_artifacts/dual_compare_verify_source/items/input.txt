@@ -1,0 +1,663 @@
+1
+find abandoned_furniture
+examine abandoned_furniture
+compare abandoned_furniture / bread
+find water_wheel
+examine water_wheel
+compare water_wheel / bread
+find rusty_gears
+examine rusty_gears
+compare rusty_gears / bread
+find ladder
+examine ladder
+compare ladder / bread
+find rope_pulley
+examine rope_pulley
+compare rope_pulley / bread
+find ancient_gate
+examine ancient_gate
+compare ancient_gate / bread
+find stone_carvings
+examine stone_carvings
+compare stone_carvings / bread
+find moss_covered_stone
+examine moss_covered_stone
+compare moss_covered_stone / bread
+find stone_altar
+examine stone_altar
+compare stone_altar / bread
+find ancient_symbols
+examine ancient_symbols
+compare ancient_symbols / bread
+find moss
+examine moss
+compare moss / bread
+find standing_stones
+examine standing_stones
+compare standing_stones / bread
+find ancient_artifacts
+examine ancient_artifacts
+compare ancient_artifacts / bread
+find magical_items
+examine magical_items
+compare magical_items / bread
+find rare_curiosities
+examine rare_curiosities
+compare rare_curiosities / bread
+find chest
+examine chest
+compare chest / bread
+find dust_sheet
+examine dust_sheet
+compare dust_sheet / bread
+find swing
+examine swing
+compare swing / bread
+find vegetable_garden
+examine vegetable_garden
+compare vegetable_garden / bread
+find stone_path
+examine stone_path
+compare stone_path / bread
+find wildflowers
+examine wildflowers
+compare wildflowers / bread
+find rake
+examine rake
+compare rake / bread
+find shovel
+examine shovel
+compare shovel / bread
+find gardening_tools
+examine gardening_tools
+compare gardening_tools / bread
+find seeds
+examine seeds
+compare seeds / bread
+find pots
+examine pots
+compare pots / bread
+find fresh_bread
+examine fresh_bread
+compare fresh_bread / bread
+find pastries
+examine pastries
+compare pastries / bread
+find sweet_treats
+examine sweet_treats
+compare sweet_treats / bread
+find balcony
+examine balcony
+compare balcony / bread
+find kingdom_view
+examine kingdom_view
+compare kingdom_view / bread
+find performance_stage
+examine performance_stage
+compare performance_stage / bread
+find musical_instruments
+examine musical_instruments
+compare musical_instruments / bread
+find acoustic_design
+examine acoustic_design
+compare acoustic_design / bread
+find old_box
+examine old_box
+compare old_box / bread
+find sink
+examine sink
+compare sink / bread
+find toilet
+examine toilet
+compare toilet / bread
+find shower
+examine shower
+compare shower / bread
+find towel_rack
+examine towel_rack
+compare towel_rack / bread
+find medicine_cabinet
+examine medicine_cabinet
+compare medicine_cabinet / bread
+find hallway_window
+examine hallway_window
+compare hallway_window / bread
+find door_frames
+examine door_frames
+compare door_frames / bread
+find hammer
+examine hammer
+compare hammer / bread
+find tongs
+examine tongs
+compare tongs / bread
+find water_trough
+examine water_trough
+compare water_trough / bread
+find smithing_tools
+examine smithing_tools
+compare smithing_tools / bread
+find waystone_monolith
+examine waystone_monolith
+compare waystone_monolith / bread
+find elysium_crystal
+examine elysium_crystal
+compare elysium_crystal / bread
+find glowing_runes
+examine glowing_runes
+compare glowing_runes / bread
+find royal_banner
+examine royal_banner
+compare royal_banner / bread
+find castle_gate
+examine castle_gate
+compare castle_gate / bread
+find guard_post
+examine guard_post
+compare guard_post / bread
+find cooking_hearths
+examine cooking_hearths
+compare cooking_hearths / bread
+find copper_pots
+examine copper_pots
+compare copper_pots / bread
+find preparation_tables
+examine preparation_tables
+compare preparation_tables / bread
+find fresh_ingredients
+examine fresh_ingredients
+compare fresh_ingredients / bread
+find watchtower
+examine watchtower
+compare watchtower / bread
+find battlements
+examine battlements
+compare battlements / bread
+find signal_flags
+examine signal_flags
+compare signal_flags / bread
+find ancient_markings
+examine ancient_markings
+compare ancient_markings / bread
+find more_crystals
+examine more_crystals
+compare more_crystals / bread
+find hidden_chamber
+examine hidden_chamber
+compare hidden_chamber / bread
+find glowing_crystal
+examine glowing_crystal
+compare glowing_crystal / bread
+find ancient_map
+examine ancient_map
+compare ancient_map / bread
+find mineral_ore
+examine mineral_ore
+compare mineral_ore / bread
+find overgrown_vegetation
+examine overgrown_vegetation
+compare overgrown_vegetation / bread
+find cave_opening
+examine cave_opening
+compare cave_opening / bread
+find stalactites
+examine stalactites
+compare stalactites / bread
+find water_pool
+examine water_pool
+compare water_pool / bread
+find glowing_crystals
+examine glowing_crystals
+compare glowing_crystals / bread
+find stone_formations
+examine stone_formations
+compare stone_formations / bread
+find wine_bottle
+examine wine_bottle
+compare wine_bottle / bread
+find cellar_tunnel
+examine cellar_tunnel
+compare cellar_tunnel / bread
+find dim_lighting
+examine dim_lighting
+compare dim_lighting / bread
+find mysterious_passage
+examine mysterious_passage
+compare mysterious_passage / bread
+find administrative_buildings
+examine administrative_buildings
+compare administrative_buildings / bread
+find official_notices
+examine official_notices
+compare official_notices / bread
+find rubble
+examine rubble
+compare rubble / bread
+find notice_boards
+examine notice_boards
+compare notice_boards / bread
+find announcements
+examine announcements
+compare announcements / bread
+find job_postings
+examine job_postings
+compare job_postings / bread
+find private_booths
+examine private_booths
+compare private_booths / bread
+find comfortable_seating
+examine comfortable_seating
+compare comfortable_seating / bread
+find workshops
+examine workshops
+compare workshops / bread
+find craft_studios
+examine craft_studios
+compare craft_studios / bread
+find tool_sounds
+examine tool_sounds
+compare tool_sounds / bread
+find burial_niches
+examine burial_niches
+compare burial_niches / bread
+find crystal_embedded_walls
+examine crystal_embedded_walls
+compare crystal_embedded_walls / bread
+find crystal_pond
+examine crystal_pond
+compare crystal_pond / bread
+find koi_fish
+examine koi_fish
+compare koi_fish / bread
+find water_lilies
+examine water_lilies
+compare water_lilies / bread
+find pond_bridge
+examine pond_bridge
+compare pond_bridge / bread
+find dark_symbols
+examine dark_symbols
+compare dark_symbols / bread
+find ritual_markers
+examine ritual_markers
+compare ritual_markers / bread
+find glowing_mushrooms
+examine glowing_mushrooms
+compare glowing_mushrooms / bread
+find fallen_leaves
+examine fallen_leaves
+compare fallen_leaves / bread
+find ancient_tree_bark
+examine ancient_tree_bark
+compare ancient_tree_bark / bread
+find sanctum_chamber
+examine sanctum_chamber
+compare sanctum_chamber / bread
+find glowing_symbols
+examine glowing_symbols
+compare glowing_symbols / bread
+find ancient_carvings
+examine ancient_carvings
+compare ancient_carvings / bread
+find dining_table
+examine dining_table
+compare dining_table / bread
+find chairs
+examine chairs
+compare chairs / bread
+find place_settings
+examine place_settings
+compare place_settings / bread
+find chandelier
+examine chandelier
+compare chandelier / bread
+find sideboard
+examine sideboard
+compare sideboard / bread
+find silverware
+examine silverware
+compare silverware / bread
+find portraits
+examine portraits
+compare portraits / bread
+find coffee_bar
+examine coffee_bar
+compare coffee_bar / bread
+find fresh_roasts
+examine fresh_roasts
+compare fresh_roasts / bread
+find cozy_atmosphere
+examine cozy_atmosphere
+compare cozy_atmosphere / bread
+find shed_door
+examine shed_door
+compare shed_door / bread
+find pet_cages
+examine pet_cages
+compare pet_cages / bread
+find exotic_animals
+examine exotic_animals
+compare exotic_animals / bread
+find pet_supplies
+examine pet_supplies
+compare pet_supplies / bread
+find wheat_field
+examine wheat_field
+compare wheat_field / bread
+find corn_field
+examine corn_field
+compare corn_field / bread
+find chicken_coop
+examine chicken_coop
+compare chicken_coop / bread
+find cow_pen
+examine cow_pen
+compare cow_pen / bread
+find ferry_boat
+examine ferry_boat
+compare ferry_boat / bread
+find ferryman_station
+examine ferryman_station
+compare ferryman_station / bread
+find waiting_area
+examine waiting_area
+compare waiting_area / bread
+find festival_decorations
+examine festival_decorations
+compare festival_decorations / bread
+find fishing_piers
+examine fishing_piers
+compare fishing_piers / bread
+find fishing_equipment
+examine fishing_equipment
+compare fishing_equipment / bread
+find fish_baskets
+examine fish_baskets
+compare fish_baskets / bread
+find altar_stone
+examine altar_stone
+compare altar_stone / bread
+find journal
+examine journal
+compare journal / bread
+find mysterious_gem
+examine mysterious_gem
+compare mysterious_gem / bread
+find stone_marker
+examine stone_marker
+compare stone_marker / bread
+find fallen_branch
+examine fallen_branch
+compare fallen_branch / bread
+find ancient_weapons
+examine ancient_weapons
+compare ancient_weapons / bread
+find old_armor
+examine old_armor
+compare old_armor / bread
+find crystal_ball
+examine crystal_ball
+compare crystal_ball / bread
+find tarot_cards
+examine tarot_cards
+compare tarot_cards / bread
+find mystical_symbols
+examine mystical_symbols
+compare mystical_symbols / bread
+find candles
+examine candles
+compare candles / bread
+find magical_fountain
+examine magical_fountain
+compare magical_fountain / bread
+find floating_rings
+examine floating_rings
+compare floating_rings / bread
+find cascading_water
+examine cascading_water
+compare cascading_water / bread
+find fresh_fruits
+examine fresh_fruits
+compare fresh_fruits / bread
+find vegetables
+examine vegetables
+compare vegetables / bread
+find produce_baskets
+examine produce_baskets
+compare produce_baskets / bread
+find door
+examine door
+compare door / bread
+find fountain
+examine fountain
+compare fountain / bread
+find herbs
+examine herbs
+compare herbs / bread
+find house_key
+examine house_key
+compare house_key / bread
+find store_counter
+examine store_counter
+compare store_counter / bread
+find shelves
+examine shelves
+compare shelves / bread
+find barrels
+examine barrels
+compare barrels / bread
+find display_case
+examine display_case
+compare display_case / bread
+find guard_station
+examine guard_station
+compare guard_station / bread
+find weapon_racks
+examine weapon_racks
+compare weapon_racks / bread
+find report_desk
+examine report_desk
+compare report_desk / bread
+find bed
+examine bed
+compare bed / bread
+find desk
+examine desk
+compare desk / bread
+find chair
+examine chair
+compare chair / bread
+find window
+examine window
+compare window / bread
+find wardrobe
+examine wardrobe
+compare wardrobe / bread
+find ancient_tome
+examine ancient_tome
+compare ancient_tome / bread
+find herb_bundle
+examine herb_bundle
+compare herb_bundle / bread
+find mysterious_artifact
+examine mysterious_artifact
+compare mysterious_artifact / bread
+find hidden_alcove
+examine hidden_alcove
+compare hidden_alcove / bread
+find private_seating
+examine private_seating
+compare private_seating / bread
+find old_wine
+examine old_wine
+compare old_wine / bread
+find preserved_foods
+examine preserved_foods
+compare preserved_foods / bread
+find dusty_jars
+examine dusty_jars
+compare dusty_jars / bread
+find ancient_temple_ruins
+examine ancient_temple_ruins
+compare ancient_temple_ruins / bread
+find crystal_pool
+examine crystal_pool
+compare crystal_pool / bread
+find carved_stone
+examine carved_stone
+compare carved_stone / bread
+find hidden_panel
+examine hidden_panel
+compare hidden_panel / bread
+find secret_space
+examine secret_space
+compare secret_space / bread
+find rare_herbs
+examine rare_herbs
+compare rare_herbs / bread
+find ancient_tree
+examine ancient_tree
+compare ancient_tree / bread
+find ancient_pillars
+examine ancient_pillars
+compare ancient_pillars / bread
+find stream
+examine stream
+compare stream / bread
+find path_markers
+examine path_markers
+compare path_markers / bread
+find boulder
+examine boulder
+compare boulder / bread
+find wild_grasses
+examine wild_grasses
+compare wild_grasses / bread
+find viewpoint
+examine viewpoint
+compare viewpoint / bread
+find weathered_stone
+examine weathered_stone
+compare weathered_stone / bread
+find ancient_carving
+examine ancient_carving
+compare ancient_carving / bread
+find crystal_fragment
+examine crystal_fragment
+compare crystal_fragment / bread
+find cave_crystal
+examine cave_crystal
+compare cave_crystal / bread
+find ancient_symbol
+examine ancient_symbol
+compare ancient_symbol / bread
+find clear_water
+examine clear_water
+compare clear_water / bread
+find docks
+examine docks
+compare docks / bread
+find boats
+examine boats
+compare boats / bread
+find ancient_trees
+examine ancient_trees
+compare ancient_trees / bread
+find forest_paths
+examine forest_paths
+compare forest_paths / bread
+find mystical_atmosphere
+examine mystical_atmosphere
+compare mystical_atmosphere / bread
+find table
+examine table
+compare table / bread
+find book
+examine book
+compare book / bread
+find lantern
+examine lantern
+compare lantern / bread
+find coat_rack
+examine coat_rack
+compare coat_rack / bread
+find mirror
+examine mirror
+compare mirror / bread
+find stove
+examine stove
+compare stove / bread
+find cupboards
+examine cupboards
+compare cupboards / bread
+find butcher_block
+examine butcher_block
+compare butcher_block / bread
+find drying_herbs
+examine drying_herbs
+compare drying_herbs / bread
+find pans
+examine pans
+compare pans / bread
+find bookshelves
+examine bookshelves
+compare bookshelves / bread
+find reading_lamp
+examine reading_lamp
+compare reading_lamp / bread
+find open_books
+examine open_books
+compare open_books / bread
+find reading_nook
+examine reading_nook
+compare reading_nook / bread
+find linguistics_textbook
+examine linguistics_textbook
+compare linguistics_textbook / bread
+find lore_scroll
+examine lore_scroll
+compare lore_scroll / bread
+find crafting_manual
+examine crafting_manual
+compare crafting_manual / bread
+find armor_crafting_manual
+examine armor_crafting_manual
+compare armor_crafting_manual / bread
+find advanced_crafting_tome
+examine advanced_crafting_tome
+compare advanced_crafting_tome / bread
+find herbalism_guide
+examine herbalism_guide
+compare herbalism_guide / bread
+find armchair
+examine armchair
+compare armchair / bread
+find coffee_table
+examine coffee_table
+compare coffee_table / bread
+find vase
+examine vase
+compare vase / bread
+find bookshelf
+examine bookshelf
+compare bookshelf / bread
+find fireplace
+examine fireplace
+compare fireplace / bread
+find old_rug
+examine old_rug
+compare old_rug / bread
+find curtains
+examine curtains
+compare curtains / bread
+find cave_entrance
+examine cave_entrance
+compare cave_entrance / bread
+find ancient_passages
+examine ancient_passages
+compare ancient_passages / bread
+find apartment_buildings
+examine apartment_buildings
+compare apartment_buildings / bread
+quit
+5

@@ -1,0 +1,43 @@
+1
+whereami
+look
+exits
+exits locked
+nearby
+nearby detail
+inventory
+i
+loadout
+status
+character brief
+sheet brief
+skills
+traits
+perks
+vitals
+reputation
+rapport
+momentum
+voice
+bio
+tainting
+progress
+score
+journal
+objectives
+notes show
+hints
+lights
+time
+weather
+temperature
+lockcheck
+noise
+causality recent
+why blocked
+help
+about
+mods list
+mods doctor
+quit
+5

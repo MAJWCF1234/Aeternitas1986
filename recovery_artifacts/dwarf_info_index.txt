@@ -1,0 +1,178 @@
+14:    <11>   DW_AT_low_pc      : 0x140043270
+15:    <19>   DW_AT_high_pc     : 50
+16:    <1a>   DW_AT_name        : (indirect string, offset: 0): ../../../libgcc/config/i386/cygwin.S
+17:    <1e>   DW_AT_comp_dir    : (indirect string, offset: 0x25): R:\winlibs_staging_ucrt64\gcc-15.2.0\build_mingw\x86_64-w64-mingw32\libgcc
+18:    <22>   DW_AT_producer    : (indirect string, offset: 0x70): GNU AS 2.46.0
+27:    <35>   DW_AT_producer    : GNU C23 15.2.0 -march=nocona -msahf -mtune=generic -g -g -g -O2 -O2 -O2 -fbuilding-libgcc -fno-stack-protector
+31:    <aa>   DW_AT_name        : (indirect line string, offset: 0xbb): ../../../libgcc/libgcc2.c
+32:    <ae>   DW_AT_comp_dir    : (indirect line string, offset: 0x70): R:\winlibs_staging_ucrt64\gcc-15.2.0\build_mingw\x86_64-w64-mingw32\libgcc
+37:    <b9>   DW_AT_name        : char
+41:    <c1>   DW_AT_name        : long long unsigned int
+45:    <db>   DW_AT_name        : long long int
+49:    <ec>   DW_AT_name        : short unsigned int
+53:    <102>   DW_AT_name        : int
+57:    <109>   DW_AT_name        : long int
+61:    <115>   DW_AT_name        : unsigned int
+65:    <125>   DW_AT_name        : long double
+69:    <134>   DW_AT_name        : unsigned char
+73:    <145>   DW_AT_name        : double
+77:    <14f>   DW_AT_name        : float
+86:    <15f>   DW_AT_name        : long unsigned int
+90:    <174>   DW_AT_name        : short int
+92:    <17f>   DW_AT_name        : ix86_tune_indices
+96:    <195>   DW_AT_decl_file   : 1
+97:    <195>   DW_AT_decl_line   : 299
+101:    <19c>   DW_AT_name        : X86_TUNE_SCHEDULE
+104:    <1b0>   DW_AT_name        : X86_TUNE_PARTIAL_REG_DEPENDENCY
+107:    <1d2>   DW_AT_name        : X86_TUNE_SSE_PARTIAL_REG_DEPENDENCY
+110:    <1f8>   DW_AT_name        : X86_TUNE_SSE_PARTIAL_REG_FP_CONVERTS_DEPENDENCY
+113:    <22a>   DW_AT_name        : X86_TUNE_SSE_PARTIAL_REG_CONVERTS_DEPENDENCY
+116:    <259>   DW_AT_name        : X86_TUNE_DEST_FALSE_DEP_FOR_GLC
+119:    <27b>   DW_AT_name        : X86_TUNE_SSE_SPLIT_REGS
+122:    <295>   DW_AT_name        : X86_TUNE_PARTIAL_FLAG_REG_STALL
+125:    <2b7>   DW_AT_name        : X86_TUNE_MOVX
+128:    <2c7>   DW_AT_name        : X86_TUNE_MEMORY_MISMATCH_STALL
+131:    <2e8>   DW_AT_name        : X86_TUNE_FUSE_CMP_AND_BRANCH_32
+134:    <30a>   DW_AT_name        : X86_TUNE_FUSE_CMP_AND_BRANCH_64
+137:    <32c>   DW_AT_name        : X86_TUNE_FUSE_CMP_AND_BRANCH_SOFLAGS
+140:    <353>   DW_AT_name        : X86_TUNE_FUSE_ALU_AND_BRANCH
+143:    <372>   DW_AT_name        : X86_TUNE_FUSE_MOV_AND_ALU
+146:    <38e>   DW_AT_name        : X86_TUNE_FUSE_ALU_AND_BRANCH_MEM
+149:    <3b1>   DW_AT_name        : X86_TUNE_FUSE_ALU_AND_BRANCH_MEM_IMM
+152:    <3d8>   DW_AT_name        : X86_TUNE_FUSE_ALU_AND_BRANCH_RIP_RELATIVE
+155:    <404>   DW_AT_name        : X86_TUNE_ACCUMULATE_OUTGOING_ARGS
+158:    <428>   DW_AT_name        : X86_TUNE_PROLOGUE_USING_MOVE
+161:    <447>   DW_AT_name        : X86_TUNE_EPILOGUE_USING_MOVE
+164:    <466>   DW_AT_name        : X86_TUNE_USE_LEAVE
+167:    <47b>   DW_AT_name        : X86_TUNE_PUSH_MEMORY
+170:    <492>   DW_AT_name        : X86_TUNE_SINGLE_PUSH
+173:    <4a9>   DW_AT_name        : X86_TUNE_DOUBLE_PUSH
+176:    <4c0>   DW_AT_name        : X86_TUNE_SINGLE_POP
+179:    <4d6>   DW_AT_name        : X86_TUNE_DOUBLE_POP
+182:    <4ec>   DW_AT_name        : X86_TUNE_PAD_SHORT_FUNCTION
+185:    <50a>   DW_AT_name        : X86_TUNE_PAD_RETURNS
+188:    <521>   DW_AT_name        : X86_TUNE_FOUR_JUMP_LIMIT
+191:    <53c>   DW_AT_name        : X86_TUNE_ALIGN_TIGHT_LOOPS
+194:    <559>   DW_AT_name        : X86_TUNE_SOFTWARE_PREFETCHING_BENEFICIAL
+197:    <584>   DW_AT_name        : X86_TUNE_LCP_STALL
+200:    <599>   DW_AT_name        : X86_TUNE_READ_MODIFY
+203:    <5b0>   DW_AT_name        : X86_TUNE_USE_INCDEC
+206:    <5c6>   DW_AT_name        : X86_TUNE_INTEGER_DFMODE_MOVES
+209:    <5e6>   DW_AT_name        : X86_TUNE_OPT_AGU
+212:    <5f9>   DW_AT_name        : X86_TUNE_AVOID_LEA_FOR_ADDR
+215:    <617>   DW_AT_name        : X86_TUNE_SLOW_IMUL_IMM32_MEM
+218:    <636>   DW_AT_name        : X86_TUNE_SLOW_IMUL_IMM8
+221:    <650>   DW_AT_name        : X86_TUNE_AVOID_MEM_OPND_FOR_CMOVE
+224:    <674>   DW_AT_name        : X86_TUNE_SINGLE_STRINGOP
+227:    <68f>   DW_AT_name        : X86_TUNE_PREFER_KNOWN_REP_MOVSB_STOSB
+230:    <6b7>   DW_AT_name        : X86_TUNE_MISALIGNED_MOVE_STRING_PRO_EPILOGUES
+233:    <6e7>   DW_AT_name        : X86_TUNE_USE_SAHF
+236:    <6fb>   DW_AT_name        : X86_TUNE_USE_CLTD
+239:    <70f>   DW_AT_name        : X86_TUNE_USE_BT
+242:    <721>   DW_AT_name        : X86_TUNE_AVOID_FALSE_DEP_FOR_BMI
+245:    <744>   DW_AT_name        : X86_TUNE_AVOID_FALSE_DEP_FOR_TZCNT
+248:    <769>   DW_AT_name        : X86_TUNE_AVOID_FALSE_DEP_FOR_BLS
+251:    <78c>   DW_AT_name        : X86_TUNE_ADJUST_UNROLL
+254:    <7a5>   DW_AT_name        : X86_TUNE_ONE_IF_CONV_INSN
+257:    <7c1>   DW_AT_name        : X86_TUNE_AVOID_MFENCE
+260:    <7d9>   DW_AT_name        : X86_TUNE_EXPAND_ABS
+263:    <7ef>   DW_AT_name        : X86_TUNE_USE_HIMODE_FIOP
+266:    <80a>   DW_AT_name        : X86_TUNE_USE_SIMODE_FIOP
+269:    <825>   DW_AT_name        : X86_TUNE_USE_FFREEP
+272:    <83b>   DW_AT_name        : X86_TUNE_EXT_80387_CONSTANTS
+275:    <85a>   DW_AT_name        : X86_TUNE_GENERAL_REGS_SSE_SPILL
+278:    <87c>   DW_AT_name        : X86_TUNE_SSE_UNALIGNED_LOAD_OPTIMAL
+281:    <8a2>   DW_AT_name        : X86_TUNE_SSE_UNALIGNED_STORE_OPTIMAL
+284:    <8c9>   DW_AT_name        : X86_TUNE_SSE_PACKED_SINGLE_INSN_OPTIMAL
+287:    <8f3>   DW_AT_name        : X86_TUNE_SSE_TYPELESS_STORES
+290:    <912>   DW_AT_name        : X86_TUNE_SSE_LOAD0_BY_PXOR
+293:    <92f>   DW_AT_name        : X86_TUNE_INTER_UNIT_MOVES_TO_VEC
+296:    <952>   DW_AT_name        : X86_TUNE_INTER_UNIT_MOVES_FROM_VEC
+299:    <977>   DW_AT_name        : X86_TUNE_INTER_UNIT_CONVERSIONS
+302:    <999>   DW_AT_name        : X86_TUNE_SPLIT_MEM_OPND_FOR_FP_CONVERTS
+305:    <9c3>   DW_AT_name        : X86_TUNE_USE_VECTOR_FP_CONVERTS
+308:    <9e5>   DW_AT_name        : X86_TUNE_USE_VECTOR_CONVERTS
+311:    <a04>   DW_AT_name        : X86_TUNE_SLOW_PSHUFB
+314:    <a1b>   DW_AT_name        : X86_TUNE_AVOID_4BYTE_PREFIXES
+317:    <a3b>   DW_AT_name        : X86_TUNE_USE_GATHER_2PARTS
+320:    <a58>   DW_AT_name        : X86_TUNE_USE_SCATTER_2PARTS
+323:    <a76>   DW_AT_name        : X86_TUNE_USE_GATHER_4PARTS
+326:    <a93>   DW_AT_name        : X86_TUNE_USE_SCATTER_4PARTS
+329:    <ab1>   DW_AT_name        : X86_TUNE_USE_GATHER_8PARTS
+332:    <ace>   DW_AT_name        : X86_TUNE_USE_SCATTER_8PARTS
+335:    <aec>   DW_AT_name        : X86_TUNE_AVOID_128FMA_CHAINS
+338:    <b0b>   DW_AT_name        : X86_TUNE_AVOID_256FMA_CHAINS
+341:    <b2a>   DW_AT_name        : X86_TUNE_AVOID_512FMA_CHAINS
+344:    <b49>   DW_AT_name        : X86_TUNE_V2DF_REDUCTION_PREFER_HADDPD
+347:    <b71>   DW_AT_name        : X86_TUNE_SSE_MOVCC_USE_BLENDV
+350:    <b91>   DW_AT_name        : X86_TUNE_AVX256_UNALIGNED_LOAD_OPTIMAL
+353:    <bba>   DW_AT_name        : X86_TUNE_AVX256_UNALIGNED_STORE_OPTIMAL
+356:    <be4>   DW_AT_name        : X86_TUNE_AVX256_SPLIT_REGS
+359:    <c01>   DW_AT_name        : X86_TUNE_AVX128_OPTIMAL
+362:    <c1b>   DW_AT_name        : X86_TUNE_AVX256_OPTIMAL
+365:    <c35>   DW_AT_name        : X86_TUNE_AVX256_AVOID_VEC_PERM
+368:    <c56>   DW_AT_name        : X86_TUNE_AVX512_SPLIT_REGS
+371:    <c73>   DW_AT_name        : X86_TUNE_AVX256_MOVE_BY_PIECES
+374:    <c94>   DW_AT_name        : X86_TUNE_AVX256_STORE_BY_PIECES
+377:    <cb6>   DW_AT_name        : X86_TUNE_AVX512_MOVE_BY_PIECES
+380:    <cd7>   DW_AT_name        : X86_TUNE_AVX512_STORE_BY_PIECES
+383:    <cf9>   DW_AT_name        : X86_TUNE_AVX512_TWO_EPILOGUES
+386:    <d19>   DW_AT_name        : X86_TUNE_DOUBLE_WITH_ADD
+389:    <d34>   DW_AT_name        : X86_TUNE_ALWAYS_FANCY_MATH_387
+392:    <d55>   DW_AT_name        : X86_TUNE_UNROLL_STRLEN
+395:    <d6e>   DW_AT_name        : X86_TUNE_SHIFT1
+398:    <d80>   DW_AT_name        : X86_TUNE_ZERO_EXTEND_WITH_AND
+401:    <da0>   DW_AT_name        : X86_TUNE_PROMOTE_HIMODE_IMUL
+404:    <dbf>   DW_AT_name        : X86_TUNE_FAST_PREFIX
+407:    <dd6>   DW_AT_name        : X86_TUNE_READ_MODIFY_WRITE
+410:    <df3>   DW_AT_name        : X86_TUNE_MOVE_M1_VIA_OR
+413:    <e0d>   DW_AT_name        : X86_TUNE_NOT_UNPAIRABLE
+416:    <e27>   DW_AT_name        : X86_TUNE_PARTIAL_REG_STALL
+419:    <e44>   DW_AT_name        : X86_TUNE_PARTIAL_MEMORY_READ_STALL
+422:    <e69>   DW_AT_name        : X86_TUNE_PROMOTE_QIMODE
+425:    <e83>   DW_AT_name        : X86_TUNE_PROMOTE_HI_REGS
+428:    <e9e>   DW_AT_name        : X86_TUNE_HIMODE_MATH
+431:    <eb5>   DW_AT_name        : X86_TUNE_SPLIT_LONG_MOVES
+434:    <ed1>   DW_AT_name        : X86_TUNE_USE_XCHGB
+437:    <ee6>   DW_AT_name        : X86_TUNE_USE_MOV0
+440:    <efa>   DW_AT_name        : X86_TUNE_NOT_VECTORMODE
+443:    <f14>   DW_AT_name        : X86_TUNE_AVOID_VECTOR_DECODE
+446:    <f33>   DW_AT_name        : X86_TUNE_BRANCH_PREDICTION_HINTS_TAKEN
+449:    <f5c>   DW_AT_name        : X86_TUNE_BRANCH_PREDICTION_HINTS_NOT_TAKEN
+452:    <f89>   DW_AT_name        : X86_TUNE_QIMODE_MATH
+455:    <fa0>   DW_AT_name        : X86_TUNE_PROMOTE_QI_REGS
+458:    <fbb>   DW_AT_name        : X86_TUNE_SLOW_STC
+461:    <fcf>   DW_AT_name        : X86_TUNE_USE_RCR
+464:    <fe2>   DW_AT_name        : X86_TUNE_LAST
+468:    <ff3>   DW_AT_name        : ix86_arch_indices
+472:    <1009>   DW_AT_decl_file   : 1
+473:    <1009>   DW_AT_decl_line   : 486
+477:    <1010>   DW_AT_name        : X86_ARCH_CMOV
+480:    <1020>   DW_AT_name        : X86_ARCH_CMPXCHG
+483:    <1033>   DW_AT_name        : X86_ARCH_CMPXCHG8B
+486:    <1048>   DW_AT_name        : X86_ARCH_XADD
+489:    <1058>   DW_AT_name        : X86_ARCH_BSWAP
+492:    <1069>   DW_AT_name        : X86_ARCH_LAST
+498:    <107c>   DW_AT_name        : signed char
+502:    <108b>   DW_AT_name        : __int128
+506:    <1097>   DW_AT_name        : __int128 unsigned
+510:    <10ac>   DW_AT_name        : _Float16
+514:    <10b8>   DW_AT_name        : complex _Float16
+518:    <10cc>   DW_AT_name        : complex float
+522:    <10dd>   DW_AT_name        : complex double
+526:    <10ef>   DW_AT_name        : complex long double
+530:    <1106>   DW_AT_name        : _Float128
+534:    <1113>   DW_AT_name        : complex _Float128
+536:    <1126>   DW_AT_name        : func_ptr
+537:    <112f>   DW_AT_decl_file   : 2
+538:    <1130>   DW_AT_decl_line   : 42
+547:    <1142>   DW_AT_name        : __CTOR_LIST__
+548:    <1150>   DW_AT_decl_file   : 2
+549:    <1150>   DW_AT_decl_line   : 47
+555:    <1156>   DW_AT_name        : __DTOR_LIST__
+556:    <1164>   DW_AT_decl_file   : 2
+557:    <1164>   DW_AT_decl_line   : 48
+571:    <117e>   DW_AT_decl_file   : 3
+572:    <117e>   DW_AT_decl_line   : 3196
+578:    <1193>   DW_AT_decl_file   : 3
+579:    <1193>   DW_AT_decl_line   : 3197
