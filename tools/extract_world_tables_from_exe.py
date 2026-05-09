@@ -3,7 +3,13 @@ from __future__ import annotations
 
 import json
 import struct
+import sys
 from pathlib import Path
+
+_TOOLS = Path(__file__).resolve().parent
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+from repo_paths import recovery_txts_dir, world_tables_recovered_json  # noqa: E402
 
 
 ROOM_COUNT = 161
@@ -230,8 +236,9 @@ def read_merchants(exe: bytes, sections, image_base: int, rva: int, n: int):
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     exe_path = root / "aeternitas64.exe"
-    out_path = root / "recovery_artifacts" / "world_tables_recovered.json"
-    out_path.parent.mkdir(exist_ok=True)
+    recovery_txts_dir().mkdir(parents=True, exist_ok=True)
+    out_path = world_tables_recovered_json()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     exe = exe_path.read_bytes()
     image_base, sections = parse_pe_sections(exe)

@@ -2,7 +2,13 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+_TOOLS = Path(__file__).resolve().parent
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+from repo_paths import world_tables_recovered_json  # noqa: E402
 
 
 def cstr(s: str) -> str:
@@ -120,7 +126,11 @@ def emit_merchant_tables(merchants: list[dict]) -> str:
 
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
-    data_path = root / "recovery_artifacts" / "world_tables_recovered.json"
+    data_path = world_tables_recovered_json()
+    if not data_path.is_file():
+        raise SystemExit(
+            f"missing {data_path}; run py -3 tools/extract_world_tables_from_exe.py"
+        )
     out_path = root / "aeternitas_world_generated.c"
     d = json.loads(data_path.read_text(encoding="utf-8"))
 

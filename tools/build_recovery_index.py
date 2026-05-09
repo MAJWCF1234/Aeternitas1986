@@ -5,10 +5,16 @@ import json
 import re
 import struct
 import subprocess
+import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+_TOOLS = Path(__file__).resolve().parent
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+from repo_paths import recovery_txts_dir, world_tables_recovered_json  # noqa: E402
+
 ART = ROOT / "recovery_artifacts"
 IMAGE_BASE_DEFAULT = 0x140000000
 
@@ -103,6 +109,8 @@ def parse_coff_file_records(symbol_dump: Path) -> list[str]:
 
 def main() -> int:
     ART.mkdir(exist_ok=True)
+    TXTS = recovery_txts_dir()
+    TXTS.mkdir(parents=True, exist_ok=True)
     original = ROOT / "aeternitas64.exe"
     recovered = ROOT / "aeternitas64_recovered.exe"
 
@@ -111,7 +119,7 @@ def main() -> int:
     original_names = {s["name"] for s in original_symbols}
     recovered_names = {s["name"] for s in recovered_symbols}
 
-    world_path = ART / "world_tables_recovered.json"
+    world_path = world_tables_recovered_json()
     world = json.loads(world_path.read_text(encoding="utf-8")) if world_path.exists() else {}
 
     public_game_symbols = [
@@ -128,14 +136,16 @@ def main() -> int:
         "toolchain": {
             "compiler_hint": "GNU C23 / MinGW-W64 GCC 15.2.0; debug and COFF symbols present",
             "evidence_files": [
-                "recovery_artifacts/exe_symbols.txt",
-                "recovery_artifacts/exe_disasm_all.txt",
-                "recovery_artifacts/dwarf_info_index.txt",
-                "recovery_artifacts/dwarf_decoded_lines.txt",
-                "recovery_artifacts/exe_strings.txt",
+                "recovery_artifacts/txts/exe_symbols.txt",
+                "recovery_artifacts/txts/exe_disasm_all.txt",
+                "recovery_artifacts/txts/dwarf_info_index.txt",
+                "recovery_artifacts/txts/dwarf_decoded_lines.txt",
+                "recovery_artifacts/txts/exe_strings.txt",
             ],
         },
-        "source_units": sorted(set(source_units_from_nm + parse_coff_file_records(ART / "exe_symbols.txt"))),
+        "source_units": sorted(
+            set(source_units_from_nm + parse_coff_file_records(TXTS / "exe_symbols.txt"))
+        ),
         "symbol_counts": {
             "original_defined": len(original_symbols),
             "recovered_defined": len(recovered_symbols),
@@ -175,7 +185,7 @@ def main() -> int:
         ][:220],
     }
 
-    (ART / "recovery_index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
+    (TXTS / "recovery_index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
 
     md = []
     md.append("# Aeternitas64 EXE Recovery Index")
@@ -219,9 +229,9 @@ def main() -> int:
     md.append("- Use symbol-address anchored disassembly for large `cmd_*` and `run_*` functions when behavior differs from the original.")
     md.append("- Keep parity tests against the original EXE for command output, save/load serialization, world navigation, merchant flows, and character creation.")
     md.append("")
-    (ART / "RECOVERY_INDEX.md").write_text("\n".join(md), encoding="utf-8")
-    print(f"Wrote {ART / 'recovery_index.json'}")
-    print(f"Wrote {ART / 'RECOVERY_INDEX.md'}")
+    (TXTS / "RECOVERY_INDEX.md").write_text("\n".join(md), encoding="utf-8")
+    print(f"Wrote {TXTS / 'recovery_index.json'}")
+    print(f"Wrote {TXTS / 'RECOVERY_INDEX.md'}")
     return 0
 
 

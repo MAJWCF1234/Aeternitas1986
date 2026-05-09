@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import platform
@@ -14,7 +15,28 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 _TOOLS = Path(__file__).resolve().parent
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+from repo_paths import world_tables_recovered_json  # noqa: E402
+
 EXE = ROOT / "aeternitas64.exe"
+
+
+def _load_harvest_playthrough():
+    """Load harvest_original_playthrough from this directory (robust when sys.path differs)."""
+    path = _TOOLS / "harvest_original_playthrough.py"
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"Missing {path}: full autotest needs tools/harvest_original_playthrough.py"
+        )
+    spec = importlib.util.spec_from_file_location(
+        "harvest_original_playthrough", path
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load harvest module from {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def build() -> None:
@@ -128,6 +150,9 @@ def run_smoke() -> None:
         "topic",
         "topic mood",
         "topic heat",
+        "could you please status",
+        "go ahead and inventory",
+        "quick save",
         "inventory",
         "done",
         "status",
@@ -142,20 +167,17 @@ def run_full_playthrough(*, include_all_rooms: bool) -> None:
     """Global command surface + UI surfaces (forge / equipment / save menus).
 
     With ``include_all_rooms``, also runs a shallow visit of every room slug from
-    ``recovery_artifacts/world_tables_recovered.json`` (same script as golden harvest).
+    ``recovery_artifacts/txts/world_tables_recovered.json`` (same data as golden harvest).
     """
-    if str(_TOOLS) not in sys.path:
-        sys.path.insert(0, str(_TOOLS))
-    from harvest_original_playthrough import (
-        build_global_script,
-        build_room_script,
-        build_ui_surfaces_script,
-    )
+    harvest = _load_harvest_playthrough()
+    build_global_script = harvest.build_global_script
+    build_room_script = harvest.build_room_script
+    build_ui_surfaces_script = harvest.build_ui_surfaces_script
 
     run_script(build_global_script(), timeout=360, label="global playthrough")
     run_script(build_ui_surfaces_script(), timeout=360, label="ui surfaces")
     if include_all_rooms:
-        data_path = ROOT / "recovery_artifacts" / "world_tables_recovered.json"
+        data_path = world_tables_recovered_json()
         if not data_path.is_file():
             print(f"SKIP: all-rooms (missing {data_path})", file=sys.stderr)
             return

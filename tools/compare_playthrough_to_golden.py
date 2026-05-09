@@ -7,9 +7,15 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
-from harvest_original_playthrough import normalize_output, repo_root
+_TOOLS = Path(__file__).resolve().parent
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+
+from harvest_original_playthrough import normalize_output, repo_root  # noqa: E402
+from repo_paths import golden_playthrough_dir  # noqa: E402
 
 
 def seed_golden_saves(golden: Path, out_dir: Path, label: str) -> None:
@@ -52,7 +58,7 @@ def main() -> int:
     root = repo_root()
     parser = argparse.ArgumentParser(description="Diff a rebuilt EXE against golden playthrough transcripts.")
     parser.add_argument("--exe", default=str(root / "aeternitas64_recovered.exe"))
-    parser.add_argument("--golden", default=str(root / "recovery_artifacts" / "golden_playthrough"))
+    parser.add_argument("--golden", default=str(golden_playthrough_dir()))
     parser.add_argument("--out", default=str(root / "recovery_artifacts" / "playthrough_diff"))
     parser.add_argument("--timeout", type=int, default=360)
     args = parser.parse_args()

@@ -7,8 +7,14 @@ import json
 import os
 import re
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
+
+_TOOLS = Path(__file__).resolve().parent
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+from repo_paths import golden_playthrough_dir, world_tables_recovered_json  # noqa: E402
 
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
@@ -30,9 +36,11 @@ def repo_root() -> Path:
 
 
 def load_world_data(root: Path) -> dict:
-    data_path = root / "recovery_artifacts" / "world_tables_recovered.json"
+    data_path = world_tables_recovered_json()
     if not data_path.is_file():
-        raise SystemExit(f"missing {data_path}; run extract_world_tables_from_exe.py first")
+        raise SystemExit(
+            f"missing {data_path}; run py -3 tools/extract_world_tables_from_exe.py first"
+        )
     return json.loads(data_path.read_text(encoding="utf-8"))
 
 
@@ -276,7 +284,7 @@ def main() -> int:
     parser.add_argument("--exe", default=str(root / "aeternitas64.exe"))
     parser.add_argument(
         "--out",
-        default=str(root / "recovery_artifacts" / "golden_playthrough"),
+        default=str(golden_playthrough_dir()),
     )
     parser.add_argument(
         "--mode",
