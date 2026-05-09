@@ -543,15 +543,18 @@ static void suggest_typo(const char *word, char *out, size_t outcap) {
     out[0] = '\0';
 }
 
-/* Longest first so "could you please" wins over "could you", etc. */
+/* Longest match wins ("could you please" before "could you", etc.). */
 static const char *const kNaturalLanguageStrip[] = {
-    "could you please ", "would you please ", "i would like to ",
-    "could i please ",   "i'm trying to ",    "let me please ",
-    "im trying to ",     "can i please ",     "i'd like to ",
-    "i want to ",        "could you ",        "would you ",
-    "i need to ",        "i should ",         "try and ",
-    "could i ",          "let me ",           "please ",
-    "try to ",           "can i ",            NULL};
+    "would you mind if i ", "if you could please ", "could you please ",
+    "would you please ",    "i would like to ",     "i would love to ",
+    "can you please ",      "could i please ",      "let me please ",
+    "i'm trying to ",       "im trying to ",        "go ahead and ",
+    "i'm going to ",        "can i please ",        "im going to ",
+    "i'd like to ",         "i want to ",           "could you ",
+    "would you ",           "i need to ",           "i should ",
+    "try and ",             "could i ",             "let me ",
+    "please ",              "try to ",              "can i ",
+    NULL};
 
 static void strip_natural_prefixes(char *line) {
   int guard = 0;
@@ -3737,7 +3740,8 @@ static void fill_help_text(char *buf, size_t cap) {
       "  exits | status | stat (quick status, character status…) | character |\n"
       "          sheet (full portrait) |\n"
       "          character brief | sheet brief | identity (compact sheet); who am i |\n"
-      "          my character | describe me | look at me  (aliases → character)\n"
+      "          appearance | my character | describe me | look at me  (aliases → "
+      "character)\n"
       "          skills | skill | aptitudes | aptitude | reputation | rep | standing\n"
       "          loadout | gear | equipment | outfit — 120-col equipment & pack UI\n"
       "          traits | trait | personality\n"
@@ -3793,7 +3797,7 @@ static void fill_help_text(char *buf, size_t cap) {
       "          causality explain | what triggered that\n"
       "          failed actions now include \"Because\" hints when context is known\n"
       "          causality clear\n"
-      "  save/qs  load/reload/ql/restore\n"
+      "  save | quick save | qs   load | quick load | reload | ql | restore\n"
       "  saves | slots — fullscreen save manager (save/load/del N); also save <1-10> | "
       "load <1-10>\n"
       "  menu  —  ASCII pause menu; resume clears it and redraws this room\n"
@@ -7658,7 +7662,7 @@ static void normalize_aliases(char *line) {
              {"obtain ", 7, "take ", 5},     {"snatch ", 7, "take ", 5},
              {"procure ", 8, "take ", 5},    {"collect ", 8, "take ", 5},
              {"withdraw ", 9, "take ", 5},   {"pick up ", 8, "take ", 5},
-             {"pickup ", 7, "take ", 5},
+             {"pickup ", 7, "take ", 5},    {"fetch ", 6, "take ", 5},
              {"grab ", 5, "take ", 5},       {"get ", 4, "take ", 5},
              {"deposit ", 8, "drop ", 5},    {"stash ", 6, "drop ", 5},
              {"discard ", 8, "drop ", 5},    {"place ", 6, "drop ", 5},
@@ -7806,19 +7810,26 @@ static void split_preposition_phrase(char *text, const char **prep_out,
 
 typedef struct {
   const char *alias;
+  size_t alias_len;
   const char *verb;
   const char *rest;
 } ParserExactRewrite;
 
 typedef struct {
   const char *prefix;
+  size_t prefix_len;
   const char *verb;
   int require_more_text;
 } ParserPrefixRewrite;
 
+#define EXACT_RW(a, v, r) {(a), sizeof(a) - 1, (v), (r)}
+#define PREFIX_RW(p, v, req) {(p), sizeof(p) - 1, (v), (req)}
+
 static int parser_apply_exact_rewrites(char *line, const ParserExactRewrite *tab) {
+  size_t line_len = strlen(line);
   int i;
   for (i = 0; tab[i].alias; i++) {
+    if (line_len != tab[i].alias_len) continue;
     if (!strcmp(line, tab[i].alias)) {
       rewrite_command(line, tab[i].verb, tab[i].rest ? tab[i].rest : "");
       return 1;
@@ -7830,7 +7841,7 @@ static int parser_apply_exact_rewrites(char *line, const ParserExactRewrite *tab
 static int parser_apply_prefix_rewrites(char *line, const ParserPrefixRewrite *tab) {
   int i;
   for (i = 0; tab[i].prefix; i++) {
-    size_t n = strlen(tab[i].prefix);
+    size_t n = tab[i].prefix_len;
     if (strncmp(line, tab[i].prefix, n) != 0) continue;
     if (tab[i].require_more_text && !line[n]) continue;
     rewrite_command(line, tab[i].verb, line + n);
@@ -7847,16 +7858,17 @@ static int parser_rewrite_question_examine(char *line) {
     size_t n = strlen(kQ[i]);
     char *p;
     if (strncmp(line, kQ[i], n) != 0) continue;
-    p = strchr(line, ' ');
-    if (p) {
-      p++;
-      if (!strncmp(p, "is ", 3) || !strncmp(p, "are ", 4))
-        p += p[0] == 'i' ? 3 : 4;
-      else if (!strncmp(line, "what's ", 7))
-        p = line + 7;
-      rewrite_command(line, "examine", p);
-      return 1;
-    }
+    /* Rest after the question stem (avoid strchr on first word — wrong for
+     * multi-word stems like "what is "). */
+    p = line + n;
+    while (*p == ' ') p++;
+    if (!strncmp(p, "is ", 3))
+      p += 3;
+    else if (!strncmp(p, "are ", 4))
+      p += 4;
+    while (*p == ' ') p++;
+    rewrite_command(line, "examine", p);
+    return 1;
   }
   return 0;
 }
@@ -7869,8 +7881,9 @@ static int parser_rewrite_describe_examine(char *line) {
     size_t n = strlen(kVerb[i]);
     char *p;
     if (strncmp(line, kVerb[i], n) != 0) continue;
-    p = strchr(line, ' ');
-    rewrite_command(line, "examine", p ? p + 1 : "");
+    p = line + n;
+    while (*p == ' ') p++;
+    rewrite_command(line, "examine", p);
     return 1;
   }
   return 0;
@@ -7884,13 +7897,10 @@ static int parser_rewrite_look_preposition(char *line) {
     size_t n = strlen(kLook[i]);
     char *p;
     if (strncmp(line, kLook[i], n) != 0) continue;
-    p = strchr(line, ' ');
-    while (p && *p == ' ') p++;
-    if (p) {
-      p = strchr(p, ' ');
-      rewrite_command(line, "examine", p ? p + 1 : "");
-      return 1;
-    }
+    p = line + n;
+    while (*p == ' ') p++;
+    rewrite_command(line, "examine", p);
+    return 1;
   }
   return 0;
 }
@@ -7904,10 +7914,9 @@ static int parser_rewrite_speak_to(char *line) {
     size_t n = strlen(kSpeak[i]);
     char *p;
     if (strncmp(line, kSpeak[i], n) != 0) continue;
-    p = strchr(line, ' ');
-    while (p && *p == ' ') p++;
-    if (p) p = strchr(p, ' ');
-    rewrite_command(line, "talk to", p ? p + 1 : "");
+    p = line + n;
+    while (*p == ' ') p++;
+    rewrite_command(line, "talk to", p);
     return 1;
   }
   return 0;
@@ -8041,21 +8050,18 @@ static int parser_rewrite_note_prefixes(char *line) {
 /* Normalize "go to / into / in / to / travel to ..." before other verb rewrites.
  * Order and early-return rules match the historical decompiled chain. */
 static int parser_rewrite_movement_phrases(char *line) {
-  if (!strncmp(line, "go to ", 6)) {
-    (void)rewrite_to_move_or_approach(line, line + 6);
-    return 1;
-  }
-  if (!strncmp(line, "go into ", 8)) {
-    (void)rewrite_to_move_or_approach(line, line + 8);
-    return 1;
-  }
-  if (!strncmp(line, "go in ", 6)) {
-    (void)rewrite_to_move_or_approach(line, line + 6);
-    return 1;
-  }
-  if (!strncmp(line, "to ", 3)) {
-    (void)rewrite_to_move_or_approach(line, line + 3);
-    return 1;
+  static const struct {
+    const char *pfx;
+    unsigned char len;
+  } kDirect[] = {
+      {"go to ", 6},   {"go into ", 8}, {"go in ", 6}, {"to ", 3},
+  };
+  size_t di;
+  for (di = 0; di < sizeof kDirect / sizeof kDirect[0]; di++) {
+    if (!strncmp(line, kDirect[di].pfx, kDirect[di].len)) {
+      (void)rewrite_to_move_or_approach(line, line + kDirect[di].len);
+      return 1;
+    }
   }
   if (!strncmp(line, "travel to ", 10) || !strncmp(line, "move to ", 8) ||
       !strncmp(line, "head to ", 8) || !strncmp(line, "proceed to ", 11)) {
@@ -8090,319 +8096,327 @@ static int parser_rewrite_mailbox_search_find(char *line) {
 }
 
 static int parser_line_is_cardinal_go_prefix(const char *line) {
-  static const char *const kGo[] = {"go north", "go south", "go east", "go west",
-                                    "go up",  "go down",  NULL};
+  static const struct {
+    const char *s;
+    unsigned char n;
+  } kGo[] = {
+      {"go north", 8}, {"go south", 8}, {"go east", 7}, {"go west", 7},
+      {"go up", 5},    {"go down", 7},  {NULL, 0}};
   int i;
-  for (i = 0; kGo[i]; i++) {
-    size_t n = strlen(kGo[i]);
-    if (!strncmp(line, kGo[i], n)) return 1;
+  for (i = 0; kGo[i].s; i++) {
+    if (!strncmp(line, kGo[i].s, kGo[i].n)) return 1;
   }
   return 0;
 }
 
 static void normalize_parser_intent(char *line) {
   static const ParserPrefixRewrite kPrefixRewrite[] = {
-      {"fast travel to ", "fasttravel", 0},
-      {"fast travel ", "fasttravel", 0},
-      {"fast-travel to ", "fasttravel", 0},
-      {"waystone to ", "waystone", 0},
-      {"nexus to ", "nexus", 0},
-      {"search for ", "find", 0},
-      {"find me ", "find", 0},
-      {"tell me about ", "examine", 0},
-      {"look for ", "find", 0},
-      {"ask about ", "talk about", 0},
-      {NULL, NULL, 0}};
+      PREFIX_RW("fast travel to ", "fasttravel", 0),
+      PREFIX_RW("fast travel ", "fasttravel", 0),
+      PREFIX_RW("fast-travel to ", "fasttravel", 0),
+      PREFIX_RW("waystone to ", "waystone", 0),
+      PREFIX_RW("nexus to ", "nexus", 0),
+      PREFIX_RW("search for ", "find", 0),
+      PREFIX_RW("find me ", "find", 0),
+      PREFIX_RW("tell me about ", "examine", 0),
+      PREFIX_RW("look for ", "find", 0),
+      PREFIX_RW("ask about ", "talk about", 0),
+      {NULL, 0, NULL, 0}};
   static const ParserExactRewrite kExactRewrite[] = {
-      {"im stuck", "hints", ""},
-      {"i am stuck", "hints", ""},
-      {"i'm stuck", "hints", ""},
-      {"give me a hint", "hints", ""},
-      {"give me hint", "hints", ""},
-      {"nudge", "hints", ""},
-      {"i need a hint", "hints", ""},
-      {"another hint", "hints", ""},
-      {"what changed last turn", "causality lastturn", ""},
-      {"what changed", "causality lastturn", ""},
-      {"what happened last turn", "causality lastturn", ""},
-      {"why did that happen", "causality recent", ""},
-      {"why did this happen", "causality recent", ""},
-      {"why did that occur", "causality recent", ""},
-      {"why did npc react", "causality social", ""},
-      {"why npc reacted", "causality social", ""},
-      {"why did they react", "causality social", ""},
-      {"what triggered that", "causality explain", ""},
-      {"what caused that", "causality explain", ""},
-      {"explain what happened", "causality explain", ""},
-      {"who heard me", "causality social", ""},
-      {"did anyone hear me", "causality social", ""},
-      {"who noticed me", "noise", ""},
-      {"did anyone notice me", "noise", ""},
-      {"what heard that noise", "noise", ""},
-      {"why didnt save work", "causality save", ""},
-      {"why didn't save work", "causality save", ""},
-      {"why load failed", "causality save", ""},
-      {"why parser failed", "causality parser", ""},
-      {"why command failed to parse", "causality parser", ""},
-      {"why did movement fail", "why blocked", ""},
-      {"why cant i go", "why blocked", ""},
-      {"why can't i go", "why blocked", ""},
-      {"what can i do", "help", ""},
-      {"what should i do", "help", ""},
-      {"what can you do", "help", ""},
-      {"commands", "help", ""},
-      {"crafting", "forge", ""},
-      {"open forge", "forge", ""},
-      {"material forge", "forge", ""},
-      {"forge menu", "forge", ""},
-      {"instructions", "help", ""},
-      {"how do i play", "help", ""},
-      {"show help", "help", ""},
-      {"keyboard shortcuts", "help", ""},
-      {"game controls", "help", ""},
-      {"modding guide", "help modding", ""},
-      {"mod guide", "help modding", ""},
-      {"mods guide", "help modding", ""},
-      {"dlc guide", "help modding", ""},
-      {"dlc help", "help modding", ""},
-      {"who made this", "about", ""},
-      {"developers", "about", ""},
-      {"attribution", "about", ""},
-      {"identity", "character brief", ""},
-      {"who am i", "character", ""},
-      {"whoami", "character", ""},
-      {"what do i look like", "character", ""},
-      {"describe me", "character", ""},
-      {"describe myself", "character", ""},
-      {"my appearance", "character", ""},
-      {"my character", "character", ""},
-      {"show character", "character", ""},
-      {"show me my character", "character", ""},
-      {"look at me", "character", ""},
-      {"look at myself", "character", ""},
-      {"my skills", "aptitudes", ""},
-      {"show skills", "aptitudes", ""},
-      {"show my skills", "aptitudes", ""},
-      {"what are my skills", "aptitudes", ""},
-      {"what skills do i have", "aptitudes", ""},
-      {"my aptitudes", "aptitudes", ""},
-      {"show aptitudes", "aptitudes", ""},
-      {"attribute points", "aptitudes", ""},
-      {"my stats", "aptitudes", ""},
-      {"stat block", "aptitudes", ""},
-      {"power profile", "aptitudes", ""},
-      {"combat readiness", "aptitudes", ""},
-      {"build summary", "aptitudes", ""},
-      {"risk profile", "aptitudes", ""},
-      {"character archetype", "aptitudes", ""},
-      {"my reputation", "reputation", ""},
-      {"show reputation", "reputation", ""},
-      {"my standing", "reputation", ""},
-      {"show standing", "reputation", ""},
-      {"what is my reputation", "reputation", ""},
-      {"my rep", "reputation", ""},
-      {"show rep", "reputation", ""},
-      {"patron standing", "reputation", ""},
-      {"merchant standing", "reputation", ""},
-      {"my gear", "gear", ""},
-      {"show gear", "gear", ""},
-      {"show equipment", "equipment", ""},
-      {"my equipment", "equipment", ""},
-      {"my loadout", "loadout", ""},
-      {"show loadout", "loadout", ""},
-      {"what am i wearing", "loadout", ""},
-      {"my traits", "traits", ""},
-      {"show traits", "traits", ""},
-      {"my personality", "traits", ""},
-      {"my momentum", "momentum", ""},
-      {"show momentum", "momentum", ""},
-      {"how am i doing", "momentum", ""},
-      {"am i making progress", "momentum", ""},
-      {"story so far", "momentum", ""},
-      {"my arc", "momentum", ""},
-      {"how far have i come", "momentum", ""},
-      {"my perks", "perks", ""},
-      {"show perks", "perks", ""},
-      {"list perks", "perks", ""},
-      {"what perks do i have", "perks", ""},
-      {"my voice", "voice", ""},
-      {"show voice", "voice", ""},
-      {"how do i sound", "voice", ""},
-      {"my pronouns", "voice", ""},
-      {"what are my pronouns", "voice", ""},
-      {"voice style", "voice", ""},
-      {"my bio", "bio", ""},
-      {"show bio", "bio", ""},
-      {"my backstory", "bio", ""},
-      {"tell me my story", "bio", ""},
-      {"my biography", "bio", ""},
-      {"my corruption", "tainting", ""},
-      {"show corruption", "tainting", ""},
-      {"am i tainted", "tainting", ""},
-      {"how corrupted am i", "tainting", ""},
-      {"moral vector", "tainting", ""},
-      {"alignment drift", "tainting", ""},
-      {"social stance", "rapport", ""},
-      {"who matters here", "rapport", ""},
-      {"who can i talk to", "rapport", ""},
-      {"npc list", "rapport", ""},
-      {"list npcs", "rapport", ""},
-      {"people in the world", "rapport", ""},
-      {"logbook", "journal", ""},
-      {"questlog", "journal", ""},
-      {"quest log", "journal", ""},
-      {"diary", "journal", ""},
-      {"adventure log", "journal", ""},
-      {"adventure journal", "journal", ""},
-      {"my journal", "journal", ""},
-      {"story journal", "journal", ""},
-      {"my notebook", "notes", ""},
-      {"open my notes", "notes", ""},
-      {"note list", "notes", ""},
-      {"read my notes", "notes", ""},
-      {"exploration", "progress", ""},
-      {"exploration summary", "progress", ""},
-      {"world progress", "progress", ""},
-      {"sitrep", "progress", ""},
-      {"situation report", "progress", ""},
-      {"how far am i", "progress", ""},
-      {"story progress", "progress", ""},
-      {"where am i in the story", "progress", ""},
-      {"what just happened", "recap", ""},
-      {"recent messages", "recap", ""},
-      {"command recap", "recap", ""},
-      {"active quests", "objectives", ""},
-      {"current objectives", "objectives", ""},
-      {"what are my objectives", "objectives", ""},
-      {"story goals", "objectives", ""},
-      {"checklist", "objectives", ""},
-      {"my checklist", "objectives", ""},
-      {"my hp", "vitals", ""},
-      {"how hurt am i", "vitals", ""},
-      {"am i hurt", "vitals", ""},
-      {"my health", "vitals", ""},
-      {"mod order", "mods list", ""},
-      {"mods order", "mods list", ""},
-      {"shopping list", "wares", ""},
-      {"merchant stock", "wares", ""},
-      {"shop stock", "wares", ""},
-      {"whats for sale", "wares", ""},
-      {"what is for sale", "wares", ""},
-      {"market", "wares", ""},
-      {"open the shop", "wares", ""},
-      {"what is for sale here", "wares", ""},
-      {"save games", "saves", ""},
-      {"my saves", "saves", ""},
-      {"load slots", "saves", ""},
-      {"troubleshoot", "errors", ""},
-      {"engine diagnostics", "errors", ""},
-      {"session log", "errors", ""},
-      {"what went wrong", "errors", ""},
-      {"debug log", "errors", ""},
-      {"travel network", "waypoints", ""},
-      {"teleport network", "waypoints", ""},
-      {"nexus list", "waypoints", ""},
-      {"attuned points", "waypoints", ""},
-      {"breadcrumbs", "trail", ""},
-      {"my path back", "trail", ""},
-      {"movement trail", "trail", ""},
-      {"adjacent rooms", "nearby", ""},
-      {"local map", "nearby", ""},
-      {"around here", "nearby", ""},
-      {"lock status", "lockcheck", ""},
-      {"door locks", "lockcheck", ""},
-      {"detection risk", "noise", ""},
-      {"how stealthy", "noise", ""},
-      {"who is here", "who", ""},
-      {"anyone here", "who", ""},
-      {"npc role", "who", ""},
-      {"who is this npc", "who", ""},
-      {"last npc role", "who", ""},
-      {"who is the last npc", "who", ""},
-      {"last npc attitude", "who", ""},
-      {"npc attitude", "who", ""},
-      {"npc danger", "who", ""},
-      {"last npc danger", "who", ""},
-      {"how dangerous is this npc", "who", ""},
-      {"npc trust", "who", ""},
-      {"last npc trust", "who", ""},
-      {"npc leverage", "who", ""},
-      {"last npc leverage", "who", ""},
-      {"how much leverage do i have", "who", ""},
-      {"conversation topic", "topic", ""},
-      {"what did we talk about", "topic", ""},
-      {"topic mood", "topic", ""},
-      {"conversation mood", "topic", ""},
-      {"topic heat", "topic", ""},
-      {"conversation heat", "topic", ""},
-      {"is last npc here", "who", ""},
-      {"last npc here", "who", ""},
-      {"who did i last meet", "who", ""},
-      {"last person i met", "who", ""},
-      {"salvage", "loot", ""},
-      {"valuables here", "loot", ""},
-      {"show inventory", "inventory", ""},
-      {"show my inventory", "inventory", ""},
-      {"show me inventory", "inventory", ""},
-      {"show me my inventory", "inventory", ""},
-      {"what am i carrying", "inventory", ""},
-      {"what do i have", "inventory", ""},
-      {"belongings", "inventory", ""},
-      {"my stuff", "inventory", ""},
-      {"what i have on me", "inventory", ""},
-      {"read room", "describe", ""},
-      {"read the room", "describe", ""},
-      {"describe here", "describe", ""},
-      {"surroundings", "describe", ""},
-      {"full room", "describe", ""},
-      {"room description", "describe", ""},
-      {"what do i see", "scan", ""},
-      {"what can i see", "scan", ""},
-      {"scan room", "scan", ""},
-      {"scan the room", "scan", ""},
-      {"area scan", "scan", ""},
-      {"survey area", "scan", ""},
-      {"survey room", "scan", ""},
-      {"recon", "scan", ""},
-      {"recon pass", "scan", ""},
-      {"scout", "scan", ""},
-      {"scout area", "scan", ""},
-      {"room overview", "scan", ""},
-      {"tactical readout", "scan", ""},
-      {"show exits", "exits", ""},
-      {"list exits", "exits", ""},
-      {"where can i go", "exits", ""},
-      {"where to", "exits", ""},
-      {"connections", "exits", ""},
-      {"room connections", "exits", ""},
-      {"where am i", "where", ""},
-      {"where am i now", "where", ""},
-      {"show status", "status", ""},
-      {"my status", "status", ""},
-      {"quick status", "status", ""},
-      {"full status", "status", ""},
-      {"character status", "status", ""},
-      {"threat posture", "status", ""},
-      {"show score", "score", ""},
-      {"my score", "score", ""},
-      {"my points", "score", ""},
-      {"game stats", "score", ""},
-      {"what time is it", "time", ""},
-      {"what's the time", "time", ""},
-      {"whats the time", "time", ""},
-      {"what's the weather", "weather", ""},
-      {"whats the weather", "weather", ""},
-      {"how's the weather", "weather", ""},
-      {"hows the weather", "weather", ""},
-      {"climate", "weather", ""},
-      {"scene tone", "weather", ""},
-      {"atmosphere", "weather", ""},
-      {"light sources", "lights", ""},
-      {"show lights", "lights", ""},
-      {"fast travel", "fasttravel", ""},
-      {"fast-travel", "fasttravel", ""},
-      {"travel mood", "progress", ""},
-      {NULL, NULL, NULL}};
+      EXACT_RW("im stuck", "hints", ""),
+      EXACT_RW("i am stuck", "hints", ""),
+      EXACT_RW("i'm stuck", "hints", ""),
+      EXACT_RW("give me a hint", "hints", ""),
+      EXACT_RW("give me hint", "hints", ""),
+      EXACT_RW("nudge", "hints", ""),
+      EXACT_RW("i need a hint", "hints", ""),
+      EXACT_RW("another hint", "hints", ""),
+      EXACT_RW("what changed last turn", "causality lastturn", ""),
+      EXACT_RW("what changed", "causality lastturn", ""),
+      EXACT_RW("what happened last turn", "causality lastturn", ""),
+      EXACT_RW("why did that happen", "causality recent", ""),
+      EXACT_RW("why did this happen", "causality recent", ""),
+      EXACT_RW("why did that occur", "causality recent", ""),
+      EXACT_RW("why did npc react", "causality social", ""),
+      EXACT_RW("why npc reacted", "causality social", ""),
+      EXACT_RW("why did they react", "causality social", ""),
+      EXACT_RW("what triggered that", "causality explain", ""),
+      EXACT_RW("what caused that", "causality explain", ""),
+      EXACT_RW("explain what happened", "causality explain", ""),
+      EXACT_RW("who heard me", "causality social", ""),
+      EXACT_RW("did anyone hear me", "causality social", ""),
+      EXACT_RW("who noticed me", "noise", ""),
+      EXACT_RW("did anyone notice me", "noise", ""),
+      EXACT_RW("what heard that noise", "noise", ""),
+      EXACT_RW("why didnt save work", "causality save", ""),
+      EXACT_RW("why didn't save work", "causality save", ""),
+      EXACT_RW("why load failed", "causality save", ""),
+      EXACT_RW("why parser failed", "causality parser", ""),
+      EXACT_RW("why command failed to parse", "causality parser", ""),
+      EXACT_RW("why did movement fail", "why blocked", ""),
+      EXACT_RW("why cant i go", "why blocked", ""),
+      EXACT_RW("why can't i go", "why blocked", ""),
+      EXACT_RW("what can i do", "help", ""),
+      EXACT_RW("what should i do", "help", ""),
+      EXACT_RW("what can you do", "help", ""),
+      EXACT_RW("commands", "help", ""),
+      EXACT_RW("crafting", "forge", ""),
+      EXACT_RW("open forge", "forge", ""),
+      EXACT_RW("material forge", "forge", ""),
+      EXACT_RW("forge menu", "forge", ""),
+      EXACT_RW("instructions", "help", ""),
+      EXACT_RW("how do i play", "help", ""),
+      EXACT_RW("show help", "help", ""),
+      EXACT_RW("keyboard shortcuts", "help", ""),
+      EXACT_RW("game controls", "help", ""),
+      EXACT_RW("modding guide", "help modding", ""),
+      EXACT_RW("mod guide", "help modding", ""),
+      EXACT_RW("mods guide", "help modding", ""),
+      EXACT_RW("dlc guide", "help modding", ""),
+      EXACT_RW("dlc help", "help modding", ""),
+      EXACT_RW("who made this", "about", ""),
+      EXACT_RW("developers", "about", ""),
+      EXACT_RW("attribution", "about", ""),
+      EXACT_RW("identity", "character brief", ""),
+      EXACT_RW("who am i", "character", ""),
+      EXACT_RW("whoami", "character", ""),
+      EXACT_RW("what do i look like", "character", ""),
+      EXACT_RW("describe me", "character", ""),
+      EXACT_RW("describe myself", "character", ""),
+      EXACT_RW("my appearance", "character", ""),
+      EXACT_RW("appearance", "character", ""),
+      EXACT_RW("my character", "character", ""),
+      EXACT_RW("show character", "character", ""),
+      EXACT_RW("show me my character", "character", ""),
+      EXACT_RW("look at me", "character", ""),
+      EXACT_RW("look at myself", "character", ""),
+      EXACT_RW("my skills", "aptitudes", ""),
+      EXACT_RW("show skills", "aptitudes", ""),
+      EXACT_RW("show my skills", "aptitudes", ""),
+      EXACT_RW("what are my skills", "aptitudes", ""),
+      EXACT_RW("what skills do i have", "aptitudes", ""),
+      EXACT_RW("my aptitudes", "aptitudes", ""),
+      EXACT_RW("show aptitudes", "aptitudes", ""),
+      EXACT_RW("attribute points", "aptitudes", ""),
+      EXACT_RW("my stats", "aptitudes", ""),
+      EXACT_RW("stat block", "aptitudes", ""),
+      EXACT_RW("power profile", "aptitudes", ""),
+      EXACT_RW("combat readiness", "aptitudes", ""),
+      EXACT_RW("build summary", "aptitudes", ""),
+      EXACT_RW("risk profile", "aptitudes", ""),
+      EXACT_RW("character archetype", "aptitudes", ""),
+      EXACT_RW("my reputation", "reputation", ""),
+      EXACT_RW("show reputation", "reputation", ""),
+      EXACT_RW("my standing", "reputation", ""),
+      EXACT_RW("show standing", "reputation", ""),
+      EXACT_RW("what is my reputation", "reputation", ""),
+      EXACT_RW("my rep", "reputation", ""),
+      EXACT_RW("show rep", "reputation", ""),
+      EXACT_RW("patron standing", "reputation", ""),
+      EXACT_RW("merchant standing", "reputation", ""),
+      EXACT_RW("my gear", "gear", ""),
+      EXACT_RW("show gear", "gear", ""),
+      EXACT_RW("show equipment", "equipment", ""),
+      EXACT_RW("my equipment", "equipment", ""),
+      EXACT_RW("my loadout", "loadout", ""),
+      EXACT_RW("show loadout", "loadout", ""),
+      EXACT_RW("what am i wearing", "loadout", ""),
+      EXACT_RW("my traits", "traits", ""),
+      EXACT_RW("show traits", "traits", ""),
+      EXACT_RW("my personality", "traits", ""),
+      EXACT_RW("my momentum", "momentum", ""),
+      EXACT_RW("show momentum", "momentum", ""),
+      EXACT_RW("how am i doing", "momentum", ""),
+      EXACT_RW("am i making progress", "momentum", ""),
+      EXACT_RW("story so far", "momentum", ""),
+      EXACT_RW("my arc", "momentum", ""),
+      EXACT_RW("how far have i come", "momentum", ""),
+      EXACT_RW("my perks", "perks", ""),
+      EXACT_RW("show perks", "perks", ""),
+      EXACT_RW("list perks", "perks", ""),
+      EXACT_RW("what perks do i have", "perks", ""),
+      EXACT_RW("my voice", "voice", ""),
+      EXACT_RW("show voice", "voice", ""),
+      EXACT_RW("how do i sound", "voice", ""),
+      EXACT_RW("my pronouns", "voice", ""),
+      EXACT_RW("what are my pronouns", "voice", ""),
+      EXACT_RW("voice style", "voice", ""),
+      EXACT_RW("my bio", "bio", ""),
+      EXACT_RW("show bio", "bio", ""),
+      EXACT_RW("my backstory", "bio", ""),
+      EXACT_RW("tell me my story", "bio", ""),
+      EXACT_RW("my biography", "bio", ""),
+      EXACT_RW("my corruption", "tainting", ""),
+      EXACT_RW("show corruption", "tainting", ""),
+      EXACT_RW("am i tainted", "tainting", ""),
+      EXACT_RW("how corrupted am i", "tainting", ""),
+      EXACT_RW("moral vector", "tainting", ""),
+      EXACT_RW("alignment drift", "tainting", ""),
+      EXACT_RW("social stance", "rapport", ""),
+      EXACT_RW("who matters here", "rapport", ""),
+      EXACT_RW("who can i talk to", "rapport", ""),
+      EXACT_RW("npc list", "rapport", ""),
+      EXACT_RW("list npcs", "rapport", ""),
+      EXACT_RW("people in the world", "rapport", ""),
+      EXACT_RW("logbook", "journal", ""),
+      EXACT_RW("questlog", "journal", ""),
+      EXACT_RW("quest log", "journal", ""),
+      EXACT_RW("diary", "journal", ""),
+      EXACT_RW("adventure log", "journal", ""),
+      EXACT_RW("adventure journal", "journal", ""),
+      EXACT_RW("my journal", "journal", ""),
+      EXACT_RW("story journal", "journal", ""),
+      EXACT_RW("my notebook", "notes", ""),
+      EXACT_RW("open my notes", "notes", ""),
+      EXACT_RW("note list", "notes", ""),
+      EXACT_RW("read my notes", "notes", ""),
+      EXACT_RW("exploration", "progress", ""),
+      EXACT_RW("exploration summary", "progress", ""),
+      EXACT_RW("world progress", "progress", ""),
+      EXACT_RW("sitrep", "progress", ""),
+      EXACT_RW("situation report", "progress", ""),
+      EXACT_RW("how far am i", "progress", ""),
+      EXACT_RW("story progress", "progress", ""),
+      EXACT_RW("where am i in the story", "progress", ""),
+      EXACT_RW("what just happened", "recap", ""),
+      EXACT_RW("recent messages", "recap", ""),
+      EXACT_RW("command recap", "recap", ""),
+      EXACT_RW("active quests", "objectives", ""),
+      EXACT_RW("current objectives", "objectives", ""),
+      EXACT_RW("what are my objectives", "objectives", ""),
+      EXACT_RW("story goals", "objectives", ""),
+      EXACT_RW("checklist", "objectives", ""),
+      EXACT_RW("my checklist", "objectives", ""),
+      EXACT_RW("my hp", "vitals", ""),
+      EXACT_RW("how hurt am i", "vitals", ""),
+      EXACT_RW("am i hurt", "vitals", ""),
+      EXACT_RW("my health", "vitals", ""),
+      EXACT_RW("mod order", "mods list", ""),
+      EXACT_RW("mods order", "mods list", ""),
+      EXACT_RW("shopping list", "wares", ""),
+      EXACT_RW("merchant stock", "wares", ""),
+      EXACT_RW("shop stock", "wares", ""),
+      EXACT_RW("whats for sale", "wares", ""),
+      EXACT_RW("what is for sale", "wares", ""),
+      EXACT_RW("market", "wares", ""),
+      EXACT_RW("open the shop", "wares", ""),
+      EXACT_RW("what is for sale here", "wares", ""),
+      EXACT_RW("save game", "save", ""),
+      EXACT_RW("load game", "load", ""),
+      EXACT_RW("quick save", "qs", ""),
+      EXACT_RW("quick load", "ql", ""),
+      EXACT_RW("save games", "saves", ""),
+      EXACT_RW("my saves", "saves", ""),
+      EXACT_RW("load slots", "saves", ""),
+      EXACT_RW("troubleshoot", "errors", ""),
+      EXACT_RW("engine diagnostics", "errors", ""),
+      EXACT_RW("session log", "errors", ""),
+      EXACT_RW("what went wrong", "errors", ""),
+      EXACT_RW("debug log", "errors", ""),
+      EXACT_RW("travel network", "waypoints", ""),
+      EXACT_RW("teleport network", "waypoints", ""),
+      EXACT_RW("nexus list", "waypoints", ""),
+      EXACT_RW("attuned points", "waypoints", ""),
+      EXACT_RW("breadcrumbs", "trail", ""),
+      EXACT_RW("my path back", "trail", ""),
+      EXACT_RW("movement trail", "trail", ""),
+      EXACT_RW("adjacent rooms", "nearby", ""),
+      EXACT_RW("local map", "nearby", ""),
+      EXACT_RW("around here", "nearby", ""),
+      EXACT_RW("lock status", "lockcheck", ""),
+      EXACT_RW("door locks", "lockcheck", ""),
+      EXACT_RW("detection risk", "noise", ""),
+      EXACT_RW("how stealthy", "noise", ""),
+      EXACT_RW("who is here", "who", ""),
+      EXACT_RW("anyone here", "who", ""),
+      EXACT_RW("npc role", "who", ""),
+      EXACT_RW("who is this npc", "who", ""),
+      EXACT_RW("last npc role", "who", ""),
+      EXACT_RW("who is the last npc", "who", ""),
+      EXACT_RW("last npc attitude", "who", ""),
+      EXACT_RW("npc attitude", "who", ""),
+      EXACT_RW("npc danger", "who", ""),
+      EXACT_RW("last npc danger", "who", ""),
+      EXACT_RW("how dangerous is this npc", "who", ""),
+      EXACT_RW("npc trust", "who", ""),
+      EXACT_RW("last npc trust", "who", ""),
+      EXACT_RW("npc leverage", "who", ""),
+      EXACT_RW("last npc leverage", "who", ""),
+      EXACT_RW("how much leverage do i have", "who", ""),
+      EXACT_RW("conversation topic", "topic", ""),
+      EXACT_RW("what did we talk about", "topic", ""),
+      EXACT_RW("topic mood", "topic", ""),
+      EXACT_RW("conversation mood", "topic", ""),
+      EXACT_RW("topic heat", "topic", ""),
+      EXACT_RW("conversation heat", "topic", ""),
+      EXACT_RW("is last npc here", "who", ""),
+      EXACT_RW("last npc here", "who", ""),
+      EXACT_RW("who did i last meet", "who", ""),
+      EXACT_RW("last person i met", "who", ""),
+      EXACT_RW("salvage", "loot", ""),
+      EXACT_RW("valuables here", "loot", ""),
+      EXACT_RW("show inventory", "inventory", ""),
+      EXACT_RW("show my inventory", "inventory", ""),
+      EXACT_RW("show me inventory", "inventory", ""),
+      EXACT_RW("show me my inventory", "inventory", ""),
+      EXACT_RW("what am i carrying", "inventory", ""),
+      EXACT_RW("what do i have", "inventory", ""),
+      EXACT_RW("belongings", "inventory", ""),
+      EXACT_RW("my stuff", "inventory", ""),
+      EXACT_RW("what i have on me", "inventory", ""),
+      EXACT_RW("read room", "describe", ""),
+      EXACT_RW("read the room", "describe", ""),
+      EXACT_RW("describe here", "describe", ""),
+      EXACT_RW("surroundings", "describe", ""),
+      EXACT_RW("full room", "describe", ""),
+      EXACT_RW("room description", "describe", ""),
+      EXACT_RW("what do i see", "scan", ""),
+      EXACT_RW("what can i see", "scan", ""),
+      EXACT_RW("scan room", "scan", ""),
+      EXACT_RW("scan the room", "scan", ""),
+      EXACT_RW("area scan", "scan", ""),
+      EXACT_RW("survey area", "scan", ""),
+      EXACT_RW("survey room", "scan", ""),
+      EXACT_RW("recon", "scan", ""),
+      EXACT_RW("recon pass", "scan", ""),
+      EXACT_RW("scout", "scan", ""),
+      EXACT_RW("scout area", "scan", ""),
+      EXACT_RW("room overview", "scan", ""),
+      EXACT_RW("tactical readout", "scan", ""),
+      EXACT_RW("show exits", "exits", ""),
+      EXACT_RW("list exits", "exits", ""),
+      EXACT_RW("where can i go", "exits", ""),
+      EXACT_RW("where to", "exits", ""),
+      EXACT_RW("connections", "exits", ""),
+      EXACT_RW("room connections", "exits", ""),
+      EXACT_RW("where am i", "where", ""),
+      EXACT_RW("where am i now", "where", ""),
+      EXACT_RW("show status", "status", ""),
+      EXACT_RW("my status", "status", ""),
+      EXACT_RW("quick status", "status", ""),
+      EXACT_RW("full status", "status", ""),
+      EXACT_RW("character status", "status", ""),
+      EXACT_RW("threat posture", "status", ""),
+      EXACT_RW("show score", "score", ""),
+      EXACT_RW("my score", "score", ""),
+      EXACT_RW("my points", "score", ""),
+      EXACT_RW("game stats", "score", ""),
+      EXACT_RW("what time is it", "time", ""),
+      EXACT_RW("what's the time", "time", ""),
+      EXACT_RW("whats the time", "time", ""),
+      EXACT_RW("what's the weather", "weather", ""),
+      EXACT_RW("whats the weather", "weather", ""),
+      EXACT_RW("how's the weather", "weather", ""),
+      EXACT_RW("hows the weather", "weather", ""),
+      EXACT_RW("climate", "weather", ""),
+      EXACT_RW("scene tone", "weather", ""),
+      EXACT_RW("atmosphere", "weather", ""),
+      EXACT_RW("light sources", "lights", ""),
+      EXACT_RW("show lights", "lights", ""),
+      EXACT_RW("fast travel", "fasttravel", ""),
+      EXACT_RW("fast-travel", "fasttravel", ""),
+      EXACT_RW("travel mood", "progress", ""),
+      {NULL, 0, NULL, NULL}};
   strip_terminal_punctuation(line);
   strip_trailing_politeness(line);
   strip_terminal_punctuation(line);
@@ -10947,7 +10961,8 @@ static void process_command(char *line, char *msg, size_t msgcap,
     *turn_advance = 0;
     snprintf(msg, msgcap,
              "Aeternitas64 stdin port — %d locations in the compiled dataset. "
-             "Regenerate data: py -3 tools/extract_aeternitas_world.py\n"
+             "Regenerate data: py -3 tools/extract_world_tables_from_exe.py; py -3 "
+             "tools/build_world_c_from_recovered_json.py\n"
              "Quick save / load file: %s",
              WORLD_ROOM_COUNT, g_save_path);
     return;
@@ -11796,7 +11811,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
     format_notes_filtered_body(body, sizeof body, "Todo notes", 1, NULL);
     append_dlc_mod_to_body(body, sizeof body,
                            aet_mods_character_notes_panel_suffix());
-    ui_fullscreen("NOTES TODO", body, pending_acc, did_fullscreen);
+    ui_fullscreen("NOTES - Todo", body, pending_acc, did_fullscreen);
     return;
   }
   if (!strcmp(line, "notes done") || !strcmp(line, "notes completed")) {
@@ -12901,7 +12916,8 @@ static void usage_stdout(void) {
       "Ship a small .exe; put saves and mods on a writable drive. First run may create\n"
       "sample pack under the active mods path. In-game:  help modding  (arrow-key guide).\n"
       "\n"
-      "Regenerate world:  py -3 tools/extract_aeternitas_world.py\n",
+      "Regenerate world:  py -3 tools/extract_world_tables_from_exe.py; py -3 "
+      "tools/build_world_c_from_recovered_json.py\n",
       stdout);
 }
 

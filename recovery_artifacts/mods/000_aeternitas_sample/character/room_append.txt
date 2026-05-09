@@ -1,1 +1,0 @@
-[Sample] %ROOMTITLE%: %COINS% coins, pack %PACK%, %READIED% readied — room panel DLC.

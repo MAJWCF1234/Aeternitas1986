@@ -1,1 +1,0 @@
-[Sample] Region color commentary after Nearby / map (%REGION%, %ROOM%).

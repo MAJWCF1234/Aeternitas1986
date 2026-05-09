@@ -1,1 +1,0 @@
-[Sample] %NAME% at %ROOMTITLE% — %THREATPOSTURE% stance, %MORALVECTOR% vector, %VOICESTYLE% voice.

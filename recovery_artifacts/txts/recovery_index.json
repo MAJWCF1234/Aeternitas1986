@@ -1,0 +1,184 @@
+{
+  "original_pe": {
+    "path": "D:\\light\\Aeternitas1986\\aeternitas64.exe",
+    "size": 482304,
+    "machine": "0x8664",
+    "image_base": "0x140000000",
+    "entry_point": "0x14000105f",
+    "size_of_image": 3751936,
+    "subsystem": 3,
+    "sections": [
+      {
+        "name": ".text",
+        "virtual_size": 180384,
+        "virtual_address": 4096,
+        "raw_size": 180736,
+        "raw_pointer": 1024
+      },
+      {
+        "name": ".data",
+        "virtual_size": 384,
+        "virtual_address": 188416,
+        "raw_size": 512,
+        "raw_pointer": 181760
+      },
+      {
+        "name": ".rdata",
+        "virtual_size": 273432,
+        "virtual_address": 192512,
+        "raw_size": 273920,
+        "raw_pointer": 182272
+      },
+      {
+        "name": ".eh_fram",
+        "virtual_size": 4,
+        "virtual_address": 466944,
+        "raw_size": 512,
+        "raw_pointer": 456192
+      },
+      {
+        "name": ".pdata",
+        "virtual_size": 5040,
+        "virtual_address": 471040,
+        "raw_size": 5120,
+        "raw_pointer": 456704
+      },
+      {
+        "name": ".xdata",
+        "virtual_size": 5272,
+        "virtual_address": 479232,
+        "raw_size": 5632,
+        "raw_pointer": 461824
+      },
+      {
+        "name": ".bss",
+        "virtual_size": 3238080,
+        "virtual_address": 487424,
+        "raw_size": 0,
+        "raw_pointer": 0
+      },
+      {
+        "name": ".idata",
+        "virtual_size": 4748,
+        "virtual_address": 3727360,
+        "raw_size": 5120,
+        "raw_pointer": 467456
+      },
+      {
+        "name": ".tls",
+        "virtual_size": 16,
+        "virtual_address": 3735552,
+        "raw_size": 512,
+        "raw_pointer": 472576
+      },
+      {
+        "name": ".rsrc",
+        "virtual_size": 536,
+        "virtual_address": 3739648,
+        "raw_size": 1024,
+        "raw_pointer": 473088
+      },
+      {
+        "name": ".reloc",
+        "virtual_size": 7748,
+        "virtual_address": 3743744,
+        "raw_size": 8192,
+        "raw_pointer": 474112
+      }
+    ]
+  },
+  "recovered_pe": null,
+  "toolchain": {
+    "compiler_hint": "GNU C23 / MinGW-W64 GCC 15.2.0; debug and COFF symbols present",
+    "evidence_files": [
+      "recovery_artifacts/txts/exe_symbols.txt",
+      "recovery_artifacts/txts/exe_disasm_all.txt",
+      "recovery_artifacts/txts/dwarf_info_index.txt",
+      "recovery_artifacts/txts/dwarf_decoded_lines.txt",
+      "recovery_artifacts/txts/exe_strings.txt"
+    ]
+  },
+  "source_units": [
+    "CRT_fp10.c",
+    "__initenv.c",
+    "__p___initenv.c",
+    "_newmode.c",
+    "aeternitas64_ascii.c",
+    "aeternitas_char_creation.c",
+    "aeternitas_char_description.c",
+    "aeternitas_mod_bootstrap.c",
+    "aeternitas_mod_guide.c",
+    "aeternitas_mods.c",
+    "aeternitas_world_generated.c",
+    "cinitexe.c",
+    "crt_handler.c",
+    "crtexe.c",
+    "cygming-crtbegin.c",
+    "cygming-crtend.c",
+    "dllargv.c",
+    "fake",
+    "gccmain.c",
+    "libgcc2.c",
+    "merr.c",
+    "mingw_helpers.c",
+    "mingw_matherr.c",
+    "natstart.c",
+    "pesect.c",
+    "pseudo-reloc-list.c",
+    "pseudo-reloc.c",
+    "strtok_r.c",
+    "tlsmcrt.c",
+    "tlssup.c",
+    "tlsthrd.c",
+    "ucrt___local_stdio_printf_options.c",
+    "ucrt___local_stdio_scanf_options.c",
+    "ucrt__getmainargs.c",
+    "ucrt_amsg_exit.c",
+    "ucrt_fprintf.c",
+    "ucrt_printf.c",
+    "ucrt_snprintf.c",
+    "ucrt_sscanf.c",
+    "ucrt_vfprintf.c",
+    "ucrt_vsnprintf.c",
+    "usermatherr.c",
+    "wildcard.c",
+    "xncommod.c",
+    "xthdloc.c",
+    "xtxtmode.c"
+  ],
+  "symbol_counts": {
+    "original_defined": 0,
+    "recovered_defined": 0,
+    "public_game_like_original": 0,
+    "missing_from_recovered_by_name": 0,
+    "extra_in_recovered_by_name": 0
+  },
+  "world_tables": {
+    "room_count": 161,
+    "dir_count": 19,
+    "has_slugs": true,
+    "has_titles": true,
+    "has_blurbs": true,
+    "has_regions": true,
+    "has_entities": true,
+    "visible_item_room_count": 160,
+    "visible_item_count": 512,
+    "hidden_item_room_count": 16,
+    "hidden_item_count": 19,
+    "npc_count": 10,
+    "merchant_count": 7,
+    "has_exits": true,
+    "known_table_symbols": [
+      "WORLD_SLUGS",
+      "WORLD_TITLES",
+      "WORLD_BLURBS",
+      "WORLD_REGIONS",
+      "WORLD_ROOM_DARK",
+      "WORLD_ROOM_ENTITIES",
+      "WORLD_EXITS",
+      "WORLD_ITEM_LISTS",
+      "WORLD_HIDDEN_ITEM_LISTS"
+    ]
+  },
+  "notable_symbols": []
+}

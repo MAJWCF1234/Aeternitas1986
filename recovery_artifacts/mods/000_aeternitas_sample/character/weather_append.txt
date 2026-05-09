@@ -1,1 +1,0 @@
-[Sample] %WEATHER% at %TEMPC%C in %REGION% — seasonal DLC after Weather.

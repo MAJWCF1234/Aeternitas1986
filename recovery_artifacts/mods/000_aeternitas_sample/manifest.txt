@@ -1,4 +1,0 @@
-# Aeternitas64 sample pack (tutorial). Safe to delete.
-priority=-100
-id=aeternitas_sample
-title=Built-in tutorial / mod smoke test

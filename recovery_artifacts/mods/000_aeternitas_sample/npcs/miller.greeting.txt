@@ -1,2 +1,0 @@
-Ah — %NAME%, you've found the sample pack (%ROLE%). Modders use manifests
-for load order; try  talk about modding  if the topic file loaded.

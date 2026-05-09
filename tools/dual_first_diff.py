@@ -28,6 +28,7 @@ from harvest_original_playthrough import (  # noqa: E402
     repo_root,
     stable_gate_line_index,
 )
+from repo_paths import golden_playthrough_dir  # noqa: E402
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 TMP_PATH_RE = re.compile(
@@ -152,7 +153,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--corpus",
-        default=str(root / "recovery_artifacts" / "golden_playthrough"),
+        default=str(golden_playthrough_dir()),
         help="Directory holding <label>.input.txt scripts (used with --label).",
     )
     parser.add_argument(

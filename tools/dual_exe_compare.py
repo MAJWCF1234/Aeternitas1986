@@ -17,6 +17,7 @@ if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 
 from harvest_original_playthrough import normalize_output, repo_root
+from repo_paths import golden_playthrough_dir  # noqa: E402
 
 # Strip per-run Temp paths so dual runs (different tempfile roots) still diff cleanly.
 AET_TMP_PATH_RE = re.compile(
@@ -123,7 +124,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--corpus",
-        default=str(root / "recovery_artifacts" / "golden_playthrough"),
+        default=str(golden_playthrough_dir()),
         help="Directory with manifest.json and *.input.txt (unlisted *.input.txt next to manifest are included automatically)",
     )
     parser.add_argument(

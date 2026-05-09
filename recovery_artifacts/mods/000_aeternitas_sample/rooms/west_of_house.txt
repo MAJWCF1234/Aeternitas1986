@@ -1,6 +1,0 @@
-You stand west of a modest house that seems to have misplaced its
-century. The path is honest dirt; the mailbox is stubborn metal.
-
-[000_aeternitas_sample] This blurb comes from your mods folder — a
-tutorial pack the game created on first run. Delete mods/000_aeternitas_sample to restore the original description, or
-add a higher-priority DLC folder to override this one.
