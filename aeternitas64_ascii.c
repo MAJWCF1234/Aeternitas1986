@@ -336,7 +336,7 @@ static int g_causal_head;
 static int g_causal_count;
 
 #define TRADE_RING 32
-#define TRADE_W 224
+#define TRADE_W 320
 static char g_trade_ring[TRADE_RING][TRADE_W];
 static int g_trade_head;
 static int g_trade_count;
@@ -1194,6 +1194,21 @@ static void print_wrapped_paragraph(const char *text, int indent, int width) {
   putchar('\n');
 }
 
+static void seed_rng_once(void) {
+  static int seeded = 0;
+  unsigned seed;
+  if (seeded) return;
+  seed = (unsigned)time(NULL) ^ (unsigned)clock();
+#if defined(_WIN32)
+  seed ^= (unsigned)GetTickCount();
+  seed ^= (unsigned)GetCurrentProcessId();
+#else
+  seed ^= (unsigned)getpid();
+#endif
+  srand(seed);
+  seeded = 1;
+}
+
 static void splash_wait(void) {
   static const char *const ascii_title[] = {
       "                            ,;                 ,;           L.               "
@@ -1226,7 +1241,7 @@ static void splash_wait(void) {
       "                                 "};
   char buf[32];
   int blink;
-  srand((unsigned)time(NULL));
+  seed_rng_once();
   clear_frame();
   printf("%sA:\\> AETERNITAS.EXE%s\n", C_BOOT_HI, C_RESET);
   fflush(stdout);
@@ -1568,6 +1583,15 @@ static void trade_history_push_row(const char *row) {
   g_trade_ring[g_trade_head][n] = '\0';
   g_trade_head = (g_trade_head + 1) % TRADE_RING;
   if (g_trade_count < TRADE_RING) g_trade_count++;
+}
+
+static void copy_capped(char *dst, size_t cap, const char *src) {
+  size_t n;
+  if (!dst || cap == 0) return;
+  if (!src) src = "";
+  n = strnlen(src, cap - 1);
+  memcpy(dst, src, n);
+  dst[n] = '\0';
 }
 
 static void trade_history_push(const char *kind, const char *merchant,
@@ -2541,9 +2565,8 @@ static void barter_set(int mode, const char *merchant, const char *item,
   g_barter_price = quoted_price;
   g_barter_list_price = list_price;
   g_barter_expire_turn = expire_turn;
-  snprintf(g_barter_merchant, sizeof g_barter_merchant, "%s",
-           merchant ? merchant : "");
-  snprintf(g_barter_item, sizeof g_barter_item, "%s", item ? item : "");
+  copy_capped(g_barter_merchant, sizeof g_barter_merchant, merchant);
+  copy_capped(g_barter_item, sizeof g_barter_item, item);
 }
 
 static int barter_quote_sync(void) {
@@ -3016,10 +3039,18 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
               }
               if (!fgets(buf, sizeof buf, fp)) goto bad;
               chomp_line(buf);
-              snprintf(g_barter_merchant, sizeof g_barter_merchant, "%s", buf);
+              if (strlen(buf) >= sizeof g_barter_merchant) {
+                barter_clear();
+                goto bad;
+              }
+              copy_capped(g_barter_merchant, sizeof g_barter_merchant, buf);
               if (!fgets(buf, sizeof buf, fp)) goto bad;
               chomp_line(buf);
-              snprintf(g_barter_item, sizeof g_barter_item, "%s", buf);
+              if (strlen(buf) >= sizeof g_barter_item) {
+                barter_clear();
+                goto bad;
+              }
+              copy_capped(g_barter_item, sizeof g_barter_item, buf);
               if (!fgets(buf, sizeof buf, fp)) goto bad;
               chomp_line(buf);
             }
@@ -3604,7 +3635,7 @@ static void expand_state_mod_text(const char *src, char *dst, size_t dstcap) {
   char readybuf[MAX_ITEM_LEN + 4];
   char npcbuf[MAX_ITEM_LEN + 4], focusbuf[MAX_ITEM_LEN + 4];
   char lasttopicb[AETER_LAST_TOPIC_CAP + 8], lasttopicmoodb[32], topicheatb[16];
-  char worldroomsb[16], visitedb[16], notesb[16], exploreb[8];
+  char worldroomsb[16], visitedb[16], notesb[16], exploreb[16];
   char strb[12], agib[12], intb[12], wisb[12], chab[12], corb[12];
   char powerb[12], resolveb[12], cunningb[12], presenceb[12], hppctb[12];
   char riskb[12], temperb[12], archetypeb[40], risklabelb[20];
@@ -3614,7 +3645,7 @@ static void expand_state_mod_text(const char *src, char *dst, size_t dstcap) {
   char npcdisplayb[64], npcroleb[24], npcdangerb[20], npctrustb[24], npcleverageb[24];
   char npcpretty[64], lastnpcpretty[64];
   char lastnpcdisplayb[64], lastnpcroleb[24], lastnpcattitudeb[24], lastnpcdangerb[20], lastnpctrustb[24], lastnpcleverageb[24];
-  char ageb[32], genderb[16], classb[40], raceb[48], buildb[32], muscleb[24];
+  char ageb[32], genderb[24], classb[40], raceb[48], buildb[32], muscleb[32];
   char vq[32];
   const char *cortier;
   int visited_n, explore_pct, hp_pct;
@@ -8115,7 +8146,8 @@ static void cmd_trade_sell_all_except(const char *except_csv, char *msg,
     }
     if (picked < 0) break;
     before = g_coins;
-    snprintf(one, sizeof one, "%s", g_inv[picked]);
+    memcpy(one, g_inv[picked], sizeof one);
+    one[sizeof one - 1] = '\0';
     cmd_trade_sell(one, msg, msgcap);
     if (!strncmp(msg, "Sold ", 5)) {
       sold++;
@@ -9444,17 +9476,20 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
     pc_format_summary(sum, sizeof sum);
     exxp[0] = '\0';
     if (ex && ex[0]) expand_mod_overlay_flat(ex, exxp, sizeof exxp);
+    msg[0] = '\0';
     if (world_room_is_dark(g_room) && !player_has_light_source()) {
-      snprintf(msg, msgcap,
-               "In the dark you take stock by touch and habit — enough to "
-               "remember who you are.\n\n%s%s%s",
-               sum, exxp[0] ? "\n\n" : "", exxp);
+      body_append(msg, msgcap,
+                  "In the dark you take stock by touch and habit — enough to "
+                  "remember who you are.\n\n%s",
+                  sum);
+      if (exxp[0]) body_append(msg, msgcap, "\n\n%s", exxp);
     } else {
-      snprintf(msg, msgcap,
-               "%s\n\n"
-               "(Go deeper:  identity  or  character brief  — same compact "
-               "sheet;  character  or  sheet  — full portrait.)%s%s",
-               sum, exxp[0] ? "\n\n" : "", exxp);
+      body_append(msg, msgcap,
+                  "%s\n\n"
+                  "(Go deeper:  identity  or  character brief  — same compact "
+                  "sheet;  character  or  sheet  — full portrait.)",
+                  sum);
+      if (exxp[0]) body_append(msg, msgcap, "\n\n%s", exxp);
     }
     return;
   }
@@ -11292,8 +11327,14 @@ static void grant_starting_loadout(void) {
     inv_add_unique(chosen);
     {
       char armored[MAX_ITEM_LEN];
-      snprintf(armored, sizeof armored, "%s_armor", chosen);
-      inv_add_unique(armored);
+      static const char suffix[] = "_armor";
+      size_t base_len = strlen(chosen);
+      size_t suffix_len = strlen(suffix);
+      if (base_len + suffix_len < sizeof armored) {
+        memcpy(armored, chosen, base_len);
+        memcpy(armored + base_len, suffix, suffix_len + 1);
+        inv_add_unique(armored);
+      }
     }
   }
 
@@ -12281,8 +12322,8 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
     int has_reinforce = 0;
     int has_edge = 0;
     int mods_used = 0;
-    char built_name[96];
-    snprintf(out_name, out_name_cap, "%s", base_tool);
+    char built_name[160];
+    copy_capped(out_name, out_name_cap, base_tool);
     snprintf(d1, d1cap, "Existing tool detected.");
     snprintf(d2, d2cap, "Applying material deltas.");
     if (d3cap) d3[0] = '\0';
@@ -12311,22 +12352,22 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
         mods_used++;
       }
     }
-    snprintf(built_name, sizeof built_name, "%s", base_tool);
+    copy_capped(built_name, sizeof built_name, base_tool);
     if (has_wrap) {
-      char t[96];
+      char t[192];
       snprintf(t, sizeof t, "Wrapped %s", built_name);
-      snprintf(built_name, sizeof built_name, "%s", t);
+      copy_capped(built_name, sizeof built_name, t);
     }
     if (has_reinforce) {
-      char t[96];
+      char t[192];
       snprintf(t, sizeof t, "Reinforced %s", built_name);
-      snprintf(built_name, sizeof built_name, "%s", t);
+      copy_capped(built_name, sizeof built_name, t);
     } else if (has_edge) {
-      char t[96];
+      char t[192];
       snprintf(t, sizeof t, "Honed %s", built_name);
-      snprintf(built_name, sizeof built_name, "%s", t);
+      copy_capped(built_name, sizeof built_name, t);
     }
-    snprintf(out_name, out_name_cap, "%s", built_name);
+    copy_capped(out_name, out_name_cap, built_name);
     snprintf(d2, d2cap, "Applying %d material modifier(s).", mods_used + synergy / 3);
     if (has_reinforce)
       snprintf(d3, d3cap, "Structure reinforced by hard/edged materials.");
@@ -13461,8 +13502,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
     }
     aet_mods_format_status(st, sizeof st);
     {
-      size_t lo = strlen(body);
-      snprintf(body + lo, sizeof body - lo, "\n--- Mod status ---\n%s", st);
+      body_append(body, sizeof body, "\n--- Mod status ---\n%s", st);
     }
     ui_fullscreen("MODS DOCTOR", body, pending_acc, did_fullscreen);
     return;
