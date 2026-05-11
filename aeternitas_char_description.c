@@ -1035,7 +1035,7 @@ static void stat_carriage_line(const AetPcSave *pc, char *buf, size_t bufcap) {
 
   if (nat >= 2) {
     if (race_reads_construct_adjacent(pc))
-      snprintf(buf, bufcap,
+    snprintf(buf, bufcap,
                "Wear and torque have marked you: especially %s and %s "
                "telegraph first in motion and in a fight.",
                t[atmax[0]].name, t[atmax[1]].name);
@@ -1058,10 +1058,10 @@ static void stat_carriage_line(const AetPcSave *pc, char *buf, size_t bufcap) {
     for (i = 0; i < 9; i++) {
       if (i == imax) continue;
       if (second < 0 || t[i].v > t[second].v) second = i;
-    }
-    if (second >= 0 && t[second].v >= 12) {
+  }
+  if (second >= 0 && t[second].v >= 12) {
       if (race_reads_construct_adjacent(pc))
-        snprintf(buf, bufcap,
+    snprintf(buf, bufcap,
                  "Wear and torque have marked you: especially %s and %s "
                  "telegraph first in motion and in a fight.",
                  t[imax].name, t[second].name);
@@ -1074,10 +1074,10 @@ static void stat_carriage_line(const AetPcSave *pc, char *buf, size_t bufcap) {
         snprintf(buf, bufcap,
                  "Wear and habit have marked you: especially %s and %s are your "
                  "calling cards in motion and in a fight.",
-                 t[imax].name, t[second].name);
-    } else {
+             t[imax].name, t[second].name);
+  } else {
       if (race_reads_construct_adjacent(pc))
-        snprintf(buf, bufcap,
+    snprintf(buf, bufcap,
                  "Wear and torque have marked you: %s is the trait strangers "
                  "parse through plating when they take your measure.",
                  t[imax].name);
@@ -1090,7 +1090,7 @@ static void stat_carriage_line(const AetPcSave *pc, char *buf, size_t bufcap) {
         snprintf(buf, bufcap,
                  "Wear and habit have marked you: %s is the trait strangers feel "
                  "first when they take your measure.",
-                 t[imax].name);
+             t[imax].name);
     }
   }
 }
@@ -1229,9 +1229,9 @@ static void race_extra_clause(const AetPcSave *pc, char *buf, size_t bufcap) {
       snprintf(buf, bufcap,
                "%s routing bends your outline away from the human mean — joints "
                "and proportions answer to a stranger blueprint.",
-               r);
-      return;
-    }
+             r);
+    return;
+  }
     snprintf(buf, bufcap,
              "%s blood bends your outline away from the human mean — joints "
              "and proportions answer to a stranger blueprint.",
@@ -1257,10 +1257,10 @@ static void race_extra_clause(const AetPcSave *pc, char *buf, size_t bufcap) {
              "profession.",
              r);
   else
-    snprintf(buf, bufcap,
-             "%s traits lace through skin and stance until race reads before "
-             "profession.",
-             r);
+  snprintf(buf, bufcap,
+           "%s traits lace through skin and stance until race reads before "
+           "profession.",
+           r);
 }
 
 void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
@@ -1319,11 +1319,11 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
     const char *aa = indef_article_noun(b);
     if (strchr(h, '(') != NULL) {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+  append(out, outcap, &n,
                "You stand %s on %s %s frame — %s, lintels read as suggestions. ",
                h, aa, b, musfat);
       else if (race_is_slime_like(pc))
-        append(out, outcap, &n,
+  append(out, outcap, &n,
                "You stand %s on %s %s frame — %s, doorways learn patience. ", h,
                aa, b, musfat);
       else
@@ -1422,7 +1422,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
 
   if (tagsbuf[0]) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+  append(out, outcap, &n,
              "Before strangers settle on your face, they swallow the whole "
              "silhouette — %s. That first read rides junction cant, %s, and "
              "%s; detail "
@@ -1453,20 +1453,20 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
          S(pc->hair_style, "plainly"));
   if (ieq(pc->hair_style, "Bald")) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "your dome stays cleared — sensor rings and bare laminate honest "
              "to hazard-light and witness alike. ");
     else if (race_is_slime_like(pc))
-      append(out, outcap, &n,
+  append(out, outcap, &n,
              "your crown stays slick — meniscus offers combs nothing to "
              "purchase, honest to drift and witness alike. ");
     else
-      append(out, outcap, &n,
+  append(out, outcap, &n,
              "your scalp stays bare and blunt, skull honest to weather and "
              "witness alike. ");
   }
   if (race_reads_construct_adjacent(pc)) {
-    append(out, outcap, &n,
+  append(out, outcap, &n,
            "%s finish rides chassis lines your %s specification threaded "
            "through mimic bone — seam, sheen, and stubborn uptime tell their "
            "own weather. Up close the palette sharpens: pores, ",
@@ -1550,7 +1550,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
          hips_clause_for_pc(pc), butt_clause_for_pc(pc), statbuf);
 
   if (race_reads_construct_adjacent(pc))
-    append(out, outcap, &n,
+  append(out, outcap, &n,
            "Strip the costumes away and the ledger reads plain: you are %s, "
            "and you are %s — coolant traces and stress bloom belong to labor; "
            "ink belongs to vows, whims, or brands someone else thought "
@@ -1579,7 +1579,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
 
   if (pc->cor > 0) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+  append(out, outcap, &n,
              "Something not quite wholesome leaks through specification — not "
              "always visible as crack or sigil, more like thermal creep across "
              "housing, or an angle in your calibration map that arrives half a "
@@ -1604,7 +1604,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
   /* --- Paragraph 5: intimate anatomy (continuous prose) --- */
   if (ieq(pc->genitalia, "None")) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "Beneath cloth your interface stays smooth and deliberate — no "
              "coupling advertises intent to every glance; thermal budget "
              "concentrates elsewhere, and pleasure, when it finds you, borrows "
@@ -1624,7 +1624,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
              "and patience rather than obvious plumbing shouting its name.\n\n");
   } else {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "Under travel-stained linen your sex registers as %s — thermal "
              "mass banked close, weight held private until intent or daring "
              "hauls fabric aside and lets breath meet truth.\n\n",
@@ -1645,7 +1645,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
 
   if (skip_breast_cc && label_is_none(breasts)) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "Your chassis stays flat and martial — %s torque where softer "
              "curves might swell, panel line drawing clean under strain; linen "
              "lies flat unless wind or labor pulls it honest.\n\n",
@@ -1661,10 +1661,10 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
              "Your chest stays flat and martial — %s muscle where softer curves "
              "might swell, pectoral line drawing clean under strain; linen lies "
              "flat unless wind or labor pulls it honest.\n\n",
-             S(pc->muscle_tone, "trained"));
+           S(pc->muscle_tone, "trained"));
   } else if (!describe_breasts) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "Your torso follows a narrow male line — shoulders and servos do "
              "most of the talking, plating visible only when breath runs deep; "
              "whatever curves other templates promised stay traded for leverage "
@@ -1683,7 +1683,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
              "and reach.\n\n");
   } else if (label_is_automatic(breasts)) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "Breasts match your frame rather than argue with it — mass sized "
              "to height and habit, sway tuned to stride, neither trophy nor "
              "afterthought unless you bent the mirror until it lied for you. "
@@ -1705,7 +1705,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
              "leather rides honest.\n\n");
   } else if (label_is_none(breasts)) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "Your chest stays deliberately minimal — flat ambition held under "
              "cloth, ports tuned to chill and friction more than display.\n\n");
     else if (race_is_slime_like(pc))
@@ -1741,7 +1741,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
   if (pen) {
     if (label_is_none(cock)) {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Between your thighs hangs hardware the world refuses to "
                "mythologize yet — ordinary reach for your scale, hydraulic rise "
                "when demand insists, crown flushed when thought wanders where "
@@ -1760,7 +1760,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
                "hands have not earned passage.\n\n");
     } else if (label_is_automatic(cock)) {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Your shaft tracks specification and bearing — thickness and "
                "reach that look mapped rather than staged behind perfume; "
                "arousal writes honesty along routing where thumb and mouth "
@@ -1779,7 +1779,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
                "and mouth eventually argue jurisdiction.\n\n");
     } else {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Between your thighs hangs a %s cock — mass enough to crowd "
                "routing through underwear into betrayal, outline stubborn "
                "beneath cloth when humor or heat climbs your throat.\n\n",
@@ -1795,12 +1795,12 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
                "Between your thighs hangs a %s cock — weight enough to crowd "
                "underwear into betrayal, outline stubborn beneath cloth when "
                "humor or heat climbs your throat.\n\n",
-               cock);
+             cock);
     }
 
     if (label_is_none(balls_d)) {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Below your shaft the housing stays spare — no paired reservoir "
                "to sway with your stride; torque and thermal stack ride the "
                "shaft and root alone when want crowds thought aside.\n\n");
@@ -1816,7 +1816,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
                "alone when want crowds thought aside.\n\n");
     } else if (label_is_automatic(balls_d)) {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Your sack carries compliance that fits the rest of you — swing "
                "and heft tuned to thigh and belly, tight enough to remind you "
                "when you sit wrong, quiet enough to forget until someone's "
@@ -1835,7 +1835,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
                "makes memory sharp.\n\n");
     } else {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Your balls settle as %s — another torque datum that changes how "
                "harness straps bite, how coolant rinses feel merciless, how "
                "standing naked reads as boast or exhaustion depending on who "
@@ -1853,24 +1853,24 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
                "Your balls settle as %s — another datum that changes how saddle "
                "leathers bite, how baths feel too hot, how standing naked "
                "reads as boast or exhaustion depending on who watches.\n\n",
-               balls_d);
+             balls_d);
     }
 
     if (fr > 0 && pen && !label_is_none(cock)) {
       if (label_is_none(balls_d)) {
         if (fr == 1) {
           if (race_reads_construct_adjacent(pc))
-            append(out, outcap, &n,
+        append(out, outcap, &n,
                    "A restless stack gathers behind your root — not the swing "
                    "of reservoirs but an inward charge, enough to blunt focus "
                    "when the room goes quiet.\n\n");
           else if (race_is_slime_like(pc))
-            append(out, outcap, &n,
+        append(out, outcap, &n,
                    "A restless knot gathers behind your root — not the swing of "
                    "ballast but an inward swell, enough to blunt focus when the "
                    "room goes quiet.\n\n");
-          else
-            append(out, outcap, &n,
+      else
+        append(out, outcap, &n,
                    "A restless knot gathers behind your root — not the swing of "
                    "weight but an inward insistence, enough to blunt focus when "
                    "the room goes quiet.\n\n");
@@ -1961,13 +1961,13 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
   if (vag) {
     if (!label_is_none(pussy) && !ieq(pussy, "None")) {
       if (race_reads_construct_adjacent(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Between your thighs, %s — folds, flush, and slick yours alone; "
                "thermal bloom banks behind curls until welcome writes its own "
                "permission.\n\n",
-               pussy);
+             pussy);
       else if (race_is_slime_like(pc))
-        append(out, outcap, &n,
+      append(out, outcap, &n,
                "Between your thighs, %s — folds, flush, and slick yours alone; "
                "warmth pools behind curls until welcome writes its own "
                "permission.\n\n",
@@ -1987,7 +1987,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
 
   if (pen && vag) {
     if (race_reads_construct_adjacent(pc))
-      append(out, outcap, &n,
+    append(out, outcap, &n,
              "You carry cock and cunt together — neither subroutine cancels the "
              "other; the pairing reads as deliberate integration, appetite "
              "doubled rather than confused, and every lover learns two "
@@ -2009,18 +2009,18 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
   if (describe_breasts && !skip_breast_cc && lr > 0) {
     lr_used = 1;
     if (race_reads_construct_adjacent(pc)) {
-      if (lr == 1)
-        append(out, outcap, &n,
+    if (lr == 1)
+      append(out, outcap, &n,
                "White coolant gathers with a restless, faint fullness — feed "
                "circuits stay awake even when no one watches; nipples load "
                "sensors at chill or unwelcome signal.\n\n");
-      else if (lr == 2)
-        append(out, outcap, &n,
+    else if (lr == 2)
+      append(out, outcap, &n,
                "Your feed lines strain with steady insistence — let-down lurks "
                "behind every rough cheer, every accidental squeeze; shirts "
                "become negotiations.\n\n");
-      else
-        append(out, outcap, &n,
+    else
+      append(out, outcap, &n,
                "Your reservoirs pack tight — one rough breath could loose more "
                "than calibration; ache spills toward throat and belly until "
                "kindness or cruelty drains you.\n\n");
@@ -2060,17 +2060,17 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
   } else if (!lr_used && lr > 0 && vag) {
     lr_used = 1;
     if (race_reads_construct_adjacent(pc)) {
-      if (lr == 1)
+    if (lr == 1)
         append(out, outcap, &n,
                "A trace fullness lingers in your chest even when your breasts "
                "stay modest — feed circuits remember duty whether curves "
                "advertise or not.\n\n");
-      else if (lr == 2)
+    else if (lr == 2)
         append(out, outcap, &n,
                "Lactation demands attention without loud curves on display — "
                "condensate rings become their own confession.\n\n");
-      else
-        append(out, outcap, &n,
+    else
+      append(out, outcap, &n,
                "Your body wants to weep milk no matter how you bind or hide "
                "it — routing and reservoir insist where silhouette stays shy.\n\n");
     } else if (race_is_slime_like(pc)) {
@@ -2106,12 +2106,12 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
     lr_used = 1;
     if (race_reads_construct_adjacent(pc)) {
       if (lr == 1)
-        append(out, outcap, &n,
+  append(out, outcap, &n,
                "Lactation gathers anyway — feed circuits rude enough to wake "
                "behind whatever story your chest tells the room; nipples betray "
                "chill and input alike.\n\n");
       else if (lr == 2)
-        append(out, outcap, &n,
+  append(out, outcap, &n,
                "Your feed lines insist despite the harness logic — condensate "
                "streaks become their own rumor across plate or modesty "
                "alike.\n\n");

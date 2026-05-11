@@ -1,1 +1,1 @@
-[Sample] %ROOMTITLE%: %COINS% coins, pack %PACK%, %READIED% readied — room panel DLC.
+[Sample] %ROOMTITLE%: purse %PURSE% (%PURSESHORT%), pack %PACK%, %READIED% readied — room panel DLC.

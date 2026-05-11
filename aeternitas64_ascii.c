@@ -31,6 +31,10 @@
 #include <io.h>
 #endif
 
+static const char *base_world_room_entity(int room) { return world_room_entity(room); }
+static const char *runtime_room_entity(int room);
+#define world_room_entity runtime_room_entity
+
 static int aet_autotest(void) {
   const char *e = getenv("AETER_AUTOTEST");
   return e != NULL && e[0] != '\0' && strcmp(e, "0") != 0;
@@ -301,8 +305,21 @@ static int g_diag_count;
 static char g_notes[MAX_NOTES][NOTE_LEN];
 static int g_note_n;
 #define AETER_REP_MAX 32
+/** Room.entity NPC slugs not on the merchant roster (parallel slug-keyed table). */
+#define AETER_SOC_NPC_MAX 32
 static int g_merchant_rep[AETER_REP_MAX];
+/** Per-merchant-index social bars (0–100); stage is derived from these + patron rep. */
+static unsigned char g_npc_friendship[AETER_REP_MAX];
+static unsigned char g_npc_romance[AETER_REP_MAX];
+/** Last turn this NPC received a social bump (talk/gift); 0 = never. */
+static int g_npc_last_social_turn[AETER_REP_MAX];
+static char g_soc_npc_slug[AETER_SOC_NPC_MAX][MAX_ITEM_LEN];
+static unsigned char g_soc_npc_friendship[AETER_SOC_NPC_MAX];
+static unsigned char g_soc_npc_romance[AETER_SOC_NPC_MAX];
+static int g_soc_npc_last_turn[AETER_SOC_NPC_MAX];
 static int g_verbose_room;
+static int g_npc_validation_checked;
+static int g_npc_validation_warnings;
 /** -1 follow env, 0 force mono, 1 force ANSI (session + save hintena/colorov). */
 static int g_settings_color_ov = -1;
 static int g_hints_pref = 1;
@@ -317,6 +334,34 @@ static int g_craft_proficiency = 1;
 static char g_causal_ring[CAUSAL_RING][CAUSAL_W];
 static int g_causal_head;
 static int g_causal_count;
+
+#define TRADE_RING 32
+#define TRADE_W 224
+static char g_trade_ring[TRADE_RING][TRADE_W];
+static int g_trade_head;
+static int g_trade_count;
+enum {
+  BARTER_NONE = 0,
+  BARTER_BUY = 1,
+  BARTER_SELL = 2
+};
+static int g_barter_mode;
+static int g_barter_price;
+static int g_barter_list_price;
+static int g_barter_expire_turn;
+static char g_barter_merchant[MAX_ITEM_LEN];
+static char g_barter_item[MAX_ITEM_LEN];
+
+typedef struct {
+  const char *slug;
+  const char *morning_room;
+  const char *afternoon_room;
+  const char *evening_room;
+  const char *night_room;
+} AetNpcRoutine;
+
+static int npc_routine_count(void);
+static const AetNpcRoutine *npc_routine_at(int idx);
 
 typedef struct {
   int verbose_room;
@@ -341,6 +386,22 @@ typedef struct {
   int note_n;
   char notes[MAX_NOTES][NOTE_LEN];
   int merchant_rep[AETER_REP_MAX];
+  unsigned char npc_friendship[AETER_REP_MAX];
+  unsigned char npc_romance[AETER_REP_MAX];
+  int npc_last_social_turn[AETER_REP_MAX];
+  char soc_npc_slug[AETER_SOC_NPC_MAX][MAX_ITEM_LEN];
+  unsigned char soc_npc_friendship[AETER_SOC_NPC_MAX];
+  unsigned char soc_npc_romance[AETER_SOC_NPC_MAX];
+  int soc_npc_last_turn[AETER_SOC_NPC_MAX];
+  int trade_head;
+  int trade_count;
+  char trade_ring[TRADE_RING][TRADE_W];
+  int barter_mode;
+  int barter_price;
+  int barter_list_price;
+  int barter_expire_turn;
+  char barter_merchant[MAX_ITEM_LEN];
+  char barter_item[MAX_ITEM_LEN];
   AetPcSave pc;
 } AetGameSnapshot;
 
@@ -374,6 +435,25 @@ static void snapshot_capture(AetGameSnapshot *dst) {
   dst->note_n = g_note_n;
   memcpy(dst->notes, g_notes, sizeof g_notes);
   memcpy(dst->merchant_rep, g_merchant_rep, sizeof g_merchant_rep);
+  memcpy(dst->npc_friendship, g_npc_friendship, sizeof g_npc_friendship);
+  memcpy(dst->npc_romance, g_npc_romance, sizeof g_npc_romance);
+  memcpy(dst->npc_last_social_turn, g_npc_last_social_turn,
+         sizeof g_npc_last_social_turn);
+  memcpy(dst->soc_npc_slug, g_soc_npc_slug, sizeof g_soc_npc_slug);
+  memcpy(dst->soc_npc_friendship, g_soc_npc_friendship,
+         sizeof g_soc_npc_friendship);
+  memcpy(dst->soc_npc_romance, g_soc_npc_romance, sizeof g_soc_npc_romance);
+  memcpy(dst->soc_npc_last_turn, g_soc_npc_last_turn,
+         sizeof g_soc_npc_last_turn);
+  dst->trade_head = g_trade_head;
+  dst->trade_count = g_trade_count;
+  memcpy(dst->trade_ring, g_trade_ring, sizeof g_trade_ring);
+  dst->barter_mode = g_barter_mode;
+  dst->barter_price = g_barter_price;
+  dst->barter_list_price = g_barter_list_price;
+  dst->barter_expire_turn = g_barter_expire_turn;
+  memcpy(dst->barter_merchant, g_barter_merchant, sizeof g_barter_merchant);
+  memcpy(dst->barter_item, g_barter_item, sizeof g_barter_item);
   pc_capture(&dst->pc);
 }
 
@@ -405,6 +485,25 @@ static void snapshot_restore(const AetGameSnapshot *src) {
   g_note_n = src->note_n;
   memcpy(g_notes, src->notes, sizeof g_notes);
   memcpy(g_merchant_rep, src->merchant_rep, sizeof g_merchant_rep);
+  memcpy(g_npc_friendship, src->npc_friendship, sizeof g_npc_friendship);
+  memcpy(g_npc_romance, src->npc_romance, sizeof g_npc_romance);
+  memcpy(g_npc_last_social_turn, src->npc_last_social_turn,
+         sizeof g_npc_last_social_turn);
+  memcpy(g_soc_npc_slug, src->soc_npc_slug, sizeof g_soc_npc_slug);
+  memcpy(g_soc_npc_friendship, src->soc_npc_friendship,
+         sizeof g_soc_npc_friendship);
+  memcpy(g_soc_npc_romance, src->soc_npc_romance, sizeof g_soc_npc_romance);
+  memcpy(g_soc_npc_last_turn, src->soc_npc_last_turn,
+         sizeof g_soc_npc_last_turn);
+  g_trade_head = src->trade_head;
+  g_trade_count = src->trade_count;
+  memcpy(g_trade_ring, src->trade_ring, sizeof g_trade_ring);
+  g_barter_mode = src->barter_mode;
+  g_barter_price = src->barter_price;
+  g_barter_list_price = src->barter_list_price;
+  g_barter_expire_turn = src->barter_expire_turn;
+  memcpy(g_barter_merchant, src->barter_merchant, sizeof g_barter_merchant);
+  memcpy(g_barter_item, src->barter_item, sizeof g_barter_item);
   pc_restore(&src->pc);
 }
 
@@ -413,6 +512,10 @@ static int count_waypoints(int only_visited);
 static void format_objectives_body(char *body, size_t cap);
 static void format_progress_body(char *body, size_t cap);
 static void format_waypoints_body(char *body, size_t cap);
+static void format_trade_history_body(char *body, size_t cap);
+static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap);
+static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap);
+static void item_pretty(const char *item, char *out, size_t cap);
 static int cmd_waypoint_travel(const char *raw, char *msg, size_t msgcap);
 static void run_game_menu(void);
 static void run_settings_ui(void);
@@ -438,6 +541,10 @@ static int resolve_inv_item_query(const char *name, int *ix_out, char *msg,
                                   size_t msgcap);
 static void strip_leading_articles(char *s);
 static int str_contains_ci(const char *haystack, const char *needle);
+static int text_has_word_ci(const char *text, const char *word);
+static int protective_phrase_has_danger_context(const char *text);
+static int protective_phrase_is_candidate(const char *text);
+static const char *protective_phrase_pronoun(const char *text);
 static int line_equals_one_of(const char *line, const char *const *candidates);
 
 static void hist_push(int from_room) {
@@ -543,17 +650,111 @@ static void suggest_typo(const char *word, char *out, size_t outcap) {
     out[0] = '\0';
 }
 
-/* Longest match wins ("could you please" before "could you", etc.). */
+/* Canonical verbs for Levenshtein typo layers: parser_topverb_min_dist with
+ * maxd 2; unique nearest wins (ties → no suggestion/autofix). d=2 allowed only
+ * when the typed token is long enough (≥6) to limit false positives. */
+static const char *const PARSER_TOPVERBS[] = {
+    "about",     "again",     "approach",  "aptitudes", "back",
+    "because",   "brief",     "buy",       "causality", "clear",
+    "compare",   "describe",  "diagnostics", "done",    "drop",
+    "drink",     "east",      "eat",       "equip",     "equipment",
+    "errors",    "examine",   "exits",     "fasttravel", "find",
+    "forge",     "gear",      "give",      "go",        "healthcheck",
+    "help",      "hints",     "hold",      "inventory", "inv",
+    "journal",   "listen",    "load",      "loadout",   "locate",
+    "look",      "loot",      "map",       "menu",      "mods",
+    "momentum",  "nexus",     "noise",     "north",     "notes",
+    "objectives", "open",     "perks",     "progress",  "purchase",
+    "quit",      "rapport",   "read",      "recap",     "repeat",
+    "reputation", "route",    "save",      "say",       "scan",
+    "score",     "search",    "sell",      "shout",     "smell",
+    "south",     "status",    "take",      "talk",      "tainting",
+    "time",      "touch",     "trail",     "unstick",   "unlock",
+    "use",       "verbose",   "vitals",    "wait",      "wallet",
+    "wares",     "waypoints", "weather",   "west",      "where",
+    "who",       NULL};
+
+static int parser_topverb_min_dist(const char *word, int maxd, int *ties_out,
+                                   const char **best_out) {
+  int k;
+  int bestd = maxd + 1;
+  int ties = 0;
+  const char *best = NULL;
+  if (!word || strlen(word) < 3) {
+    if (ties_out) *ties_out = 0;
+    if (best_out) *best_out = NULL;
+    return maxd + 1;
+  }
+  for (k = 0; PARSER_TOPVERBS[k]; k++) {
+    int d = levenshtein_upto(word, PARSER_TOPVERBS[k], maxd);
+    if (d > maxd) continue;
+    if (d < bestd) {
+      bestd = d;
+      best = PARSER_TOPVERBS[k];
+      ties = 1;
+    } else if (d == bestd) {
+      ties++;
+      if (best && strcmp(PARSER_TOPVERBS[k], best) < 0) best = PARSER_TOPVERBS[k];
+    }
+  }
+  if (ties_out) *ties_out = ties;
+  if (best_out) *best_out = best;
+  return bestd;
+}
+
+static void rewrite_command(char *line, const char *verb, const char *rest);
+
+/* Deterministic autofix: exactly one verb is the unique closest match (d≤2).
+ * d=2 only if the typed token is long enough to reduce false positives. */
+static int parser_autofix_first_token_unique_typo(char *line) {
+  char tok[64];
+  const char *sp;
+  size_t wl;
+  int ties;
+  const char *best;
+  int bestd;
+  if (!line || !line[0]) return 0;
+  sp = strchr(line, ' ');
+  wl = sp ? (size_t)(sp - line) : strlen(line);
+  if (wl < 4 || wl >= sizeof tok) return 0;
+  memcpy(tok, line, wl);
+  tok[wl] = '\0';
+  bestd = parser_topverb_min_dist(tok, 2, &ties, &best);
+  if (bestd > 2 || ties != 1 || !best) return 0;
+  if (bestd == 2 && wl < 6) return 0;
+  if (strcmp(tok, best) == 0) return 0;
+  if (sp) {
+    while (*sp == ' ') sp++;
+    rewrite_command(line, best, sp);
+  } else {
+    rewrite_command(line, best, "");
+  }
+  return 1;
+}
+
+/* Longest match wins — array order is longest-first ("could you please" before
+ * "could you", etc.; strip_natural_prefixes picks the first matching prefix).
+ * Conservative English-only fillers; only strip when followed by more command
+ * text (prefix match leaves `line + n` possibly empty only when user typed just
+ * the filler — loops bail when nothing strips). */
 static const char *const kNaturalLanguageStrip[] = {
-    "would you mind if i ", "if you could please ", "could you please ",
+    "would it be possible to ", "would you mind if i ", "do you mind if i ",
+    "if you could please ", "could you please ",
     "would you please ",    "i would like to ",     "i would love to ",
-    "can you please ",      "could i please ",      "let me please ",
+    "can you please ",      "could i please ",      "may i please ",
+    "let me please ",
     "i'm trying to ",       "im trying to ",        "go ahead and ",
     "i'm going to ",        "can i please ",        "im going to ",
     "i'd like to ",         "i want to ",           "could you ",
     "would you ",           "i need to ",           "i should ",
+    "might as well ",       "i have to ",           "i've got to ",
+    "ive got to ",          "i gotta ",             "i'm gonna ",
+    "im gonna ",            "i will ",              "i'll ",
+    "ill ",                 "i can ",               "i am going to ",
+    "i am trying to ",      "i'm about to ",        "im about to ",
     "try and ",             "could i ",             "let me ",
     "please ",              "try to ",              "can i ",
+    "i ",
     NULL};
 
 static void strip_natural_prefixes(char *line) {
@@ -1252,12 +1453,66 @@ static void player_heal(int amt) {
   g_health = sum > g_max_health ? g_max_health : (int)sum;
 }
 
+#define CURRENCY_BRONZE_VALUE 10
+#define CURRENCY_SILVER_VALUE 50
+#define CURRENCY_GOLD_VALUE 100
+
+static void currency_split(int amount, int *gold, int *silver, int *bronze,
+                           int *copper) {
+  int v = amount < 0 ? 0 : amount;
+  if (gold) *gold = v / CURRENCY_GOLD_VALUE;
+  v %= CURRENCY_GOLD_VALUE;
+  if (silver) *silver = v / CURRENCY_SILVER_VALUE;
+  v %= CURRENCY_SILVER_VALUE;
+  if (bronze) *bronze = v / CURRENCY_BRONZE_VALUE;
+  if (copper) *copper = v % CURRENCY_BRONZE_VALUE;
+}
+
+static void currency_format_long(int amount, char *out, size_t cap) {
+  char parts[4][32];
+  int gold, silver, bronze, copper;
+  int n = 0, i;
+  if (!out || cap < 2) return;
+  currency_split(amount, &gold, &silver, &bronze, &copper);
+  if (gold > 0) snprintf(parts[n++], sizeof parts[0], "%d gold", gold);
+  if (silver > 0) snprintf(parts[n++], sizeof parts[0], "%d silver", silver);
+  if (bronze > 0) snprintf(parts[n++], sizeof parts[0], "%d bronze", bronze);
+  if (copper > 0 || n == 0)
+    snprintf(parts[n++], sizeof parts[0], "%d copper", copper);
+  out[0] = '\0';
+  for (i = 0; i < n; i++) {
+    if (i > 0) strncat(out, ", ", cap - strlen(out) - 1);
+    strncat(out, parts[i], cap - strlen(out) - 1);
+  }
+}
+
+static void currency_format_compact(int amount, char *out, size_t cap) {
+  char parts[4][16];
+  int gold, silver, bronze, copper;
+  int n = 0, i;
+  if (!out || cap < 2) return;
+  currency_split(amount, &gold, &silver, &bronze, &copper);
+  if (gold > 0) snprintf(parts[n++], sizeof parts[0], "%dg", gold);
+  if (silver > 0) snprintf(parts[n++], sizeof parts[0], "%ds", silver);
+  if (bronze > 0) snprintf(parts[n++], sizeof parts[0], "%db", bronze);
+  if (copper > 0 || n == 0)
+    snprintf(parts[n++], sizeof parts[0], "%dc", copper);
+  out[0] = '\0';
+  for (i = 0; i < n; i++) {
+    if (i > 0) strncat(out, " ", cap - strlen(out) - 1);
+    strncat(out, parts[i], cap - strlen(out) - 1);
+  }
+}
+
 static int tender_pickup_coins(const char *item_id) {
   if (!item_id || !item_id[0]) return 0;
+  if (str_ieq(item_id, "copper_coin")) return 1;
+  if (str_ieq(item_id, "bronze_coin")) return CURRENCY_BRONZE_VALUE;
+  if (str_ieq(item_id, "silver_coin")) return CURRENCY_SILVER_VALUE;
+  if (str_ieq(item_id, "gold_coin")) return CURRENCY_GOLD_VALUE;
   if (str_ieq(item_id, "hidden_cash")) return 12;
   if (str_ieq(item_id, "buried_coin")) return 6;
-  if (str_ieq(item_id, "ancient_coin")) return 4;
-  if (str_ieq(item_id, "gold_coin")) return 10;
+  if (str_ieq(item_id, "ancient_coin")) return 15;
   return 0;
 }
 
@@ -1289,6 +1544,72 @@ static void diag_clear(void) {
 static void causal_clear(void) {
   g_causal_head = 0;
   g_causal_count = 0;
+}
+
+static void trade_history_clear(void) {
+  g_trade_head = 0;
+  g_trade_count = 0;
+}
+
+static void barter_clear(void) {
+  g_barter_mode = BARTER_NONE;
+  g_barter_price = 0;
+  g_barter_list_price = 0;
+  g_barter_expire_turn = 0;
+  g_barter_merchant[0] = '\0';
+  g_barter_item[0] = '\0';
+}
+
+static void trade_history_push_row(const char *row) {
+  size_t n;
+  const char *src = row ? row : "";
+  n = strnlen(src, TRADE_W - 1);
+  memcpy(g_trade_ring[g_trade_head], src, n);
+  g_trade_ring[g_trade_head][n] = '\0';
+  g_trade_head = (g_trade_head + 1) % TRADE_RING;
+  if (g_trade_count < TRADE_RING) g_trade_count++;
+}
+
+static void trade_history_push(const char *kind, const char *merchant,
+                               const char *item, int amount, int list_price,
+                               int coin_total) {
+  char scratch[TRADE_W];
+  char whatb[96];
+  char amountb[48], listb[48], purseb[48];
+  const char *k = kind ? kind : "";
+  const char *who = merchant && merchant[0] ? merchant : "merchant";
+  const char *what = item && item[0] ? item : "item";
+  item_pretty(what, whatb, sizeof whatb);
+  if (amount < 0) amount = 0;
+  if (list_price < 0) list_price = amount;
+  currency_format_long(amount, amountb, sizeof amountb);
+  currency_format_long(list_price, listb, sizeof listb);
+  currency_format_long(coin_total, purseb, sizeof purseb);
+  if (str_ieq(k, "buy")) {
+    if (list_price != amount)
+      (void)snprintf(scratch, sizeof scratch,
+                     "T%04d [buy] bought %s from %s for %s (list %s) -> purse %s",
+                     g_turns, whatb, who, amountb, listb, purseb);
+    else
+      (void)snprintf(scratch, sizeof scratch,
+                     "T%04d [buy] bought %s from %s for %s -> purse %s", g_turns,
+                     whatb, who, amountb, purseb);
+  } else if (str_ieq(k, "sell")) {
+    if (list_price != amount)
+      (void)snprintf(scratch, sizeof scratch,
+                     "T%04d [sell] sold %s to %s for %s (list %s) -> purse %s",
+                     g_turns, whatb, who, amountb, listb, purseb);
+    else
+      (void)snprintf(scratch, sizeof scratch,
+                     "T%04d [sell] sold %s to %s for %s -> purse %s", g_turns,
+                     whatb, who, amountb, purseb);
+  } else {
+    (void)snprintf(scratch, sizeof scratch,
+                   "T%04d [trade] %s with %s for %s -> purse %s", g_turns, whatb,
+                   who, amountb, purseb);
+  }
+  scratch[sizeof scratch - 1] = '\0';
+  trade_history_push_row(scratch);
 }
 
 static void diag_push(const char *tag, const char *detail) {
@@ -1365,6 +1686,28 @@ static void format_causality_body(char *body, size_t cap, const char *term) {
   if (shown == 0)
     strncat(body, "  (no events matched this filter)\n",
             cap - strlen(body) - 1);
+}
+
+static void format_trade_history_body(char *body, size_t cap) {
+  int i, start;
+  if (!body || cap < 64) return;
+  body[0] = '\0';
+  (void)snprintf(body, cap,
+                 "=== TRADE HISTORY ===\n\n"
+                 "Completed merchant transactions (newest last; max %d, saved with your game).\n\n",
+                 TRADE_RING);
+  if (g_trade_count == 0) {
+    strncat(body, "  (none yet - buy or sell with a merchant first.)\n",
+            cap - strlen(body) - 1);
+    return;
+  }
+  start = (g_trade_head - g_trade_count + TRADE_RING) % TRADE_RING;
+  for (i = 0; i < g_trade_count; i++) {
+    int idx = (start + i) % TRADE_RING;
+    char out[TRADE_W + 8];
+    (void)snprintf(out, sizeof out, "  • %s\n", g_trade_ring[idx]);
+    strncat(body, out, cap - strlen(body) - 1);
+  }
 }
 
 static void format_causality_turn_body(char *body, size_t cap, int turn_value) {
@@ -1635,12 +1978,14 @@ static void format_diag_health_body(char *body, size_t cap) {
         "  Save file: %s\n"
         "  Here: %s [%s]\n"
         "  Turns: %d   Pack: %d / %d   HP: %d / %d\n"
+        "  NPC world refs: %d checked, %d warning(s)\n"
         "  Dark (no light): %s\n"
         "  Autotest mode: %s\n",
         WORLD_ROOM_COUNT, MAX_WORLD_ROOMS, wok ? "OK" : "CHECK",
         g_save_path[0] ? g_save_path : "(default)",
         resolve_world_title(g_room), world_slug(g_room), g_turns, g_inv_n, MAX_INV,
-        g_health, g_max_health, room_too_dark_to_see() ? "yes" : "no",
+        g_health, g_max_health, g_npc_validation_checked,
+        g_npc_validation_warnings, room_too_dark_to_see() ? "yes" : "no",
         aet_autotest() ? "on" : "off");
     strncat(body, chunk, cap - strlen(body) - 1);
   }
@@ -1648,6 +1993,106 @@ static void format_diag_health_body(char *body, size_t cap) {
       body,
       "\nTip: errors clear  —  empties the issue list for this run.\n",
       cap - strlen(body) - 1);
+}
+
+static int npc_world_entity_count(const char *slug) {
+  int i, c = 0;
+  if (!slug || !slug[0]) return 0;
+  for (i = 0; i < WORLD_ROOM_COUNT; i++) {
+    const char *ent = base_world_room_entity(i);
+    if (ent && ent[0] && str_ieq(ent, slug)) c++;
+  }
+  return c;
+}
+
+static void validate_npc_world_refs(void) {
+  int i;
+  int checked = 0;
+  int warnings = 0;
+
+  for (i = 0; i < WORLD_ROOM_COUNT; i++) {
+    const char *ent = base_world_room_entity(i);
+    const AetNpcLineSet *dlg;
+    const AetMerchantTable *mt;
+    char detail[196];
+    if (!ent || !ent[0]) continue;
+    checked++;
+    dlg = aet_npc_lines(ent);
+    mt = aet_merchant_trades(ent);
+    if (!dlg && !mt) {
+      snprintf(detail, sizeof detail,
+               "room %s [%s] references unknown npc/entity slug \"%s\"",
+               world_slug(i), resolve_world_title(i), ent);
+      diag_push("npc-world", detail);
+      warnings++;
+      continue;
+    }
+    if (mt && !dlg) {
+      snprintf(detail, sizeof detail,
+               "merchant slug \"%s\" is placed at %s [%s] but has no dialogue roster",
+               ent, world_slug(i), resolve_world_title(i));
+      diag_push("npc-world", detail);
+      warnings++;
+    }
+  }
+
+  for (i = 0; i < npc_routine_count(); i++) {
+    const AetNpcRoutine *rt = npc_routine_at(i);
+    const char *rooms[4] = {rt->morning_room, rt->afternoon_room, rt->evening_room,
+                            rt->night_room};
+    int k;
+    checked++;
+    if (!aet_npc_lines(rt->slug) && !aet_merchant_trades(rt->slug)) {
+      char detail[196];
+      snprintf(detail, sizeof detail,
+               "routine slug \"%s\" has no npc dialogue or merchant data", rt->slug);
+      diag_push("npc-world", detail);
+      warnings++;
+    }
+    for (k = 0; k < 4; k++) {
+      if (!rooms[k] || !rooms[k][0] || world_room_index(rooms[k]) >= 0) continue;
+      {
+        char detail[196];
+        snprintf(detail, sizeof detail,
+                 "routine for \"%s\" references unknown room slug \"%s\"", rt->slug,
+                 rooms[k]);
+        diag_push("npc-world", detail);
+        warnings++;
+      }
+    }
+  }
+
+  for (i = 0; i < aet_npc_line_count(); i++) {
+    const char *slug = aet_npc_line_slug_at(i);
+    if (!slug || !slug[0]) continue;
+    if (npc_world_entity_count(slug) <= 0) {
+      char detail[196];
+      snprintf(detail, sizeof detail,
+               "dialogue roster \"%s\" has no room.entity placement in this build",
+               slug);
+      diag_push("npc-world", detail);
+      warnings++;
+      checked++;
+    }
+  }
+
+  for (i = 0; i < AETER_SOC_NPC_MAX; i++) {
+    const char *slug = g_soc_npc_slug[i];
+    if (!slug[0]) continue;
+    checked++;
+    if (aet_npc_lines(slug) || npc_world_entity_count(slug) > 0) continue;
+    {
+      char detail[196];
+      snprintf(detail, sizeof detail,
+               "loaded social state references unknown npc slug \"%.96s\"",
+               slug);
+      diag_push("npc-world", detail);
+      warnings++;
+    }
+  }
+
+  g_npc_validation_checked = checked;
+  g_npc_validation_warnings = warnings;
 }
 
 static int parse_save_slot(const char *s, int *slot) {
@@ -1715,15 +2160,82 @@ static void entity_pretty(const char *ent, char *out, size_t cap) {
   out[i] = '\0';
 }
 
+static void item_pretty(const char *item, char *out, size_t cap) {
+  const char *label;
+  size_t i = 0;
+  int new_word = 1;
+  if (!out || cap < 2) return;
+  out[0] = '\0';
+  if (!item || !item[0]) return;
+  label = aet_item_catalog_label_for_slug(item);
+  if (label && label[0]) {
+    snprintf(out, cap, "%s", label);
+    return;
+  }
+  for (; *item && i + 1 < cap; item++) {
+    unsigned char c = (unsigned char)*item;
+    if (c == '_') {
+      out[i++] = ' ';
+      new_word = 1;
+      continue;
+    }
+    out[i++] = (char)(new_word ? toupper(c) : c);
+    new_word = 0;
+  }
+  out[i] = '\0';
+}
+
+static void soc_npc_clear(void) {
+  memset(g_soc_npc_slug, 0, sizeof g_soc_npc_slug);
+  memset(g_soc_npc_friendship, 0, sizeof g_soc_npc_friendship);
+  memset(g_soc_npc_romance, 0, sizeof g_soc_npc_romance);
+  memset(g_soc_npc_last_turn, 0, sizeof g_soc_npc_last_turn);
+}
+
+static int soc_npc_find(const char *slug) {
+  int i;
+  if (!slug || !slug[0]) return -1;
+  for (i = 0; i < AETER_SOC_NPC_MAX; i++) {
+    if (g_soc_npc_slug[i][0] && str_ieq(g_soc_npc_slug[i], slug)) return i;
+  }
+  return -1;
+}
+
+static int soc_npc_alloc(const char *slug) {
+  int i;
+  size_t L;
+  if (!slug || !slug[0]) return -1;
+  if (aet_merchant_index(slug) >= 0) return -1;
+  for (i = 0; i < AETER_SOC_NPC_MAX; i++) {
+    if (!g_soc_npc_slug[i][0]) {
+      L = strnlen(slug, MAX_ITEM_LEN - 1);
+      memcpy(g_soc_npc_slug[i], slug, L);
+      g_soc_npc_slug[i][L] = '\0';
+      return i;
+    }
+  }
+  return -1;
+}
+
+static int soc_npc_ensure(const char *slug) {
+  int ix = soc_npc_find(slug);
+  if (ix >= 0) return ix;
+  return soc_npc_alloc(slug);
+}
+
 static void merchant_rep_clear(void) {
   memset(g_merchant_rep, 0, sizeof g_merchant_rep);
+  memset(g_npc_friendship, 0, sizeof g_npc_friendship);
+  memset(g_npc_romance, 0, sizeof g_npc_romance);
+  memset(g_npc_last_social_turn, 0, sizeof g_npc_last_social_turn);
+  soc_npc_clear();
 }
 
 static void merchant_rep_load_line(const char *line) {
   int mc = aet_merchant_count();
   int i = 0;
   const char *p = line;
-  merchant_rep_clear();
+  memset(g_merchant_rep, 0, sizeof g_merchant_rep);
   if (mc > AETER_REP_MAX) mc = AETER_REP_MAX;
   while (i < mc && p && *p) {
     char *end = NULL;
@@ -1747,6 +2259,138 @@ static void merchant_rep_bump_slug(const char *slug, int delta) {
   if (g_merchant_rep[ix] > 220) g_merchant_rep[ix] = 220;
 }
 
+static void soc_clamp_byte(unsigned char *p) {
+  if (*p > 100u) *p = 100u;
+}
+
+static int merchant_rep_score(int ix);
+
+static unsigned char soc_derive_stage_values(int friendship, int romance,
+                                           int patron_rep) {
+  int f = friendship;
+  int r = romance;
+  int rep = patron_rep;
+  if (r >= 75 && f >= 50) return 6;
+  if (r >= 55 && f >= 35) return 5;
+  if (r >= 28) return 4;
+  if (f >= 58 || rep >= 85) return 3;
+  if (f >= 30 || rep >= 45) return 2;
+  if (f >= 10 || rep >= 12) return 1;
+  return 0;
+}
+
+static unsigned char soc_derive_stage(int ix) {
+  return soc_derive_stage_values((int)g_npc_friendship[ix],
+                                 (int)g_npc_romance[ix], merchant_rep_score(ix));
+}
+
+static unsigned char soc_derive_stage_npc_slug(const char *slug) {
+  int mix = aet_merchant_index(slug);
+  int si;
+  if (mix >= 0 && mix < AETER_REP_MAX)
+    return soc_derive_stage(mix);
+  si = soc_npc_find(slug);
+  if (si < 0)
+    return soc_derive_stage_values(0, 0, 0);
+  return soc_derive_stage_values((int)g_soc_npc_friendship[si],
+                                 (int)g_soc_npc_romance[si], 0);
+}
+
+static const char *soc_stage_name(unsigned char st) {
+  switch (st) {
+    case 0:
+      return "Stranger";
+    case 1:
+      return "Acquainted";
+    case 2:
+      return "Friend";
+    case 3:
+      return "Close friend";
+    case 4:
+      return "Romantic interest";
+    case 5:
+      return "Lover";
+    case 6:
+      return "Partner";
+    default:
+      return "Stranger";
+  }
+}
+
+static void soc_bump_talk(const char *slug) {
+  int ix;
+  int si;
+  AetPcSave p;
+  int bonus = 0;
+  if (!slug || !slug[0]) return;
+  ix = aet_merchant_index(slug);
+  pc_capture(&p);
+  pc_fill_narrative_defaults(&p);
+  if (p.cha >= 15) bonus += 1;
+  if (p.cha >= 18) bonus += 1;
+  if (ix >= 0 && ix < AETER_REP_MAX) {
+    g_npc_friendship[ix] =
+        (unsigned char)((int)g_npc_friendship[ix] + 2 + bonus);
+    soc_clamp_byte(&g_npc_friendship[ix]);
+    if (p.cha >= 17)
+      g_npc_romance[ix] = (unsigned char)((int)g_npc_romance[ix] + 1);
+    soc_clamp_byte(&g_npc_romance[ix]);
+    g_npc_last_social_turn[ix] = g_turns;
+    return;
+  }
+  si = soc_npc_ensure(slug);
+  if (si < 0) return;
+  g_soc_npc_friendship[si] =
+      (unsigned char)((int)g_soc_npc_friendship[si] + 2 + bonus);
+  soc_clamp_byte(&g_soc_npc_friendship[si]);
+  if (p.cha >= 17)
+    g_soc_npc_romance[si] =
+        (unsigned char)((int)g_soc_npc_romance[si] + 1);
+  soc_clamp_byte(&g_soc_npc_romance[si]);
+  g_soc_npc_last_turn[si] = g_turns;
+}
+
+static void soc_bump_gift(const char *slug) {
+  int ix;
+  int si;
+  if (!slug || !slug[0]) return;
+  ix = aet_merchant_index(slug);
+  if (ix >= 0 && ix < AETER_REP_MAX) {
+    g_npc_friendship[ix] = (unsigned char)((int)g_npc_friendship[ix] + 8);
+    g_npc_romance[ix] = (unsigned char)((int)g_npc_romance[ix] + 5);
+    soc_clamp_byte(&g_npc_friendship[ix]);
+    soc_clamp_byte(&g_npc_romance[ix]);
+    g_npc_last_social_turn[ix] = g_turns;
+    return;
+  }
+  si = soc_npc_ensure(slug);
+  if (si < 0) return;
+  g_soc_npc_friendship[si] =
+      (unsigned char)((int)g_soc_npc_friendship[si] + 8);
+  g_soc_npc_romance[si] = (unsigned char)((int)g_soc_npc_romance[si] + 5);
+  soc_clamp_byte(&g_soc_npc_friendship[si]);
+  soc_clamp_byte(&g_soc_npc_romance[si]);
+  g_soc_npc_last_turn[si] = g_turns;
+}
+
+static int soc_parse_uchar_line(const char *line, unsigned char *dst, int maxn) {
+  char work[800];
+  char *ctx = NULL;
+  char *tok;
+  int n = 0;
+  if (!line || !dst || maxn <= 0) return 0;
+  strncpy(work, line, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  for (tok = strtok_r(work, " \t", &ctx); tok && n < maxn;
+       tok = strtok_r(NULL, " \t", &ctx)) {
+    long v = strtol(tok, NULL, 10);
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+    dst[n++] = (unsigned char)v;
+  }
+  return n;
+}
+
 static void merchant_rep_bump_conversation(const char *slug, int base_delta) {
   AetPcSave p;
   int d = base_delta;
@@ -1755,6 +2399,7 @@ static void merchant_rep_bump_conversation(const char *slug, int base_delta) {
   if (p.cha >= 15) d += 1;
   if (p.cha >= 18) d += 1;
   merchant_rep_bump_slug(slug, d);
+  soc_bump_talk(slug);
 }
 
 static void merchant_rep_bump_gift(const char *slug) {
@@ -1764,6 +2409,7 @@ static void merchant_rep_bump_gift(const char *slug) {
   pc_capture(&p);
   if (p.cha >= 14) d += 1;
   merchant_rep_bump_slug(slug, d);
+  soc_bump_gift(slug);
 }
 
 static int merchant_rep_score(int ix) {
@@ -1802,15 +2448,127 @@ static int merchant_sell_bonus_pct(int score) {
   return 0;
 }
 
-static int merchant_adjust_buy_price(int base, int score) {
-  int pct = merchant_buy_discount_pct(score);
+static const char *merchant_trade_skill_label(int cha) {
+  if (cha >= 18) return "silver-tongued";
+  if (cha >= 16) return "keen trader";
+  if (cha >= 14) return "confident bargainer";
+  if (cha >= 12) return "watchful buyer";
+  if (cha >= 10) return "practical haggler";
+  return "unguarded";
+}
+
+static int merchant_trade_buy_skill_pct(int cha) {
+  if (cha >= 18) return 8;
+  if (cha >= 16) return 6;
+  if (cha >= 14) return 4;
+  if (cha >= 12) return 2;
+  return 0;
+}
+
+static int merchant_trade_sell_skill_pct(int cha) {
+  if (cha >= 18) return 15;
+  if (cha >= 16) return 12;
+  if (cha >= 14) return 10;
+  if (cha >= 12) return 7;
+  if (cha >= 10) return 5;
+  return 0;
+}
+
+static int merchant_adjust_buy_price(int base, int score, int cha) {
+  int pct = merchant_buy_discount_pct(score) + merchant_trade_buy_skill_pct(cha);
   int n = base - (base * pct) / 100;
   return n < 1 ? 1 : n;
 }
 
-static int merchant_adjust_sell_price(int base, int score) {
-  int pct = merchant_sell_bonus_pct(score);
-  return base + (base * pct) / 100;
+static int merchant_adjust_sell_price(int base, int score, int cha) {
+  int pct = merchant_sell_bonus_pct(score) + merchant_trade_sell_skill_pct(cha);
+  int bonus = (base * pct) / 100;
+  if (pct > 0 && base >= 4 && bonus < 1) bonus = 1;
+  return base + bonus;
+}
+
+static int merchant_friendship_score(int ix) {
+  if (ix < 0 || ix >= AETER_REP_MAX) return 0;
+  return (int)g_npc_friendship[ix];
+}
+
+static int merchant_haggle_buy_pct(int score, int friendship, int cha) {
+  int pct = 0;
+  if (cha >= 10) pct += 4;
+  if (cha >= 14) pct += 2;
+  if (cha >= 18) pct += 2;
+  if (score >= 10) pct += 1;
+  if (score >= 25) pct += 1;
+  if (friendship >= 20) pct += 1;
+  if (friendship >= 40) pct += 1;
+  if (pct > 12) pct = 12;
+  return pct;
+}
+
+static int merchant_haggle_sell_pct(int score, int friendship, int cha) {
+  int pct = 0;
+  if (cha >= 10) pct += 6;
+  if (cha >= 14) pct += 3;
+  if (cha >= 18) pct += 3;
+  if (score >= 10) pct += 1;
+  if (score >= 25) pct += 1;
+  if (friendship >= 20) pct += 1;
+  if (friendship >= 40) pct += 1;
+  if (pct > 18) pct = 18;
+  return pct;
+}
+
+static int merchant_haggle_buy_price(int current, int score, int friendship,
+                                     int cha) {
+  int pct = merchant_haggle_buy_pct(score, friendship, cha);
+  int delta = (current * pct) / 100;
+  if (pct > 0 && current >= 10 && delta < 1) delta = 1;
+  current -= delta;
+  return current < 1 ? 1 : current;
+}
+
+static int merchant_haggle_sell_price(int current, int score, int friendship,
+                                      int cha) {
+  int pct = merchant_haggle_sell_pct(score, friendship, cha);
+  int delta = (current * pct) / 100;
+  if (pct > 0 && current >= 4 && delta < 1) delta = 1;
+  return current + delta;
+}
+
+static void barter_set(int mode, const char *merchant, const char *item,
+                       int quoted_price, int list_price, int expire_turn) {
+  g_barter_mode = mode;
+  g_barter_price = quoted_price;
+  g_barter_list_price = list_price;
+  g_barter_expire_turn = expire_turn;
+  snprintf(g_barter_merchant, sizeof g_barter_merchant, "%s",
+           merchant ? merchant : "");
+  snprintf(g_barter_item, sizeof g_barter_item, "%s", item ? item : "");
+}
+
+static int barter_quote_sync(void) {
+  const char *ent;
+  if (g_barter_mode == BARTER_NONE) return 0;
+  if (g_turns > g_barter_expire_turn) {
+    barter_clear();
+    return 0;
+  }
+  ent = world_room_entity(g_room);
+  if (!ent[0] || !str_ieq(ent, g_barter_merchant)) {
+    barter_clear();
+    return 0;
+  }
+  return 1;
+}
+
+static int barter_quote_matches(int mode, const char *merchant, const char *item,
+                                int *price_out) {
+  if (!barter_quote_sync()) return 0;
+  if (g_barter_mode != mode) return 0;
+  if (!merchant || !merchant[0] || !str_ieq(g_barter_merchant, merchant)) return 0;
+  if (!item || !item[0] || !str_ieq(g_barter_item, item)) return 0;
+  if (price_out) *price_out = g_barter_price;
+  return 1;
 }
 
 static int read_kv_int(FILE *fp, const char *expect_key, int *v) {
@@ -1871,7 +2629,46 @@ static int write_save_file_path(const char *path) {
     for (ri = 0; ri < mc; ri++)
       fprintf(fp, " %d", merchant_rep_score(ri));
     fputc('\n', fp);
+    fprintf(fp, "SOC\n");
+    fprintf(fp, "%d\n", mc);
+    for (ri = 0; ri < mc; ri++)
+      fprintf(fp, "%s%u", ri ? " " : "", (unsigned)g_npc_friendship[ri]);
+    fputc('\n', fp);
+    for (ri = 0; ri < mc; ri++)
+      fprintf(fp, "%s%u", ri ? " " : "", (unsigned)g_npc_romance[ri]);
+    fputc('\n', fp);
   }
+  /*
+   * SOC2: optional extension — non-merchant room.entity slugs with friendship,
+   * romance, last social turn. Omitted in older saves; ignored if absent on load.
+   * Rows: <slug> <friendship 0-100> <romance 0-100> <last_turn int>
+   */
+  {
+    int si, nout = 0;
+    for (si = 0; si < AETER_SOC_NPC_MAX; si++) {
+      if (g_soc_npc_slug[si][0]) nout++;
+    }
+    fprintf(fp, "SOC2\n%d\n", nout);
+    for (si = 0; si < AETER_SOC_NPC_MAX; si++) {
+      if (!g_soc_npc_slug[si][0]) continue;
+      fprintf(fp, "%s %u %u %d\n", g_soc_npc_slug[si],
+              (unsigned)g_soc_npc_friendship[si],
+              (unsigned)g_soc_npc_romance[si], g_soc_npc_last_turn[si]);
+    }
+  }
+  fprintf(fp, "TRADELOG\n%d\n", g_trade_count);
+  {
+    int start = (g_trade_head - g_trade_count + TRADE_RING) % TRADE_RING;
+    for (i = 0; i < g_trade_count; i++) {
+      int idx = (start + i) % TRADE_RING;
+      fprintf(fp, "%s\n", g_trade_ring[idx]);
+    }
+  }
+  fprintf(fp, "BARTER\n");
+  fprintf(fp, "%d %d %d %d\n", g_barter_mode, g_barter_price, g_barter_list_price,
+          g_barter_expire_turn);
+  fprintf(fp, "%s\n", g_barter_merchant[0] ? g_barter_merchant : "");
+  fprintf(fp, "%s\n", g_barter_item[0] ? g_barter_item : "");
   pc_write_save(fp);
   fprintf(fp, "FOCUS\n");
   fprintf(fp, "%s\n", g_last_focus[0] ? g_last_focus : "");
@@ -1932,6 +2729,12 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
   g_last_npc[0] = '\0';
   g_last_topic[0] = '\0';
   g_ready_item[0] = '\0';
+  memset(g_npc_friendship, 0, sizeof g_npc_friendship);
+  memset(g_npc_romance, 0, sizeof g_npc_romance);
+  memset(g_npc_last_social_turn, 0, sizeof g_npc_last_social_turn);
+  soc_npc_clear();
+  trade_history_clear();
+  barter_clear();
   if (!fgets(buf, sizeof buf, fp)) goto bad;
   chomp_line(buf);
   if (strcmp(buf, "AET64SAVE1") != 0) goto bad;
@@ -2135,6 +2938,91 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
               chomp_line(buf);
             } else
               merchant_rep_clear();
+            if (!strcmp(buf, "SOC")) {
+              char ln[800];
+              int mc_file2 = aet_merchant_count();
+              int nf, nr, jj;
+              if (mc_file2 > AETER_REP_MAX) mc_file2 = AETER_REP_MAX;
+              if (!fgets(ln, sizeof ln, fp)) goto bad;
+              chomp_line(ln);
+              (void)atoi(ln);
+              if (!fgets(ln, sizeof ln, fp)) goto bad;
+              chomp_line(ln);
+              nf = soc_parse_uchar_line(ln, g_npc_friendship, AETER_REP_MAX);
+              if (!fgets(ln, sizeof ln, fp)) goto bad;
+              chomp_line(ln);
+              nr = soc_parse_uchar_line(ln, g_npc_romance, AETER_REP_MAX);
+              for (jj = nf; jj < mc_file2; jj++) g_npc_friendship[jj] = 0;
+              for (jj = nr; jj < mc_file2; jj++) g_npc_romance[jj] = 0;
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+            }
+            if (!strcmp(buf, "SOC2")) {
+              char ln2[512];
+              int rowwant, rr;
+              if (!fgets(ln2, sizeof ln2, fp)) goto bad;
+              chomp_line(ln2);
+              rowwant = atoi(ln2);
+              if (rowwant < 0) rowwant = 0;
+              if (rowwant > 512) rowwant = 512;
+              soc_npc_clear();
+              for (rr = 0; rr < rowwant; rr++) {
+                unsigned uf, ur;
+                int ut;
+                char slugbuf[MAX_ITEM_LEN];
+                int slot;
+                if (!fgets(ln2, sizeof ln2, fp)) goto bad;
+                chomp_line(ln2);
+                if (sscanf(ln2, "%47s %u %u %d", slugbuf, &uf, &ur, &ut) != 4)
+                  continue;
+                if (uf > 100u) uf = 100u;
+                if (ur > 100u) ur = 100u;
+                if (!slugbuf[0] || aet_merchant_index(slugbuf) >= 0) continue;
+                slot = soc_npc_ensure(slugbuf);
+                if (slot < 0) continue;
+                g_soc_npc_friendship[slot] = (unsigned char)uf;
+                g_soc_npc_romance[slot] = (unsigned char)ur;
+                g_soc_npc_last_turn[slot] = ut;
+              }
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+            }
+            if (!strcmp(buf, "TRADELOG")) {
+              int rowwant, rr;
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+              rowwant = atoi(buf);
+              if (rowwant < 0) rowwant = 0;
+              if (rowwant > TRADE_RING) rowwant = TRADE_RING;
+              trade_history_clear();
+              for (rr = 0; rr < rowwant; rr++) {
+                if (!fgets(buf, sizeof buf, fp)) goto bad;
+                chomp_line(buf);
+                trade_history_push_row(buf);
+              }
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+            }
+            if (!strcmp(buf, "BARTER")) {
+              int bm, bp, bl, be;
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+              barter_clear();
+              if (sscanf(buf, "%d %d %d %d", &bm, &bp, &bl, &be) == 4) {
+                g_barter_mode = bm;
+                g_barter_price = bp;
+                g_barter_list_price = bl;
+                g_barter_expire_turn = be;
+              }
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+              snprintf(g_barter_merchant, sizeof g_barter_merchant, "%s", buf);
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+              snprintf(g_barter_item, sizeof g_barter_item, "%s", buf);
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+            }
             if (strcmp(buf, "CHARACTER") == 0) {
               if (!pc_read_save(fp, buf, sizeof buf)) goto bad;
               pc_loaded = 1;
@@ -2179,6 +3067,7 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
     clear_focus();
   eq_sync_pc_sheet();
   ui_init_color();
+  validate_npc_world_refs();
   snprintf(msg, msgcap, "%s — restored from %s.", pc_display_name(), path);
   causal_push("load", path);
   return 1;
@@ -2487,8 +3376,8 @@ static const char *weather_for_slice(const char *season, int roll) {
   return "rain";
 }
 
-static void get_world_clock(AetWorldClock *out) {
-  int total_minutes = 12 * 60 + g_turns * 10;
+static void world_clock_for_turn(int turns, AetWorldClock *out) {
+  int total_minutes = 12 * 60 + turns * 10;
   int day_zero = total_minutes / (24 * 60);
   int minute_of_day = total_minutes % (24 * 60);
   int base_temp;
@@ -2519,6 +3408,147 @@ static void get_world_clock(AetWorldClock *out) {
     base_temp -= 1;
   out->temp_c = base_temp;
   out->forecast_hours = 6 - (out->hour % 6);
+}
+
+static const AetNpcRoutine NPC_ROUTINES[] = {
+    {"miller", "abandoned_mill", "abandoned_mill", "mill_upper_level",
+     "mill_upper_level"},
+    {"blacksmith", "blacksmith", "blacksmith", "blacksmith_waystone",
+     "blacksmith_waystone"},
+    {"forest_hermit", "hermit_hut", "deep_forest", "hermit_hut", "hermit_hut"},
+    {"general_store_owner", "general_store", "general_store", "village_road",
+     "general_store"},
+    {"tavern_keeper", "tavern_kitchen", "tavern_common_room",
+     "tavern_common_room", "tavern_back_room"},
+    {"priestess", "temple_garden", "temple_of_architect", "temple_garden",
+     "temple_of_architect"},
+    {"paladin_marcus", "temple_training_grounds", "temple_training_grounds",
+     "temple_of_architect", "temple_training_grounds"},
+    {"village_innkeeper", "village_inn", "village_inn", "village_inn",
+     "inn_rooms"},
+    {"village_guard", "village_square", "village_square", "town_square",
+     "town_square"},
+};
+
+static int npc_routine_count(void) {
+  return (int)(sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]);
+}
+
+static const AetNpcRoutine *npc_routine_at(int idx) {
+  return (idx >= 0 && idx < npc_routine_count()) ? &NPC_ROUTINES[idx] : NULL;
+}
+
+static const AetNpcRoutine *npc_routine_for(const char *slug) {
+  size_t i;
+  if (!slug || !slug[0]) return NULL;
+  for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
+    if (str_ieq(NPC_ROUTINES[i].slug, slug)) return &NPC_ROUTINES[i];
+  }
+  return NULL;
+}
+
+static const char *npc_routine_room_for_period(const AetNpcRoutine *rt,
+                                               const char *period) {
+  if (!rt) return NULL;
+  if (str_ieq(period, "morning")) return rt->morning_room;
+  if (str_ieq(period, "afternoon")) return rt->afternoon_room;
+  if (str_ieq(period, "evening")) return rt->evening_room;
+  return rt->night_room;
+}
+
+static const char *npc_room_slug_for_turn(const char *slug, int turns) {
+  AetWorldClock wc;
+  const AetNpcRoutine *rt = npc_routine_for(slug);
+  if (!rt) return NULL;
+  world_clock_for_turn(turns, &wc);
+  return npc_routine_room_for_period(rt, wc.period);
+}
+
+static const char *npc_activity_for_period(const char *slug,
+                                           const char *period) {
+  if (!slug || !slug[0]) return "";
+  if (str_ieq(slug, "miller")) {
+    if (str_ieq(period, "morning") || str_ieq(period, "afternoon"))
+      return "minding the millstones";
+    return "checking the upper works";
+  }
+  if (str_ieq(slug, "blacksmith")) {
+    if (str_ieq(period, "morning") || str_ieq(period, "afternoon"))
+      return "working the forge";
+    return "banking the fire near the waystone";
+  }
+  if (str_ieq(slug, "forest_hermit")) {
+    if (str_ieq(period, "afternoon")) return "walking the deep forest";
+    return "keeping to the hermit's hut";
+  }
+  if (str_ieq(slug, "general_store_owner")) {
+    if (str_ieq(period, "evening")) return "taking the road for trade gossip";
+    if (str_ieq(period, "night")) return "counting stock behind the counter";
+    return "keeping the shop floor";
+  }
+  if (str_ieq(slug, "tavern_keeper")) {
+    if (str_ieq(period, "morning")) return "working the tavern kitchen";
+    if (str_ieq(period, "night")) return "handling quiet business in the back room";
+    return "hosting the common room";
+  }
+  if (str_ieq(slug, "priestess")) {
+    if (str_ieq(period, "morning") || str_ieq(period, "evening"))
+      return "walking the temple garden";
+    return "hearing petitions in the temple";
+  }
+  if (str_ieq(slug, "paladin_marcus")) {
+    if (str_ieq(period, "evening")) return "standing watch in the temple hall";
+    return "drilling in the training grounds";
+  }
+  if (str_ieq(slug, "village_innkeeper")) {
+    if (str_ieq(period, "night")) return "checking the upstairs rooms";
+    return "keeping the inn";
+  }
+  if (str_ieq(slug, "village_guard")) {
+    if (str_ieq(period, "evening") || str_ieq(period, "night"))
+      return "watching the town square";
+    return "patrolling the village square";
+  }
+  return "";
+}
+
+static const char *runtime_room_entity(int room) {
+  AetWorldClock wc;
+  const char *base;
+  const AetNpcRoutine *base_rt;
+  size_t i;
+  if (room < 0 || room >= WORLD_ROOM_COUNT) return "";
+  world_clock_for_turn(g_turns, &wc);
+  for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
+    const char *room_slug =
+        npc_routine_room_for_period(&NPC_ROUTINES[i], wc.period);
+    int rr = room_slug ? world_room_index(room_slug) : -1;
+    if (rr == room) return NPC_ROUTINES[i].slug;
+  }
+  base = base_world_room_entity(room);
+  if (!base || !base[0]) return "";
+  base_rt = npc_routine_for(base);
+  if (!base_rt) return base;
+  return "";
+}
+
+static void get_world_clock(AetWorldClock *out) { world_clock_for_turn(g_turns, out); }
+
+static void note_npc_routine_changes(int prev_turn, int new_turn) {
+  size_t i;
+  if (new_turn <= prev_turn) return;
+  for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
+    const char *was = npc_room_slug_for_turn(NPC_ROUTINES[i].slug, prev_turn);
+    const char *now = npc_room_slug_for_turn(NPC_ROUTINES[i].slug, new_turn);
+    if (was && now && !str_ieq(was, now)) {
+      char detail[200];
+      AetWorldClock wc;
+      world_clock_for_turn(new_turn, &wc);
+      snprintf(detail, sizeof detail, "%s: %s -> %s (%s)", NPC_ROUTINES[i].slug,
+               was, now, wc.period);
+      causal_push("npc-routine", detail);
+    }
+  }
 }
 
 static void format_clock_time(char *out, size_t cap, const AetWorldClock *wc) {
@@ -2568,7 +3598,8 @@ static const char *topic_heat_for(const char *topic_mood, int risk);
 static const char *npc_trust_for(const char *slug, const char *role, int risk);
 static const char *npc_leverage_for(const char *slug, const char *role, int risk);
 static void expand_state_mod_text(const char *src, char *dst, size_t dstcap) {
-  char coinsb[24], hpbuf[16], maxhpbuf[16], scorebuf[16], turnsbuf[16];
+  char coinsb[24], purseb[48], purseshortb[24], hpbuf[16], maxhpbuf[16],
+      scorebuf[16], turnsbuf[16];
   char invcbuf[16], invmaxbuf[16], packbuf[40];
   char readybuf[MAX_ITEM_LEN + 4];
   char npcbuf[MAX_ITEM_LEN + 4], focusbuf[MAX_ITEM_LEN + 4];
@@ -2623,6 +3654,8 @@ static void expand_state_mod_text(const char *src, char *dst, size_t dstcap) {
     return;
   }
   (void)snprintf(coinsb, sizeof coinsb, "%d", g_coins);
+  currency_format_compact(g_coins, purseb, sizeof purseb);
+  currency_format_compact(g_coins, purseshortb, sizeof purseshortb);
   (void)snprintf(hpbuf, sizeof hpbuf, "%d", g_health);
   (void)snprintf(maxhpbuf, sizeof maxhpbuf, "%d", g_max_health);
   (void)snprintf(scorebuf, sizeof scorebuf, "%d", g_score);
@@ -2923,6 +3956,8 @@ static void expand_state_mod_text(const char *src, char *dst, size_t dstcap) {
   mod_replace_token_pass(a, b, sizeof b, "%INVMAX%", invmaxbuf);
   mod_replace_token_pass(b, a, sizeof a, "%INVCOUNT%", invcbuf);
   mod_replace_token_pass(a, b, sizeof b, "%COINS%", coinsb);
+  mod_replace_token_pass(b, a, sizeof a, "%PURSE%", purseb);
+  mod_replace_token_pass(a, b, sizeof b, "%PURSESHORT%", purseshortb);
   mod_replace_token_pass(b, a, sizeof a, "%HP%", hpbuf);
   mod_replace_token_pass(a, b, sizeof b, "%SCORE%", scorebuf);
   mod_replace_token_pass(b, a, sizeof a, "%TURNS%", turnsbuf);
@@ -2931,7 +3966,7 @@ static void expand_state_mod_text(const char *src, char *dst, size_t dstcap) {
   (void)snprintf(dst, dstcap, "%s", a);
 }
 
-/** Character %NAME%…, room, clock, then live %COINS% / %HP%… (see help modding). */
+/** Character %NAME%…, room, clock, then live %COINS% / %PURSE% / %HP%… (see help modding). */
 static void expand_mod_overlay_flat(const char *suffix, char *out, size_t outcap) {
   char t1[4096], t2[4096], t3[4096];
   if (!out || outcap < 2) return;
@@ -3224,17 +4259,22 @@ static void format_exits_screen(char *body, size_t cap, const char *mode) {
   for (d = 0; d < DIR_COUNT; d++) {
     int dest = world_exit(g_room, d);
     int locked = 0, diff = 0, lock_known;
+    int npc_n = 0;
     char lname[64];
+    char npc_tag[16];
     const char *ent;
     if (dest < 0) continue;
     lock_known = exit_lock_info(g_room, d, lname, sizeof lname, &locked, &diff);
     if (!exit_mode_matches(mode, dest, lock_known, locked)) continue;
     ent = world_room_entity(dest);
+    npc_n = (ent && ent[0]) ? 1 : 0;
+    npc_tag[0] = '\0';
+    if (npc_n > 0) snprintf(npc_tag, sizeof npc_tag, " [npc:%d]", npc_n);
     body_append(body, cap, "  %-10s %-28s [%s]  %s%s%s%s\n", dir_name(d),
                 resolve_world_title(dest), world_slug(dest),
                 lock_known ? (locked ? "[locked]" : "[open]") : "[open]",
                 g_visited[dest] ? " [visited]" : " [new]",
-                (ent && ent[0]) ? " [npc]" : "",
+                npc_tag,
                 (lock_known && locked) ? " [tool?]" : "");
     shown++;
   }
@@ -3308,7 +4348,9 @@ static void show_room(void) {
       snprintf(left, sizeof left, "%-3s- %s", dir_short_name(dd), dir_name(dd));
     }
     if (i < right_n) {
-      snprintf(right, sizeof right, "* %s", g_room_items[g_room][i]);
+      char pretty[32];
+      item_pretty(g_room_items[g_room][i], pretty, sizeof pretty);
+      snprintf(right, sizeof right, "* %s", pretty);
     } else if (room_too_dark_to_see() && i == 0) {
       snprintf(right, sizeof right, "(hidden by darkness)");
     }
@@ -3718,16 +4760,43 @@ static void ui_modding_guide_pager(const char *pending_acc, int *did_fullscreen)
   return_to_game_screen();
 }
 
+static void fill_help_smart_hint(char *buf, size_t cap) {
+  const char *e;
+  if (!buf || cap < 32) return;
+  if (room_too_dark_to_see()) {
+    snprintf(
+        buf, cap,
+        "Smart hint: You are in darkness without a light source in your pack — "
+        "equip or hold a lantern, torch, candle, etc. (see lights), or retreat to "
+        "lit rooms.\n\n");
+    return;
+  }
+  e = world_room_entity(g_room);
+  if (e && e[0]) {
+    snprintf(buf, cap,
+             "Smart hint: Someone may be here — try who, listen, or talk about "
+             "<topic> / talk to <name>.\n\n");
+    return;
+  }
+  snprintf(buf, cap,
+           "Smart hint: Try exits for directions, look or examine for detail, scan "
+           "for a room digest, or unstick / hint when stuck.\n\n");
+}
+
 static void fill_help_text(char *buf, size_t cap) {
-  snprintf(
+  fill_help_smart_hint(buf, cap);
+  body_append(
       buf, cap,
+      "Command groups: Movement · Navigation · Look & status · Inventory · "
+      "Trade · Craft · Time · Notes · Parser · Debug · Saves · Mods\n\n"
       "Tip: after you close this screen, type  help modding  for the scrollable\n"
       "DLC / modding guide (arrow keys, PgUp/Dn; Q or Enter to leave).\n\n"
       "Aeternitas64 — text adventure (%d locations).\n"
-      "  Travel: directions, go/walk/run <dir>, go <n> <dir> (max 50),\n"
+      "  Travel: directions (n/s/e/w…; northward/southwards…; diagonals + -ward forms),\n"
+      "          go/walk/run <dir>, go <n> <dir> (max 50),\n"
       "          approach | goto | walk to | enter <place> — one step if adjacent\n"
       "          or <n> <dir> / <dir> <n> — same; special exits as in exits.\n"
-      "  back [n] | trail | trail stats | trail clear\n"
+      "  back [n] | trail [n] | trail stats | trail clear\n"
       "  waypoints | waystones | nexus  —  attuned travel points (travel network…)\n"
       "  fasttravel <waypoint> | waystone <name> | nexus <name>  —  travel from one\n"
       "  nearby [detail|npc|locked] | map  —  adjacent rooms\n"
@@ -3736,7 +4805,8 @@ static void fill_help_text(char *buf, size_t cap) {
       "          loot value | loot weight\n"
       "  compare <a> / <b>  —  quick appraisal (also: compare <a> vs <b>)\n"
       "  where | whereami  —  here;  where <name> | locate <name>  —  NPC rooms\n"
-      "  look | l | look at / examine / inspect / x <thing>  (x me / self — compact sheet)\n"
+      "  look | l  — room overview;  look/l <thing> | look at / examine /\n"
+      "          inspect / x <thing>  (x me / self — compact sheet)\n"
       "  exits | status | stat (quick status, character status…) | character |\n"
       "          sheet (full portrait) |\n"
       "          character brief | sheet brief | identity (compact sheet); who am i |\n"
@@ -3754,11 +4824,14 @@ static void fill_help_text(char *buf, size_t cap) {
       "  inventory | i | inv | pack — same UI as loadout / gear / equipment / outfit\n"
       "  score  (my score, game stats…)\n"
       "  take | get | grab <item> | (get|grab|take) all [except a,b…]\n"
-      "  wares | shop | prices  —  merchant lists;  buy | purchase | sell <item>\n"
-      "          (patron score shifts your column prices;  reputation  explains it)\n"
-      "  coins | wallet  —  purse;  bare buy/sell opens the price list\n"
+      "  wares | shop | prices  —  merchant lists in g/s/b/c;  buy | purchase | sell <item>\n"
+      "          buy/sell all [except a,b…]; haggle | barter [buy|sell] <item>\n"
+      "          patron score and CHA tilt base prices; haggling quotes one item at a time\n"
+      "          trade history | trade log | transactions  —  completed buy/sell ledger\n"
+      "  coins | wallet | purse  —  purse in gold / silver / bronze / copper; bare buy/sell opens prices\n"
       "  eat | taste <item> | drink | sip <item>  —  consume pack staples\n"
-      "  find <item|npc>  —  scan visible items, pack, and known NPC rooms\n"
+      "  find <item|npc>  —  scan visible items, pack, and known NPC rooms; point me to /\n"
+      "          where was / show me where to find … normalize here\n"
       "  describe | blurb | room  —  fullscreen room text (surroundings, full room…)\n"
       "  drop <item> | drop all | drop all except <...> | put down <item>\n"
       "  give <item>  (someone here)  |  listen | smell\n"
@@ -3776,6 +4849,10 @@ static void fill_help_text(char *buf, size_t cap) {
       "          jot … | jot down … | memo … | remember that …  —  same as note\n"
       "          notes clear\n"
       "  g | again | repeat  —  repeat last input (full chain);  chain with ; or \"then\"\n"
+      "  Parser: deterministic only (no model guessing): fillers/synonyms; bare i→inventory;\n"
+      "  go <dir> alone→move; trailing thanks/please; unique near-verb autofix (edit distance,\n"
+      "  ties and short tokens rejected; rest preserved); where can i find / point me to /\n"
+      "  can i see / tell-style phrases; show me / interact with / discuss / chat about …\n"
       "  Plain English, questions, and prepositions are normalized where sensible\n"
       "  (e.g. instructions, connections, breadcrumbs, shopping list, market,\n"
       "   my saves, my notebook, i need a hint, troubleshoot, map completion,\n"
@@ -3784,7 +4861,8 @@ static void fill_help_text(char *buf, size_t cap) {
       "   topic, topic mood, topic heat, npc trust, npc leverage, conversation topic, salvage)\n"
       "  it | that | this  —  last item (take/drop) or last NPC (after who/talk)\n"
       "  lights  —  light ids; equip/hold/wield <item> | unequip | take off\n"
-      "  search | scan | loot [value|weight] | compare <a>/<b> | who | talk |\n"
+      "  search | scan | loot [value|weight] | compare <a>/<b> | who |\n"
+      "          who all | who global  —  current room vs world NPC placements | talk |\n"
       "          talk about <topic> | talk to <who> about <topic>\n"
       "  topic | last topic | topic mood | topic heat | npc trust | npc leverage  —  last successful\n"
       "          talk-about phrase (mods: %%LASTTOPIC%% %%LASTTOPICMOOD%% %%TOPICHEAT%%)\n"
@@ -3807,13 +4885,15 @@ static void fill_help_text(char *buf, size_t cap) {
       "  mods reload  —  rescan data packs (path: see help modding / --mods)\n"
       "  mods list     —  show pack load order (priority / DLC debugging)\n"
       "  mods doctor   —  verify/repair runtime mod files and show bootstrap health\n"
+      "  mods doctor verbose  —  same, plus full mod status summary\n"
       "  mods directory <path>  —  set mod pack root for this session, then reload\n"
       "  mod crafting: packs may add crafting/profiles.txt and crafting/archetypes.txt\n"
       "  help modding  —  DLC / modding guide (arrow keys, PgUp/Dn; Q quits)\n"
       "  --------------------------------------------------------------------\n"
       "  DLC drops: folders under mods/ with manifest priority=; last load wins.\n"
       "  First run creates 000_aeternitas_sample (tutorial); see PACK_GUIDE.txt.\n"
-      "  Aliases: get/grab/pick up…->take, put down/deposit/stash…->drop\n"
+      "  Aliases: get/grab/snag/lift/pluck/recover/pocket/scoop/pick up…->take, "
+      "put down/deposit/stash…->drop\n"
       "  Dark rooms: light source (see status).  clear | cls\n",
       WORLD_ROOM_COUNT);
 }
@@ -3831,7 +4911,9 @@ static void format_lights_body(char *buf, size_t cap) {
   for (i = 0; i < g_inv_n; i++) {
     int w;
     if (!item_id_is_light(g_inv[i])) continue;
-    w = snprintf(buf + len, cap > len ? cap - len : 0, "  - %s\n", g_inv[i]);
+    char pretty[96];
+    item_pretty(g_inv[i], pretty, sizeof pretty);
+    w = snprintf(buf + len, cap > len ? cap - len : 0, "  - %s\n", pretty);
     if (w < 0 || (size_t)w >= cap - len) break;
     len += (size_t)w;
     any = 1;
@@ -4044,19 +5126,23 @@ static int try_move_n_steps(int dir, int n, char *msg, size_t msgcap,
 
 static int parse_direction_token(const char *tok, int *dir_out) {
   if (!tok || !tok[0]) return 0;
-  if (!strcmp(tok, "n") || !strcmp(tok, "north")) {
+  if (!strcmp(tok, "n") || !strcmp(tok, "north") || !strcmp(tok, "northward") ||
+      !strcmp(tok, "northwards")) {
     *dir_out = DIR_N;
     return 1;
   }
-  if (!strcmp(tok, "s") || !strcmp(tok, "south")) {
+  if (!strcmp(tok, "s") || !strcmp(tok, "south") || !strcmp(tok, "southward") ||
+      !strcmp(tok, "southwards")) {
     *dir_out = DIR_S;
     return 1;
   }
-  if (!strcmp(tok, "e") || !strcmp(tok, "east")) {
+  if (!strcmp(tok, "e") || !strcmp(tok, "east") || !strcmp(tok, "eastward") ||
+      !strcmp(tok, "eastwards")) {
     *dir_out = DIR_E;
     return 1;
   }
-  if (!strcmp(tok, "w") || !strcmp(tok, "west")) {
+  if (!strcmp(tok, "w") || !strcmp(tok, "west") || !strcmp(tok, "westward") ||
+      !strcmp(tok, "westwards")) {
     *dir_out = DIR_W;
     return 1;
   }
@@ -4068,19 +5154,23 @@ static int parse_direction_token(const char *tok, int *dir_out) {
     *dir_out = DIR_D;
     return 1;
   }
-  if (!strcmp(tok, "ne") || !strcmp(tok, "northeast")) {
+  if (!strcmp(tok, "ne") || !strcmp(tok, "northeast") ||
+      !strcmp(tok, "northeastward") || !strcmp(tok, "northeastwards")) {
     *dir_out = DIR_NE;
     return 1;
   }
-  if (!strcmp(tok, "nw") || !strcmp(tok, "northwest")) {
+  if (!strcmp(tok, "nw") || !strcmp(tok, "northwest") ||
+      !strcmp(tok, "northwestward") || !strcmp(tok, "northwestwards")) {
     *dir_out = DIR_NW;
     return 1;
   }
-  if (!strcmp(tok, "se") || !strcmp(tok, "southeast")) {
+  if (!strcmp(tok, "se") || !strcmp(tok, "southeast") ||
+      !strcmp(tok, "southeastward") || !strcmp(tok, "southeastwards")) {
     *dir_out = DIR_SE;
     return 1;
   }
-  if (!strcmp(tok, "sw") || !strcmp(tok, "southwest")) {
+  if (!strcmp(tok, "sw") || !strcmp(tok, "southwest") ||
+      !strcmp(tok, "southwestward") || !strcmp(tok, "southwestwards")) {
     *dir_out = DIR_SW;
     return 1;
   }
@@ -4169,12 +5259,59 @@ static const char *npc_pick_chatter(const AetNpcLineSet *set) {
   return set->chatter[h % n];
 }
 
-static void cmd_who(char *msg, size_t msgcap) {
+static void cmd_who(char *msg, size_t msgcap, int global_mode) {
   const char *ent = world_room_entity(g_room);
   char pretty[128];
   char role[96];
   char banner[256];
   size_t L;
+  if (global_mode) {
+    int i, shown = 0;
+    AetWorldClock wc;
+    pc_format_identity_banner(banner, sizeof banner);
+    get_world_clock(&wc);
+    snprintf(msg, msgcap,
+             "Global NPC presence scan\n\n"
+             "%s\n\n"
+             "Live NPC placements in this build (%s):\n\n",
+             banner, wc.period);
+    for (i = 0; i < WORLD_ROOM_COUNT; i++) {
+      const char *e = world_room_entity(i);
+      char row[256];
+      char who_pretty[96];
+      const char *tag;
+      const char *act;
+      if (!e || !e[0]) continue;
+      entity_pretty(e, who_pretty, sizeof who_pretty);
+      act = npc_activity_for_period(e, wc.period);
+      tag = (i == g_room) ? "  [here]" : "";
+      if (act && act[0])
+        body_append(msg, msgcap, "  • %-20s  —  %s  [%s]%s\n"
+                                 "      activity: %s\n",
+                    who_pretty, resolve_world_title(i), world_slug(i), tag, act);
+      else
+        body_append(msg, msgcap, "  • %-20s  —  %s  [%s]%s\n", who_pretty,
+                    resolve_world_title(i), world_slug(i), tag);
+      shown++;
+      if (strlen(msg) + 280 >= msgcap) {
+        snprintf(row, sizeof row,
+                 "\n  ... truncated after %d placements (use bigger body cap if this world grows).\n",
+                 shown);
+        strncat(msg, row, msgcap - strlen(msg) - 1);
+        break;
+      }
+    }
+    if (shown == 0) {
+      strncat(msg, "  (No room.entity NPC placements found in this build.)\n",
+              msgcap - strlen(msg) - 1);
+    } else {
+      body_append(msg, msgcap,
+                  "\nTotal placements: %d\n"
+                  "Try  where <npc>  for a name-targeted lookup, or plain  who  for the local room.\n",
+                  shown);
+    }
+    return;
+  }
   if (!ent[0]) {
     pc_format_identity_banner(banner, sizeof banner);
     snprintf(msg, msgcap,
@@ -4194,6 +5331,15 @@ static void cmd_who(char *msg, size_t msgcap) {
     (void)snprintf(msg + L, msgcap - L,
                    "\n\nYou appear to others roughly as %s (%s).", role,
                    pc_display_name());
+  {
+    AetWorldClock wc;
+    const char *act;
+    get_world_clock(&wc);
+    act = npc_activity_for_period(ent, wc.period);
+    if (act && act[0] && strlen(msg) + strlen(act) + 48 < msgcap)
+      (void)snprintf(msg + strlen(msg), msgcap - strlen(msg),
+                     "\nCurrent routine: %s.", act);
+  }
 }
 
 static void cmd_talk(const char *target, const char *topic, char *msg,
@@ -4332,6 +5478,7 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
       pc_expand_world_placeholders(use_gr, xp, sizeof xp);
       snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
       remember_npc_here();
+      merchant_rep_bump_conversation(ent, 2);
       return;
     }
     if (dlg->chatter && dlg->chatter[0]) {
@@ -4340,6 +5487,7 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
         pc_expand_world_placeholders(line, xp, sizeof xp);
         snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
         remember_npc_here();
+        merchant_rep_bump_conversation(ent, 2);
         return;
       }
     }
@@ -4347,6 +5495,7 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
       pc_expand_world_placeholders(use_gr, xp, sizeof xp);
       snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
       remember_npc_here();
+      merchant_rep_bump_conversation(ent, 2);
       return;
     }
   }
@@ -4359,6 +5508,7 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
              pretty, ent, role);
   }
   remember_npc_here();
+  merchant_rep_bump_conversation(ent, 2);
 }
 
 static int take_item(const char *name, char *msg, size_t msgcap) {
@@ -4388,8 +5538,10 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
   for (i = 0; i < g_room_item_n[g_room]; i++) {
     if (str_ieq(g_room_items[g_room][i], target)) {
       char taken[MAX_ITEM_LEN];
+      char pretty[96];
       strncpy(taken, g_room_items[g_room][i], MAX_ITEM_LEN - 1);
       taken[MAX_ITEM_LEN - 1] = '\0';
+      item_pretty(taken, pretty, sizeof pretty);
       {
         int cash = tender_pickup_coins(taken);
         for (j = i; j < g_room_item_n[g_room] - 1; j++)
@@ -4397,9 +5549,11 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
         g_room_item_n[g_room]--;
         g_score += 5;
         if (cash > 0) {
+          char cashb[48];
           g_coins += cash;
+          currency_format_long(cash, cashb, sizeof cashb);
           snprintf(msg, msgcap,
-                   "You take %s (%d coins go into your purse).", taken, cash);
+                   "You take %s (%s go into your purse).", pretty, cashb);
         } else {
           inv_add(taken);
           if (str_ieq(taken, "bucket"))
@@ -4409,9 +5563,9 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
                 "It settles against you with the polite mass of an object that "
                 "knows it is in the wrong genre. Somewhere, a narrator clears "
                 "their throat — or maybe that is only wind through the Nexus.",
-                taken);
+                pretty);
           else
-            snprintf(msg, msgcap, "Taken: %s", taken);
+            snprintf(msg, msgcap, "Taken: %s", pretty);
         }
       }
       return 1;
@@ -4419,6 +5573,56 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
   }
   snprintf(msg, msgcap, "You do not see that here.");
   return 0;
+}
+
+static int cmd_protective_grab(const char *raw, char *msg, size_t msgcap) {
+  const char *ent = world_room_entity(g_room);
+  const char *pron = protective_phrase_pronoun(raw);
+  char pretty[64];
+  char detail[240];
+  int named_here;
+  if (!raw || !raw[0]) {
+    snprintf(msg, msgcap,
+             "Protect whom? Try a rescue-style phrase like grab their hand and pull them away from danger.");
+    return 0;
+  }
+  if (!ent || !ent[0]) {
+    snprintf(msg, msgcap, "No one is here to pull clear of danger.");
+    return 0;
+  }
+  entity_pretty(ent, pretty, sizeof pretty);
+  named_here = str_contains_ci(raw, ent) || str_contains_ci(raw, pretty);
+  if (!named_here && !pron) {
+    snprintf(msg, msgcap,
+             "No one here matches that rescue target. Try who or talk to %s.",
+             pretty);
+    return 0;
+  }
+  if (g_intent.friendly || g_intent.careful) {
+    if (pron)
+      snprintf(msg, msgcap,
+               "You read \"%s\" as %s here. You catch %s's hand and guide them clear with careful, protective intent. The parser reads it as a rescue move, not a pickup attempt.",
+               pron, pretty, pretty);
+    else
+      snprintf(msg, msgcap,
+               "You catch %s's hand and guide them clear with careful, protective intent. The parser reads it as a rescue move, not a pickup attempt.",
+               pretty);
+  } else if (g_intent.harsh || g_intent.loud) {
+    snprintf(msg, msgcap,
+             "You seize %s and haul them clear in one urgent motion. The parser still reads the line as protection under pressure, not possession or inventory play.",
+             pretty);
+  } else {
+    snprintf(msg, msgcap,
+             "You grab %s and pull them clear of the danger in one decisive motion. The parser reads it as protection, not a pickup attempt.",
+             pretty);
+  }
+  remember_npc_here();
+  g_last_intent = g_intent;
+  snprintf(detail, sizeof detail, "%s: rescue phrase%s%s", ent,
+           protective_phrase_has_danger_context(raw) ? " [danger]" : "",
+           pron ? " [pronoun]" : "");
+  causal_push("protective-grab", detail);
+  return 1;
 }
 
 static void take_all(char *msg, size_t msgcap) {
@@ -4438,6 +5642,7 @@ static void take_all(char *msg, size_t msgcap) {
 
 static void search_room(char *msg, size_t msgcap) {
   char found[MAX_ITEM_LEN];
+  char pretty[96];
   int j;
   AetPcSave pr;
   pc_capture(&pr);
@@ -4476,13 +5681,14 @@ static void search_room(char *msg, size_t msgcap) {
   g_score += 10;
   if (pr.per >= 15) g_score += 1;
   remember_focus_item(found);
+  item_pretty(found, pretty, sizeof pretty);
   if (room_too_dark_to_see())
     snprintf(msg, msgcap,
-             "Mostly by touch in the dark, you fish out: %s.%s", found,
+             "Mostly by touch in the dark, you fish out: %s.%s", pretty,
              pr.per >= 15 ? " Your hands knew where to linger." : "");
   else
     snprintf(msg, msgcap,
-             "You uncover a concealed stash: %s.%s", found,
+             "You uncover a concealed stash: %s.%s", pretty,
              pr.per >= 15 ? " Details snap into place — you were built to notice."
                           : "");
 }
@@ -4615,8 +5821,10 @@ static void cmd_scan(char *msg, size_t msgcap) {
   if (g_room_item_n[g_room] > 0) {
     strncat(msg, "  ", msgcap - strlen(msg) - 1);
     for (i = 0; i < g_room_item_n[g_room] && strlen(msg) + 2 < msgcap; i++) {
+      char pretty[96];
       if (i) strncat(msg, ", ", msgcap - strlen(msg) - 1);
-      strncat(msg, g_room_items[g_room][i], msgcap - strlen(msg) - 1);
+      item_pretty(g_room_items[g_room][i], pretty, sizeof pretty);
+      strncat(msg, pretty, msgcap - strlen(msg) - 1);
     }
     strncat(msg, "\n", msgcap - strlen(msg) - 1);
   }
@@ -4679,9 +5887,11 @@ static void cmd_loot(char *msg, size_t msgcap, const char *sort) {
 
   for (i = 0; i < n && strlen(msg) + 120 < msgcap; i++) {
     const char *id = g_room_items[g_room][ix[i]];
+    char pretty[96];
     char row[140];
+    item_pretty(id, pretty, sizeof pretty);
     snprintf(row, sizeof row,
-             "  %-36s  ~%3u coin  |  bulk ~%2u\n", id, item_est_value(id),
+             "  %-36s  ~%3u coin  |  bulk ~%2u\n", pretty, item_est_value(id),
              item_est_heft(id));
     strncat(msg, row, msgcap - strlen(msg) - 1);
   }
@@ -4745,6 +5955,7 @@ static void cmd_compare(const char *rest, char *body, size_t cap) {
   char buf[INPUT_LINE_MAX];
   char *div, *a, *b;
   char ia[MAX_ITEM_LEN], ib[MAX_ITEM_LEN];
+  char pretty_a[96], pretty_b[96];
   char err[256];
   char banner[256];
   unsigned va, vb, ha, hb;
@@ -4768,7 +5979,7 @@ static void cmd_compare(const char *rest, char *body, size_t cap) {
           "%s\n\n"
           "Compare what to what?\n\n"
           "Examples:\n"
-          "  compare rusty_pick / scrap_metal\n"
+          "  compare rusty pick / scrap metal\n"
           "  compare bread vs lockpick\n\n"
           "Both objects must be visible here or in your pack.\n",
           banner);
@@ -4800,6 +6011,8 @@ static void cmd_compare(const char *rest, char *body, size_t cap) {
   vb = item_est_value(ib);
   ha = item_est_heft(ia);
   hb = item_est_heft(ib);
+  item_pretty(ia, pretty_a, sizeof pretty_a);
+  item_pretty(ib, pretty_b, sizeof pretty_b);
   la = inv_has(ia) ? "in pack" : "on ground here";
   lb = inv_has(ib) ? "in pack" : "on ground here";
 
@@ -4811,7 +6024,7 @@ static void cmd_compare(const char *rest, char *body, size_t cap) {
            "  Est. value: ~%u coin   Bulk: ~%u   (%s)\n\n"
            "%s\n"
            "  Est. value: ~%u coin   Bulk: ~%u   (%s)\n\n",
-           banner, ia, va, ha, la, ib, vb, hb, lb);
+           banner, pretty_a, va, ha, la, pretty_b, vb, hb, lb);
   if (va > vb)
     strncat(body, "Likelier payday: first item.\n", cap - strlen(body) - 1);
   else if (vb > va)
@@ -4849,6 +6062,7 @@ static int inv_take_out(int ix, char *taken, size_t taken_cap) {
 static int drop_item(const char *name, char *msg, size_t msgcap) {
   int ix, j;
   char dropped[MAX_ITEM_LEN];
+  char pretty[96];
   if (g_room_item_n[g_room] >= MAX_ITEMS_ROOM) {
     snprintf(msg, msgcap, "The floor here is too cluttered to drop that.");
     return 0;
@@ -4880,14 +6094,15 @@ static int drop_item(const char *name, char *msg, size_t msgcap) {
   g_score += 1;
   if (str_ieq(g_ready_item, dropped)) g_ready_item[0] = '\0';
   eq_remove_item_from_slots(dropped);
+  item_pretty(dropped, pretty, sizeof pretty);
   if (str_ieq(dropped, "bucket"))
     snprintf(msg, msgcap,
              "Dropped: %s\n\n"
              "It meets the floor with a sound that insists this has happened "
              "before, in other stories, under other rules.",
-             dropped);
+             pretty);
   else
-    snprintf(msg, msgcap, "Dropped: %s", dropped);
+    snprintf(msg, msgcap, "Dropped: %s", pretty);
   return 1;
 }
 
@@ -4957,15 +6172,49 @@ static void drop_all(char *msg, size_t msgcap) {
     snprintf(msg, msgcap, "You set everything down.");
 }
 
+static void normalize_bulk_exception_list(char *buf) {
+  char tmp[320];
+  size_t i, o = 0;
+  if (!buf || !buf[0]) return;
+  for (i = 0; buf[i] && o + 1 < sizeof tmp; i++) {
+    if (buf[i] == ';') {
+      tmp[o++] = ',';
+      continue;
+    }
+    if (buf[i] == '&') {
+      while (o > 0 && tmp[o - 1] == ' ') o--;
+      if (o > 0 && tmp[o - 1] != ',') tmp[o++] = ',';
+      continue;
+    }
+    if (i > 0 && buf[i - 1] == ' ' && !strncmp(buf + i, "and ", 4)) {
+      while (o > 0 && tmp[o - 1] == ' ') o--;
+      if (o > 0 && tmp[o - 1] != ',') tmp[o++] = ',';
+      i += 3;
+      continue;
+    }
+    if (i > 0 && buf[i - 1] == ' ' && !strncmp(buf + i, "plus ", 5)) {
+      while (o > 0 && tmp[o - 1] == ' ') o--;
+      if (o > 0 && tmp[o - 1] != ',') tmp[o++] = ',';
+      i += 4;
+      continue;
+    }
+    tmp[o++] = buf[i];
+  }
+  tmp[o] = '\0';
+  snprintf(buf, 320, "%s", tmp);
+}
+
 static int item_excluded(const char *item, const char *except_csv) {
   char buf[320];
   char *tok;
   if (!except_csv || !except_csv[0]) return 0;
   strncpy(buf, except_csv, sizeof buf - 1);
   buf[sizeof buf - 1] = '\0';
+  normalize_bulk_exception_list(buf);
   for (tok = strtok(buf, ","); tok != NULL; tok = strtok(NULL, ",")) {
     char qn[MAX_ITEM_LEN];
     while (*tok == ' ' || *tok == '\t') tok++;
+    strip_leading_articles(tok);
     strip_trailing_space(tok);
     if (!tok[0]) continue;
     query_norm_underscore(qn, sizeof qn, tok);
@@ -5403,14 +6652,30 @@ static void format_locate_body(char *body, size_t cap, const char *raw) {
   snprintf(body, cap, "%s\n\nSearch for \"%s\":\n\n", banner, raw);
   for (i = 0; i < WORLD_ROOM_COUNT; i++) {
     const char *ent = world_room_entity(i);
+    const AetNpcRoutine *rt;
     char pretty[96];
     char line[200];
     if (!ent[0]) continue;
     entity_pretty(ent, pretty, sizeof pretty);
+    rt = npc_routine_for(ent);
     if (str_ieq(ent, buf) || strstr(ent, qn) != NULL ||
         str_ieq(pretty, buf)) {
-      snprintf(line, sizeof line, "  %s  [%s]  —  %s\n", pretty, ent,
-               resolve_world_title(i));
+      if (rt) {
+        AetWorldClock wc;
+        const char *act;
+        get_world_clock(&wc);
+        act = npc_activity_for_period(ent, wc.period);
+        if (act && act[0])
+          snprintf(line, sizeof line,
+                   "  %s  [%s]  —  %s  (%s routine: %s)\n", pretty, ent,
+                   resolve_world_title(i), wc.period, act);
+        else
+          snprintf(line, sizeof line, "  %s  [%s]  —  %s  (%s routine)\n", pretty,
+                   ent, resolve_world_title(i), wc.period);
+      } else {
+        snprintf(line, sizeof line, "  %s  [%s]  —  %s\n", pretty, ent,
+                 resolve_world_title(i));
+      }
       strncat(body, line, cap - strlen(body) - 1);
     }
   }
@@ -5425,23 +6690,25 @@ static void format_journal_body(char *body, size_t cap) {
   int w;
   char role[96];
   char pr[64];
+  char purseb[48];
   AetPcSave jp;
   pc_capture(&jp);
   pc_fill_narrative_defaults(&jp);
   pc_format_role_phrase(role, sizeof role);
   pc_format_pronouns_short(jp.gender[0] ? jp.gender : "they", pr, sizeof pr);
+  currency_format_compact(g_coins, purseb, sizeof purseb);
   snprintf(body, cap,
            "Journal (ASCII port)\n\n"
            "  Character: %s (%s)\n"
            "  Pronouns: %s\n\n"
            "  Location: %s\n"
            "  Explored: %d / %d locations\n"
-           "  Health: %d / %d   Coins: %d   Score: %d   Turns: %d\n\n"
+           "  Health: %d / %d   Purse: %s   Score: %d   Turns: %d\n\n"
            "  Loose goals: find light for dark rooms, open the house, search "
            "for caches,\n"
            "  talk to anyone present, map exits with \"nearby\" and \"route\".\n",
            pc_display_name(), role, pr, resolve_world_title(g_room),
-           count_visited(), WORLD_ROOM_COUNT, g_health, g_max_health, g_coins,
+           count_visited(), WORLD_ROOM_COUNT, g_health, g_max_health, purseb,
            g_score, g_turns);
   len = strlen(body);
   if (!qh || !*qh || len + 80 >= cap) return;
@@ -5461,9 +6728,12 @@ static void format_journal_body(char *body, size_t cap) {
 static void format_aptitudes_body(char *body, size_t cap) {
   AetPcSave p;
   int any = 0;
+  int buy_edge, sell_edge;
   char pr[64];
   pc_capture(&p);
   pc_fill_narrative_defaults(&p);
+  buy_edge = merchant_trade_buy_skill_pct(p.cha);
+  sell_edge = merchant_trade_sell_skill_pct(p.cha);
   pc_format_pronouns_short(p.gender[0] ? p.gender : "they", pr, sizeof pr);
   snprintf(
       body, cap,
@@ -5515,6 +6785,11 @@ static void format_aptitudes_body(char *body, size_t cap) {
   if (!any)
     body_append(body, cap,
                 "  • Balanced or still forming — no pair dominated the chart.\n");
+  body_append(body, cap,
+              "\nCommerce\n"
+              "  • Trading edge — %s. Current read: buy %d%%, sell %d%% "
+              "(merchant goods under 4 copper may still round flat).\n",
+              merchant_trade_skill_label(p.cha), buy_edge, sell_edge);
   body_append(
       body, cap,
       "\nTry  character  for the portrait,  objectives  for the world checklist.\n"
@@ -5545,7 +6820,9 @@ static void format_reputation_body(char *body, size_t cap) {
       "Effects (when trading here)\n"
       "  Stranger → better prices as you climb toward Renowned (caps modest so "
       "the\n"
-      "  economy cannot break).\n\n");
+      "  economy cannot break).\n"
+      "  Your CHA also adds a separate trading edge shown in wares and "
+      "aptitudes.\n\n");
   if (n <= 0) {
     body_append(body, cap, "(No merchant roster in this world.)\n");
     return;
@@ -5593,6 +6870,60 @@ static int str_contains_ci(const char *haystack, const char *needle) {
     if (i == nl) return 1;
   }
   return 0;
+}
+
+static int text_has_word_ci(const char *text, const char *word) {
+  size_t wl;
+  const char *p;
+  if (!text || !word || !word[0]) return 0;
+  wl = strlen(word);
+  for (p = text; *p; p++) {
+    size_t i = 0;
+    if (p != text &&
+        (isalnum((unsigned char)p[-1]) || (unsigned char)p[-1] == '_'))
+      continue;
+    while (i < wl && p[i] &&
+           tolower((unsigned char)p[i]) == tolower((unsigned char)word[i]))
+      i++;
+    if (i == wl &&
+        !(isalnum((unsigned char)p[i]) || (unsigned char)p[i] == '_'))
+      return 1;
+  }
+  return 0;
+}
+
+static int protective_phrase_has_danger_context(const char *text) {
+  return str_contains_ci(text, "away from danger") ||
+         str_contains_ci(text, "out of danger") ||
+         str_contains_ci(text, "to safety") ||
+         text_has_word_ci(text, "danger") || text_has_word_ci(text, "harm") ||
+         text_has_word_ci(text, "trouble") || text_has_word_ci(text, "threat") ||
+         text_has_word_ci(text, "fire") || text_has_word_ci(text, "safe") ||
+         text_has_word_ci(text, "safety");
+}
+
+static int protective_phrase_is_candidate(const char *text) {
+  int has_hand;
+  int has_pull;
+  int has_route;
+  if (!text || !text[0]) return 0;
+  has_hand = text_has_word_ci(text, "hand") || text_has_word_ci(text, "arm") ||
+             text_has_word_ci(text, "wrist");
+  has_pull = text_has_word_ci(text, "pull") || text_has_word_ci(text, "guide") ||
+             text_has_word_ci(text, "lead") || text_has_word_ci(text, "draw");
+  has_route = str_contains_ci(text, "away from") ||
+              text_has_word_ci(text, "aside") || text_has_word_ci(text, "clear") ||
+              str_contains_ci(text, "to safety");
+  return has_hand && has_pull && has_route &&
+         protective_phrase_has_danger_context(text);
+}
+
+static const char *protective_phrase_pronoun(const char *text) {
+  if (text_has_word_ci(text, "her")) return "her";
+  if (text_has_word_ci(text, "him")) return "him";
+  if (text_has_word_ci(text, "them")) return "them";
+  if (text_has_word_ci(text, "their")) return "their";
+  return NULL;
 }
 
 static void format_traits_body(char *body, size_t cap) {
@@ -5735,7 +7066,9 @@ static void format_momentum_body(char *body, size_t cap) {
   int pct =
       (WORLD_ROOM_COUNT > 0) ? (v * 100) / WORLD_ROOM_COUNT : 0;
   char banner[256];
+  char purseb[32];
   pc_format_identity_banner(banner, sizeof banner);
+  currency_format_compact(g_coins, purseb, sizeof purseb);
   snprintf(
       body, cap,
       "Momentum\n\n"
@@ -5752,9 +7085,9 @@ static void format_momentum_body(char *body, size_t cap) {
               "  Turns taken:     %d\n"
               "  Map footprint:   %d / %d locations (%d%%)\n"
               "  Score:           %d\n"
-              "  Coins:           %d\n"
+              "  Purse:           %s\n"
               "  Condition:       %d / %d\n\n",
-              g_turns, v, WORLD_ROOM_COUNT, pct, g_score, g_coins, g_health,
+              g_turns, v, WORLD_ROOM_COUNT, pct, g_score, purseb, g_health,
               g_max_health);
   body_append(body, cap, "Read of the moment\n");
   if (pct < 25)
@@ -6038,13 +7371,15 @@ static void format_rapport_body(char *body, size_t cap) {
       body, cap,
       "Rapport\n\n"
       "%s — %s · %s\n\n"
-      "Other editions track relationship stages per NPC — stranger, friend, "
-      "partner — with\n"
-      "automated deltas on every line of dialogue. The stdin port has no silent "
-      "graph behind\n"
-      "your back: you get reliable anchors (who exists in world data, where "
-      "they live)\n"
-      "plus tools to remember the rest yourself.\n\n",
+      "Trading-circle NPCs (same roster as shop patrons) carry friendship and "
+      "romance scores,\n"
+      "folded into a relationship stage together with patron standing. Talk "
+      "topics, gifts,\n"
+      "and banter increase those meters; values persist in your save (SOC "
+      "block).\n"
+      "Other room NPCs (not on the merchant roster) use the SOC2 extension: "
+      "same bars,\n"
+      "patron rep omitted — rows keyed by entity slug.\n\n",
       pc_display_name(), role, pr);
   body_append(body, cap,
                 "Anchored cast (from room.entity — sorted by id)\n\n");
@@ -6067,13 +7402,69 @@ static void format_rapport_body(char *body, size_t cap) {
                 "  %s is tied to this room — try  who ,  talk ,  talk about …\n",
                 pretty);
   }
+  body_append(body, cap,
+              "\nTrade-circle ties (merchant roster)\n"
+              "Stages derive from friendship · romance · patron rep together "
+              "(0–100 bars).\n\n");
+  {
+    int mc = aet_merchant_count();
+    int si;
+    if (mc > AETER_REP_MAX) mc = AETER_REP_MAX;
+    for (si = 0; si < mc && strlen(body) + 160 < cap; si++) {
+      const char *slug = aet_merchant_slug_at(si);
+      char pretty_m[112];
+      unsigned char st;
+      int rep_s;
+      if (!slug || !slug[0]) continue;
+      entity_pretty(slug, pretty_m, sizeof pretty_m);
+      st = soc_derive_stage(si);
+      rep_s = merchant_rep_score(si);
+      body_append(body, cap,
+                  "  • %-22s\n"
+                  "    stage %-18s | friendship %u | romance %u | patron %d (%s)\n",
+                  pretty_m, soc_stage_name(st),
+                  (unsigned)g_npc_friendship[si],
+                  (unsigned)g_npc_romance[si], rep_s,
+                  merchant_rep_tier_label(rep_s));
+      if (g_npc_last_social_turn[si] > 0)
+        body_append(body, cap, "    last social interaction: turn %d\n",
+                    g_npc_last_social_turn[si]);
+    }
+  }
+  body_append(body, cap,
+              "\nOther NPC ties (non-merchant room.entity slugs, SOC2)\n"
+              "Stages use friendship and romance only (no patron discount "
+              "track).\n\n");
+  {
+    int si, any = 0;
+    for (si = 0; si < AETER_SOC_NPC_MAX; si++) {
+      char pretty_o[112];
+      unsigned char st;
+      if (!g_soc_npc_slug[si][0]) continue;
+      any = 1;
+      if (strlen(body) + 180 >= cap) break;
+      entity_pretty(g_soc_npc_slug[si], pretty_o, sizeof pretty_o);
+      st = soc_derive_stage_npc_slug(g_soc_npc_slug[si]);
+      body_append(body, cap,
+                  "  • %-22s\n"
+                  "    stage %-18s | friendship %u | romance %u\n",
+                  pretty_o, soc_stage_name(st),
+                  (unsigned)g_soc_npc_friendship[si],
+                  (unsigned)g_soc_npc_romance[si]);
+      if (g_soc_npc_last_turn[si] > 0)
+        body_append(body, cap, "    last social interaction: turn %d\n",
+                    g_soc_npc_last_turn[si]);
+    }
+    if (!any)
+      body_append(body, cap,
+                  "  (None tracked yet — talk while they are present.)\n");
+  }
   body_append(
       body, cap,
       "\nPlayer memory\n"
-      "  •  notes  — free-form stages (e.g. \"Miller — owes a favor\")\n"
+      "  •  notes  — free-form beats the meters miss\n"
       "  •  reputation  — faction blurbs;  bio  — backstory hooks\n\n"
-      "Mods can append relationship ladders, jealousy flags, or episode "
-      "timelines below.\n");
+      "Mods can append jealousy arcs, rivalry hooks, or episode ladders below.\n");
 }
 
 static void format_vitals_body(char *body, size_t cap) {
@@ -6126,10 +7517,58 @@ static void format_vitals_body(char *body, size_t cap) {
       body, cap,
       "\nRecovery tools in this build\n"
       "  eat / drink / rest / wait  — when the world gives you staples\n"
-      "  status  — coins, inventory pressure, room context in one sheet\n\n"
+      "  status  — purse, inventory pressure, room context in one sheet\n\n"
       "When mana, stamina, or sleep debt become real saves, they will surface "
       "here first.\n"
       "Mods can append wound clocks, poison tags, or clinician notes below.\n");
+}
+
+static unsigned inventory_item_bulk(const char *slug) {
+  const AetItemCatalogEntry *cat;
+  unsigned est;
+  if (!slug || !slug[0]) return 1u;
+  cat = aet_item_catalog_by_slug(slug);
+  if (cat && cat->wgt > 0) return (unsigned)cat->wgt;
+  est = item_est_heft(slug);
+  if (est <= 8u) return 1u;
+  if (est <= 16u) return 2u;
+  if (est <= 28u) return 3u;
+  if (est <= 40u) return 4u;
+  if (est <= 52u) return 5u;
+  return 6u;
+}
+
+static unsigned inventory_total_bulk(void) {
+  int i;
+  unsigned total = 0;
+  for (i = 0; i < g_inv_n; i++) total += inventory_item_bulk(g_inv[i]);
+  return total;
+}
+
+static int inventory_heaviest_items(char out[][MAX_ITEM_LEN], unsigned out_bulk[],
+                                    int max_out) {
+  int i, j, n = 0;
+  if (!out || !out_bulk || max_out <= 0) return 0;
+  for (i = 0; i < g_inv_n; i++) {
+    unsigned bulk = inventory_item_bulk(g_inv[i]);
+    int pos = n;
+    for (j = 0; j < n; j++) {
+      if (bulk > out_bulk[j]) {
+        pos = j;
+        break;
+      }
+    }
+    if (pos >= max_out) continue;
+    if (n < max_out) n++;
+    for (j = n - 1; j > pos; j--) {
+      out_bulk[j] = out_bulk[j - 1];
+      memcpy(out[j], out[j - 1], MAX_ITEM_LEN);
+    }
+    out_bulk[pos] = bulk;
+    strncpy(out[pos], g_inv[i], MAX_ITEM_LEN - 1);
+    out[pos][MAX_ITEM_LEN - 1] = '\0';
+  }
+  return n;
 }
 
 static void format_contextual_hints_body(char *body, size_t cap) {
@@ -6138,6 +7577,7 @@ static void format_contextual_hints_body(char *body, size_t cap) {
   const char *slug;
   const char *hsfx;
   size_t len0;
+  unsigned pack_bulk;
 
   if (!body || cap < 256) return;
   if (!g_hints_pref) {
@@ -6163,6 +7603,7 @@ static void format_contextual_hints_body(char *body, size_t cap) {
         pc_display_name(), role, pr);
   }
   len0 = strlen(body);
+  pack_bulk = inventory_total_bulk();
 
   if (room_too_dark_to_see())
     body_append(body, cap,
@@ -6188,6 +7629,32 @@ static void format_contextual_hints_body(char *body, size_t cap) {
     body_append(body, cap,
                 "• Inventory full — drop, sell, or use items before new loot "
                 "sticks.\n");
+
+  if ((g_inv_n >= 6 && pack_bulk >= 10u) || pack_bulk >= 12u) {
+    char heavy[3][MAX_ITEM_LEN];
+    unsigned heavy_bulk[3] = {0u, 0u, 0u};
+    int n_heavy, i;
+    body_append(body, cap,
+                g_inv_n >= MAX_INV
+                    ? "• Pack weight is high too — est. bulk %u across %d item(s). "
+                      "Use loot weight before taking more, then drop, sell, or use "
+                      "the worst anchors first.\n"
+                    : "• Pack pressure is building — est. bulk %u across %d item(s). "
+                      "Use loot weight before scooping more, compare marginal items, "
+                      "and drop or sell the worst anchors first.\n",
+                pack_bulk, g_inv_n);
+    n_heavy = inventory_heaviest_items(heavy, heavy_bulk, 3);
+    if (n_heavy > 0) {
+      body_append(body, cap, "  Heaviest right now: ");
+      for (i = 0; i < n_heavy; i++) {
+        char pretty[96];
+        if (i) body_append(body, cap, i + 1 < n_heavy ? ", " : " and ");
+        item_pretty(heavy[i], pretty, sizeof pretty);
+        body_append(body, cap, "%s (~%u)", pretty, heavy_bulk[i]);
+      }
+      body_append(body, cap, ".\n");
+    }
+  }
 
   if (ent && ent[0]) {
     char pretty[96];
@@ -6364,6 +7831,7 @@ static void format_notes_stats_body(char *body, size_t cap) {
 static void cmd_give(const char *rest, char *msg, size_t msgcap) {
   char work[256];
   char taken[MAX_ITEM_LEN];
+  char itempretty[96];
   char pretty[128];
   char *to_sep;
   const char *ent = world_room_entity(g_room);
@@ -6396,14 +7864,18 @@ static void cmd_give(const char *rest, char *msg, size_t msgcap) {
   }
   entity_pretty(ent, pretty, sizeof pretty);
   inv_take_out(ix, taken, sizeof taken);
+  item_pretty(taken, itempretty, sizeof itempretty);
   if (str_ieq(g_last_focus, taken)) clear_focus();
   if (str_ieq(g_ready_item, taken)) g_ready_item[0] = '\0';
   g_score += 2;
-  if (aet_merchant_index(ent) >= 0) merchant_rep_bump_gift(ent);
+  if (aet_merchant_index(ent) >= 0)
+    merchant_rep_bump_gift(ent);
+  else
+    soc_bump_gift(ent);
   snprintf(msg, msgcap,
            "You hand over %s to %s. They accept it with a cautious nod toward "
            "%s.",
-           taken, pretty, pc_display_name());
+           itempretty, pretty, pc_display_name());
 }
 
 static int format_merchant_wares(char *body, size_t cap) {
@@ -6416,12 +7888,20 @@ static int format_merchant_wares(char *body, size_t cap) {
   int any;
   int mix;
   int rep0;
+  AetPcSave p;
+  int buy_edge, sell_edge;
+  char purseb[32];
   if (!ent[0]) return 0;
   mt = aet_merchant_trades(ent);
   if (!mt) return 0;
   entity_pretty(ent, pretty, sizeof pretty);
   mix = aet_merchant_index(ent);
   rep0 = merchant_rep_score(mix);
+  pc_capture(&p);
+  pc_fill_narrative_defaults(&p);
+  buy_edge = merchant_trade_buy_skill_pct(p.cha);
+  sell_edge = merchant_trade_sell_skill_pct(p.cha);
+  currency_format_compact(g_coins, purseb, sizeof purseb);
   w = snprintf(body, cap, "%s — trade list\n\n", pretty);
   if (w < 0 || (size_t)w >= cap) return 1;
   len = (size_t)w;
@@ -6433,19 +7913,45 @@ static int format_merchant_wares(char *body, size_t cap) {
     if (w < 0 || len + (size_t)w >= cap) return 1;
     len += (size_t)w;
   }
+  w = snprintf(body + len, cap - len,
+               "Trade knack: %s (CHA %d) — buy edge %d%%, sell edge %d%%.\n\n",
+               merchant_trade_skill_label(p.cha), p.cha, buy_edge, sell_edge);
+  if (w < 0 || len + (size_t)w >= cap) return 1;
+  len += (size_t)w;
+  if (barter_quote_sync() && str_ieq(g_barter_merchant, ent)) {
+    char qb[48], lb[48];
+    char itempretty[96];
+    currency_format_long(g_barter_price, qb, sizeof qb);
+    currency_format_long(g_barter_list_price, lb, sizeof lb);
+    item_pretty(g_barter_item, itempretty, sizeof itempretty);
+    w = snprintf(body + len, cap - len,
+                 "Pending barter quote: %s %s for %s (list %s). "
+                 "Use %s %s before turn %d.\n\n",
+                 g_barter_mode == BARTER_SELL ? "sell" : "buy", itempretty, qb,
+                 lb,
+                 g_barter_mode == BARTER_SELL ? "sell" : "buy", itempretty,
+                 g_barter_expire_turn);
+    if (w < 0 || len + (size_t)w >= cap) return 1;
+    len += (size_t)w;
+  }
   w = snprintf(body + len, cap - len, "For sale (you pay):\n");
   if (w < 0 || len + (size_t)w >= cap) return 1;
   len += (size_t)w;
   any = 0;
   for (o = mt->stock; o->item && o->item[0]; o++) {
-    int ypay = mix >= 0 ? merchant_adjust_buy_price(o->price, rep0) : o->price;
+    int ypay = mix >= 0 ? merchant_adjust_buy_price(o->price, rep0, p.cha)
+                        : merchant_adjust_buy_price(o->price, 0, p.cha);
+    char payb[16], listb[16];
+    char itempretty[96];
+    currency_format_compact(ypay, payb, sizeof payb);
+    currency_format_compact(o->price, listb, sizeof listb);
+    item_pretty(o->item, itempretty, sizeof itempretty);
     any = 1;
     if (mix >= 0 && ypay != o->price)
-      w = snprintf(body + len, cap - len, "  %-28s  %4d coins  (list %d)\n",
-                   o->item, ypay, o->price);
+      w = snprintf(body + len, cap - len, "  %-28s  %10s  (list %s)\n",
+                   itempretty, payb, listb);
     else
-      w = snprintf(body + len, cap - len, "  %-28s  %4d coins\n", o->item,
-                   o->price);
+      w = snprintf(body + len, cap - len, "  %-28s  %10s\n", itempretty, payb);
     if (w < 0 || len + (size_t)w >= cap - 32) break;
     len += (size_t)w;
   }
@@ -6459,14 +7965,19 @@ static int format_merchant_wares(char *body, size_t cap) {
   len += (size_t)w;
   any = 0;
   for (o = mt->buys; o->item && o->item[0]; o++) {
-    int yget = mix >= 0 ? merchant_adjust_sell_price(o->price, rep0) : o->price;
+    int yget = mix >= 0 ? merchant_adjust_sell_price(o->price, rep0, p.cha)
+                        : merchant_adjust_sell_price(o->price, 0, p.cha);
+    char getb[16], listb[16];
+    char itempretty[96];
+    currency_format_compact(yget, getb, sizeof getb);
+    currency_format_compact(o->price, listb, sizeof listb);
+    item_pretty(o->item, itempretty, sizeof itempretty);
     any = 1;
     if (mix >= 0 && yget != o->price)
-      w = snprintf(body + len, cap - len, "  %-28s  %4d coins  (list %d)\n",
-                   o->item, yget, o->price);
+      w = snprintf(body + len, cap - len, "  %-28s  %10s  (list %s)\n",
+                   itempretty, getb, listb);
     else
-      w = snprintf(body + len, cap - len, "  %-28s  %4d coins\n", o->item,
-                   o->price);
+      w = snprintf(body + len, cap - len, "  %-28s  %10s\n", itempretty, getb);
     if (w < 0 || len + (size_t)w >= cap - 64) break;
     len += (size_t)w;
   }
@@ -6476,15 +7987,347 @@ static int format_merchant_wares(char *body, size_t cap) {
     len += (size_t)w;
   }
   (void)snprintf(body + len, cap > len ? cap - len : 0,
-                 "\nYou have %d coins.  buy <item>  |  sell <item>\n",
-                 g_coins);
+                 "\nPurse: %s.  buy <item>  |  sell <item>  |  buy/sell all [except ...]\n"
+                 "haggle [buy|sell] <item>  quotes one item for a few turns.\n",
+                 purseb);
   return 1;
+}
+
+static int merchant_buys_item(const AetMerchantTable *mt, const char *item) {
+  const AetMerchantOffer *o;
+  if (!mt || !item || !item[0]) return 0;
+  for (o = mt->buys; o->item && o->item[0]; o++) {
+    if (str_ieq(item, o->item)) return 1;
+  }
+  return 0;
+}
+
+static int merchant_offer_matches_query(const char *item, const char *q,
+                                        const char *qnorm) {
+  return room_item_matches_query(item, q, qnorm);
+}
+
+static void cmd_trade_buy_all_except(const char *except_csv, char *msg,
+                                     size_t msgcap) {
+  const char *ent;
+  const AetMerchantTable *mt;
+  const AetMerchantOffer *o;
+  char pretty[96];
+  char one[256];
+  int eligible = 0;
+  int bought = 0;
+  int total = 0;
+  int partial = 0;
+  if (!msg || msgcap == 0) return;
+  ent = world_room_entity(g_room);
+  if (!ent[0]) {
+    snprintf(msg, msgcap, "There is no trader here.");
+    return;
+  }
+  mt = aet_merchant_trades(ent);
+  if (!mt) {
+    entity_pretty(ent, pretty, sizeof pretty);
+    snprintf(msg, msgcap, "%s is not a trader in this port.", pretty);
+    return;
+  }
+  for (o = mt->stock; o->item && o->item[0]; o++) {
+    int before;
+    if (item_excluded(o->item, except_csv)) continue;
+    eligible++;
+    before = g_coins;
+    snprintf(one, sizeof one, "%s", o->item);
+    cmd_trade_buy(one, msg, msgcap);
+    if (!strncmp(msg, "Bought ", 7)) {
+      bought++;
+      total += before - g_coins;
+    } else {
+      partial = 1;
+    }
+  }
+  if (bought == 0) {
+    if (eligible == 0)
+      snprintf(msg, msgcap,
+               "Your exception list leaves nothing to buy from this merchant.");
+    return;
+  }
+  if (!partial && bought == eligible)
+    {
+      char totalb[48];
+      currency_format_long(total, totalb, sizeof totalb);
+      snprintf(msg, msgcap, "You buy %d listed good%s for %s total.", bought,
+               bought == 1 ? "" : "s", totalb);
+    }
+  else
+    {
+      char totalb[48];
+      currency_format_long(total, totalb, sizeof totalb);
+      snprintf(msg, msgcap,
+               "You buy %d listed good%s for %s total. Some offers remain "
+               "(filtered, too expensive, or no pack room).",
+               bought, bought == 1 ? "" : "s", totalb);
+    }
+}
+
+static void cmd_trade_sell_all_except(const char *except_csv, char *msg,
+                                      size_t msgcap) {
+  const char *ent;
+  const AetMerchantTable *mt;
+  const AetMerchantOffer *o;
+  char pretty[96];
+  char one[MAX_ITEM_LEN];
+  int eligible = 0;
+  int sold = 0;
+  int total = 0;
+  int partial = 0;
+  int guard = 0;
+  int i;
+  if (!msg || msgcap == 0) return;
+  ent = world_room_entity(g_room);
+  if (!ent[0]) {
+    snprintf(msg, msgcap, "There is no buyer here.");
+    return;
+  }
+  mt = aet_merchant_trades(ent);
+  if (!mt) {
+    entity_pretty(ent, pretty, sizeof pretty);
+    snprintf(msg, msgcap, "%s is not a trader in this port.", pretty);
+    return;
+  }
+  for (o = mt->buys; o->item && o->item[0]; o++) break;
+  if (!o || !o->item || !o->item[0]) {
+    entity_pretty(ent, pretty, sizeof pretty);
+    snprintf(msg, msgcap, "%s is not buying goods here.", pretty);
+    return;
+  }
+  for (i = 0; i < g_inv_n; i++) {
+    if (item_excluded(g_inv[i], except_csv)) continue;
+    if (!merchant_buys_item(mt, g_inv[i])) continue;
+    eligible++;
+  }
+  while (guard++ < MAX_INV * 2) {
+    int picked = -1;
+    int before;
+    for (i = 0; i < g_inv_n; i++) {
+      if (item_excluded(g_inv[i], except_csv)) continue;
+      if (!merchant_buys_item(mt, g_inv[i])) continue;
+      picked = i;
+      break;
+    }
+    if (picked < 0) break;
+    before = g_coins;
+    snprintf(one, sizeof one, "%s", g_inv[picked]);
+    cmd_trade_sell(one, msg, msgcap);
+    if (!strncmp(msg, "Sold ", 5)) {
+      sold++;
+      total += g_coins - before;
+    } else {
+      partial = 1;
+      break;
+    }
+  }
+  if (sold == 0) {
+    if (eligible == 0)
+      snprintf(msg, msgcap,
+               "You are not carrying anything this merchant will buy%s%s.",
+               except_csv && except_csv[0] ? " outside " : "",
+               except_csv && except_csv[0] ? "your exception list" : "");
+    return;
+  }
+  if (!partial && sold == eligible)
+    {
+      char totalb[48];
+      currency_format_long(total, totalb, sizeof totalb);
+      snprintf(msg, msgcap, "You sell %d carried good%s for %s total.", sold,
+               sold == 1 ? "" : "s", totalb);
+    }
+  else
+    {
+      char totalb[48];
+      currency_format_long(total, totalb, sizeof totalb);
+      snprintf(msg, msgcap,
+               "You sell %d carried good%s for %s total. Some saleable "
+               "items remain.",
+               sold, sold == 1 ? "" : "s", totalb);
+    }
+}
+
+static void cmd_trade_haggle(const char *rest, char *msg, size_t msgcap) {
+  char work[256];
+  char norm[MAX_ITEM_LEN];
+  char pretty[96];
+  char detail[160];
+  char itembuf[MAX_ITEM_LEN];
+  char itempretty[96];
+  char invpretty[96];
+  char *item = work;
+  const char *ent;
+  const AetMerchantTable *mt;
+  const AetMerchantOffer *buy_offer = NULL;
+  const AetMerchantOffer *sell_offer = NULL;
+  AetPcSave pc;
+  int mix, rep0, friendship;
+  int mode = BARTER_NONE;
+  int can_buy = 0;
+  int can_sell = 0;
+  int ix = -1;
+  int quote = 0;
+  if (!rest) rest = "";
+  strncpy(work, rest, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  strip_leading_articles(work);
+  strip_trailing_space(work);
+  if (!work[0]) {
+    snprintf(msg, msgcap,
+             "Haggle what? Try: haggle buy <item>  or  haggle sell <item>.");
+    return;
+  }
+  if (!strncmp(work, "buy ", 4)) {
+    mode = BARTER_BUY;
+    item = work + 4;
+  } else if (!strncmp(work, "purchase ", 9)) {
+    mode = BARTER_BUY;
+    item = work + 9;
+  } else if (!strncmp(work, "sell ", 5)) {
+    mode = BARTER_SELL;
+    item = work + 5;
+  }
+  while (*item == ' ') item++;
+  strip_leading_articles(item);
+  strip_trailing_space(item);
+  if (!item[0]) {
+    snprintf(msg, msgcap,
+             "Haggle what? Try: haggle buy <item>  or  haggle sell <item>.");
+    return;
+  }
+  ent = world_room_entity(g_room);
+  if (!ent[0]) {
+    snprintf(msg, msgcap, "There is no trader here to bargain with.");
+    return;
+  }
+  mt = aet_merchant_trades(ent);
+  if (!mt) {
+    entity_pretty(ent, pretty, sizeof pretty);
+    snprintf(msg, msgcap, "%s is not a trader in this port.", pretty);
+    return;
+  }
+  pc_capture(&pc);
+  pc_fill_narrative_defaults(&pc);
+  mix = aet_merchant_index(ent);
+  rep0 = merchant_rep_score(mix);
+  friendship = merchant_friendship_score(mix);
+  query_norm_underscore(norm, sizeof norm, item);
+  for (sell_offer = mt->stock; sell_offer->item && sell_offer->item[0]; sell_offer++) {
+    if (merchant_offer_matches_query(sell_offer->item, item, norm)) {
+      can_buy = 1;
+      break;
+    }
+  }
+  {
+    int r = resolve_inv_item_query(item, &ix, NULL, 0);
+    if (r == 0) r = resolve_inv_item_query(norm, &ix, NULL, 0);
+    if (r > 0 && ix >= 0 && merchant_buys_item(mt, g_inv[ix])) {
+      can_sell = 1;
+      snprintf(itembuf, sizeof itembuf, "%s", g_inv[ix]);
+      for (buy_offer = mt->buys; buy_offer->item && buy_offer->item[0]; buy_offer++) {
+        if (str_ieq(buy_offer->item, itembuf)) break;
+      }
+    }
+  }
+  if (mode == BARTER_NONE) {
+    if (can_buy && !can_sell)
+      mode = BARTER_BUY;
+    else if (can_sell && !can_buy)
+      mode = BARTER_SELL;
+    else if (can_buy && can_sell) {
+      item_pretty(sell_offer->item, itempretty, sizeof itempretty);
+      item_pretty(itembuf, invpretty, sizeof invpretty);
+      snprintf(msg, msgcap,
+               "Be specific here: haggle buy %s  or  haggle sell %s.", itempretty,
+               invpretty);
+      return;
+    }
+  }
+  if (mode == BARTER_BUY) {
+    int current;
+    char quoteb[48], currentb[48];
+    if (!can_buy || !sell_offer || !sell_offer->item) {
+      snprintf(msg, msgcap, "They are not offering that here.");
+      return;
+    }
+    item_pretty(sell_offer->item, itempretty, sizeof itempretty);
+    current = merchant_adjust_buy_price(sell_offer->price, mix >= 0 ? rep0 : 0, pc.cha);
+    quote = merchant_haggle_buy_price(current, rep0, friendship, pc.cha);
+    currency_format_long(quote, quoteb, sizeof quoteb);
+    currency_format_long(current, currentb, sizeof currentb);
+    if (barter_quote_matches(BARTER_BUY, ent, sell_offer->item, NULL) &&
+        g_barter_price == quote) {
+      snprintf(msg, msgcap,
+               "They already agreed to %s for %s. Use buy %s before turn %d.",
+               quoteb, itempretty, itempretty,
+               g_barter_expire_turn);
+      return;
+    }
+    if (quote >= current) {
+      snprintf(msg, msgcap, "You press for a better rate, but %s holds at %s.",
+               itempretty, currentb);
+      return;
+    }
+    barter_set(BARTER_BUY, ent, sell_offer->item, quote, sell_offer->price, g_turns + 3);
+    snprintf(detail, sizeof detail, "%s %s %d->%d", ent, sell_offer->item, current,
+             quote);
+    causal_push("barter-buy", detail);
+    snprintf(msg, msgcap,
+             "You haggle %s down to %s (was %s). Quote holds through turn %d; "
+             "use buy %s.",
+             itempretty, quoteb, currentb, g_barter_expire_turn, itempretty);
+    return;
+  }
+  if (mode == BARTER_SELL) {
+    int current;
+    char quoteb[48], currentb[48];
+    if (ix < 0) {
+      snprintf(msg, msgcap, "You are not carrying that.");
+      return;
+    }
+    if (!can_sell || !buy_offer || !buy_offer->item) {
+      snprintf(msg, msgcap, "They are not interested in that.");
+      return;
+    }
+    current = merchant_adjust_sell_price(buy_offer->price, mix >= 0 ? rep0 : 0, pc.cha);
+    quote = merchant_haggle_sell_price(current, rep0, friendship, pc.cha);
+    item_pretty(itembuf, invpretty, sizeof invpretty);
+    currency_format_long(quote, quoteb, sizeof quoteb);
+    currency_format_long(current, currentb, sizeof currentb);
+    if (barter_quote_matches(BARTER_SELL, ent, itembuf, NULL) &&
+        g_barter_price == quote) {
+      snprintf(msg, msgcap,
+               "They already agreed to pay %s for %s. Use sell %s before turn %d.",
+               quoteb, invpretty, invpretty, g_barter_expire_turn);
+      return;
+    }
+    if (quote <= current) {
+      snprintf(msg, msgcap, "They hear you out, but hold at %s for %s.",
+               currentb, invpretty);
+      return;
+    }
+    barter_set(BARTER_SELL, ent, itembuf, quote, buy_offer->price, g_turns + 3);
+    snprintf(detail, sizeof detail, "%s %s %d->%d", ent, itembuf, current, quote);
+    causal_push("barter-sell", detail);
+    snprintf(msg, msgcap,
+             "You talk %s up to %s (was %s). Quote holds through turn %d; use "
+             "sell %s.",
+             invpretty, quoteb, currentb, g_barter_expire_turn, invpretty);
+    return;
+  }
+  snprintf(msg, msgcap, "They are not trading that here.");
 }
 
 static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap) {
   char work[256];
   char norm[MAX_ITEM_LEN];
   char pretty[96];
+  char itempretty[96];
+  AetPcSave pc;
   const char *ent;
   const AetMerchantTable *mt;
   const AetMerchantOffer *o;
@@ -6494,10 +8337,12 @@ static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap) {
   strip_trailing_space(work);
   if (!work[0]) {
     snprintf(msg, msgcap,
-             "Buy what? Try: wares  —  or  buy <item>  (needs coins).");
+             "Buy what? Try: wares  —  or  buy <item>  (needs money in your purse).");
     return;
   }
   ent = world_room_entity(g_room);
+  pc_capture(&pc);
+  pc_fill_narrative_defaults(&pc);
   if (!ent[0]) {
     snprintf(msg, msgcap, "There is no trader here.");
     return;
@@ -6516,14 +8361,24 @@ static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap) {
   }
   query_norm_underscore(norm, sizeof norm, work);
   for (o = mt->stock; o->item && o->item[0]; o++) {
-    if (str_ieq(o->item, work) || str_ieq(o->item, norm)) {
+    if (merchant_offer_matches_query(o->item, work, norm)) {
       int mix = aet_merchant_index(ent);
       int rep0 = merchant_rep_score(mix);
-      int price =
-          mix >= 0 ? merchant_adjust_buy_price(o->price, rep0) : o->price;
+      int used_barter = 0;
+      int price = merchant_adjust_buy_price(o->price, mix >= 0 ? rep0 : 0, pc.cha);
+      int quoted_price = 0;
+      char priceb[48], purseb[48], listb[48];
+      if (barter_quote_matches(BARTER_BUY, ent, o->item, &quoted_price) &&
+          quoted_price < price) {
+        price = quoted_price;
+        used_barter = 1;
+      }
+      currency_format_long(price, priceb, sizeof priceb);
+      currency_format_long(g_coins, purseb, sizeof purseb);
+      currency_format_long(o->price, listb, sizeof listb);
+      item_pretty(o->item, itempretty, sizeof itempretty);
       if (g_coins < price) {
-        snprintf(msg, msgcap, "You need %d coins (you have %d).", price,
-                 g_coins);
+        snprintf(msg, msgcap, "You need %s (you have %s).", priceb, purseb);
         return;
       }
       if (g_inv_n >= MAX_INV) {
@@ -6533,11 +8388,16 @@ static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap) {
       g_coins -= price;
       inv_add(o->item);
       merchant_rep_bump_slug(ent, 1);
-      if (mix >= 0 && price != o->price)
-        snprintf(msg, msgcap, "Bought %s for %d coins (listed %d — patron rate).",
-                 o->item, price, o->price);
+      trade_history_push("buy", ent, o->item, price, o->price, g_coins);
+      if (used_barter) {
+        barter_clear();
+        snprintf(msg, msgcap, "Bought %s for %s (listed %s — haggled).",
+                 itempretty, priceb, listb);
+      } else if (price != o->price)
+        snprintf(msg, msgcap, "Bought %s for %s (listed %s — trade rate).",
+                 itempretty, priceb, listb);
       else
-        snprintf(msg, msgcap, "Bought %s for %d coins.", o->item, price);
+        snprintf(msg, msgcap, "Bought %s for %s.", itempretty, priceb);
       {
         AetPcSave pb;
         size_t L = strlen(msg);
@@ -6558,6 +8418,7 @@ static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap) {
   char norm[MAX_ITEM_LEN];
   char tmp[MAX_ITEM_LEN];
   char pretty[96];
+  AetPcSave pc;
   const char *ent;
   const AetMerchantTable *mt;
   const AetMerchantOffer *o;
@@ -6571,6 +8432,8 @@ static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap) {
     return;
   }
   ent = world_room_entity(g_room);
+  pc_capture(&pc);
+  pc_fill_narrative_defaults(&pc);
   if (!ent[0]) {
     snprintf(msg, msgcap, "There is no buyer here.");
     return;
@@ -6602,20 +8465,37 @@ static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap) {
     int mix;
     int rep0;
     int pay;
+    int used_barter = 0;
+    int quoted_price = 0;
+    char payb[48], listb[48];
+    char itempretty[96];
     if (!str_ieq(g_inv[ix], o->item)) continue;
     mix = aet_merchant_index(ent);
     rep0 = merchant_rep_score(mix);
-    pay = mix >= 0 ? merchant_adjust_sell_price(o->price, rep0) : o->price;
+    pay = merchant_adjust_sell_price(o->price, mix >= 0 ? rep0 : 0, pc.cha);
+    if (barter_quote_matches(BARTER_SELL, ent, g_inv[ix], &quoted_price) &&
+        quoted_price > pay) {
+      pay = quoted_price;
+      used_barter = 1;
+    }
+    currency_format_long(pay, payb, sizeof payb);
+    currency_format_long(o->price, listb, sizeof listb);
     inv_take_out(ix, tmp, sizeof tmp);
+    item_pretty(tmp, itempretty, sizeof itempretty);
     if (str_ieq(g_ready_item, tmp)) g_ready_item[0] = '\0';
     if (str_ieq(g_last_focus, tmp)) clear_focus();
     g_coins += pay;
     merchant_rep_bump_slug(ent, 1);
-    if (mix >= 0 && pay != o->price)
-      snprintf(msg, msgcap, "Sold %s for %d coins (listed %d — patron rate).", tmp,
-               pay, o->price);
+    trade_history_push("sell", ent, tmp, pay, o->price, g_coins);
+    if (used_barter) {
+      barter_clear();
+      snprintf(msg, msgcap, "Sold %s for %s (listed %s — haggled).",
+               itempretty, payb, listb);
+    } else if (pay != o->price)
+      snprintf(msg, msgcap, "Sold %s for %s (listed %s — trade rate).",
+               itempretty, payb, listb);
     else
-      snprintf(msg, msgcap, "Sold %s for %d coins.", tmp, pay);
+      snprintf(msg, msgcap, "Sold %s for %s.", itempretty, payb);
     {
       AetPcSave pb;
       size_t L = strlen(msg);
@@ -6924,28 +8804,56 @@ static void strip_leading_articles(char *s) {
 static int room_item_matches_query(const char *item, const char *q,
                                    const char *qnorm) {
   char inorm[MAX_ITEM_LEN];
+  char pretty[96];
+  char pnorm[96];
   if (!item || !q[0]) return 0;
   query_norm_underscore(inorm, sizeof inorm, item);
+  item_pretty(item, pretty, sizeof pretty);
+  query_norm_underscore(pnorm, sizeof pnorm, pretty);
   if (str_ieq(item, q) || str_ieq(item, qnorm)) return 1;
   if (str_ieq(inorm, qnorm)) return 1;
+  if (str_ieq(pretty, q) || str_ieq(pretty, qnorm)) return 1;
+  if (str_ieq(pnorm, qnorm)) return 1;
   if (strstr(item, qnorm) != NULL) return 1;
   if (strstr(inorm, qnorm) != NULL) return 1;
+  if (strstr(pnorm, qnorm) != NULL) return 1;
   return 0;
+}
+
+static int room_entity_matches_query_here(const char *q, char *pretty_out,
+                                          size_t pretty_cap) {
+  const char *ent = world_room_entity(g_room);
+  char qnorm[MAX_ITEM_LEN];
+  char pretty[64];
+  char pnorm[64];
+  if (!q || !q[0] || !ent || !ent[0]) return 0;
+  entity_pretty(ent, pretty, sizeof pretty);
+  query_norm_underscore(qnorm, sizeof qnorm, q);
+  query_norm_underscore(pnorm, sizeof pnorm, pretty);
+  if (!(str_ieq(ent, q) || str_ieq(ent, qnorm) || str_ieq(pretty, q) ||
+        str_ieq(pretty, qnorm) || str_ieq(pnorm, qnorm) ||
+        strstr(ent, qnorm) != NULL || strstr(pnorm, qnorm) != NULL))
+    return 0;
+  if (pretty_out && pretty_cap > 0) snprintf(pretty_out, pretty_cap, "%s", pretty);
+  return 1;
 }
 
 static void format_item_choices(char *out, size_t outcap, const char *prefix,
                                 char items[][MAX_ITEM_LEN], int n) {
   int i, shown;
+  char pretty[96];
   if (!out || outcap < 2) return;
   out[0] = '\0';
   if (!items || n <= 0) return;
   (void)snprintf(out, outcap, "%s", prefix ? prefix : "");
   shown = n > 6 ? 6 : n;
   for (i = 0; i < shown; i++) {
-    size_t L = strlen(out);
-    if (L + MAX_ITEM_LEN + 4 >= outcap) break;
+    size_t L;
+    item_pretty(items[i], pretty, sizeof pretty);
+    L = strlen(out);
+    if (L + strlen(pretty) + 4 >= outcap) break;
     if (i > 0) strncat(out, ", ", outcap - strlen(out) - 1);
-    strncat(out, items[i], outcap - strlen(out) - 1);
+    strncat(out, pretty, outcap - strlen(out) - 1);
   }
   if (n > shown && strlen(out) + 16 < outcap)
     strncat(out, ", ...", outcap - strlen(out) - 1);
@@ -6981,6 +8889,15 @@ static int resolve_room_item_query(const char *name, char *resolved,
     format_item_choices(hint, sizeof hint, "", picks, n);
     snprintf(msg, msgcap, "Be specific — did you mean: %s?", hint);
     return -1;
+  }
+  {
+    char pretty[64];
+    if (room_entity_matches_query_here(name, pretty, sizeof pretty)) {
+      snprintf(msg, msgcap,
+               "You cannot take %s - people are not inventory. Try talk to %s, who, or nearby npc.",
+               pretty, pretty);
+      return -1;
+    }
   }
   return 0;
 }
@@ -7043,16 +8960,19 @@ static void format_find_item_body(char *body, size_t cap, const char *raw) {
            banner, raw);
   for (i = 0; i < g_inv_n; i++) {
     if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
-    snprintf(line, sizeof line, "  (carried)  %.*s\n", MAX_ITEM_LEN - 1,
-             g_inv[i]);
+    char pretty[96];
+    item_pretty(g_inv[i], pretty, sizeof pretty);
+    snprintf(line, sizeof line, "  (carried)  %s\n", pretty);
     strncat(body, line, cap - strlen(body) - 1);
     found = 1;
   }
   for (i = 0; i < WORLD_ROOM_COUNT; i++) {
     for (j = 0; j < g_room_item_n[i]; j++) {
       if (!room_item_matches_query(g_room_items[i][j], q, qnorm)) continue;
-      snprintf(line, sizeof line, "  %.*s  —  %s  [%s]\n", MAX_ITEM_LEN - 1,
-               g_room_items[i][j], resolve_world_title(i), world_slug(i));
+      char pretty[96];
+      item_pretty(g_room_items[i][j], pretty, sizeof pretty);
+      snprintf(line, sizeof line, "  %s  —  %s  [%s]\n", pretty,
+               resolve_world_title(i), world_slug(i));
       strncat(body, line, cap - strlen(body) - 1);
       found = 1;
     }
@@ -7151,9 +9071,9 @@ static int content_item_response(const char *id, const char *mode, char *msg,
   }
   if (str_ieq(id, "house_key")) {
     snprintf(msg, msgcap,
-             "A house key with a tooth pattern that seems too deliberate for "
-             "ordinary carpentry. It should answer the glowing front-door "
-             "keyhole.");
+             "Old iron with a tired polish and a faint warmth, as if it remembers "
+             "the house's keyhole. The bitting looks too deliberate for ordinary "
+             "carpentry.");
     return 1;
   }
   if (str_ieq(id, "door")) {
@@ -7188,8 +9108,9 @@ static int content_item_response(const char *id, const char *mode, char *msg,
                "Architect and Elysium crystals.");
     else
       snprintf(msg, msgcap,
-               "Leather, old paper, and cramped marginalia. It looks readable, "
-               "though not all of it looks friendly.");
+               "Leather-bound weight, cover symbols you almost recognize, pages "
+               "dry enough to fear an open flame — and cramped marginalia that "
+               "does not look entirely friendly.");
     return 1;
   }
   if (str_ieq(id, "engineering_tome")) {
@@ -7490,6 +9411,13 @@ static int content_item_response(const char *id, const char *mode, char *msg,
           "inexplicably drawn to it.");
     return 1;
   }
+  {
+    const char *catalog_desc = aet_item_catalog_description_for_slug(id);
+    if (catalog_desc) {
+      snprintf(msg, msgcap, "%s", catalog_desc);
+      return 1;
+    }
+  }
   return 0;
 }
 
@@ -7585,21 +9513,25 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
 
   for (i = 0; i < g_room_item_n[g_room]; i++) {
     if (room_item_matches_query(g_room_items[g_room][i], q, qnorm)) {
+      char pretty[96];
       remember_focus_item(g_room_items[g_room][i]);
       if (content_item_response(g_room_items[g_room][i], mode, msg, msgcap))
         return;
-      snprintf(msg, msgcap, "You look closely at %.40s.", g_room_items[g_room][i]);
+      item_pretty(g_room_items[g_room][i], pretty, sizeof pretty);
+      snprintf(msg, msgcap, "You look closely at %.40s.", pretty);
       return;
     }
   }
   for (i = 0; i < g_inv_n; i++) {
     if (room_item_matches_query(g_inv[i], q, qnorm)) {
+      char pretty[96];
       remember_focus_item(g_inv[i]);
       if (content_item_response(g_inv[i], mode, msg, msgcap)) return;
+      item_pretty(g_inv[i], pretty, sizeof pretty);
       snprintf(msg, msgcap,
                "You inspect %.40s in your pack. It is exactly what you are "
                "carrying.",
-               g_inv[i]);
+               pretty);
       return;
     }
   }
@@ -7660,6 +9592,10 @@ static void normalize_aliases(char *line) {
     size_t to_len;
   } tab[] = {{"retrieve ", 9, "take ", 5}, {"acquire ", 8, "take ", 5},
              {"obtain ", 7, "take ", 5},     {"snatch ", 7, "take ", 5},
+             {"snag ", 5, "take ", 5},       {"lift ", 5, "take ", 5},
+             {"pluck ", 6, "take ", 5},      {"recover ", 8, "take ", 5},
+             {"pocket ", 7, "take ", 5},
+             {"scoop ", 6, "take ", 5},
              {"procure ", 8, "take ", 5},    {"collect ", 8, "take ", 5},
              {"withdraw ", 9, "take ", 5},   {"pick up ", 8, "take ", 5},
              {"pickup ", 7, "take ", 5},    {"fetch ", 6, "take ", 5},
@@ -7688,7 +9624,8 @@ static void strip_leading_spaces(char *s) {
 static void strip_trailing_politeness(char *line) {
   int guard = 0;
   static const char *const tails[] = {
-      " please", " pls", " plz", " thanks", " thank you", " ok", " okay", NULL};
+      ", thank you", ", thanks", ", please", " please", " pls", " plz",
+      " thanks",    " thank you", " ok",      " okay",  NULL};
   while (guard++ < 8) {
     size_t len = strlen(line);
     int i, trimmed = 0;
@@ -7875,7 +9812,8 @@ static int parser_rewrite_question_examine(char *line) {
 
 static int parser_rewrite_describe_examine(char *line) {
   static const char *const kVerb[] = {"describe ", "observe ", "check ", "study ",
-                                      "view ", NULL};
+                                      "view ", "peruse ", "survey ", "glance at ",
+                                      "skim over ", "skim ", NULL};
   int i;
   for (i = 0; kVerb[i]; i++) {
     size_t n = strlen(kVerb[i]);
@@ -7891,7 +9829,8 @@ static int parser_rewrite_describe_examine(char *line) {
 
 static int parser_rewrite_look_preposition(char *line) {
   static const char *const kLook[] = {"look through ", "look inside ", "look into ",
-                                      "look in ", NULL};
+                                      "look in ", "peer at ",   "gaze at ",
+                                      "stare at ", NULL};
   int i;
   for (i = 0; kLook[i]; i++) {
     size_t n = strlen(kLook[i]);
@@ -7903,6 +9842,125 @@ static int parser_rewrite_look_preposition(char *line) {
     return 1;
   }
   return 0;
+}
+
+/* Single-token direction after articles -> bare compass command; else examine <rest>. */
+static int parser_interaction_rest_dir_or_examine(char *line, const char *rest) {
+  char work[INPUT_LINE_MAX];
+  char tok[64];
+  const char *p;
+  size_t tn;
+  int dir;
+  if (!rest || !rest[0]) return 0;
+  strncpy(work, rest, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  strip_leading_articles(work);
+  strip_trailing_space(work);
+  squeeze_spaces(work);
+  p = work;
+  while (*p == ' ') p++;
+  if (!*p) return 0;
+  tn = 0;
+  while (p[tn] && p[tn] != ' ' && tn + 1 < sizeof tok) {
+    tok[tn] = p[tn];
+    tn++;
+  }
+  tok[tn] = '\0';
+  if (p[tn]) {
+    size_t j = tn;
+    while (p[j] == ' ') j++;
+    if (p[j] != '\0') {
+      rewrite_command(line, "examine", rest);
+      return 1;
+    }
+  }
+  if (parse_direction_token(tok, &dir))
+    rewrite_command(line, tok, "");
+  else
+    rewrite_command(line, "examine", rest);
+  return 1;
+}
+
+/* Plain-English interaction stems -> deterministic examine / movement / talk. */
+static int parser_rewrite_interaction_phrases(char *line) {
+  static const char *const kExamineOnly[] = {
+      "give me a look at ",
+      "have a look at ",
+      "take a look at ",
+      "look closer at ",
+      "let me see ",
+      "show me ",
+      "tell me more about ",
+      "i want to know about ",
+      "get a closer look at ",
+      NULL};
+  static const char *const kInteract[] = {"interact with ", "engage with ",
+                                            "deal with ", NULL};
+  int i;
+  for (i = 0; kExamineOnly[i]; i++) {
+    size_t n = strlen(kExamineOnly[i]);
+    const char *r;
+    if (strncmp(line, kExamineOnly[i], n) != 0) continue;
+    r = line + n;
+    while (*r == ' ') r++;
+    if (!*r) return 0;
+    rewrite_command(line, "examine", r);
+    return 1;
+  }
+  if (!strncmp(line, "handle ", 7)) {
+    const char *r = line + 7;
+    while (*r == ' ') r++;
+    if (!*r) return 0;
+    return parser_interaction_rest_dir_or_examine(line, r);
+  }
+  for (i = 0; kInteract[i]; i++) {
+    size_t n = strlen(kInteract[i]);
+    const char *r;
+    if (strncmp(line, kInteract[i], n) != 0) continue;
+    r = line + n;
+    while (*r == ' ') r++;
+    if (!*r) return 0;
+    return parser_interaction_rest_dir_or_examine(line, r);
+  }
+  if (!strncmp(line, "discuss with ", 13)) {
+    const char *r = line + 13;
+    while (*r == ' ') r++;
+    if (!*r) return 0;
+    rewrite_command(line, "talk to", r);
+    return 1;
+  }
+  if (!strncmp(line, "discuss about ", 14)) {
+    const char *r = line + 14;
+    while (*r == ' ') r++;
+    if (!*r) return 0;
+    rewrite_command(line, "talk about", r);
+    return 1;
+  }
+  if (!strncmp(line, "discuss ", 8)) {
+    const char *r = line + 8;
+    while (*r == ' ') r++;
+    if (!*r) return 0;
+    rewrite_command(line, "talk about", r);
+    return 1;
+  }
+  return 0;
+}
+
+static int parser_rewrite_protective_grab(char *line) {
+  const char *rest = NULL;
+  if (!strncmp(line, "take ", 5))
+    rest = line + 5;
+  else if (!strncmp(line, "hold ", 5))
+    rest = line + 5;
+  else if (!strncmp(line, "reach for ", 10))
+    rest = line + 10;
+  else if (!strncmp(line, "catch ", 6))
+    rest = line + 6;
+  if (!rest) return 0;
+  while (*rest == ' ') rest++;
+  if (!protective_phrase_is_candidate(rest)) return 0;
+  rewrite_command(line, "protective grab", rest);
+  return 1;
 }
 
 static int parser_rewrite_speak_to(char *line) {
@@ -8047,6 +10105,96 @@ static int parser_rewrite_note_prefixes(char *line) {
   return 0;
 }
 
+static int parser_rewrite_plain_english_queries(char *line) {
+  static const struct {
+    const char *topic;
+    const char *verb;
+    const char *rest;
+  } topics[] = {
+      {"inventory", "inventory", ""}, {"pack", "inventory", ""},
+      {"bag", "inventory", ""},       {"stuff", "inventory", ""},
+      {"items", "inventory", ""},     {"belongings", "inventory", ""},
+      {"gear", "gear", ""},           {"equipment", "equipment", ""},
+      {"loadout", "loadout", ""},     {"health", "vitals", ""},
+      {"hp", "vitals", ""},           {"status", "status", ""},
+      {"stats", "aptitudes", ""},     {"skills", "aptitudes", ""},
+      {"abilities", "aptitudes", ""}, {"objectives", "objectives", ""},
+      {"quests", "journal", ""},      {"journal", "journal", ""},
+      {"notes", "notes", ""},         {"map", "nearby", ""},
+      {"location", "where", ""},      {"surroundings", "look", ""},
+      {"room", "describe", ""},       {"exits", "exits", ""},
+      {"weather", "weather", ""},     {"time", "time", ""},
+      {NULL, NULL, NULL}};
+  static const char *const wrappers[] = {
+      "check my ",       "check the ",      "check ",
+      "show me my ",    "show my ",        "show me the ",
+      "show me ",       "show the ",       "show ",
+      "look at my ",    "look at the ",    "look at ",
+      "look in my ",    "look in the ",    "look in ",
+      "open my ",       "open the ",       "open ",
+      "review my ",     "review the ",     "review ",
+      "read my ",       "read the ",       "read ",
+      "tell me my ",    "tell me the ",    "tell me ",
+      "what is my ",    "what's my ",      "whats my ",
+      "what are my ",   "where is my ",    "where's my ",
+      "wheres my ",     NULL};
+  int wi, ti;
+  for (wi = 0; wrappers[wi]; wi++) {
+    size_t wn = strlen(wrappers[wi]);
+    const char *r;
+    char topic[96];
+    size_t rn, i;
+    if (strncmp(line, wrappers[wi], wn) != 0) continue;
+    r = line + wn;
+    while (!strncmp(r, "own ", 4)) r += 4;
+    if (!strncmp(r, "current ", 8)) r += 8;
+    while (!strncmp(r, "the ", 4) || !strncmp(r, "my ", 3)) {
+      if (!strncmp(r, "the ", 4)) r += 4;
+      else r += 3;
+    }
+    rn = 0;
+    while (r[rn] && r[rn] != ' ' && rn + 1 < sizeof topic) {
+      topic[rn] = r[rn];
+      rn++;
+    }
+    topic[rn] = '\0';
+    if (r[rn]) {
+      const char *tail = r + rn;
+      while (*tail == ' ') tail++;
+      if (!strcmp(tail, "screen") || !strcmp(tail, "menu") ||
+          !strcmp(tail, "panel")) {
+        /* keep single topic */
+      } else if (rn + 1 < sizeof topic) {
+        topic[rn++] = ' ';
+        for (i = 0; tail[i] && rn + 1 < sizeof topic; i++) {
+          if (tail[i] == ' ') break;
+          topic[rn++] = tail[i];
+        }
+        topic[rn] = '\0';
+      }
+    }
+    for (ti = 0; topics[ti].topic; ti++) {
+      if (!strcmp(topic, topics[ti].topic)) {
+        rewrite_command(line, topics[ti].verb, topics[ti].rest);
+        return 1;
+      }
+    }
+  }
+  if (!strcmp(line, "where am i at") || !strcmp(line, "where i am") ||
+      !strcmp(line, "where am i standing") ||
+      !strcmp(line, "tell me where i am") ||
+      !strcmp(line, "can you tell me where i am")) {
+    rewrite_command(line, "where", "");
+    return 1;
+  }
+  if (!strcmp(line, "look around here") || !strcmp(line, "look round") ||
+      !strcmp(line, "look all around")) {
+    rewrite_command(line, "look", "");
+    return 1;
+  }
+  return 0;
+}
+
 /* Normalize "go to / into / in / to / travel to ..." before other verb rewrites.
  * Order and early-return rules match the historical decompiled chain. */
 static int parser_rewrite_movement_phrases(char *line) {
@@ -8095,22 +10243,57 @@ static int parser_rewrite_mailbox_search_find(char *line) {
   return 0;
 }
 
-static int parser_line_is_cardinal_go_prefix(const char *line) {
-  static const struct {
-    const char *s;
-    unsigned char n;
-  } kGo[] = {
-      {"go north", 8}, {"go south", 8}, {"go east", 7}, {"go west", 7},
-      {"go up", 5},    {"go down", 7},  {NULL, 0}};
-  int i;
-  for (i = 0; kGo[i].s; i++) {
-    if (!strncmp(line, kGo[i].s, kGo[i].n)) return 1;
+/* Whole line "go <dir>" with exactly one direction token -> bare direction (north…).
+ * Avoids ambiguous prefix matching (e.g. "go north" vs "go northeast"). */
+static int parser_rewrite_go_single_direction(char *line) {
+  const char *p;
+  char tok[64];
+  size_t tn;
+  int dir;
+  if (strncmp(line, "go ", 3) != 0) return 0;
+  p = line + 3;
+  while (*p == ' ') p++;
+  if (!*p) return 0;
+  tn = 0;
+  while (p[tn] && p[tn] != ' ' && tn + 1 < sizeof tok) {
+    tok[tn] = p[tn];
+    tn++;
   }
-  return 0;
+  tok[tn] = '\0';
+  if (p[tn]) {
+    size_t j = tn;
+    while (p[j] == ' ') j++;
+    if (p[j] != '\0') return 0;
+  }
+  if (!parse_direction_token(tok, &dir)) return 0;
+  rewrite_command(line, tok, "");
+  return 1;
 }
 
 static void normalize_parser_intent(char *line) {
   static const ParserPrefixRewrite kPrefixRewrite[] = {
+      PREFIX_RW("show me where to find ", "find", 1),
+      PREFIX_RW("could i get a look at ", "look at", 1),
+      PREFIX_RW("can you tell me about ", "examine", 1),
+      PREFIX_RW("can i get a look at ", "look at", 1),
+      PREFIX_RW("point me towards ", "find", 1),
+      PREFIX_RW("where can i find ", "find", 1),
+      PREFIX_RW("where do i find ", "find", 1),
+      PREFIX_RW("point me to ", "find", 1),
+      PREFIX_RW("where were ", "find", 1),
+      PREFIX_RW("where was ", "find", 1),
+      PREFIX_RW("learn more about ", "examine", 1),
+      PREFIX_RW("make conversation with ", "talk to", 1),
+      PREFIX_RW("have a word with ", "talk to", 1),
+      PREFIX_RW("say hello to ", "talk to", 1),
+      PREFIX_RW("negotiate with ", "talk to", 1),
+      PREFIX_RW("haggle over ", "haggle buy ", 1),
+      PREFIX_RW("barter for ", "haggle buy ", 1),
+      PREFIX_RW("negotiate price for ", "haggle ", 1),
+      PREFIX_RW("figure out ", "examine", 1),
+      PREFIX_RW("work out ", "examine", 1),
+      PREFIX_RW("can i see ", "look at", 1),
+      PREFIX_RW("peek at ", "look at", 0),
       PREFIX_RW("fast travel to ", "fasttravel", 0),
       PREFIX_RW("fast travel ", "fasttravel", 0),
       PREFIX_RW("fast-travel to ", "fasttravel", 0),
@@ -8121,6 +10304,11 @@ static void normalize_parser_intent(char *line) {
       PREFIX_RW("tell me about ", "examine", 0),
       PREFIX_RW("look for ", "find", 0),
       PREFIX_RW("ask about ", "talk about", 0),
+      PREFIX_RW("speak about ", "talk about", 1),
+      PREFIX_RW("chat about ", "talk about", 1),
+      PREFIX_RW("whisper to ", "talk to", 1),
+      PREFIX_RW("complain to ", "talk to", 1),
+      PREFIX_RW("scream ", "shout", 1),
       {NULL, 0, NULL, 0}};
   static const ParserExactRewrite kExactRewrite[] = {
       EXACT_RW("im stuck", "hints", ""),
@@ -8131,6 +10319,8 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("nudge", "hints", ""),
       EXACT_RW("i need a hint", "hints", ""),
       EXACT_RW("another hint", "hints", ""),
+      EXACT_RW("peek", "look", ""),
+      EXACT_RW("glance", "look", ""),
       EXACT_RW("what changed last turn", "causality lastturn", ""),
       EXACT_RW("what changed", "causality lastturn", ""),
       EXACT_RW("what happened last turn", "causality lastturn", ""),
@@ -8301,6 +10491,17 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("market", "wares", ""),
       EXACT_RW("open the shop", "wares", ""),
       EXACT_RW("what is for sale here", "wares", ""),
+      EXACT_RW("bargain", "haggle", ""),
+      EXACT_RW("barter", "haggle", ""),
+      EXACT_RW("haggle", "haggle", ""),
+      EXACT_RW("negotiate price", "haggle", ""),
+      EXACT_RW("buy everything", "buy all", ""),
+      EXACT_RW("purchase everything", "purchase all", ""),
+      EXACT_RW("sell everything", "sell all", ""),
+      EXACT_RW("trade log", "trade history", ""),
+      EXACT_RW("transaction log", "trade history", ""),
+      EXACT_RW("transaction history", "trade history", ""),
+      EXACT_RW("history trade", "trade history", ""),
       EXACT_RW("save game", "save", ""),
       EXACT_RW("load game", "load", ""),
       EXACT_RW("quick save", "qs", ""),
@@ -8355,6 +10556,7 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("last person i met", "who", ""),
       EXACT_RW("salvage", "loot", ""),
       EXACT_RW("valuables here", "loot", ""),
+      EXACT_RW("i", "inventory", ""),
       EXACT_RW("show inventory", "inventory", ""),
       EXACT_RW("show my inventory", "inventory", ""),
       EXACT_RW("show me inventory", "inventory", ""),
@@ -8423,6 +10625,7 @@ static void normalize_parser_intent(char *line) {
   if (!line[0]) return;
 
   if (parser_rewrite_note_prefixes(line)) return;
+  if (parser_rewrite_plain_english_queries(line)) return;
   if (parser_apply_exact_rewrites(line, kExactRewrite)) return;
   if (parser_apply_prefix_rewrites(line, kPrefixRewrite)) return;
 
@@ -8432,13 +10635,17 @@ static void normalize_parser_intent(char *line) {
   if (parser_rewrite_question_examine(line)) return;
   if (parser_rewrite_describe_examine(line)) return;
   if (parser_rewrite_look_preposition(line)) return;
+  if (parser_rewrite_interaction_phrases(line)) return;
+  if (parser_rewrite_protective_grab(line)) return;
   if (parser_rewrite_mailbox_search_find(line)) return;
 
   if (parser_rewrite_speak_to(line)) return;
   if (parser_rewrite_ask_about(line)) return;
   if (parser_rewrite_unlock_open_use(line)) return;
   if (parser_rewrite_take_drop_put(line)) return;
-  if (parser_line_is_cardinal_go_prefix(line)) return;
+  if (parser_rewrite_go_single_direction(line)) return;
+
+  (void)parser_autofix_first_token_unique_typo(line);
 }
 
 static void commas_then_to_semicolon(char *s) {
@@ -8535,22 +10742,24 @@ static void format_objectives_body(char *body, size_t cap) {
   int any_waypoint = count_waypoints(1) > 0;
   char role[96];
   char pr[64];
+  char purseb[32];
   AetPcSave ob;
   pc_capture(&ob);
   pc_fill_narrative_defaults(&ob);
   pc_format_role_phrase(role, sizeof role);
   pc_format_pronouns_short(ob.gender[0] ? ob.gender : "they", pr, sizeof pr);
+  currency_format_compact(g_coins, purseb, sizeof purseb);
 
   snprintf(body, cap,
            "Objectives\n\n"
            "Playing: %s (%s)\n"
            "%s\n\n"
            "Current: %s  [%s]\n"
-           "Explored: %d / %d   Health: %d/%d   Score: %d   Coins: %d\n\n"
+           "Explored: %d / %d   Health: %d/%d   Score: %d   Purse: %s\n\n"
            "Story track\n",
            pc_display_name(), role, pr, resolve_world_title(g_room),
            world_slug(g_room), count_visited(), WORLD_ROOM_COUNT, g_health,
-           g_max_health, g_score, g_coins);
+           g_max_health, g_score, purseb);
   objective_line(body, cap, count_visited() > 1,
                  "Leave the first clearing and map the house perimeter.");
   objective_line(body, cap, searched_start,
@@ -8618,12 +10827,14 @@ static void format_progress_body(char *body, size_t cap) {
   {
     char role[96];
     char pr[64];
+    char purseb[48];
     AetPcSave prog;
     pc_capture(&prog);
     pc_fill_narrative_defaults(&prog);
     pc_format_role_phrase(role, sizeof role);
     pc_format_pronouns_short(prog.gender[0] ? prog.gender : "they", pr,
                              sizeof pr);
+    currency_format_long(g_coins, purseb, sizeof purseb);
     snprintf(body, cap,
              "Progress\n\n"
              "Character: %s (%s)\n"
@@ -8646,7 +10857,7 @@ static void format_progress_body(char *body, size_t cap) {
              "Player state\n"
              "  Pack: %d / %d slots\n"
              "  Health: %d / %d\n"
-             "  Coins: %d\n"
+             "  Purse: %s\n"
              "  Score: %d\n"
              "  Turns: %d\n"
              "  Notes: %d todo, %d done\n",
@@ -8659,7 +10870,7 @@ static void format_progress_body(char *body, size_t cap) {
              g_shed_unlocked ? "open" : "locked",
              player_has_light_source() ? "carried" : "not carried", wp_seen,
              wp_total, npc_seen, adj_locks, adj_npcs, best_lock_tool(),
-             g_inv_n, MAX_INV, g_health, g_max_health, g_coins, g_score,
+             g_inv_n, MAX_INV, g_health, g_max_health, purseb, g_score,
              g_turns, g_note_n - done_notes, done_notes);
   }
 }
@@ -8790,8 +11001,8 @@ static int cmd_waypoint_travel(const char *raw, char *msg, size_t msgcap) {
   return 1;
 }
 
-static void cmd_trail(char *msg, size_t msgcap) {
-  int i;
+static void cmd_trail(char *msg, size_t msgcap, int limit) {
+  int i, start, requested;
   char banner[256];
   msg[0] = '\0';
   pc_format_identity_banner(banner, sizeof banner);
@@ -8801,15 +11012,25 @@ static void cmd_trail(char *msg, size_t msgcap) {
              banner);
     return;
   }
-  snprintf(msg, msgcap, "%s\n\nBack-trail (oldest to newest):", banner);
-  for (i = 0; i < g_hist_n; i++) {
-    char chunk[120];
-    int r = g_hist[i];
-    size_t len = strlen(msg);
-    if (len + 100 >= msgcap) break;
-    snprintf(chunk, sizeof chunk, " | %s", resolve_world_title(r));
-    strncat(msg, chunk, msgcap - len - 1);
+  requested = limit;
+  if (limit <= 0 || limit > g_hist_n) limit = g_hist_n;
+  start = g_hist_n - limit;
+  if (requested > g_hist_n)
+    snprintf(msg, msgcap,
+             "%s\n\nBack-trail (oldest to newest, showing all %d available step(s) "
+             "(requested %d)):",
+             banner, g_hist_n, requested);
+  else if (limit < g_hist_n)
+    snprintf(msg, msgcap,
+             "%s\n\nBack-trail (oldest to newest, showing last %d of %d step(s)):",
+             banner, limit, g_hist_n);
+  else
+    snprintf(msg, msgcap, "%s\n\nBack-trail (oldest to newest):", banner);
+  for (i = start; i < g_hist_n; i++) {
+    body_append(msg, msgcap, "\n  %2d. %s", i - start + 1,
+                resolve_world_title(g_hist[i]));
   }
+  body_append(msg, msgcap, "\n\nUse  back  or  back <n>  to retrace.\n");
 }
 
 typedef struct {
@@ -8832,6 +11053,8 @@ static const CraftMatProfile CRAFT_PROFILES[] = {
     {"stick", "Wood", 0, 4, 0, 3, 5, 3, 4, 1, 7},
     {"reed", "Plant", 0, 1, 0, 7, 2, 1, 2, 2, 5},
     {"hardwood_branch", "Wood", 0, 6, 0, 2, 8, 5, 5, 1, 8},
+    {"wood_scrap", "Wood", 0, 3, 0, 3, 4, 2, 3, 1, 6},
+    {"scrap_metal", "Metal", 0, 7, 3, 1, 6, 6, 2, 1, 6},
     {"metal_rod", "Metal", 0, 9, 0, 1, 9, 8, 3, 1, 7},
     {"flint", "Stone", 0, 8, 9, 0, 6, 4, 2, 0, 6},
     {"sharp_stone", "Stone", 0, 6, 5, 0, 4, 5, 1, 0, 5},
@@ -8843,6 +11066,14 @@ static const CraftMatProfile CRAFT_PROFILES[] = {
     {"stone_blade", "Stone", 0, 7, 7, 0, 5, 5, 1, 0, 5},
     {"iron_spike", "Metal", 0, 9, 8, 0, 8, 3, 1, 0, 6},
     {"leather_wrap", "Animal", 0, 1, 0, 9, 7, 1, 9, 6, 8},
+    {"bandage", "Cloth", 0, 0, 0, 7, 5, 0, 4, 8, 6},
+    {"cloth", "Cloth", 0, 0, 0, 8, 4, 0, 3, 8, 5},
+    {"oil", "Fuel", 0, 0, 0, 2, 1, 1, 1, 2, 9},
+    {"resin", "Pitch", 0, 1, 0, 3, 6, 1, 8, 9, 8},
+    {"glass_shard", "Glass", 0, 4, 9, 0, 1, 1, 0, 0, 4},
+    {"wire", "Metal", 0, 5, 1, 6, 5, 2, 2, 8, 8},
+    {"lockpick", "Tool/Metal", 1, 5, 4, 5, 4, 1, 5, 2, 9},
+    {"club", "Tool/Wood", 1, 5, 1, 2, 6, 5, 5, 1, 6},
     {"bone-tipped_spear", "Tool/Weapon", 1, 6, 6, 4, 5, 5, 4, 0, 8},
     {NULL, "Mixed", 0, 3, 0, 3, 3, 3, 3, 1, 4}};
 
@@ -8850,20 +11081,29 @@ static const CraftArchetype CRAFT_ARCHETYPES[] = {
     {"Axe", 10, 6, 7, 4, 4, 1},
     {"Spear", 8, 6, 5, 3, 3, 4},
     {"Knife", 6, 8, 4, 2, 3, 1},
+    {"Sword", 8, 8, 6, 3, 5, 2},
+    {"Mace", 10, 3, 8, 2, 6, 1},
+    {"Shield", 8, 1, 9, 5, 7, 2},
+    {"Bow", 4, 2, 7, 7, 8, 9},
     {"Torch", 2, 0, 2, 3, 2, 6},
     {"Bandage", 1, 0, 7, 4, 5, 8},
+    {"Snare", 2, 2, 5, 8, 6, 9},
+    {"Charm", 3, 1, 5, 6, 5, 5},
+    {"Lockpick", 5, 4, 4, 2, 7, 5},
     {NULL, 0, 0, 0, 0, 0, 0}};
 
 static void craft_keyword_boost(const char *text, CraftMatProfile *out) {
   if (!text || !out) return;
   if (str_contains_ci(text, "metal") || str_contains_ci(text, "iron") ||
-      str_contains_ci(text, "steel")) {
+      str_contains_ci(text, "steel") || str_contains_ci(text, "bronze") ||
+      str_contains_ci(text, "copper") || str_contains_ci(text, "scrap")) {
     out->hrd += 3;
     out->dur += 2;
     out->wgt += 2;
   }
   if (str_contains_ci(text, "stone") || str_contains_ci(text, "flint") ||
-      str_contains_ci(text, "shard") || str_contains_ci(text, "blade")) {
+      str_contains_ci(text, "shard") || str_contains_ci(text, "blade") ||
+      str_contains_ci(text, "glass") || str_contains_ci(text, "obsidian")) {
     out->shp += 3;
     out->hrd += 2;
   }
@@ -8874,20 +11114,36 @@ static void craft_keyword_boost(const char *text, CraftMatProfile *out) {
     out->dur += 1;
   }
   if (str_contains_ci(text, "reed") || str_contains_ci(text, "fiber") ||
-      str_contains_ci(text, "cloth") || str_contains_ci(text, "bandage")) {
+      str_contains_ci(text, "cloth") || str_contains_ci(text, "bandage") ||
+      str_contains_ci(text, "linen") || str_contains_ci(text, "thread")) {
     out->flx += 3;
     out->bnd += 3;
     out->wgt -= 1;
   }
   if (str_contains_ci(text, "leather") || str_contains_ci(text, "wrap") ||
-      str_contains_ci(text, "cord") || str_contains_ci(text, "vine")) {
+      str_contains_ci(text, "cord") || str_contains_ci(text, "vine") ||
+      str_contains_ci(text, "rope") || str_contains_ci(text, "strap") ||
+      str_contains_ci(text, "wire")) {
     out->grp += 3;
     out->bnd += 3;
   }
   if (str_contains_ci(text, "torch") || str_contains_ci(text, "lantern") ||
-      str_contains_ci(text, "oil")) {
+      str_contains_ci(text, "oil") || str_contains_ci(text, "resin") ||
+      str_contains_ci(text, "pitch") || str_contains_ci(text, "wax")) {
     out->utl += 3;
     out->bnd += 1;
+  }
+  if (str_contains_ci(text, "bone") || str_contains_ci(text, "horn") ||
+      str_contains_ci(text, "antler")) {
+    out->hrd += 2;
+    out->shp += 1;
+    out->wgt -= 1;
+  }
+  if (str_contains_ci(text, "gem") || str_contains_ci(text, "crystal") ||
+      str_contains_ci(text, "rune") || str_contains_ci(text, "symbol")) {
+    out->utl += 4;
+    out->bnd += 2;
+    out->shp += 1;
   }
   if (str_contains_ci(text, "key") || str_contains_ci(text, "lockpick")) {
     out->is_base_tool = 1;
@@ -9719,6 +11975,13 @@ typedef struct {
   int len;
 } UiLineBuf;
 
+typedef struct {
+  const char *title;
+  const char *pending_acc;
+  int *did_fullscreen;
+  int width;
+} AetScreenFrame;
+
 static void ui_line_init(UiLineBuf *b, char *dst, size_t cap, int maxw) {
   if (!b || !dst || cap < 2) return;
   b->dst = dst;
@@ -9748,6 +12011,76 @@ static void ui_line_pad(UiLineBuf *b) {
   if (!b || !b->dst || b->cap < 2) return;
   while (b->len < b->maxw && (size_t)(b->len + 1) < b->cap) b->dst[b->len++] = ' ';
   b->dst[b->len] = '\0';
+}
+
+/* Compact full-screen frame helper for inventory, forge, saves, and future
+ * minigames. It deliberately owns no heap memory and no callbacks: floppy-sized
+ * builds get shared frame/prompt/input behavior without a widget framework. */
+static void screen_frame_init(AetScreenFrame *f, const char *title,
+                              const char *pending_acc, int *did_fullscreen,
+                              int width) {
+  if (!f) return;
+  f->title = title ? title : "";
+  f->pending_acc = pending_acc;
+  f->did_fullscreen = did_fullscreen;
+  f->width = width > 0 ? width : 120;
+}
+
+static void screen_frame_rule(const AetScreenFrame *f) {
+  int i, w = (f && f->width > 0) ? f->width : 120;
+  fputs(C_BORDER, stdout);
+  for (i = 0; i < w; i++) putchar('=');
+  fputs(C_RESET, stdout);
+  putchar('\n');
+}
+
+static void screen_frame_begin_status(const AetScreenFrame *f, const char *right) {
+  clear_frame();
+  screen_frame_rule(f);
+  if (f && f->title && f->title[0]) {
+    UiLineBuf lb;
+    char line[192];
+    int title_len = (int)strlen(f->title);
+    int right_len = (right && right[0]) ? (int)strlen(right) : 0;
+    int pad = (f->width - title_len) / 2;
+    if (pad < 0) pad = 0;
+    if (right_len > 0 && pad + title_len + 1 + right_len > f->width) {
+      pad = f->width - title_len - right_len - 1;
+      if (pad < 0) pad = 0;
+    }
+    ui_line_init(&lb, line, sizeof line, f->width);
+    ui_line_append_width(&lb, "", pad);
+    ui_line_append(&lb, f->title);
+    if (right_len > 0 && lb.len < f->width - right_len)
+      ui_line_append_width(&lb, "", f->width - right_len - lb.len);
+    if (right_len > 0) ui_line_append(&lb, right);
+    ui_line_pad(&lb);
+    printf("%s%s%s\n", C_TITLE, line, C_RESET);
+  }
+  screen_frame_rule(f);
+}
+
+static void screen_frame_prompt(const AetScreenFrame *f) {
+  if (f && f->pending_acc && f->pending_acc[0]) printf("\n%s", f->pending_acc);
+  printf("\n%s>> %s", C_PROMPT, C_RESET);
+  fflush(stdout);
+}
+
+static int screen_read_command(char *line, size_t cap, int lower) {
+  size_t i;
+  if (!line || cap < 2) return 0;
+  if (!fgets(line, (int)cap, stdin)) return 0;
+  chomp_line(line);
+  strip_trailing_space(line);
+  if (lower) {
+    for (i = 0; line[i]; i++) line[i] = (char)tolower((unsigned char)line[i]);
+  }
+  return 1;
+}
+
+static void screen_frame_finish(const AetScreenFrame *f) {
+  if (f && f->did_fullscreen) *f->did_fullscreen = 1;
+  return_to_game_screen();
 }
 
 static void craft_compute_stats(const CraftAttr *a, const char *name, int *dur,
@@ -9795,6 +12128,114 @@ static void craft_compute_stats(const CraftAttr *a, const char *name, int *dur,
   if (quality) *quality = q;
 }
 
+/** Binding / strap materials: high bend + flex, low hardness (cord, leather,
+ * modded fibers with similar stats). Not slug-specific. */
+static int craft_mp_like_binding_wrap(const CraftMatProfile *mp) {
+  if (!mp) return 0;
+  return mp->bnd >= 6 && mp->flx >= 7 && mp->hrd <= 4;
+}
+
+/** Metal reinforcement: shard, rod, or any profile that reads as hard+edged. */
+static int craft_mp_like_metal_reinforcement(const CraftMatProfile *mp) {
+  if (!mp) return 0;
+  return (mp->hrd >= 6 && mp->shp >= 4) || mp->hrd >= 8;
+}
+
+/** Soft plant fiber on bench (reed-like) without requiring the vanilla id. */
+static int craft_bench_has_soft_plant_fiber(const char bench[][MAX_ITEM_LEN],
+                                           int bench_n) {
+  int i;
+  for (i = 0; i < bench_n; i++) {
+    CraftMatProfile mp;
+    craft_profile_for_item(bench[i], &mp);
+    if (mp.flx >= 6 && mp.dur <= 5 && mp.hrd <= 3 && mp.shp <= 5) return 1;
+  }
+  return 0;
+}
+
+static int craft_archetype_distance(int req_hrd, int req_shp, int req_dur,
+                                    int req_bnd, int req_grp, int req_flx,
+                                    const CraftAttr *sum) {
+  int dist = 0;
+  if (!sum) return 99999;
+  dist += abs(req_hrd - sum->hrd);
+  dist += (int)(1.5 * abs(req_shp - sum->shp));
+  dist += abs(req_dur - sum->dur) / 2;
+  dist += abs(req_bnd - sum->bnd);
+  dist += abs(req_grp - sum->grp) / 2;
+  dist += abs(req_flx - sum->flx) / 2;
+  return dist;
+}
+
+static int craft_profile_like_edge(const CraftMatProfile *p) {
+  return p && p->shp >= 6 && p->hrd >= 4;
+}
+
+static int craft_profile_like_core(const CraftMatProfile *p) {
+  return p && p->hrd >= 5 && p->dur >= 4;
+}
+
+static int craft_profile_like_handle(const CraftMatProfile *p) {
+  return p && p->grp >= 4 && p->utl >= 5 && p->wgt <= 6;
+}
+
+static int craft_profile_like_binding(const CraftMatProfile *p) {
+  return p && p->bnd >= 6 && p->flx >= 5;
+}
+
+static int craft_profile_like_fuel(const CraftMatProfile *p) {
+  return p && p->utl >= 8 && p->wgt <= 3;
+}
+
+static int craft_profile_like_ward(const CraftMatProfile *p) {
+  return p && p->utl >= 7 && p->bnd >= 4 && p->shp <= 4;
+}
+
+static int craft_blend_synergy(char bench[][MAX_ITEM_LEN], int bench_n,
+                               CraftAttr *sum) {
+  int i;
+  int edge = 0, core = 0, handle = 0, binding = 0, fuel = 0, ward = 0;
+  if (!sum) return 0;
+  for (i = 0; i < bench_n; i++) {
+    CraftMatProfile p;
+    craft_profile_for_item(bench[i], &p);
+    if (craft_profile_like_edge(&p)) edge++;
+    if (craft_profile_like_core(&p)) core++;
+    if (craft_profile_like_handle(&p)) handle++;
+    if (craft_profile_like_binding(&p)) binding++;
+    if (craft_profile_like_fuel(&p)) fuel++;
+    if (craft_profile_like_ward(&p)) ward++;
+  }
+  if (edge && handle) {
+    sum->shp += 2;
+    sum->grp += 1;
+    sum->utl += 1;
+  }
+  if (core && binding) {
+    sum->dur += 3;
+    sum->bnd += 1;
+  }
+  if (edge && binding) {
+    sum->shp += 1;
+    sum->bnd += 2;
+  }
+  if (fuel && binding) {
+    sum->utl += 3;
+    sum->dur += 1;
+  }
+  if (ward && binding) {
+    sum->utl += 2;
+    sum->bnd += 2;
+  }
+  if (bench_n >= 4 && edge && core && handle && binding) {
+    sum->dur += 2;
+    sum->grp += 2;
+    sum->utl += 1;
+  }
+  if (sum->wgt >= 12 && binding == 0) sum->grp -= 2;
+  return edge + core + handle + binding + fuel + ward;
+}
+
 /* craft_predict: sum material profiles (weighted substitution), then either
  * upgrade an existing base tool or snap blended sums to the nearest archetype
  * distance (mods may replace CRAFT_ARCHETYPES). Not memorized recipes — same
@@ -9806,6 +12247,7 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
   int i;
   CraftAttr sum = {0, 0, 0, 0, 0, 0, 0, 0};
   int has_tool = 0;
+  int synergy = 0;
   char base_tool[MAX_ITEM_LEN] = "";
   if (ok_out) *ok_out = 0;
   if (!out_name || out_name_cap < 2 || !out_attr) return;
@@ -9825,6 +12267,7 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
     sum.bnd += p.bnd;
     sum.utl += p.utl;
   }
+  synergy = craft_blend_synergy(bench, bench_n, &sum);
   *out_attr = sum;
   if (bench_n <= 0) {
     snprintf(out_name, out_name_cap, "Unknown / Debris");
@@ -9847,14 +12290,15 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
       CraftMatProfile mp;
       if (str_ieq(bench[i], base_tool)) continue;
       craft_profile_for_item(bench[i], &mp);
-      if (str_ieq(bench[i], "leather_wrap") || str_ieq(bench[i], "leather_cord")) {
+      if (str_ieq(bench[i], "leather_wrap") || str_ieq(bench[i], "leather_cord") ||
+          craft_mp_like_binding_wrap(&mp)) {
         sum.grp += 3;
         sum.dur += 2;
         has_wrap = 1;
         mods_used++;
       }
       if (str_ieq(bench[i], "iron_spike") || str_ieq(bench[i], "metal_rod") ||
-          (mp.hrd >= 6 && mp.shp >= 4)) {
+          craft_mp_like_metal_reinforcement(&mp)) {
         sum.shp += 2;
         sum.dur += 3;
         if (mp.wgt >= 6) sum.wgt += 2;
@@ -9883,7 +12327,7 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
       snprintf(built_name, sizeof built_name, "%s", t);
     }
     snprintf(out_name, out_name_cap, "%s", built_name);
-    snprintf(d2, d2cap, "Applying %d material modifier(s).", mods_used);
+    snprintf(d2, d2cap, "Applying %d material modifier(s).", mods_used + synergy / 3);
     if (has_reinforce)
       snprintf(d3, d3cap, "Structure reinforced by hard/edged materials.");
     else if (has_wrap)
@@ -9908,12 +12352,12 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
       int ai;
       for (ai = 0; ai < aet_mods_crafting_archetype_count(); ai++) {
         AetCraftArchetype ma;
-        int dist = 0;
+        int dist;
         if (!aet_mods_crafting_archetype_get(ai, &ma)) continue;
-        dist += abs(ma.req_hrd - sum.hrd);
-        dist += (int)(1.5 * abs(ma.req_shp - sum.shp));
-        dist += abs(ma.req_bnd - sum.bnd);
-        dist += abs(ma.req_flx - sum.flx) / 2;
+        dist = craft_archetype_distance(ma.req_hrd, ma.req_shp, ma.req_dur,
+                                        ma.req_bnd, ma.req_grp, ma.req_flx,
+                                        &sum);
+        if (synergy >= 4) dist -= 2;
         if (dist < best) {
           best = dist;
           best_type = ma.name;
@@ -9921,18 +12365,17 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
       }
     } else
       for (i = 0; CRAFT_ARCHETYPES[i].type; i++) {
-      int dist = 0;
+      int dist;
       const CraftArchetype *a = &CRAFT_ARCHETYPES[i];
-      dist += abs(a->req_hrd - sum.hrd);
-      dist += (int)(1.5 * abs(a->req_shp - sum.shp));
-      dist += abs(a->req_bnd - sum.bnd);
-      dist += abs(a->req_flx - sum.flx) / 2;
+      dist = craft_archetype_distance(a->req_hrd, a->req_shp, a->req_dur,
+                                      a->req_bnd, a->req_grp, a->req_flx, &sum);
+      if (synergy >= 4) dist -= 2;
       if (dist < best) {
         best = dist;
         best_type = a->type;
       }
     }
-    if (bench_n < 2 || best > 18) {
+    if (bench_n < 2 || best > 28) {
       snprintf(out_name, out_name_cap, "Worthless Debris");
       snprintf(d1, d1cap, "Lacks required structure.");
       snprintf(d2, d2cap, "Try stronger handle + edge + binding.");
@@ -9942,15 +12385,24 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
     {
       const char *prefix = "Crude";
       const char *mat = "";
-      if (craft_bench_has(bench, bench_n, "reed") && (sum.flx >= 7 && sum.dur <= 4)) {
+      if ((craft_bench_has(bench, bench_n, "reed") ||
+            craft_bench_has_soft_plant_fiber(bench, bench_n)) &&
+          sum.flx >= 7 && sum.dur <= 4) {
         prefix = "Flimsy";
         mat = "Reed";
+      } else if (sum.utl >= 14 && sum.bnd >= 8 && sum.shp <= 8) {
+        prefix = "Odd";
+        mat = "Warded";
       } else if (sum.hrd >= 10 && sum.wgt >= 8) {
         prefix = "Heavy Scrap";
+      } else if (sum.flx >= 12 && sum.bnd >= 10) {
+        prefix = "Tensioned";
       } else if (sum.dur >= 10 && sum.grp >= 6) {
         prefix = "Reliable";
       }
       if (sum.hrd >= 8 && sum.shp >= 7 && sum.bnd >= 3) mat = "Flint";
+      else if (sum.utl >= 12 && sum.bnd >= 8) mat = "Bound";
+      else if (sum.flx >= 12 && sum.grp >= 7) mat = "Spring";
       snprintf(out_name, out_name_cap, "%s %s %s", prefix, mat, best_type);
       while (strstr(out_name, "  ")) {
         char *p = strstr(out_name, "  ");
@@ -9985,14 +12437,17 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
   enum { FORGE_ROWS = 14 };
   static const char *const kForgeExit[] = {"done", "back", "exit", "resume",
                                            NULL};
+  AetScreenFrame frame;
   char bench[6][MAX_ITEM_LEN];
   int bench_n = 0;
   char line[INPUT_LINE_MAX];
+  screen_frame_init(&frame, "D Y N A M I C   M A T E R I A L   F O R G E",
+                    pending_acc, did_fullscreen, 120);
   eq_prune_slots_not_in_inventory();
   for (;;) {
     int idx_map[MAX_INV];
     int listed = 0;
-    int i, pad_t;
+    int i;
     CraftAttr a = {0, 0, 0, 0, 0, 0, 0, 0};
     char out_name[64], d1[96], d2[96], d3[96];
     int ok = 0;
@@ -10002,12 +12457,13 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
     char wb[40], subln[160];
     const char *cred;
     int st_dur = 0, st_shp = 0, st_hnd = 0, st_wgt = 0, q_score = 0;
-    const char *forge_title = "D Y N A M I C   M A T E R I A L   F O R G E";
     char profbuf[28];
 
     cred = g_use_color ? "\x1b[91;1m" : "";
 
-    clear_frame();
+    snprintf(profbuf, sizeof profbuf, "[ PROFICIENCY: %2d ]",
+             g_craft_proficiency);
+    screen_frame_begin_status(&frame, profbuf);
     craft_predict(bench, bench_n, out_name, sizeof out_name, &a, d1, sizeof d1, d2,
                   sizeof d2, d3, sizeof d3, &ok);
     craft_compute_stats(&a, out_name, &st_dur, &st_shp, &st_hnd, &st_wgt, bench_n,
@@ -10018,16 +12474,6 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
     format_bar10(st_wgt, bw, sizeof bw);
 
     for (i = 0; i < FORGE_ROWS && i < g_inv_n; i++) idx_map[listed++] = i;
-
-    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
-    snprintf(profbuf, sizeof profbuf, "[ PROFICIENCY: %2d ]",
-             g_craft_proficiency);
-    pad_t = 120 - 3 - (int)strlen(forge_title) - (int)strlen(profbuf);
-    if (pad_t < 1) pad_t = 1;
-    printf("   %s%s%s", C_TITLE, forge_title, C_RESET);
-    for (i = 0; i < pad_t; i++) putchar(' ');
-    printf("%s%s%s\n", C_EXIT, profbuf, C_RESET);
-    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
 
     snprintf(wb, sizeof wb, "[ WORKBENCH : %d/6 ]", bench_n);
     {
@@ -10135,13 +12581,8 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
         " %sCOMMANDS: [ADD #]  [REM #]  [PROF 1-10]  [CLEAR]  [CRAFT]  [DONE]  "
         "(blend · q%d)%s\n",
         C_MUTED, q_score, C_RESET);
-    if (pending_acc && pending_acc[0]) printf("\n%s", pending_acc);
-    printf("\n%s>> %s", C_PROMPT, C_RESET);
-    fflush(stdout);
-    if (!fgets(line, sizeof line, stdin)) break;
-    chomp_line(line);
-    strip_trailing_space(line);
-    for (i = 0; line[i]; i++) line[i] = (char)tolower((unsigned char)line[i]);
+    screen_frame_prompt(&frame);
+    if (!screen_read_command(line, sizeof line, 1)) break;
     if (!line[0]) continue;
     if (line_equals_one_of(line, kForgeExit)) {
       break;
@@ -10217,8 +12658,7 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
       continue;
     }
   }
-  if (did_fullscreen) *did_fullscreen = 1;
-  return_to_game_screen();
+  screen_frame_finish(&frame);
 }
 
 /* --- Equipment / inventory UI (120 cols: 50 + 4 + 66; inner 48 / 64) --- */
@@ -10347,15 +12787,17 @@ static void eq_ui_emit_inv_empty(void) {
 static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscreen) {
   enum { EQ_INV_ROWS = 12, EQ_ROWS = 3 + EQ_INV_ROWS + 1 };
   static const char *const kEqUiExit[] = {"done", "back", "exit", "resume", NULL};
+  AetScreenFrame frame;
   char line[INPUT_LINE_MAX];
   char msg[200];
+  screen_frame_init(&frame, "***   E Q U I P M E N T   &   I N V E N T O R Y   ***",
+                    pending_acc, did_fullscreen, 120);
   eq_prune_slots_not_in_inventory();
   for (;;) {
     int i, listed = 0;
     int idx_map[MAX_INV];
     int def = 0, atk = 0, wgt = 0;
-    int c;
-    clear_frame();
+    screen_frame_begin_status(&frame, AETER_MAIN_MENU_VER);
     for (i = 0; i < EQ_SLOT_COUNT; i++) {
       int sdef, satk, swgt;
       if (!g_eq_slots[i][0]) continue;
@@ -10366,21 +12808,6 @@ static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscr
     }
     for (i = 0; i < EQ_INV_ROWS && i < g_inv_n; i++) idx_map[listed++] = i;
 
-    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
-    {
-      const char *const ttl =
-          "***   E Q U I P M E N T   &   I N V E N T O R Y   ***";
-      int pad_left = 35, pad_mid = 25;
-      int used = pad_left + (int)strlen(ttl) + pad_mid + (int)strlen(AETER_MAIN_MENU_VER);
-      int pad_end = (used < 120) ? (120 - used) : 0;
-      for (c = 0; c < pad_left; c++) putchar(' ');
-      printf("%s%s%s", C_TITLE, ttl, C_RESET);
-      for (c = 0; c < pad_mid; c++) putchar(' ');
-      printf("%s%s%s", C_EXIT, AETER_MAIN_MENU_VER, C_RESET);
-      for (c = 0; c < pad_end; c++) putchar(' ');
-      putchar('\n');
-    }
-    printf("%s%s%s\n", C_BORDER, AETER_RULE_120, C_RESET);
     {
       UiLineBuf sb;
       char sline[160];
@@ -10479,14 +12906,9 @@ static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscr
           " %sPack: %d items — only rows 1-%d shown; use catalog [id] or "
           "inventory for full list.%s\n",
           C_MUTED, g_inv_n, EQ_INV_ROWS, C_RESET);
-    if (pending_acc && pending_acc[0]) printf("\n%s", pending_acc);
-    printf("\n%s>> %s", C_PROMPT, C_RESET);
-    fflush(stdout);
+    screen_frame_prompt(&frame);
 
-    if (!fgets(line, sizeof line, stdin)) break;
-    chomp_line(line);
-    strip_trailing_space(line);
-    for (i = 0; line[i]; i++) line[i] = (char)tolower((unsigned char)line[i]);
+    if (!screen_read_command(line, sizeof line, 1)) break;
     if (!line[0]) continue;
     if (line_equals_one_of(line, kEqUiExit)) break;
     if (!strncmp(line, "unequip ", 8)) {
@@ -10546,8 +12968,7 @@ static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscr
         "EQUIPMENT",
         "Commands: equip <row>, equip <id> to <slot>, unequip <slot>, done, resume.");
   }
-  if (did_fullscreen) *did_fullscreen = 1;
-  return_to_game_screen();
+  screen_frame_finish(&frame);
 }
 
 static void run_game_menu(void) {
@@ -10609,8 +13030,12 @@ static void run_game_menu(void) {
     }
     snprintf(left_score, sizeof left_score, "%s  Score    : %s%d%s", C_MUTED,
              C_HEADING, g_score, C_RESET);
-    snprintf(left_coin, sizeof left_coin, "%s  Coins    : %s%d%s", C_MUTED,
-             C_ITEM, g_coins, C_RESET);
+    {
+      char purseb[24];
+      currency_format_compact(g_coins, purseb, sizeof purseb);
+      snprintf(left_coin, sizeof left_coin, "%s  Purse    : %s%s%s", C_MUTED,
+               C_ITEM, purseb, C_RESET);
+    }
     {
       AetPcSave pcm;
       pc_capture(&pcm);
@@ -10835,7 +13260,8 @@ static void process_command(char *line, char *msg, size_t msgcap,
   static const char *const kModsDoctor[] = {"mods doctor", "mods verify",
                                              "mods repair", NULL};
   static const char *const kInv[] = {"inventory", "i", "inv", "pack", NULL};
-  static const char *const kCoins[] = {"coins", "wallet", "money", NULL};
+  static const char *const kCoins[] = {"coins", "wallet", "money", "purse",
+                                       NULL};
   static const char *const kTrailClr[] = {"trail clear", "clear trail", NULL};
   static const char *const kProgress[] = {"progress", "visited", "seen", NULL};
   static const char *const kWhyBlocked[] = {"why blocked", "why cant i move",
@@ -10855,12 +13281,15 @@ static void process_command(char *line, char *msg, size_t msgcap,
   static const char *const kCausalityExplain[] = {"causality explain",
                                                    "because explain", NULL};
   static const char *const kWaitUntil[] = {"wait until ", "rest until ", NULL};
+  char parse_before[INPUT_LINE_MAX];
 
   *did_fullscreen = 0;
   *turn_advance = 1;
   msg[0] = '\0';
   memset(&g_intent, 0, sizeof g_intent);
 
+  strncpy(parse_before, line, sizeof parse_before - 1);
+  parse_before[sizeof parse_before - 1] = '\0';
   strip_natural_prefixes(line);
   strip_motion_verb(line);
   extract_intent_modifiers(line, &g_intent);
@@ -10871,6 +13300,11 @@ static void process_command(char *line, char *msg, size_t msgcap,
   }
   normalize_aliases(line);
   normalize_parser_intent(line);
+  if (strcmp(parse_before, line) != 0) {
+    char pbuf[420];
+    snprintf(pbuf, sizeof pbuf, "%.*s -> %.*s", 180, parse_before, 180, line);
+    causal_push("parser-normalize", pbuf);
+  }
 
   if (line_equals_one_of(line, kQuit)) {
     printf("Thanks for playing.\n");
@@ -11010,13 +13444,43 @@ static void process_command(char *line, char *msg, size_t msgcap,
     return;
   }
 
-  if (line_equals_one_of(line, kModsDoctor)) {
+  if (!strcmp(line, "mods doctor verbose") || !strcmp(line, "mods verify verbose") ||
+      !strcmp(line, "mods repair verbose")) {
     char mp[520];
+    char st[AETER_HELP_BODY_CAP];
+    char warn[3072];
     *turn_advance = 0;
     mods_resolve_root(mp, sizeof mp);
     aet_mod_bootstrap_prepare_runtime(g_save_path, mp, &g_bootstrap_status);
     aet_mods_reload(mp);
     format_bootstrap_status(body, sizeof body, mp);
+    aet_mods_format_load_warnings(warn, sizeof warn);
+    if (warn[0]) {
+      size_t lo = strlen(body);
+      snprintf(body + lo, sizeof body - lo, "\n%s", warn);
+    }
+    aet_mods_format_status(st, sizeof st);
+    {
+      size_t lo = strlen(body);
+      snprintf(body + lo, sizeof body - lo, "\n--- Mod status ---\n%s", st);
+    }
+    ui_fullscreen("MODS DOCTOR", body, pending_acc, did_fullscreen);
+    return;
+  }
+
+  if (line_equals_one_of(line, kModsDoctor)) {
+    char mp[520];
+    char warn[3072];
+    *turn_advance = 0;
+    mods_resolve_root(mp, sizeof mp);
+    aet_mod_bootstrap_prepare_runtime(g_save_path, mp, &g_bootstrap_status);
+    aet_mods_reload(mp);
+    format_bootstrap_status(body, sizeof body, mp);
+    aet_mods_format_load_warnings(warn, sizeof warn);
+    if (warn[0]) {
+      size_t lo = strlen(body);
+      snprintf(body + lo, sizeof body - lo, "\n%s", warn);
+    }
     ui_fullscreen("MODS DOCTOR", body, pending_acc, did_fullscreen);
     return;
   }
@@ -11032,6 +13496,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
     char t[32];
     char role[96];
     char pr[64];
+    char purseb[48];
     AetPcSave ps;
     *turn_advance = 0;
     get_world_clock(&wc);
@@ -11040,12 +13505,13 @@ static void process_command(char *line, char *msg, size_t msgcap,
     pc_fill_narrative_defaults(&ps);
     pc_format_role_phrase(role, sizeof role);
     pc_format_pronouns_short(ps.gender[0] ? ps.gender : "they", pr, sizeof pr);
+    currency_format_long(g_coins, purseb, sizeof purseb);
     snprintf(body, sizeof body,
              "%s · %s\n%s\n\n"
-             "Health %d / %d\nScore %d\nCoins %d\nTurns %d\nTime %s (%s), day "
+             "Health %d / %d\nScore %d\nPurse %s\nTurns %d\nTime %s (%s), day "
              "%d, %s\n",
              pc_display_name(), role, pr, g_health, g_max_health, g_score,
-             g_coins, g_turns, t, wc.period, wc.day, wc.season);
+             purseb, g_turns, t, wc.period, wc.day, wc.season);
     append_dlc_mod_to_body(body, sizeof body,
                            aet_mods_character_score_suffix());
     ui_fullscreen("SCORE", body, pending_acc, did_fullscreen);
@@ -11053,8 +13519,10 @@ static void process_command(char *line, char *msg, size_t msgcap,
   }
 
   if (line_equals_one_of(line, kCoins)) {
+    char purseb[48];
     *turn_advance = 0;
-    snprintf(msg, msgcap, "%s — %d coins.", pc_display_name(), g_coins);
+    currency_format_long(g_coins, purseb, sizeof purseb);
+    snprintf(msg, msgcap, "%s — purse: %s.", pc_display_name(), purseb);
     return;
   }
 
@@ -11073,9 +13541,31 @@ static void process_command(char *line, char *msg, size_t msgcap,
     return;
   }
 
+  if (!strncmp(line, "trail ", 6)) {
+    long n;
+    char *endp;
+    const char *arg = line + 6;
+    while (*arg == ' ') arg++;
+    *turn_advance = 0;
+    if (!*arg) {
+      snprintf(msg, msgcap, "Use: trail <1-25>  or  trail.");
+      return;
+    }
+    n = strtol(arg, &endp, 10);
+    while (*endp == ' ') endp++;
+    if (endp == arg || *endp != '\0' || n < 1 || n > 25) {
+      snprintf(msg, msgcap, "Use: trail <1-25>  or  trail.");
+      return;
+    }
+    cmd_trail(body, sizeof body, (int)n);
+    append_dlc_mod_to_body(body, sizeof body, aet_mods_character_trail_suffix());
+    ui_fullscreen("TRAIL", body, pending_acc, did_fullscreen);
+    return;
+  }
+
   if (!strcmp(line, "trail")) {
     *turn_advance = 0;
-    cmd_trail(body, sizeof body);
+    cmd_trail(body, sizeof body, 0);
     append_dlc_mod_to_body(body, sizeof body, aet_mods_character_trail_suffix());
     ui_fullscreen("TRAIL", body, pending_acc, did_fullscreen);
     return;
@@ -11233,6 +13723,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
     char t[32];
     char who[160];
     char pr[64];
+    char purseb[48];
     AetPcSave pcs;
     const char *lit;
     *turn_advance = 0;
@@ -11247,6 +13738,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
     pc_capture(&pcs);
     pc_fill_narrative_defaults(&pcs);
     pc_format_pronouns_short(pcs.gender[0] ? pcs.gender : "they", pr, sizeof pr);
+  currency_format_long(g_coins, purseb, sizeof purseb);
     snprintf(who, sizeof who, "%s (%s %s)",
              pcs.name[0] ? pcs.name : "Adventurer",
              pcs.race[0] ? pcs.race : "Human",
@@ -11261,7 +13753,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
         "It / last examined: %s\n"
         "Inventory slots: %d\n"
         "Health: %d / %d\n"
-        "Coins: %d\n"
+        "Purse: %s\n"
         "Score: %d\nTurns: %d\n",
         who, pr, resolve_world_title(g_room), world_slug(g_room),
         world_region(g_room)[0] ? world_region(g_room) : "(unspecified)", t,
@@ -11269,7 +13761,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
         g_verbose_room ? "full (verbose)" : "short (brief)",
         (g_ready_item[0] && inv_has(g_ready_item)) ? g_ready_item : "—",
         (g_last_focus[0] && inv_has(g_last_focus)) ? g_last_focus : "—",
-        g_inv_n, g_health, g_max_health, g_coins, g_score, g_turns);
+        g_inv_n, g_health, g_max_health, purseb, g_score, g_turns);
     append_causal_status_overlay(body, sizeof body);
     append_dlc_mod_to_body(body, sizeof body,
                            aet_mods_character_status_suffix());
@@ -12008,12 +14500,18 @@ static void process_command(char *line, char *msg, size_t msgcap,
   }
 
   if (!strcmp(line, "who") || !strcmp(line, "npcs") ||
-      !strcmp(line, "people")) {
+      !strcmp(line, "people") || !strcmp(line, "who all") ||
+      !strcmp(line, "who global") || !strcmp(line, "npcs all") ||
+      !strcmp(line, "people all")) {
+    int global_people =
+        (!strcmp(line, "who all") || !strcmp(line, "who global") ||
+         !strcmp(line, "npcs all") || !strcmp(line, "people all"));
     *turn_advance = 0;
-    cmd_who(body, sizeof body);
+    cmd_who(body, sizeof body, global_people);
     append_dlc_mod_to_body(body, sizeof body,
                            aet_mods_character_people_suffix());
-    ui_fullscreen("PEOPLE HERE", body, pending_acc, did_fullscreen);
+    ui_fullscreen(global_people ? "PEOPLE (GLOBAL)" : "PEOPLE HERE", body,
+                  pending_acc, did_fullscreen);
     return;
   }
   if (!strcmp(line, "topic") || !strcmp(line, "last topic") ||
@@ -12068,6 +14566,13 @@ static void process_command(char *line, char *msg, size_t msgcap,
     apply_intent_to_social_feedback(msg, msgcap);
     g_last_intent = g_intent;
     causal_push("talk-target", work[0] ? work : "(none)");
+    return;
+  }
+
+  if (!strncmp(line, "protective grab ", 16)) {
+    const char *r = line + 16;
+    while (*r == ' ') r++;
+    if (!cmd_protective_grab(r, msg, msgcap)) *turn_advance = 0;
     return;
   }
 
@@ -12192,6 +14697,16 @@ static void process_command(char *line, char *msg, size_t msgcap,
   if (!strcmp(line, "look") || !strcmp(line, "l") || !strcmp(line, "x") ||
       !strcmp(line, "examine") || !strcmp(line, "look around")) {
     *turn_advance = 0;
+    return;
+  }
+  if (!strncmp(line, "l ", 2)) {
+    *turn_advance = 0;
+    examine_target(line + 2, msg, msgcap);
+    return;
+  }
+  if (!strncmp(line, "look ", 5)) {
+    *turn_advance = 0;
+    examine_target(line + 5, msg, msgcap);
     return;
   }
 
@@ -12440,23 +14955,79 @@ static void process_command(char *line, char *msg, size_t msgcap,
     ui_fullscreen("WARES", body, pending_acc, did_fullscreen);
     return;
   }
+  if (!strcmp(line, "haggle") || !strcmp(line, "barter") ||
+      !strcmp(line, "negotiate")) {
+    *turn_advance = 0;
+    cmd_trade_haggle("", msg, msgcap);
+    return;
+  }
+  if (!strncmp(line, "haggle ", 7) || !strncmp(line, "barter ", 7) ||
+      !strncmp(line, "negotiate ", 10)) {
+    const char *r = !strncmp(line, "haggle ", 7)
+                        ? line + 7
+                        : !strncmp(line, "barter ", 7) ? line + 7 : line + 10;
+    while (*r == ' ') r++;
+    cmd_trade_haggle(r, msg, msgcap);
+    return;
+  }
+  if (!strncmp(line, "buy all except ", 15) ||
+      !strncmp(line, "buy all but ", 12)) {
+    const char *ex =
+        !strncmp(line, "buy all except ", 15) ? line + 15 : line + 12;
+    while (*ex == ' ') ex++;
+    cmd_trade_buy_all_except(ex, msg, msgcap);
+    return;
+  }
+  if (!strncmp(line, "purchase all except ", 20) ||
+      !strncmp(line, "purchase all but ", 17)) {
+    const char *ex =
+        !strncmp(line, "purchase all except ", 20) ? line + 20 : line + 17;
+    while (*ex == ' ') ex++;
+    cmd_trade_buy_all_except(ex, msg, msgcap);
+    return;
+  }
+  if (!strncmp(line, "sell all except ", 16) ||
+      !strncmp(line, "sell all but ", 13)) {
+    const char *ex =
+        !strncmp(line, "sell all except ", 16) ? line + 16 : line + 13;
+    while (*ex == ' ') ex++;
+    cmd_trade_sell_all_except(ex, msg, msgcap);
+    return;
+  }
+  if (!strcmp(line, "trade history") || !strcmp(line, "trade log") ||
+      !strcmp(line, "transactions") || !strcmp(line, "transaction log") ||
+      !strcmp(line, "transaction history")) {
+    *turn_advance = 0;
+    format_trade_history_body(body, sizeof body);
+    ui_fullscreen("TRADE HISTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
 
   if (!strncmp(line, "buy ", 4)) {
     const char *r = line + 4;
     while (*r == ' ') r++;
-    cmd_trade_buy(r, msg, msgcap);
+    if (str_ieq(r, "all"))
+      cmd_trade_buy_all_except(NULL, msg, msgcap);
+    else
+      cmd_trade_buy(r, msg, msgcap);
     return;
   }
   if (!strncmp(line, "purchase ", 9)) {
     const char *r = line + 9;
     while (*r == ' ') r++;
-    cmd_trade_buy(r, msg, msgcap);
+    if (str_ieq(r, "all"))
+      cmd_trade_buy_all_except(NULL, msg, msgcap);
+    else
+      cmd_trade_buy(r, msg, msgcap);
     return;
   }
   if (!strncmp(line, "sell ", 5)) {
     const char *r = line + 5;
     while (*r == ' ') r++;
-    cmd_trade_sell(r, msg, msgcap);
+    if (str_ieq(r, "all"))
+      cmd_trade_sell_all_except(NULL, msg, msgcap);
+    else
+      cmd_trade_sell(r, msg, msgcap);
     return;
   }
 
@@ -12640,6 +15211,28 @@ static void process_command(char *line, char *msg, size_t msgcap,
     if (wl >= sizeof fw) wl = sizeof fw - 1;
     memcpy(fw, line, wl);
     fw[wl] = '\0';
+    if (wl >= 3) {
+      int ties;
+      const char *best;
+      int bestd = parser_topverb_min_dist(fw, 2, &ties, &best);
+      if (ties == 1 && best && bestd > 0 && bestd <= 2 &&
+          !(bestd == 2 && wl < 6) && strcmp(fw, best) != 0) {
+        diag_push("unknown", line);
+        causal_push("unknown-command", line);
+        if (sp) {
+          const char *rest = sp;
+          while (*rest == ' ') rest++;
+          if (rest[0])
+            snprintf(msg, msgcap, "Unknown command. Did you mean \"%s %s\"?",
+                     best, rest);
+          else
+            snprintf(msg, msgcap, "Unknown command. Did you mean \"%s\"?", best);
+        } else {
+          snprintf(msg, msgcap, "Unknown command. Did you mean \"%s\"?", best);
+        }
+        return;
+      }
+    }
     suggest_typo(fw, hint, sizeof hint);
     diag_push("unknown", line);
     causal_push("unknown-command", line);
@@ -12678,6 +15271,11 @@ static void init_new_game(int start_room) {
   g_craft_proficiency = 1;
   diag_clear();
   causal_clear();
+  trade_history_clear();
+  barter_clear();
+  g_npc_validation_checked = 0;
+  g_npc_validation_warnings = 0;
+  validate_npc_world_refs();
   /* grant_starting_loadout + eq_bootstrap_from_character run after
    * run_character_creation() so class / weapon / armor picks apply. */
 }
@@ -12813,7 +15411,9 @@ static void acc_append(char *acc, size_t acccap, const char *msg) {
 static void handle_line(char *line) {
   char work[INPUT_LINE_MAX];
   char acc[TRANSCRIPT_CAP];
-  char *seg, *next;
+  char segments[16][INPUT_LINE_MAX];
+  int seg_n = 0;
+  int si;
   int any = 0;
   char *p;
   int any_adv = 0;
@@ -12852,9 +15452,23 @@ static void handle_line(char *line) {
     chain_for_repeat[wlen] = '\0';
 
     acc[0] = '\0';
-    for (seg = work; seg != NULL; seg = next) {
-      next = strchr(seg, ';');
-      if (next) *next++ = '\0';
+    for (p = work; p && *p && seg_n < 16;) {
+      char *end = strchr(p, ';');
+      size_t n;
+      if (end) *end = '\0';
+      while (*p == ' ') p++;
+      strip_trailing_space(p);
+      if (*p) {
+        n = strnlen(p, INPUT_LINE_MAX - 1);
+        memcpy(segments[seg_n], p, n);
+        segments[seg_n][n] = '\0';
+        seg_n++;
+      }
+      if (!end) break;
+      p = end + 1;
+    }
+    for (si = 0; si < seg_n; si++) {
+      char *seg = segments[si];
       while (*seg == ' ') seg++;
       strip_trailing_space(seg);
       if (!seg[0]) continue;
@@ -12864,16 +15478,17 @@ static void handle_line(char *line) {
         int adv = 0;
         int did_fs = 0;
         process_command(seg, msg, sizeof msg, &adv, acc, &did_fs);
-        if (did_fs) {
-          if (any_adv) (void)write_save_file();
-          return;
-        }
+        /* Fullscreen segments used to abort the whole chain here; that broke
+         * zero-turn flows like `exits; n` or `help; whereami`. Each fullscreen
+         * returns before we continue; remaining segments still run. */
         if (g_return_to_menu) {
           if (any_adv) (void)write_save_file();
           return;
         }
         if (adv > 0) {
+          int prev_turn = g_turns;
           g_turns += adv;
+          note_npc_routine_changes(prev_turn, g_turns);
           any_adv = 1;
         }
         append_auto_causal_hint(seg, msg, sizeof msg);

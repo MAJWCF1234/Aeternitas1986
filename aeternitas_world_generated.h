@@ -43,6 +43,8 @@ const char *const *world_hidden_item_list(int room);
 int world_room_index(const char *slug);
 
 const AetNpcLineSet *aet_npc_lines(const char *entity_slug);
+int aet_npc_line_count(void);
+const char *aet_npc_line_slug_at(int idx);
 int aet_merchant_count(void);
 int aet_merchant_index(const char *slug);
 const char *aet_merchant_slug_at(int idx);
