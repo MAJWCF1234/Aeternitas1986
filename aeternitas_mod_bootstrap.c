@@ -141,7 +141,7 @@ static int write_text_if_missing(const char *path, const char *text, int *wrote)
   "\n"                                                                 \
   "For DLC: copy this tree, rename the folder, raise manifest priority,\n" \
   "and replace slugs/ids with your content. Full reference:\n"       \
-  "  help modding   mods list   (in-game)\n"
+  "  help modding   mods list   mods doctor   (in-game)\n"
 
 #define SAMPLE_ROOM_APPEND                                               \
   "— Appended by west_of_house.append.txt (layered blurbs for DLC).\n"
@@ -242,7 +242,7 @@ static int write_text_if_missing(const char *path, const char *text, int *wrote)
   "[Sample] %WEATHER% at %TEMPC%C in %REGION% — seasonal DLC after Weather.\n"
 
 #define SAMPLE_CHAR_ROOM                                                 \
-  "[Sample] %ROOMTITLE%: %COINS% coins, pack %PACK%, %READIED% readied — room panel DLC.\n"
+  "[Sample] %ROOMTITLE%: purse %PURSE% (%PURSESHORT%), pack %PACK%, %READIED% readied — room panel DLC.\n"
 
 #define SAMPLE_CHAR_RECAP                                                \
   "[Sample] %NAME% — last NPC %LASTNPCDISPLAY% [%LASTNPCROLE%/%LASTNPCATTITUDE%/%LASTNPCDANGER%/%LASTNPCTRUST%/%LASTNPCLEVERAGE%] (%LASTNPCHERE%), here: %NPCDISPLAY% [%NPCROLE%/%NPCDANGER%/%NPCTRUST%/%NPCLEVERAGE%], presence %NPCPRESENCE%, focus %LASTFOCUS%, topic %LASTTOPIC% (%LASTTOPICMOOD%, heat %TOPICHEAT%), blurbs %ROOMMODE%.\n"

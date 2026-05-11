@@ -15,7 +15,9 @@ void aet_mods_build_default_path(const char *save_file_path, char *out, size_t o
 /**
  * Scan mods_directory for subfolders (packs). Each pack may contain:
  *   manifest.txt         — optional keys: priority=<int>; enabled=0 or
- *                          disabled=1 skips the whole pack; id=/title= notes.
+ *                          disabled=1 skips the whole pack;
+ *                          id=<short id> and title=<human title> (shown in
+ *                          mods list / load order; informational only).
  *   rooms/<slug>.txt     — full room blurb replace (slug must exist in world)
  *   rooms/<slug>.prepend.txt — text prepended to current blurb (after replaces)
  *   rooms/<slug>.append.txt  — text appended to current blurb
@@ -23,8 +25,11 @@ void aet_mods_build_default_path(const char *save_file_path, char *out, size_t o
  *   items/<item_id>.txt  — examine / x text (item id as in game, e.g. lockpick)
  *   crafting/profiles.txt — item craft profile overrides:
  *                           item_id|class|is_base|hrd|shp|flx|dur|wgt|grp|bnd|utl
- *   crafting/archetypes.txt — craft result targets:
+ *   crafting/archetypes.txt — blend-shape targets (not recipes): nearest-name by
+ *                           weighted distance of summed bench attrs vs each row:
  *                           name|req_hrd|req_shp|req_dur|req_bnd|req_grp|req_flx
+ *                           (engine matches all six vs totals; dur/grp halved in
+ *                           distance — same as built-in CRAFT_ARCHETYPES.)
  *   npcs/<entity>.greeting.txt — replaces NPC greeting (may use %NAME% %RACE%
  *                          %CLASS% %ROLE% %PRONOUNS% — from current character)
  *   npcs/<entity>__<keyword>.txt — topic line (same placeholders supported)
@@ -116,6 +121,9 @@ int aet_mods_crafting_profile(const char *item_id, char *mat_class,
 int aet_mods_crafting_archetype_count(void);
 int aet_mods_crafting_archetype_get(int idx, AetCraftArchetype *out);
 void aet_mods_format_status(char *buf, size_t cap);
+/** Non-empty after reload if room overlays had issues (unknown slug, unreadable file,
+ *  or path join overflow while scanning packs). Otherwise writes "". */
+void aet_mods_format_load_warnings(char *buf, size_t cap);
 /** Pack load order (folder names and priorities); empty if not initialized. */
 void aet_mods_format_load_order(char *buf, size_t cap);
 

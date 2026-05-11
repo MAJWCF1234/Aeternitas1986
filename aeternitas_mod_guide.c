@@ -37,6 +37,7 @@ const char *aet_mod_guide_full_text(void) {
          "  <mods root>/\n"
          "    <pack_name>/          one folder per pack (see naming below)\n"
          "      manifest.txt        optional -- priority=, enabled=0, disabled=1,\n"
+         "                          id= / title= (shown in  mods list ),\n"
          "                          # comments; skipped packs are not loaded.\n"
          "      rooms/<slug>.txt    replaces full room blurb (slug from world)\n"
          "      rooms/<slug>.prepend.txt / .append.txt -- layer text before/after\n"
@@ -76,6 +77,14 @@ const char *aet_mod_guide_full_text(void) {
          "      character/exits_append.txt after exits fullscreen\n"
          "      character/scan_append.txt after scan fullscreen\n"
          "      character/trail_append.txt after trail fullscreen\n"
+         "\n"
+         "COMMANDS & CHECKS\n"
+         "-----------------\n"
+         "  mods reload   —  rescan packs from disk\n"
+         "  mods list     —  pack load order (manifest priority, folder name)\n"
+         "  mods doctor   —  runtime bootstrap health + overlay warnings if any\n"
+         "                   (unknown room/title slug, unreadable file, path too long)\n"
+         "  mods doctor verbose  —  same plus full merged overlay summary\n"
          "\n"
          "[CI autotest: arrow-key pager skipped; use help modding interactively.]";
 }

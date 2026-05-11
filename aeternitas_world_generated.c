@@ -2726,7 +2726,7 @@ static const AetMerchantOffer MERCHANT_farmer_STOCK[] = {
   {NULL, 0}
 };
 static const AetMerchantOffer MERCHANT_farmer_BUYS[] = {
-  {"gold_coin", 10},
+  {"gold_coin", 100},
   {"seeds", 5},
   {"tools", 15},
   {NULL, 0}
@@ -2755,7 +2755,7 @@ static const AetMerchantOffer MERCHANT_general_store_owner_BUYS[] = {
   {"crystal_heart", 60},
   {"furs", 20},
   {"gem", 30},
-  {"gold_coin", 10},
+  {"gold_coin", 100},
   {"honey", 12},
   {"preserves", 8},
   {"protective_charm", 35},
@@ -2770,7 +2770,7 @@ static const AetMerchantOffer MERCHANT_miller_STOCK[] = {
   {NULL, 0}
 };
 static const AetMerchantOffer MERCHANT_miller_BUYS[] = {
-  {"gold_coin", 10},
+  {"gold_coin", 100},
   {"scrap_metal", 4},
   {"wood_scrap", 2},
   {NULL, 0}
@@ -2791,7 +2791,7 @@ static const AetMerchantOffer MERCHANT_tavern_keeper_BUYS[] = {
   {"ancient_coin", 15},
   {"furs", 20},
   {"gem", 25},
-  {"gold_coin", 10},
+  {"gold_coin", 100},
   {"honey", 12},
   {"rare_spice", 18},
   {"silk", 25},
@@ -2817,7 +2817,7 @@ static const AetMerchantOffer MERCHANT_traveling_merchant_BUYS[] = {
   {"ancient_coin", 15},
   {"crystal_heart", 50},
   {"gem", 25},
-  {"gold_coin", 10},
+  {"gold_coin", 100},
   {"protective_charm", 30},
   {NULL, 0}
 };
@@ -2831,7 +2831,7 @@ static const AetMerchantOffer MERCHANT_village_innkeeper_STOCK[] = {
 };
 static const AetMerchantOffer MERCHANT_village_innkeeper_BUYS[] = {
   {"gem", 25},
-  {"gold_coin", 10},
+  {"gold_coin", 100},
   {NULL, 0}
 };
 static const AetMerchantTable AET_MERCHANTS_REC[] = {
@@ -2844,6 +2844,8 @@ static const AetMerchantTable AET_MERCHANTS_REC[] = {
   {"village_innkeeper", MERCHANT_village_innkeeper_STOCK, MERCHANT_village_innkeeper_BUYS},
 };
 const AetNpcLineSet *aet_npc_lines(const char *entity_slug) { int i; if(!entity_slug||!entity_slug[0]) return NULL; for(i=0;i<(int)(sizeof AET_NPC_LINES_REC/sizeof AET_NPC_LINES_REC[0]);i++) if(ieq(AET_NPC_LINES_REC[i].slug,entity_slug)) return &AET_NPC_LINES_REC[i]; return NULL; }
+int aet_npc_line_count(void) { return (int)(sizeof AET_NPC_LINES_REC/sizeof AET_NPC_LINES_REC[0]); }
+const char *aet_npc_line_slug_at(int idx) { if(idx<0||idx>=aet_npc_line_count()) return ""; return AET_NPC_LINES_REC[idx].slug; }
 int aet_merchant_count(void) { return (int)(sizeof AET_MERCHANTS_REC/sizeof AET_MERCHANTS_REC[0]); }
 int aet_merchant_index(const char *slug) { int i; if(!slug||!slug[0]) return -1; for(i=0;i<aet_merchant_count();i++) if(ieq(AET_MERCHANTS_REC[i].slug,slug)) return i; return -1; }
 const char *aet_merchant_slug_at(int idx) { if(idx<0||idx>=aet_merchant_count()) return ""; return AET_MERCHANTS_REC[idx].slug; }

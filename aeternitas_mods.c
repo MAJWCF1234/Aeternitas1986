@@ -114,7 +114,18 @@ static char *g_char_notes_panel_append;
 
 static char g_loaded_packs[AETER_MODS_MAX_PACKS][256];
 static int g_loaded_pack_pri[AETER_MODS_MAX_PACKS];
+static char g_loaded_pack_id[AETER_MODS_MAX_PACKS][128];
+static char g_loaded_pack_title[AETER_MODS_MAX_PACKS][192];
 static int g_loaded_pack_n;
+
+#ifndef AETER_MOD_WARN_CAP
+#define AETER_MOD_WARN_CAP 36
+#endif
+static char g_warn_unknown_room[AETER_MOD_WARN_CAP][144];
+static int g_warn_unknown_room_n;
+static char g_warn_room_read[AETER_MOD_WARN_CAP][144];
+static int g_warn_room_read_n;
+static int g_warn_path_join;
 
 static void lc_inplace(char *s) {
   char *p;
@@ -716,10 +727,21 @@ static void add_greeting(char *entity, char *text) {
 }
 
 static void add_topic(char *entity, char *keyword, char *text) {
+  int i;
   if (!entity || !keyword || !text) {
     free(entity);
     free(keyword);
     free(text);
+    return;
+  }
+  for (i = 0; i < g_topics_n; i++) {
+    if (!str_ieq_local(g_topics[i].entity, entity)) continue;
+    if (!g_topics[i].keyword || strcmp(g_topics[i].keyword, keyword) != 0)
+      continue;
+    free(g_topics[i].text);
+    g_topics[i].text = text;
+    free(entity);
+    free(keyword);
     return;
   }
   if (g_topics_n >= g_topics_cap) {
@@ -847,6 +869,8 @@ static int foreach_file_in_dir(const char *dir, const char *ext,
 typedef struct {
   char name[256];
   int priority;
+  char id[128];
+  char title[192];
 } PackSlot;
 
 static int cmp_pack_load_order(const void *a, const void *b) {
@@ -859,7 +883,24 @@ static int cmp_pack_load_order(const void *a, const void *b) {
 typedef struct {
   int priority;
   int enabled;
+  char id[128];
+  char title[192];
 } ModManifest;
+
+static void copy_manifest_value(const char *raw, char *dest, size_t destcap) {
+  size_t L;
+  if (!dest || destcap < 1) return;
+  dest[0] = '\0';
+  if (!raw) return;
+  while (*raw == ' ' || *raw == '\t') raw++;
+  L = strlen(raw);
+  while (L > 0 && (raw[L - 1] == '\n' || raw[L - 1] == '\r' || raw[L - 1] == ' ' ||
+                   raw[L - 1] == '\t'))
+    L--;
+  if (L >= destcap) L = destcap - 1;
+  memcpy(dest, raw, L);
+  dest[L] = '\0';
+}
 
 static void read_manifest(const char *pack_path, ModManifest *m) {
   char mf[650];
@@ -868,10 +909,13 @@ static void read_manifest(const char *pack_path, ModManifest *m) {
   char *p;
   m->priority = 0;
   m->enabled = 1;
+  m->id[0] = '\0';
+  m->title[0] = '\0';
   if (!path_join(mf, sizeof mf, pack_path, "manifest.txt")) return;
   fp = fopen(mf, "r");
   if (!fp) return;
   while (fgets(line, sizeof line, fp)) {
+    trim_tail(line);
     p = line;
     while (*p == ' ' || *p == '\t') p++;
     if (*p == '#' || *p == '\r' || *p == '\n' || *p == '\0') continue;
@@ -879,19 +923,42 @@ static void read_manifest(const char *pack_path, ModManifest *m) {
     else if (strncmp(p, "enabled=", 8) == 0) m->enabled = atoi(p + 8) != 0;
     else if (strncmp(p, "disabled=", 9) == 0) {
       if (atoi(p + 9) != 0) m->enabled = 0;
-    }
+    } else if (strncmp(p, "id=", 3) == 0)
+      copy_manifest_value(p + 3, m->id, sizeof m->id);
+    else if (strncmp(p, "title=", 6) == 0)
+      copy_manifest_value(p + 6, m->title, sizeof m->title);
   }
   fclose(fp);
 }
 
-struct load_ctx {
+typedef struct {
   const char *pack_name;
-};
+} ModFileCtx;
+
+static void warn_unknown_slug(const char *pack, const char *subdir,
+                              const char *fname, const char *slug) {
+  if (g_warn_unknown_room_n >= AETER_MOD_WARN_CAP) return;
+  snprintf(g_warn_unknown_room[g_warn_unknown_room_n],
+           sizeof g_warn_unknown_room[0],
+           "\"%s\"/%s/%s  —  unknown slug \"%s\" (skipped)", pack ? pack : "?",
+           subdir ? subdir : "?", fname, slug);
+  g_warn_unknown_room_n++;
+}
+
+static void warn_overlay_read(const char *pack, const char *subdir,
+                              const char *fname) {
+  if (g_warn_room_read_n >= AETER_MOD_WARN_CAP) return;
+  snprintf(g_warn_room_read[g_warn_room_read_n], sizeof g_warn_room_read[0],
+           "\"%s\"/%s/%s  —  could not read file", pack ? pack : "?",
+           subdir ? subdir : "?", fname);
+  g_warn_room_read_n++;
+}
 
 static int cb_room_blurb(const char *full, const char *fname, void *v) {
   char slug[192];
   int room;
-  (void)v;
+  const ModFileCtx *ctx = (const ModFileCtx *)v;
+  const char *pk = ctx && ctx->pack_name ? ctx->pack_name : "?";
   if (!ends_with(fname, ".txt")) return 0;
   if (ends_with(fname, ".append.txt") || ends_with(fname, ".prepend.txt"))
     return 0;
@@ -899,10 +966,21 @@ static int cb_room_blurb(const char *full, const char *fname, void *v) {
   slug[sizeof slug - 1] = '\0';
   slug[strlen(slug) - 4] = '\0';
   room = world_room_index(slug);
-  if (room < 0) return 0;
+  if (room < 0) {
+    warn_unknown_slug(pk, "rooms", fname, slug);
+    return 0;
+  }
   {
     char *body = read_text_file(full, 256000);
-    if (body) set_blurb(room, body);
+    if (!body) {
+      warn_overlay_read(pk, "rooms", fname);
+      return 0;
+    }
+    if (!body[0]) {
+      free(body);
+      return 0;
+    }
+    set_blurb(room, body);
   }
   return 1;
 }
@@ -912,7 +990,8 @@ static int cb_room_prepend(const char *full, const char *fname, void *v) {
   int room;
   char *body;
   size_t fl;
-  (void)v;
+  const ModFileCtx *ctx = (const ModFileCtx *)v;
+  const char *pk = ctx && ctx->pack_name ? ctx->pack_name : "?";
   if (!ends_with(fname, ".prepend.txt")) return 0;
   fl = strlen(fname);
   if (fl < 13u) return 0;
@@ -920,9 +999,19 @@ static int cb_room_prepend(const char *full, const char *fname, void *v) {
   slug[sizeof slug - 1] = '\0';
   slug[fl - 12u] = '\0';
   room = world_room_index(slug);
-  if (room < 0) return 0;
+  if (room < 0) {
+    warn_unknown_slug(pk, "rooms", fname, slug);
+    return 0;
+  }
   body = read_text_file(full, 256000);
-  if (!body) return 0;
+  if (!body) {
+    warn_overlay_read(pk, "rooms", fname);
+    return 0;
+  }
+  if (!body[0]) {
+    free(body);
+    return 0;
+  }
   apply_room_prepend(room, body);
   return 1;
 }
@@ -932,7 +1021,8 @@ static int cb_room_append(const char *full, const char *fname, void *v) {
   int room;
   char *body;
   size_t fl;
-  (void)v;
+  const ModFileCtx *ctx = (const ModFileCtx *)v;
+  const char *pk = ctx && ctx->pack_name ? ctx->pack_name : "?";
   if (!ends_with(fname, ".append.txt")) return 0;
   fl = strlen(fname);
   if (fl < 12u) return 0;
@@ -940,9 +1030,19 @@ static int cb_room_append(const char *full, const char *fname, void *v) {
   slug[sizeof slug - 1] = '\0';
   slug[fl - 11u] = '\0';
   room = world_room_index(slug);
-  if (room < 0) return 0;
+  if (room < 0) {
+    warn_unknown_slug(pk, "rooms", fname, slug);
+    return 0;
+  }
   body = read_text_file(full, 256000);
-  if (!body) return 0;
+  if (!body) {
+    warn_overlay_read(pk, "rooms", fname);
+    return 0;
+  }
+  if (!body[0]) {
+    free(body);
+    return 0;
+  }
   apply_room_append(room, body);
   return 1;
 }
@@ -950,16 +1050,30 @@ static int cb_room_append(const char *full, const char *fname, void *v) {
 static int cb_room_title(const char *full, const char *fname, void *v) {
   char slug[192];
   int room;
-  (void)v;
+  const ModFileCtx *ctx = (const ModFileCtx *)v;
+  const char *pk = ctx && ctx->pack_name ? ctx->pack_name : "?";
   if (!ends_with(fname, ".txt")) return 0;
+  if (ends_with(fname, ".append.txt") || ends_with(fname, ".prepend.txt"))
+    return 0;
   strncpy(slug, fname, sizeof slug - 1);
   slug[sizeof slug - 1] = '\0';
   slug[strlen(slug) - 4] = '\0';
   room = world_room_index(slug);
-  if (room < 0) return 0;
+  if (room < 0) {
+    warn_unknown_slug(pk, "titles", fname, slug);
+    return 0;
+  }
   {
     char *body = read_text_file(full, 8000);
-    if (body) set_title(room, body);
+    if (!body) {
+      warn_overlay_read(pk, "titles", fname);
+      return 0;
+    }
+    if (!body[0]) {
+      free(body);
+      return 0;
+    }
+    set_title(room, body);
   }
   return 1;
 }
@@ -975,6 +1089,10 @@ static int cb_item(const char *full, const char *fname, void *v) {
   id[strlen(id) - 4] = '\0';
   buf = read_text_file(full, 128000);
   if (!buf) return 0;
+  if (!buf[0]) {
+    free(buf);
+    return 0;
+  }
   idheap = strdup(id);
   if (!idheap) {
     free(buf);
@@ -995,6 +1113,10 @@ static int cb_npc_greeting(const char *full, const char *fname, void *v) {
   stem[strlen(stem) - 13] = '\0';
   text = read_text_file(full, 16000);
   if (!text) return 0;
+  if (!text[0]) {
+    free(text);
+    return 0;
+  }
   entity = strdup(stem);
   if (!entity) {
     free(text);
@@ -1030,6 +1152,12 @@ static int cb_npc_topic(const char *full, const char *fname, void *v) {
   if (!text) {
     free(entity);
     free(keyword);
+    return 0;
+  }
+  if (!text[0]) {
+    free(entity);
+    free(keyword);
+    free(text);
     return 0;
   }
   lc_inplace(keyword);
@@ -1368,18 +1496,27 @@ static void load_character_overlays(const char *pack_path) {
 
 static void load_one_pack(const char *pack_path, const char *pack_name) {
   char sub[600];
-  (void)pack_name;
+  ModFileCtx ctx;
+  ctx.pack_name = pack_name;
   load_character_overlays(pack_path);
-  if (path_join(sub, sizeof sub, pack_path, "rooms") && dir_exists(sub)) {
-    (void)foreach_file_in_dir(sub, ".txt", cb_room_blurb, NULL);
-    (void)foreach_file_in_dir(sub, ".prepend.txt", cb_room_prepend, NULL);
-    (void)foreach_file_in_dir(sub, ".append.txt", cb_room_append, NULL);
+  if (!path_join(sub, sizeof sub, pack_path, "rooms"))
+    g_warn_path_join++;
+  else if (dir_exists(sub)) {
+    (void)foreach_file_in_dir(sub, ".txt", cb_room_blurb, &ctx);
+    (void)foreach_file_in_dir(sub, ".prepend.txt", cb_room_prepend, &ctx);
+    (void)foreach_file_in_dir(sub, ".append.txt", cb_room_append, &ctx);
   }
-  if (path_join(sub, sizeof sub, pack_path, "titles") && dir_exists(sub))
-    (void)foreach_file_in_dir(sub, ".txt", cb_room_title, NULL);
-  if (path_join(sub, sizeof sub, pack_path, "items") && dir_exists(sub))
+  if (!path_join(sub, sizeof sub, pack_path, "titles"))
+    g_warn_path_join++;
+  else if (dir_exists(sub))
+    (void)foreach_file_in_dir(sub, ".txt", cb_room_title, &ctx);
+  if (!path_join(sub, sizeof sub, pack_path, "items"))
+    g_warn_path_join++;
+  else if (dir_exists(sub))
     (void)foreach_file_in_dir(sub, ".txt", cb_item, NULL);
-  if (path_join(sub, sizeof sub, pack_path, "npcs") && dir_exists(sub)) {
+  if (!path_join(sub, sizeof sub, pack_path, "npcs"))
+    g_warn_path_join++;
+  else if (dir_exists(sub)) {
     (void)foreach_file_in_dir(sub, ".greeting.txt", cb_npc_greeting, NULL);
     (void)foreach_file_in_dir(sub, ".txt", cb_npc_topic, NULL);
   }
@@ -1393,6 +1530,9 @@ void aet_mods_init(const char *mods_directory) {
   char root[520];
 
   aet_mods_shutdown();
+  g_warn_unknown_room_n = 0;
+  g_warn_room_read_n = 0;
+  g_warn_path_join = 0;
 
   if (!mods_directory || !mods_directory[0]) return;
   strncpy(root, mods_directory, sizeof root - 1);
@@ -1432,6 +1572,8 @@ void aet_mods_init(const char *mods_directory) {
       slots[ns].name[L] = '\0';
     }
     slots[ns].priority = mf.priority;
+    snprintf(slots[ns].id, sizeof slots[ns].id, "%s", mf.id);
+    snprintf(slots[ns].title, sizeof slots[ns].title, "%s", mf.title);
     ns++;
   }
   qsort(slots, (size_t)ns, sizeof slots[0], cmp_pack_load_order);
@@ -1448,6 +1590,10 @@ void aet_mods_init(const char *mods_directory) {
         g_loaded_packs[g_loaded_pack_n][Ln] = '\0';
       }
       g_loaded_pack_pri[g_loaded_pack_n] = slots[i].priority;
+      snprintf(g_loaded_pack_id[g_loaded_pack_n],
+               sizeof g_loaded_pack_id[g_loaded_pack_n], "%s", slots[i].id);
+      snprintf(g_loaded_pack_title[g_loaded_pack_n],
+               sizeof g_loaded_pack_title[g_loaded_pack_n], "%s", slots[i].title);
       g_loaded_pack_n++;
     }
   }
@@ -1665,6 +1811,36 @@ void aet_mods_format_status(char *buf, size_t cap) {
     snprintf(buf, cap, "%s", g_status_summary);
   else
     snprintf(buf, cap, "Mods not initialized.\n");
+}
+
+void aet_mods_format_load_warnings(char *buf, size_t cap) {
+  size_t used;
+  int i;
+  if (!buf || cap < 8) return;
+  buf[0] = '\0';
+  if (!g_warn_unknown_room_n && !g_warn_room_read_n && !g_warn_path_join)
+    return;
+  used = 0;
+  if (g_warn_path_join > 0)
+    used += (size_t)snprintf(
+        buf + used, cap > used ? cap - used : 0,
+        "Mod paths truncated (%d); shorten pack or mods root path.\n\n",
+        g_warn_path_join);
+  if (g_warn_unknown_room_n > 0) {
+    used += (size_t)snprintf(buf + used, cap > used ? cap - used : 0,
+                             "Room/title overlays skipped (slug not in world):\n");
+    for (i = 0; i < g_warn_unknown_room_n && used + 2 < cap; i++)
+      used += (size_t)snprintf(buf + used, cap > used ? cap - used : 0,
+                               "  %s\n", g_warn_unknown_room[i]);
+    used += (size_t)snprintf(buf + used, cap > used ? cap - used : 0, "\n");
+  }
+  if (g_warn_room_read_n > 0) {
+    used += (size_t)snprintf(buf + used, cap > used ? cap - used : 0,
+                             "Unreadable overlay files:\n");
+    for (i = 0; i < g_warn_room_read_n && used + 2 < cap; i++)
+      used += (size_t)snprintf(buf + used, cap > used ? cap - used : 0,
+                               "  %s\n", g_warn_room_read[i]);
+  }
 }
 
 const char *aet_mods_character_sheet_suffix(void) {
@@ -1939,8 +2115,23 @@ void aet_mods_format_load_order(char *buf, size_t cap) {
       "Pack load order (first -> last; later wins on conflicts):\n");
   if (used >= cap) return;
   for (i = 0; i < g_loaded_pack_n; i++) {
-    int w = snprintf(buf + used, cap > used ? cap - used : 0, "  [%4d]  %s\n",
+    int w = snprintf(buf + used, cap > used ? cap - used : 0, "  [%4d]  %s",
                      g_loaded_pack_pri[i], g_loaded_packs[i]);
+    if (w < 0 || (size_t)w >= cap - used) break;
+    used += (size_t)w;
+    if (g_loaded_pack_title[i][0]) {
+      w = snprintf(buf + used, cap > used ? cap - used : 0, " — %s",
+                   g_loaded_pack_title[i]);
+      if (w < 0 || (size_t)w >= cap - used) break;
+      used += (size_t)w;
+    }
+    if (g_loaded_pack_id[i][0]) {
+      w = snprintf(buf + used, cap > used ? cap - used : 0, "  (%s)",
+                   g_loaded_pack_id[i]);
+      if (w < 0 || (size_t)w >= cap - used) break;
+      used += (size_t)w;
+    }
+    w = snprintf(buf + used, cap > used ? cap - used : 0, "\n");
     if (w < 0 || (size_t)w >= cap - used) break;
     used += (size_t)w;
   }
