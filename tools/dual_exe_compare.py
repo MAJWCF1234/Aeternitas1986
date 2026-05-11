@@ -201,12 +201,12 @@ def main() -> int:
             with tempfile.TemporaryDirectory(prefix=f"aet-dual-{label}-rec-") as tdr:
                 save_o = Path(tdo) / "save.txt"
                 save_r = Path(tdr) / "save.txt"
-        rc_o, norm_o, err_o = run_normalized(
-            orig, input_text, save_o, orig.parent, env_base, args.timeout
-        )
-        rc_r, norm_r, err_r = run_normalized(
-            rec, input_text, save_r, rec.parent, env_base, args.timeout
-        )
+                rc_o, norm_o, err_o = run_normalized(
+                    orig, input_text, save_o, orig.parent, env_base, args.timeout
+                )
+                rc_r, norm_r, err_r = run_normalized(
+                    rec, input_text, save_r, rec.parent, env_base, args.timeout
+                )
 
         anon = not args.no_anonymize_temps
         compare_o = for_diff_stdout(norm_o, anon)

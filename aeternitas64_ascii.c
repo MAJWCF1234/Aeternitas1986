@@ -10244,7 +10244,7 @@ static void eq_ui_emit_slot_row(int slot_i) {
   snprintf(tag, sizeof tag, "[%s]", EQ_SLOT_NAME[slot_i]);
   for (j = 0; tag[j]; j++) tag[j] = (char)toupper((unsigned char)tag[j]);
   inner[0] = '\0';
-  snprintf(inner + strlen(inner), sizeof inner - strlen(inner), " %s%-10.10s%s",
+  snprintf(inner + strlen(inner), sizeof inner - strlen(inner), " %s%-12.12s%s",
            C_MUTED, tag, C_RESET);
   if (g_eq_slots[slot_i][0]) {
     const char *disp = g_eq_slots[slot_i];
@@ -10336,7 +10336,7 @@ static void eq_ui_emit_inv_line(int inv_ix) {
 }
 
 static void eq_ui_emit_inv_empty(void) {
-  char inner[8];
+  char inner[96];
   inner[0] = '\0';
   aet_sgr_pad_to(inner, sizeof inner, 64);
   printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
