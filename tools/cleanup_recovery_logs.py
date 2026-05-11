@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
-"""Remove ephemeral recovery logs and scratch transcripts (see patterns in main).
+"""List or remove ephemeral recovery logs and scratch transcripts (see patterns in main).
 
 Canonical data lives under ``recovery_artifacts/txts/`` (JSON, symbol dumps). This script
-does not delete those. It does not touch baseline EXEs or world_tables_recovered.json*."""
+does not delete those. It does not touch baseline EXEs or world_tables_recovered.json*.
+
+Dry-run is the default; pass ``--apply`` to delete matched paths.
+"""
 
 from __future__ import annotations
 
+import argparse
 import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+_TOOLS = Path(__file__).resolve().parent
+if str(_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_TOOLS))
+from repo_paths import ROOT, require_under_root  # noqa: E402
 
 KEEP_NAMES = frozenset(
     {
@@ -33,19 +40,47 @@ KEEP_NAMES = frozenset(
 )
 
 
+def _safe_path(path: Path) -> Path:
+    return require_under_root(path, label="cleanup target")
+
+
+def _delete_file(path: Path, *, apply: bool) -> None:
+    target = _safe_path(path)
+    if apply:
+        target.unlink()
+        print("deleted", target.relative_to(ROOT))
+    else:
+        print("would delete", target.relative_to(ROOT))
+
+
+def _delete_dir(path: Path, *, apply: bool) -> None:
+    target = _safe_path(path)
+    if apply:
+        shutil.rmtree(target)
+        print("removed dir", target.relative_to(ROOT))
+    else:
+        print("would remove dir", target.relative_to(ROOT))
+
+
 def main() -> int:
+    ap = argparse.ArgumentParser(description="Clean ephemeral recovery scratch files.")
+    ap.add_argument(
+        "--apply",
+        action="store_true",
+        help="Actually delete matched paths. Without this, only prints what would be removed.",
+    )
+    args = ap.parse_args()
+
     removed = 0
     for p in ROOT.glob("tools/_describe_*.txt"):
-        p.unlink()
+        _delete_file(p, apply=args.apply)
         removed += 1
-        print("deleted", p.relative_to(ROOT))
 
     art = ROOT / "recovery_artifacts"
     for d in sorted(art.glob("assistant_temp_recovery_*")):
         if d.is_dir():
-            shutil.rmtree(d)
+            _delete_dir(d, apply=args.apply)
             removed += 1
-            print("removed dir", d.relative_to(ROOT))
 
     txts = art / "txts"
     if txts.is_dir():
@@ -71,11 +106,11 @@ def main() -> int:
                     "exe_rdata_dump.txt",
                 )
             ):
-                p.unlink()
+                _delete_file(p, apply=args.apply)
                 removed += 1
-                print("deleted", p.relative_to(ROOT))
 
-    print(f"OK: removed {removed} path(s)")
+    verb = "removed" if args.apply else "matched"
+    print(f"OK: {verb} {removed} path(s)")
     return 0
 
 

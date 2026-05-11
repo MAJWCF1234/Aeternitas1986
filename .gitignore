@@ -2,6 +2,7 @@
 aeternitas64_save.txt
 aeternitas64_dev_save.txt
 autotest_out.txt
+tools/_*.txt
 
 # Build outputs
 *.exe

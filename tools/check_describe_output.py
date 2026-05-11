@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Run describe_pc_test and assert narrative invariants (no crash, key markers).
 
-Build the harness first: ``py -3 tools/run_describe_pc_test.py --build-only``.
+Build the harness first (from repo root; see ``tools/describe_pc_test.c`` header)::
+
+    gcc -std=c11 -Wall -Wextra -finput-charset=UTF-8 -fexec-charset=UTF-8 \\
+        -o describe_pc_test.exe tools/describe_pc_test.c aeternitas_char_description.c
 """
 
 from __future__ import annotations
 
+import argparse
 import re
 import subprocess
 import sys
@@ -58,6 +62,8 @@ REQUIRED_SUBSTRINGS = (
     "mask keeps taxonomy unstable",
     "sensor rings and bare laminate",
     "meniscus offers combs nothing to purchase",
+    # Flesh corruption branch (cor > 0, non-construct / non-slime): Elf harness case.
+    "temperature gone wrong on skin",
     # Scarless face + marks ledger + corruption for constructs / slime.
     "laminate stays honest",
     "surface stays rumor-smooth",
@@ -190,10 +196,42 @@ FORBIDDEN_SUBSTRINGS = (
 
 
 def main() -> int:
-    if not EXE.is_file():
-        print(f"Missing {EXE}; build with tools/run_describe_pc_test.py first.", file=sys.stderr)
+    ap = argparse.ArgumentParser(
+        description="Run describe_pc_test and assert narrative output invariants."
+    )
+    ap.add_argument("--exe", type=Path, default=EXE, help="Path to describe_pc_test executable.")
+    ap.add_argument(
+        "--timeout",
+        type=int,
+        default=30,
+        help="Seconds before the harness is killed as hung.",
+    )
+    args = ap.parse_args()
+
+    exe = args.exe
+    if not exe.is_file():
+        print(
+            f"Missing {exe}; build with gcc per docstring in tools/check_describe_output.py "
+            f"(same command as tools/describe_pc_test.c header).",
+            file=sys.stderr,
+        )
         return 2
-    p = subprocess.run([str(EXE)], cwd=ROOT, text=True, capture_output=True, encoding="utf-8")
+    try:
+        p = subprocess.run(
+            [str(exe)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            timeout=args.timeout,
+        )
+    except subprocess.TimeoutExpired as exc:
+        print(f"describe harness timed out after {args.timeout}s: {exe}", file=sys.stderr)
+        if exc.stdout:
+            print(exc.stdout[-4000:], file=sys.stderr)
+        if exc.stderr:
+            print(exc.stderr[-4000:], file=sys.stderr)
+        return 124
     if p.returncode != 0:
         print(p.stderr or p.stdout, file=sys.stderr)
         return p.returncode
