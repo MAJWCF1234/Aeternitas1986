@@ -31,6 +31,16 @@
 #include <io.h>
 #endif
 
+#ifdef AETER_MINIGAMES
+#include "tools/testing/mgt_game_bridge.h"
+#include "tools/testing/mgt_game_sim.h"
+#include "tools/testing/mgt_host.h"
+#include "tools/testing/mgt_read.h"
+#include "tools/testing/mgt_state.h"
+#include "tools/testing/mgt_sync.h"
+#include "mgt.h"
+#endif
+
 static const char *base_world_room_entity(int room) { return world_room_entity(room); }
 static const char *runtime_room_entity(int room);
 #define world_room_entity runtime_room_entity
@@ -77,7 +87,7 @@ static const char *const DIR_LABELS[DIR_COUNT] = {
 #define MAX_NOTES 32
 #define NOTE_LEN 192
 #define INPUT_LINE_MAX 512
-/** Room for fill_help_text() plus mod suffix lines (WORLD_ROOM_COUNT in format). */
+
 #define AETER_HELP_BODY_CAP 8192
 #define TRANSCRIPT_CAP 4096
 #define PROCESS_MSG_CAP 1536
@@ -86,7 +96,7 @@ static const char *const DIR_LABELS[DIR_COUNT] = {
 #define AETER_START_HP 100
 
 static char g_save_path[520];
-/** If non-empty: mod pack root (overrides env and default save_dir/mods). */
+
 static char g_mods_override[520];
 static AetRuntimeBootstrapStatus g_bootstrap_status;
 typedef struct {
@@ -101,11 +111,36 @@ static AetIntentCtx g_intent;
 static AetIntentCtx g_last_intent;
 static char g_transcript[TRANSCRIPT_CAP];
 static int g_return_to_menu;
+
+enum {
+  DISAMBIG_ACT_NONE = 0,
+  DISAMBIG_ACT_TAKE,
+  DISAMBIG_ACT_DROP,
+  DISAMBIG_ACT_EXAMINE,
+  DISAMBIG_ACT_EQUIP,
+  DISAMBIG_ACT_BUY,
+  DISAMBIG_ACT_SELL
+};
+#define DISAMBIG_PICK_MAX 10
+#define DISAMBIG_MEM_MAX 24
+static int g_disambig_next_act;
+static int g_disambig_act;
+static int g_disambig_inv;
+static char g_disambig_query[MAX_ITEM_LEN];
+static char g_disambig_picks[DISAMBIG_PICK_MAX][MAX_ITEM_LEN];
+static int g_disambig_pick_n;
+typedef struct {
+  char q[MAX_ITEM_LEN];
+  char slug[MAX_ITEM_LEN];
+} DisambigMemEnt;
+static DisambigMemEnt g_disambig_mem[DISAMBIG_MEM_MAX];
+static int g_disambig_mem_n;
+
 static const char *UI_RULE =
     "===============================================================================";
 static const char *UI_RULE_LIGHT =
     "--------------------------------------------------------------------------------";
-/** 120-column title rules (material forge + equipment UI). */
+
 static const char AETER_RULE_120[] =
     "==============================================================================="
     "=========================================";
@@ -297,6 +332,10 @@ static const char *const EQ_SLOT_NAME[EQ_SLOT_COUNT] = {
     "feet", "weapon", "offhand", "accessory"};
 static char g_eq_slots[EQ_SLOT_COUNT][MAX_ITEM_LEN];
 static char g_last_cmd[INPUT_LINE_MAX];
+#define CMD_HIST_RING 32
+static char g_cmd_hist[CMD_HIST_RING][INPUT_LINE_MAX];
+static int g_cmd_hist_count;
+static int g_cmd_hist_head;
 #define DIAG_RING 8
 #define DIAG_W 168
 static char g_diag_ring[DIAG_RING][DIAG_W];
@@ -305,24 +344,44 @@ static int g_diag_count;
 static char g_notes[MAX_NOTES][NOTE_LEN];
 static int g_note_n;
 #define AETER_REP_MAX 32
-/** Room.entity NPC slugs not on the merchant roster (parallel slug-keyed table). */
+
 #define AETER_SOC_NPC_MAX 32
 static int g_merchant_rep[AETER_REP_MAX];
-/** Per-merchant-index social bars (0–100); stage is derived from these + patron rep. */
+
 static unsigned char g_npc_friendship[AETER_REP_MAX];
 static unsigned char g_npc_romance[AETER_REP_MAX];
-/** Last turn this NPC received a social bump (talk/gift); 0 = never. */
+
 static int g_npc_last_social_turn[AETER_REP_MAX];
 static char g_soc_npc_slug[AETER_SOC_NPC_MAX][MAX_ITEM_LEN];
 static unsigned char g_soc_npc_friendship[AETER_SOC_NPC_MAX];
 static unsigned char g_soc_npc_romance[AETER_SOC_NPC_MAX];
 static int g_soc_npc_last_turn[AETER_SOC_NPC_MAX];
+
+#define CONV_MENU_MAX 6
+#define CONV_TOPIC_MEM_SZ 56
+enum {
+  CONV_PICK_TOPIC = 0,
+  CONV_PICK_MORE = 1,
+  CONV_PICK_GOODBYE = 2
+};
+static int g_conv_active;
+static char g_conv_npc[MAX_ITEM_LEN];
+static int g_conv_pick_n;
+static int g_conv_pick_kind[CONV_MENU_MAX];
+static char g_conv_pick_label[CONV_MENU_MAX][72];
+static char g_conv_pick_phrase[CONV_MENU_MAX][128];
+static char g_npc_topic_mem[AETER_REP_MAX][CONV_TOPIC_MEM_SZ];
+static char g_npc_topic_last[AETER_REP_MAX][CONV_TOPIC_MEM_SZ];
+static char g_soc_topic_mem[AETER_SOC_NPC_MAX][CONV_TOPIC_MEM_SZ];
+static char g_soc_topic_last[AETER_SOC_NPC_MAX][CONV_TOPIC_MEM_SZ];
+
 static int g_verbose_room;
 static int g_npc_validation_checked;
 static int g_npc_validation_warnings;
-/** -1 follow env, 0 force mono, 1 force ANSI (session + save hintena/colorov). */
+
 static int g_settings_color_ov = -1;
 static int g_hints_pref = 1;
+static int g_autosave_enabled = 1;
 static int g_ironman_stub = 0;
 #define RECAP_MAX 16
 #define RECAP_W 320
@@ -340,6 +399,21 @@ static int g_causal_count;
 static char g_trade_ring[TRADE_RING][TRADE_W];
 static int g_trade_head;
 static int g_trade_count;
+
+#define REL_HIST_RING 32
+#define REL_HIST_ACT 20
+typedef struct {
+  int turn;
+  char slug[MAX_ITEM_LEN];
+  char act[REL_HIST_ACT];
+  signed char df;
+  signed char dr;
+  signed char dp;
+} RelHistRow;
+static RelHistRow g_rel_hist[REL_HIST_RING];
+static int g_rel_hist_head;
+static int g_rel_hist_count;
+
 enum {
   BARTER_NONE = 0,
   BARTER_BUY = 1,
@@ -402,6 +476,11 @@ typedef struct {
   int barter_expire_turn;
   char barter_merchant[MAX_ITEM_LEN];
   char barter_item[MAX_ITEM_LEN];
+  int craft_proficiency;
+  int hints_pref;
+  int settings_color_ov;
+  int autosave_enabled;
+  char eq_slots[EQ_SLOT_COUNT][MAX_ITEM_LEN];
   AetPcSave pc;
 } AetGameSnapshot;
 
@@ -454,6 +533,11 @@ static void snapshot_capture(AetGameSnapshot *dst) {
   dst->barter_expire_turn = g_barter_expire_turn;
   memcpy(dst->barter_merchant, g_barter_merchant, sizeof g_barter_merchant);
   memcpy(dst->barter_item, g_barter_item, sizeof g_barter_item);
+  dst->craft_proficiency = g_craft_proficiency;
+  dst->hints_pref = g_hints_pref;
+  dst->settings_color_ov = g_settings_color_ov;
+  dst->autosave_enabled = g_autosave_enabled;
+  memcpy(dst->eq_slots, g_eq_slots, sizeof g_eq_slots);
   pc_capture(&dst->pc);
 }
 
@@ -504,6 +588,11 @@ static void snapshot_restore(const AetGameSnapshot *src) {
   g_barter_expire_turn = src->barter_expire_turn;
   memcpy(g_barter_merchant, src->barter_merchant, sizeof g_barter_merchant);
   memcpy(g_barter_item, src->barter_item, sizeof g_barter_item);
+  g_craft_proficiency = src->craft_proficiency;
+  g_hints_pref = src->hints_pref;
+  g_settings_color_ov = src->settings_color_ov;
+  g_autosave_enabled = src->autosave_enabled ? 1 : 0;
+  memcpy(g_eq_slots, src->eq_slots, sizeof g_eq_slots);
   pc_restore(&src->pc);
 }
 
@@ -513,6 +602,7 @@ static void format_objectives_body(char *body, size_t cap);
 static void format_progress_body(char *body, size_t cap);
 static void format_waypoints_body(char *body, size_t cap);
 static void format_trade_history_body(char *body, size_t cap);
+static int write_save_file_path(const char *path);
 static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap);
 static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap);
 static void item_pretty(const char *item, char *out, size_t cap);
@@ -521,10 +611,20 @@ static void run_game_menu(void);
 static void run_settings_ui(void);
 static void return_to_game_screen(void);
 static void ui_block_pause(const char *title, const char *body);
+static int guide_line_count(const char *s);
+static void ui_scrollable_panel(const char *title, const char *body,
+                              const char *pending_acc, int *did_fullscreen);
+static void cmd_play_piano(char *msg, size_t msgcap);
+static int try_minigame(const char *id, char *msg, size_t msgcap);
+static int room_can_fish(void);
+static int room_can_farm(void);
+static int room_can_cook(void);
+static int room_can_gamble(void);
 static int run_save_manager_ui(int *did_fullscreen, int esc_menu);
 static void run_material_forge(const char *pending_acc, int *did_fullscreen);
 static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscreen);
 static int inv_find(const char *name);
+static int soc_friendship_for_slug(const char *slug);
 static int inv_take_out(int ix, char *taken, size_t taken_cap);
 static void eq_clear_all(void);
 static void eq_sync_ready_item(void);
@@ -539,6 +639,27 @@ static int resolve_room_item_query(const char *name, char *resolved,
                                    size_t msgcap);
 static int resolve_inv_item_query(const char *name, int *ix_out, char *msg,
                                   size_t msgcap);
+static void disambig_reset_all(void);
+static int disambig_resolve_ambiguous(int act, int inv, const char *query,
+                                      char picks[][MAX_ITEM_LEN], int n,
+                                      char *resolved, size_t resolved_cap,
+                                      char *msg, size_t msgcap);
+static int disambig_try_followup(const char *line, char *msg, size_t msgcap,
+                                 int *turn_advance);
+static void cmd_talk(const char *target, const char *topic, char *msg,
+                     size_t msgcap);
+static void conv_clear(void);
+static int conv_try_followup(const char *line, char *msg, size_t msgcap,
+                             int *turn_advance);
+static void cmd_price_compare(const char *rest, char *body, size_t cap);
+static void examine_target(const char *raw, char *msg, size_t msgcap);
+static int item_has_read_text(const char *id);
+static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
+                                char *msg, size_t msgcap);
+#ifdef AETER_MINIGAMES
+static int game_open_reader(const char *item_id, char *msg, size_t msgcap);
+static int game_read_resolve(const char *item_id, MgtReadDocument *doc);
+#endif
 static void strip_leading_articles(char *s);
 static int str_contains_ci(const char *haystack, const char *needle);
 static int text_has_word_ci(const char *text, const char *word);
@@ -615,8 +736,8 @@ static void suggest_typo(const char *word, char *out, size_t outcap) {
       "find",
       "describe",  "blurb",     "shout",     "say",        "brief",
       "verbose",   "recap",     "transcript", "touch",      "lights",
-      "again",     "repeat",
-      "about",     "credits",   "version",   "ver",       "approach",
+      "again",     "repeat",    "history",   "utilities",
+      "about",     "credits",   "lore",      "version",   "ver",       "approach",
       "equip",     "goto",
       "wield",     "stow",      "visited",   "seen",      "takeoff",
       "close",     "buy",       "sell",      "purchase",  "wares",
@@ -650,11 +771,9 @@ static void suggest_typo(const char *word, char *out, size_t outcap) {
     out[0] = '\0';
 }
 
-/* Canonical verbs for Levenshtein typo layers: parser_topverb_min_dist with
- * maxd 2; unique nearest wins (ties → no suggestion/autofix). d=2 allowed only
- * when the typed token is long enough (≥6) to limit false positives. */
 static const char *const PARSER_TOPVERBS[] = {
     "about",     "again",     "approach",  "aptitudes", "back",
+    "lore",
     "because",   "brief",     "buy",       "causality", "clear",
     "compare",   "describe",  "diagnostics", "done",    "drop",
     "drink",     "east",      "eat",       "equip",     "equipment",
@@ -704,8 +823,6 @@ static int parser_topverb_min_dist(const char *word, int maxd, int *ties_out,
 
 static void rewrite_command(char *line, const char *verb, const char *rest);
 
-/* Deterministic autofix: exactly one verb is the unique closest match (d≤2).
- * d=2 only if the typed token is long enough to reduce false positives. */
 static int parser_autofix_first_token_unique_typo(char *line) {
   char tok[64];
   const char *sp;
@@ -732,11 +849,6 @@ static int parser_autofix_first_token_unique_typo(char *line) {
   return 1;
 }
 
-/* Longest match wins — array order is longest-first ("could you please" before
- * "could you", etc.; strip_natural_prefixes picks the first matching prefix).
- * Conservative English-only fillers; only strip when followed by more command
- * text (prefix match leaves `line + n` possibly empty only when user typed just
- * the filler — loops bail when nothing strips). */
 static const char *const kNaturalLanguageStrip[] = {
     "would it be possible to ", "would you mind if i ", "do you mind if i ",
     "if you could please ", "could you please ",
@@ -988,12 +1100,11 @@ static void ui_flash_screen(void) {
 }
 
 #if defined(_WIN32)
-/* MinGW/UCRT stdio still uses the C locale unless we switch it; pair with
- * SetConsole*CP so typographic UTF-8 in sources and mods renders correctly. */
+
 static void win32_console_utf8_begin(void) {
   (void)SetConsoleOutputCP(CP_UTF8);
   (void)SetConsoleCP(CP_UTF8);
-  /* Prefer GNU-style first (common on MinGW); then MSVC/UCRT ".UTF8". */
+  
   if (setlocale(LC_ALL, "C.UTF-8"))
     return;
   if (setlocale(LC_ALL, ".UTF8"))
@@ -1381,10 +1492,6 @@ static size_t mod_replace_token_pass(const char *src, char *dst, size_t dstcap,
   return (size_t)(d - dst);
 }
 
-/**
- * Second pass for mod overlay text: current room title, slug, region.
- * Tokens: %ROOMTITLE% %ROOMSLUG% %ROOM% (same as slug) %REGION%
- */
 static void expand_scene_mod_text(const char *src, char *dst, size_t dstcap) {
   char a[4096], b[4096];
   const char *slug, *title, *reg;
@@ -1448,12 +1555,230 @@ static int inv_has(const char *name) {
   return 0;
 }
 
+static int inv_count(const char *name) {
+  int i, n = 0;
+  if (!name || !name[0]) return 0;
+  for (i = 0; i < g_inv_n; i++)
+    if (str_ieq(g_inv[i], name)) n++;
+  return n;
+}
+
+#ifdef AETER_MINIGAMES
+static const char *game_mgt_weather_string(void);
+static void inv_add(const char *name);
+
+static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
+                                char *msg, size_t msgcap);
+static int game_read_resolve(const char *item_id, MgtReadDocument *doc);
+
+static int g_mgt_ready;
+static MgtPersistentState g_mgt_quicksave_profile;
+static int g_mgt_quicksave_valid;
+
+static void game_fill_sim(MgtGameSim *sim);
+
+static void game_mgt_ensure_profile(void) {
+  MgtPersistentState *pst = mgt_host_state();
+  MgtGameSim sim;
+
+  if (g_mgt_ready) {
+    game_fill_sim(&sim);
+    mgt_sync_from_world(pst, &sim);
+    return;
+  }
+  if (g_mgt_quicksave_valid) {
+    *pst = g_mgt_quicksave_profile;
+  } else {
+    memset(&sim, 0, sizeof sim);
+    if (!mgt_harness_load(&sim, pst, NULL))
+      mgt_profile_fresh_adventure(pst, (unsigned)time(NULL) | 1u);
+  }
+  game_fill_sim(&sim);
+  mgt_sync_from_world(pst, &sim);
+}
+
+static void game_mgt_capture_profile(MgtPersistentState *out) {
+  if (!out) return;
+  game_mgt_ensure_profile();
+  *out = *mgt_host_state();
+  g_mgt_quicksave_profile = *out;
+  g_mgt_quicksave_valid = 1;
+}
+
+static void game_mgt_bootstrap_profile(void) { game_mgt_ensure_profile(); }
+
+static void game_fill_sim(MgtGameSim *sim) {
+  AetPcSave pc;
+  const char *slug;
+  int i;
+  if (!sim) return;
+  memset(sim, 0, sizeof *sim);
+  pc_capture(&pc);
+  sim->coins = g_coins;
+  sim->craft_proficiency = g_craft_proficiency;
+  sim->cha = pc.cha;
+  sim->wis = pc.wis;
+  sim->intl = pc.intl;
+  sim->adventure_turn = g_turns;
+  sim->inv_n = g_inv_n;
+  if (sim->inv_n > MGT_SIM_INV_MAX) sim->inv_n = MGT_SIM_INV_MAX;
+  for (i = 0; i < sim->inv_n; i++) {
+    snprintf(sim->inv[i], sizeof sim->inv[i], "%s", g_inv[i]);
+  }
+  slug = world_slug(g_room);
+  if (slug)
+    snprintf(sim->room_slug, sizeof sim->room_slug, "%s", slug);
+  else
+    sim->room_slug[0] = '\0';
+  {
+    const char *wx = game_mgt_weather_string();
+    snprintf(sim->weather, sizeof sim->weather, "%s", wx ? wx : "clear");
+  }
+}
+
+static void game_apply_sim(const MgtGameSim *sim) {
+  int i;
+  if (!sim) return;
+  g_coins = sim->coins;
+  if (sim->craft_proficiency > g_craft_proficiency)
+    g_craft_proficiency = sim->craft_proficiency;
+  if (g_craft_proficiency > 100) g_craft_proficiency = 100;
+  g_inv_n = 0;
+  for (i = 0; i < sim->inv_n && i < MGT_SIM_INV_MAX; i++) inv_add(sim->inv[i]);
+}
+
+static void game_mgt_sync_from(MgtPersistentState *st, void *ctx) {
+  MgtGameSim sim;
+  (void)ctx;
+  if (!st) return;
+  game_fill_sim(&sim);
+  mgt_sync_from_world(st, &sim);
+}
+
+static void game_mgt_give_item(const char *id, void *ctx) {
+  (void)ctx;
+  if (id && id[0]) inv_add(id);
+}
+
+static void game_mgt_sync_to(const MgtPersistentState *st_in, void *ctx) {
+  MgtGameSim sim;
+  (void)ctx;
+  if (!st_in) return;
+  game_fill_sim(&sim);
+  mgt_sync_to_world((MgtPersistentState *)st_in, &sim);
+  game_apply_sim(&sim);
+}
+
+static void game_mgt_redraw(void *ctx) {
+  (void)ctx;
+  return_to_game_screen();
+}
+
+static int try_minigame(const char *id, char *msg, size_t msgcap) {
+  MgtPersistentState *st;
+  MgtGameSim sim;
+  int rc;
+  if (!id || !id[0]) return 0;
+  if (!mgt_registry_find(id)) {
+    if (msg && msgcap)
+      snprintf(msg, msgcap, "That activity is not available.");
+    return 0;
+  }
+  if (!g_mgt_ready) {
+    aet_minigames_register_sync(game_mgt_sync_from, game_mgt_sync_to,
+                                game_mgt_redraw, NULL);
+    aet_minigames_register_give(game_mgt_give_item, NULL);
+    mgt_read_register_resolver(game_read_resolve);
+    game_mgt_bootstrap_profile();
+    g_mgt_ready = 1;
+  }
+  rc = aet_minigame_takeover(id);
+  if (rc == (int)MGT_HOST_ABORT) {
+    if (msg && msgcap)
+      snprintf(msg, msgcap, "Could not start that activity.");
+    return 0;
+  }
+  st = mgt_host_state();
+  game_fill_sim(&sim);
+  g_mgt_quicksave_profile = *st;
+  g_mgt_quicksave_valid = 1;
+  mgt_harness_save(&sim, st, NULL);
+  if (msg && msgcap) {
+    if (st && st->last_banner[0])
+      snprintf(msg, msgcap, "%s", st->last_banner);
+    else
+      snprintf(msg, msgcap, "You finish and return to the adventure.");
+  }
+  return 1;
+}
+#else
+static int try_minigame(const char *id, char *msg, size_t msgcap) {
+  (void)id;
+  if (msg && msgcap) msg[0] = '\0';
+  return 0;
+}
+#endif
+
+static int room_can_fish(void) {
+  const char *slug = world_slug(g_room);
+  if (room_has_visible_item(g_room, "fishing_spot")) return 1;
+  if (slug && (!strcmp(slug, "pond") || !strcmp(slug, "fishing_piers") ||
+               !strcmp(slug, "river_shore") || !strcmp(slug, "hollowridge_docks") ||
+               !strcmp(slug, "stream") || !strcmp(slug, "ferry_crossing")))
+    return 1;
+  return 0;
+}
+
+static int room_can_farm(void) {
+  const char *slug = world_slug(g_room);
+  return slug && !strcmp(slug, "farm");
+}
+
+static int room_can_cook(void) {
+  const char *slug = world_slug(g_room);
+  if (!slug) return 0;
+  if (strstr(slug, "kitchen") != NULL) return 1;
+  return !strcmp(slug, "roasting_room");
+}
+
+static int room_can_gamble(void) {
+  const char *slug = world_slug(g_room);
+  return slug && (!strcmp(slug, "tavern_common_room") ||
+                  !strcmp(slug, "the_hidden_gem_tavern") ||
+                  !strcmp(slug, "cozy_booths"));
+}
+
+static void meter_bar_pct(char *out, size_t cap, int pct) {
+  int filled, i;
+  if (!out || cap < 12) return;
+  if (pct < 0) pct = 0;
+  if (pct > 100) pct = 100;
+  filled = (pct * 10 + 99) / 100;
+  for (i = 0; i < 10; i++) out[i] = (i < filled) ? '#' : '-';
+  out[10] = '\0';
+}
+
 static int room_floor_has_id(const char *id) {
   int i;
   if (!id || !id[0]) return 0;
   for (i = 0; i < g_room_item_n[g_room]; i++)
     if (str_ieq(g_room_items[g_room][i], id)) return 1;
   return 0;
+}
+
+static void cmd_play_piano(char *msg, size_t msgcap) {
+  if (!msg || msgcap < 32) return;
+  if (!room_has_visible_item(g_room, "tavern_piano")) {
+    snprintf(msg, msgcap, "There is no piano here to play.");
+    return;
+  }
+#ifdef AETER_MINIGAMES
+  if (try_minigame("piano", msg, msgcap)) return;
+#endif
+  snprintf(
+      msg, msgcap,
+      "You pick out a hesitant melody on the worn keys. A few regulars glance "
+      "over, then return to their drinks.");
 }
 
 static int topic_mentions_bucket(const char *s) {
@@ -1566,6 +1891,49 @@ static void trade_history_clear(void) {
   g_trade_count = 0;
 }
 
+static void rel_hist_clear(void) {
+  g_rel_hist_head = 0;
+  g_rel_hist_count = 0;
+}
+
+static void rel_hist_push(const char *slug, const char *act, int df, int dr,
+                          int dp) {
+  RelHistRow *row;
+  if (!slug || !slug[0] || !act || !act[0]) return;
+  if (df == 0 && dr == 0 && dp == 0) return;
+  row = &g_rel_hist[g_rel_hist_head];
+  row->turn = g_turns;
+  snprintf(row->slug, sizeof row->slug, "%s", slug);
+  snprintf(row->act, sizeof row->act, "%s", act);
+  if (df < -99) df = -99;
+  if (df > 99) df = 99;
+  if (dr < -99) dr = -99;
+  if (dr > 99) dr = 99;
+  if (dp < -99) dp = -99;
+  if (dp > 99) dp = 99;
+  row->df = (signed char)df;
+  row->dr = (signed char)dr;
+  row->dp = (signed char)dp;
+  g_rel_hist_head = (g_rel_hist_head + 1) % REL_HIST_RING;
+  if (g_rel_hist_count < REL_HIST_RING) g_rel_hist_count++;
+}
+
+static void rel_hist_load_row(int turn, const char *slug, const char *act,
+                             int df, int dr, int dp) {
+  RelHistRow *row;
+  if (!slug || !slug[0] || !act || !act[0]) return;
+  if (df == 0 && dr == 0 && dp == 0) return;
+  row = &g_rel_hist[g_rel_hist_head];
+  row->turn = turn >= 0 ? turn : 0;
+  snprintf(row->slug, sizeof row->slug, "%s", slug);
+  snprintf(row->act, sizeof row->act, "%s", act);
+  row->df = (signed char)df;
+  row->dr = (signed char)dr;
+  row->dp = (signed char)dp;
+  g_rel_hist_head = (g_rel_hist_head + 1) % REL_HIST_RING;
+  if (g_rel_hist_count < REL_HIST_RING) g_rel_hist_count++;
+}
+
 static void barter_clear(void) {
   g_barter_mode = BARTER_NONE;
   g_barter_price = 0;
@@ -1573,6 +1941,20 @@ static void barter_clear(void) {
   g_barter_expire_turn = 0;
   g_barter_merchant[0] = '\0';
   g_barter_item[0] = '\0';
+}
+
+static void barter_sanitize_loaded(void) {
+  if (g_barter_mode != BARTER_NONE && g_barter_mode != BARTER_BUY &&
+      g_barter_mode != BARTER_SELL) {
+    barter_clear();
+    return;
+  }
+  if (g_barter_mode == BARTER_NONE) return;
+  if (!g_barter_merchant[0] || !g_barter_item[0] ||
+      !aet_merchant_trades(g_barter_merchant) ||
+      g_barter_expire_turn < g_turns) {
+    barter_clear();
+  }
 }
 
 static void trade_history_push_row(const char *row) {
@@ -1592,6 +1974,55 @@ static void copy_capped(char *dst, size_t cap, const char *src) {
   n = strnlen(src, cap - 1);
   memcpy(dst, src, n);
   dst[n] = '\0';
+}
+
+static void cmd_hist_clear(void) {
+  g_cmd_hist_count = 0;
+  g_cmd_hist_head = 0;
+}
+
+static void cmd_hist_push(const char *line) {
+  size_t n;
+  int prev;
+  if (!line || !line[0]) return;
+  if (!strcmp(line, "g") || !strcmp(line, "again") || !strcmp(line, "repeat"))
+    return;
+  if (g_cmd_hist_count > 0) {
+    prev = (g_cmd_hist_head - 1 + CMD_HIST_RING) % CMD_HIST_RING;
+    if (str_ieq(g_cmd_hist[prev], line)) return;
+  }
+  n = strnlen(line, INPUT_LINE_MAX - 1);
+  memcpy(g_cmd_hist[g_cmd_hist_head], line, n);
+  g_cmd_hist[g_cmd_hist_head][n] = '\0';
+  g_cmd_hist_head = (g_cmd_hist_head + 1) % CMD_HIST_RING;
+  if (g_cmd_hist_count < CMD_HIST_RING) g_cmd_hist_count++;
+}
+
+static int cmd_hist_get_from_latest(int n, char *out, size_t cap) {
+  int idx;
+  if (!out || cap < 2 || n < 1 || n > g_cmd_hist_count) return 0;
+  idx = (g_cmd_hist_head - n + CMD_HIST_RING) % CMD_HIST_RING;
+  copy_capped(out, cap, g_cmd_hist[idx]);
+  return 1;
+}
+
+static void format_cmd_history_body(char *body, size_t cap) {
+  int i, start;
+  if (!body || cap < 64) return;
+  snprintf(body, cap,
+           "Command history\n\n"
+           "Recent inputs (newest last). Re-run with  history <n>  or  !<n>  "
+           "(e.g. !3).\n"
+           "  again | g | repeat  — last full chain (including ; / then).\n\n");
+  if (g_cmd_hist_count == 0) {
+    body_append(body, cap, "  (empty — enter a few commands first.)\n");
+    return;
+  }
+  start = (g_cmd_hist_head - g_cmd_hist_count + CMD_HIST_RING) % CMD_HIST_RING;
+  for (i = 0; i < g_cmd_hist_count; i++) {
+    int idx = (start + i) % CMD_HIST_RING;
+    body_append(body, cap, "  %2d. %s\n", i + 1, g_cmd_hist[idx]);
+  }
 }
 
 static void trade_history_push(const char *kind, const char *merchant,
@@ -1713,24 +2144,49 @@ static void format_causality_body(char *body, size_t cap, const char *term) {
 }
 
 static void format_trade_history_body(char *body, size_t cap) {
-  int i, start;
+  int i, start, buys = 0, sells = 0, recent_n;
   if (!body || cap < 64) return;
   body[0] = '\0';
   (void)snprintf(body, cap,
                  "=== TRADE HISTORY ===\n\n"
-                 "Completed merchant transactions (newest last; max %d, saved with your game).\n\n",
+                 "Completed merchant transactions (saved with your game; max %d).\n\n",
                  TRADE_RING);
   if (g_trade_count == 0) {
-    strncat(body, "  (none yet - buy or sell with a merchant first.)\n",
+    strncat(body, "  (none yet — buy or sell with a merchant first.)\n",
             cap - strlen(body) - 1);
     return;
   }
   start = (g_trade_head - g_trade_count + TRADE_RING) % TRADE_RING;
   for (i = 0; i < g_trade_count; i++) {
     int idx = (start + i) % TRADE_RING;
+    const char *row = g_trade_ring[idx];
+    if (strstr(row, "[buy]")) buys++;
+    if (strstr(row, "[sell]")) sells++;
+  }
+  body_append(body, cap,
+              "Summary: %d transaction%s (%d buy%s, %d sell%s)\n\n",
+              g_trade_count, g_trade_count == 1 ? "" : "s", buys, buys == 1 ? "" : "s",
+              sells, sells == 1 ? "" : "s");
+  recent_n = g_trade_count < 5 ? g_trade_count : 5;
+  body_append(body, cap, "Recent (newest first)\n");
+  for (i = g_trade_count - 1; i >= g_trade_count - recent_n; i--) {
+    int idx = (start + i) % TRADE_RING;
     char out[TRADE_W + 8];
     (void)snprintf(out, sizeof out, "  • %s\n", g_trade_ring[idx]);
     strncat(body, out, cap - strlen(body) - 1);
+  }
+  if (g_trade_count > recent_n) {
+    body_append(body, cap, "\nFull ledger (oldest → newest)\n");
+    for (i = 0; i < g_trade_count; i++) {
+      int idx = (start + i) % TRADE_RING;
+      char out[TRADE_W + 8];
+      if (strlen(body) + sizeof out + 4 >= cap) {
+        body_append(body, cap, "  ... ledger truncated (screen cap).\n");
+        break;
+      }
+      (void)snprintf(out, sizeof out, "  • %s\n", g_trade_ring[idx]);
+      strncat(body, out, cap - strlen(body) - 1);
+    }
   }
 }
 
@@ -2173,6 +2629,41 @@ static void make_slot_save_path(int slot, char *out, size_t cap) {
   memcpy(out + stem_len + suffix_len, ext, ext_len + 1);
 }
 
+static void make_autosave_path(char *out, size_t cap) {
+  const char *dot;
+  const char *slash;
+  const char *ext;
+  char stem[520];
+  size_t stem_len;
+  size_t ext_len;
+  if (!out || cap == 0) return;
+  out[0] = '\0';
+  slash = strrchr(g_save_path, '\\');
+  if (!slash) slash = strrchr(g_save_path, '/');
+  dot = strrchr(g_save_path, '.');
+  if (!dot || (slash && dot < slash)) dot = g_save_path + strlen(g_save_path);
+  stem_len = (size_t)(dot - g_save_path);
+  if (stem_len >= sizeof stem) stem_len = sizeof stem - 1;
+  memcpy(stem, g_save_path, stem_len);
+  stem[stem_len] = '\0';
+  ext = *dot ? dot : ".txt";
+  ext_len = strlen(ext);
+  if (stem_len + 9 + ext_len + 1 > cap) {
+    snprintf(out, cap, "aeternitas64_autosave.txt");
+    return;
+  }
+  memcpy(out, stem, stem_len);
+  memcpy(out + stem_len, "_autosave", 9);
+  memcpy(out + stem_len + 9, ext, ext_len + 1);
+}
+
+static void autosave_write_shadow(void) {
+  char path[520];
+  if (!g_autosave_enabled) return;
+  make_autosave_path(path, sizeof path);
+  (void)write_save_file_path(path);
+}
+
 static void entity_pretty(const char *ent, char *out, size_t cap) {
   size_t i = 0;
   if (!ent || !ent[0] || cap < 2) {
@@ -2214,6 +2705,8 @@ static void soc_npc_clear(void) {
   memset(g_soc_npc_friendship, 0, sizeof g_soc_npc_friendship);
   memset(g_soc_npc_romance, 0, sizeof g_soc_npc_romance);
   memset(g_soc_npc_last_turn, 0, sizeof g_soc_npc_last_turn);
+  memset(g_soc_topic_mem, 0, sizeof g_soc_topic_mem);
+  memset(g_soc_topic_last, 0, sizeof g_soc_topic_last);
 }
 
 static int soc_npc_find(const char *slug) {
@@ -2252,6 +2745,8 @@ static void merchant_rep_clear(void) {
   memset(g_npc_friendship, 0, sizeof g_npc_friendship);
   memset(g_npc_romance, 0, sizeof g_npc_romance);
   memset(g_npc_last_social_turn, 0, sizeof g_npc_last_social_turn);
+  memset(g_npc_topic_mem, 0, sizeof g_npc_topic_mem);
+  memset(g_npc_topic_last, 0, sizeof g_npc_topic_last);
   soc_npc_clear();
 }
 
@@ -2275,16 +2770,47 @@ static void merchant_rep_load_line(const char *line) {
 
 static void merchant_rep_bump_slug(const char *slug, int delta) {
   int ix;
+  int before;
   if (!slug || !slug[0] || delta == 0) return;
   ix = aet_merchant_index(slug);
   if (ix < 0 || ix >= AETER_REP_MAX) return;
+  before = g_merchant_rep[ix];
   g_merchant_rep[ix] += delta;
   if (g_merchant_rep[ix] < 0) g_merchant_rep[ix] = 0;
   if (g_merchant_rep[ix] > 220) g_merchant_rep[ix] = 220;
+  rel_hist_push(slug, "patron", 0, 0, g_merchant_rep[ix] - before);
 }
 
 static void soc_clamp_byte(unsigned char *p) {
   if (*p > 100u) *p = 100u;
+}
+
+static void relationship_decay_tick(void) {
+  int i;
+  if (g_turns < 1 || (g_turns % 20) != 0) return;
+  for (i = 0; i < AETER_REP_MAX; i++) {
+    if ((int)g_npc_friendship[i] < 10) continue;
+    if (g_npc_last_social_turn[i] <= 0 ||
+        g_turns - g_npc_last_social_turn[i] < 50)
+      continue;
+    g_npc_friendship[i] =
+        (unsigned char)((int)g_npc_friendship[i] > 0 ? (int)g_npc_friendship[i] - 1 : 0);
+    {
+      const char *slug = aet_merchant_slug_at(i);
+      if (slug && slug[0]) rel_hist_push(slug, "idle decay", -1, 0, 0);
+    }
+  }
+  for (i = 0; i < AETER_SOC_NPC_MAX; i++) {
+    if (!g_soc_npc_slug[i][0]) continue;
+    if ((int)g_soc_npc_friendship[i] < 10) continue;
+    if (g_soc_npc_last_turn[i] <= 0 || g_turns - g_soc_npc_last_turn[i] < 50)
+      continue;
+    g_soc_npc_friendship[i] =
+        (unsigned char)((int)g_soc_npc_friendship[i] > 0
+                            ? (int)g_soc_npc_friendship[i] - 1
+                            : 0);
+    rel_hist_push(g_soc_npc_slug[i], "idle decay", -1, 0, 0);
+  }
 }
 
 static int merchant_rep_score(int ix);
@@ -2346,6 +2872,7 @@ static void soc_bump_talk(const char *slug) {
   int si;
   AetPcSave p;
   int bonus = 0;
+  unsigned char f0, r0;
   if (!slug || !slug[0]) return;
   ix = aet_merchant_index(slug);
   pc_capture(&p);
@@ -2353,6 +2880,8 @@ static void soc_bump_talk(const char *slug) {
   if (p.cha >= 15) bonus += 1;
   if (p.cha >= 18) bonus += 1;
   if (ix >= 0 && ix < AETER_REP_MAX) {
+    f0 = g_npc_friendship[ix];
+    r0 = g_npc_romance[ix];
     g_npc_friendship[ix] =
         (unsigned char)((int)g_npc_friendship[ix] + 2 + bonus);
     soc_clamp_byte(&g_npc_friendship[ix]);
@@ -2360,10 +2889,14 @@ static void soc_bump_talk(const char *slug) {
       g_npc_romance[ix] = (unsigned char)((int)g_npc_romance[ix] + 1);
     soc_clamp_byte(&g_npc_romance[ix]);
     g_npc_last_social_turn[ix] = g_turns;
+    rel_hist_push(slug, "talk", (int)g_npc_friendship[ix] - (int)f0,
+                  (int)g_npc_romance[ix] - (int)r0, 0);
     return;
   }
   si = soc_npc_ensure(slug);
   if (si < 0) return;
+  f0 = g_soc_npc_friendship[si];
+  r0 = g_soc_npc_romance[si];
   g_soc_npc_friendship[si] =
       (unsigned char)((int)g_soc_npc_friendship[si] + 2 + bonus);
   soc_clamp_byte(&g_soc_npc_friendship[si]);
@@ -2372,29 +2905,58 @@ static void soc_bump_talk(const char *slug) {
         (unsigned char)((int)g_soc_npc_romance[si] + 1);
   soc_clamp_byte(&g_soc_npc_romance[si]);
   g_soc_npc_last_turn[si] = g_turns;
+  rel_hist_push(slug, "talk", (int)g_soc_npc_friendship[si] - (int)f0,
+                (int)g_soc_npc_romance[si] - (int)r0, 0);
 }
 
 static void soc_bump_gift(const char *slug) {
   int ix;
   int si;
+  unsigned char f0, r0;
   if (!slug || !slug[0]) return;
   ix = aet_merchant_index(slug);
   if (ix >= 0 && ix < AETER_REP_MAX) {
+    f0 = g_npc_friendship[ix];
+    r0 = g_npc_romance[ix];
     g_npc_friendship[ix] = (unsigned char)((int)g_npc_friendship[ix] + 8);
     g_npc_romance[ix] = (unsigned char)((int)g_npc_romance[ix] + 5);
     soc_clamp_byte(&g_npc_friendship[ix]);
     soc_clamp_byte(&g_npc_romance[ix]);
     g_npc_last_social_turn[ix] = g_turns;
+    rel_hist_push(slug, "gift", (int)g_npc_friendship[ix] - (int)f0,
+                  (int)g_npc_romance[ix] - (int)r0, 0);
     return;
   }
   si = soc_npc_ensure(slug);
   if (si < 0) return;
+  f0 = g_soc_npc_friendship[si];
+  r0 = g_soc_npc_romance[si];
   g_soc_npc_friendship[si] =
       (unsigned char)((int)g_soc_npc_friendship[si] + 8);
   g_soc_npc_romance[si] = (unsigned char)((int)g_soc_npc_romance[si] + 5);
   soc_clamp_byte(&g_soc_npc_friendship[si]);
   soc_clamp_byte(&g_soc_npc_romance[si]);
   g_soc_npc_last_turn[si] = g_turns;
+  rel_hist_push(slug, "gift", (int)g_soc_npc_friendship[si] - (int)f0,
+                (int)g_soc_npc_romance[si] - (int)r0, 0);
+}
+
+static int soc_parse_int_line(const char *line, int *dst, int maxn) {
+  char work[800];
+  char *ctx = NULL;
+  char *tok;
+  int n = 0;
+  if (!line || !dst || maxn <= 0) return 0;
+  strncpy(work, line, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  for (tok = strtok_r(work, " \t", &ctx); tok && n < maxn;
+       tok = strtok_r(NULL, " \t", &ctx)) {
+    long v = strtol(tok, NULL, 10);
+    if (v < 0) v = 0;
+    if (v > 1000000) v = 1000000;
+    dst[n++] = (int)v;
+  }
+  return n;
 }
 
 static int soc_parse_uchar_line(const char *line, unsigned char *dst, int maxn) {
@@ -2622,6 +3184,7 @@ static int write_save_file_path(const char *path) {
   fprintf(fp, "craftprof %d\n", g_craft_proficiency);
   fprintf(fp, "hintena %d\n", g_hints_pref ? 1 : 0);
   fprintf(fp, "colorov %d\n", g_settings_color_ov);
+  fprintf(fp, "autosave %d\n", g_autosave_enabled ? 1 : 0);
   fprintf(fp, "histn %d\n", g_hist_n);
   for (i = 0; i < g_hist_n; i++) fprintf(fp, "%d\n", g_hist[i]);
   for (r = 0; r < WORLD_ROOM_COUNT; r++)
@@ -2660,12 +3223,11 @@ static int write_save_file_path(const char *path) {
     for (ri = 0; ri < mc; ri++)
       fprintf(fp, "%s%u", ri ? " " : "", (unsigned)g_npc_romance[ri]);
     fputc('\n', fp);
+    for (ri = 0; ri < mc; ri++)
+      fprintf(fp, "%s%d", ri ? " " : "", g_npc_last_social_turn[ri]);
+    fputc('\n', fp);
   }
-  /*
-   * SOC2: optional extension — non-merchant room.entity slugs with friendship,
-   * romance, last social turn. Omitted in older saves; ignored if absent on load.
-   * Rows: <slug> <friendship 0-100> <romance 0-100> <last_turn int>
-   */
+  
   {
     int si, nout = 0;
     for (si = 0; si < AETER_SOC_NPC_MAX; si++) {
@@ -2687,6 +3249,17 @@ static int write_save_file_path(const char *path) {
       fprintf(fp, "%s\n", g_trade_ring[idx]);
     }
   }
+  fprintf(fp, "RELHIST\n%d\n", g_rel_hist_count);
+  {
+    int rh, rstart =
+        (g_rel_hist_head - g_rel_hist_count + REL_HIST_RING) % REL_HIST_RING;
+    for (rh = 0; rh < g_rel_hist_count; rh++) {
+      int ridx = (rstart + rh) % REL_HIST_RING;
+      const RelHistRow *row = &g_rel_hist[ridx];
+      fprintf(fp, "%d %s %s %d %d %d\n", row->turn, row->slug, row->act,
+              (int)row->df, (int)row->dr, (int)row->dp);
+    }
+  }
   fprintf(fp, "BARTER\n");
   fprintf(fp, "%d %d %d %d\n", g_barter_mode, g_barter_price, g_barter_list_price,
           g_barter_expire_turn);
@@ -2697,6 +3270,45 @@ static int write_save_file_path(const char *path) {
   fprintf(fp, "%s\n", g_last_focus[0] ? g_last_focus : "");
   fprintf(fp, "TOPIC\n");
   fprintf(fp, "%s\n", g_last_topic[0] ? g_last_topic : "");
+  fprintf(fp, "LASTNPC\n");
+  fprintf(fp, "%s\n", g_last_npc[0] ? g_last_npc : "");
+  {
+    int mc = aet_merchant_count();
+    int ri, si, nout = 0;
+    if (mc > AETER_REP_MAX) mc = AETER_REP_MAX;
+    for (ri = 0; ri < mc; ri++) {
+      if (g_npc_topic_mem[ri][0] || g_npc_topic_last[ri][0]) nout++;
+    }
+    for (si = 0; si < AETER_SOC_NPC_MAX; si++) {
+      if (g_soc_npc_slug[si][0] &&
+          (g_soc_topic_mem[si][0] || g_soc_topic_last[si][0]))
+        nout++;
+    }
+    fprintf(fp, "CONVMEM\n%d\n", nout);
+    for (ri = 0; ri < mc; ri++) {
+      const char *slug = aet_merchant_slug_at(ri);
+      if (!slug || (!g_npc_topic_mem[ri][0] && !g_npc_topic_last[ri][0]))
+        continue;
+      fprintf(fp, "%s\t%s\t%s\n", slug, g_npc_topic_mem[ri],
+              g_npc_topic_last[ri]);
+    }
+    for (si = 0; si < AETER_SOC_NPC_MAX; si++) {
+      if (!g_soc_npc_slug[si][0]) continue;
+      if (!g_soc_topic_mem[si][0] && !g_soc_topic_last[si][0]) continue;
+      fprintf(fp, "%s\t%s\t%s\n", g_soc_npc_slug[si], g_soc_topic_mem[si],
+              g_soc_topic_last[si]);
+    }
+  }
+#ifdef AETER_MINIGAMES
+  {
+    MgtPersistentState mgst;
+    game_mgt_capture_profile(&mgst);
+    if (!mgt_profile_write_embedded(fp, &mgst)) {
+      (void)fclose(fp);
+      return 0;
+    }
+  }
+#endif
   if (fflush(fp) != 0 || ferror(fp)) {
     (void)fclose(fp);
     return 0;
@@ -2747,16 +3359,23 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
     return 0;
   }
   snapshot_capture(&g_load_rollback);
+  disambig_reset_all();
+  conv_clear();
   g_verbose_room = 1;
   g_recap_n = 0;
   g_last_npc[0] = '\0';
   g_last_topic[0] = '\0';
+  memset(g_npc_topic_mem, 0, sizeof g_npc_topic_mem);
+  memset(g_npc_topic_last, 0, sizeof g_npc_topic_last);
+  memset(g_soc_topic_mem, 0, sizeof g_soc_topic_mem);
+  memset(g_soc_topic_last, 0, sizeof g_soc_topic_last);
   g_ready_item[0] = '\0';
   memset(g_npc_friendship, 0, sizeof g_npc_friendship);
   memset(g_npc_romance, 0, sizeof g_npc_romance);
   memset(g_npc_last_social_turn, 0, sizeof g_npc_last_social_turn);
   soc_npc_clear();
   trade_history_clear();
+  rel_hist_clear();
   barter_clear();
   if (!fgets(buf, sizeof buf, fp)) goto bad;
   chomp_line(buf);
@@ -2795,7 +3414,7 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
           g_max_health = tm;
         } else if (fseek(fp, pos, SEEK_SET) != 0)
           goto bad;
-      } else if (fseek(fp, pos, SEEK_SET) != 0)
+      }       else if (fseek(fp, pos, SEEK_SET) != 0)
         goto bad;
     } else if (pos >= 0 && fseek(fp, pos, SEEK_SET) != 0)
       goto bad;
@@ -2846,6 +3465,18 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
       chomp_line(buf);
       if (sscanf(buf, "colorov %d", &co) == 1 && co >= -1 && co <= 1)
         g_settings_color_ov = co;
+      else if (fseek(fp, pos, SEEK_SET) != 0)
+        goto bad;
+    } else if (pos >= 0 && fseek(fp, pos, SEEK_SET) != 0)
+      goto bad;
+  }
+  {
+    long pos = ftell(fp);
+    if (pos >= 0 && fgets(buf, sizeof buf, fp)) {
+      int au;
+      chomp_line(buf);
+      if (sscanf(buf, "autosave %d", &au) == 1 && (au == 0 || au == 1))
+        g_autosave_enabled = au;
       else if (fseek(fp, pos, SEEK_SET) != 0)
         goto bad;
     } else if (pos >= 0 && fseek(fp, pos, SEEK_SET) != 0)
@@ -2908,60 +3539,65 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
     g_hidden_n[r] = h;
   }
   g_note_n = 0;
-  if (fgets(buf, sizeof buf, fp)) {
+  if (!fgets(buf, sizeof buf, fp)) goto bad;
+  chomp_line(buf);
+  if (strcmp(buf, "NOTES") != 0) goto bad;
+  if (!fgets(buf, sizeof buf, fp)) goto bad;
+  {
+    int nn, k;
     chomp_line(buf);
-    if (strcmp(buf, "NOTES") == 0 && fgets(buf, sizeof buf, fp)) {
-      int nn, k;
+    nn = atoi(buf);
+    if (nn < 0 || nn > MAX_NOTES) goto bad;
+    for (k = 0; k < nn; k++) {
+      size_t noteL;
+      if (!fgets(buf, sizeof buf, fp)) goto bad;
       chomp_line(buf);
-      nn = atoi(buf);
-      if (nn < 0) nn = 0;
-      if (nn > MAX_NOTES) nn = MAX_NOTES;
-      for (k = 0; k < nn; k++) {
-        size_t noteL;
-        if (!fgets(buf, sizeof buf, fp)) break;
-        chomp_line(buf);
-        noteL = strnlen(buf, NOTE_LEN - 1);
-        memcpy(g_notes[g_note_n], buf, noteL);
-        g_notes[g_note_n][noteL] = '\0';
-        g_note_n++;
-      }
-      if (fgets(buf, sizeof buf, fp)) {
-        chomp_line(buf);
-        if (strcmp(buf, "READIED") == 0 && fgets(buf, sizeof buf, fp)) {
-          size_t rl;
-          int eq_loaded = 0;
+      noteL = strnlen(buf, NOTE_LEN - 1);
+      memcpy(g_notes[g_note_n], buf, noteL);
+      g_notes[g_note_n][noteL] = '\0';
+      g_note_n++;
+    }
+    if (!fgets(buf, sizeof buf, fp)) goto bad;
+    chomp_line(buf);
+    if (strcmp(buf, "READIED") != 0) goto bad;
+    if (!fgets(buf, sizeof buf, fp)) goto bad;
+    {
+      size_t rl;
+      int eq_loaded = 0;
+      int pc_loaded = 0;
+      chomp_line(buf);
+      rl = strnlen(buf, sizeof g_ready_item - 1);
+      memcpy(g_ready_item, buf, rl);
+      g_ready_item[rl] = '\0';
+      if (!inv_has(g_ready_item)) g_ready_item[0] = '\0';
+      if (!fgets(buf, sizeof buf, fp)) goto bad;
+      chomp_line(buf);
+      if (strcmp(buf, "EQUIP") != 0) goto bad;
+      {
+        int esi;
+        eq_clear_all();
+        for (esi = 0; esi < EQ_SLOT_COUNT; esi++) {
+          size_t el;
+          if (!fgets(buf, sizeof buf, fp)) goto bad;
           chomp_line(buf);
-          rl = strnlen(buf, sizeof g_ready_item - 1);
-          memcpy(g_ready_item, buf, rl);
-          g_ready_item[rl] = '\0';
-          if (!inv_has(g_ready_item)) g_ready_item[0] = '\0';
-          if (fgets(buf, sizeof buf, fp)) {
-            int pc_loaded = 0;
-            chomp_line(buf);
-            if (strcmp(buf, "EQUIP") == 0) {
-              int esi;
-              eq_clear_all();
-              for (esi = 0; esi < EQ_SLOT_COUNT; esi++) {
-                size_t el;
-                if (!fgets(buf, sizeof buf, fp)) goto bad;
-                chomp_line(buf);
-                el = strnlen(buf, MAX_ITEM_LEN - 1);
-                memcpy(g_eq_slots[esi], buf, el);
-                g_eq_slots[esi][el] = '\0';
-                if (g_eq_slots[esi][0] && !inv_has(g_eq_slots[esi]))
-                  g_eq_slots[esi][0] = '\0';
-              }
-              eq_loaded = 1;
-              if (!fgets(buf, sizeof buf, fp)) goto bad;
-              chomp_line(buf);
-            }
-            if (!strncmp(buf, "REP ", 4)) {
-              merchant_rep_load_line(buf + 4);
-              if (!fgets(buf, sizeof buf, fp)) goto bad;
-              chomp_line(buf);
-            } else
-              merchant_rep_clear();
-            if (!strcmp(buf, "SOC")) {
+          el = strnlen(buf, MAX_ITEM_LEN - 1);
+          memcpy(g_eq_slots[esi], buf, el);
+          g_eq_slots[esi][el] = '\0';
+          if (g_eq_slots[esi][0] && !inv_has(g_eq_slots[esi]))
+            g_eq_slots[esi][0] = '\0';
+        }
+        eq_loaded = 1;
+      }
+      if (!fgets(buf, sizeof buf, fp)) goto bad;
+      chomp_line(buf);
+      if (!strncmp(buf, "REP ", 4)) {
+        merchant_rep_load_line(buf + 4);
+        if (!fgets(buf, sizeof buf, fp)) goto bad;
+        chomp_line(buf);
+      } else {
+        memset(g_merchant_rep, 0, sizeof g_merchant_rep);
+      }
+      if (!strcmp(buf, "SOC")) {
               char ln[800];
               int mc_file2 = aet_merchant_count();
               int nf, nr, jj;
@@ -2977,8 +3613,21 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
               nr = soc_parse_uchar_line(ln, g_npc_romance, AETER_REP_MAX);
               for (jj = nf; jj < mc_file2; jj++) g_npc_friendship[jj] = 0;
               for (jj = nr; jj < mc_file2; jj++) g_npc_romance[jj] = 0;
-              if (!fgets(buf, sizeof buf, fp)) goto bad;
-              chomp_line(buf);
+              if (!fgets(ln, sizeof ln, fp)) goto bad;
+              chomp_line(ln);
+              if (ln[0] && strcmp(ln, "SOC2") != 0 &&
+                  strcmp(ln, "TRADELOG") != 0 && strcmp(ln, "RELHIST") != 0 &&
+                  strcmp(ln, "BARTER") != 0 &&
+                  strcmp(ln, "CHARACTER") != 0 && strncmp(ln, "REP ", 4) != 0) {
+                int nl;
+                nl = soc_parse_int_line(ln, g_npc_last_social_turn, AETER_REP_MAX);
+                for (jj = nl; jj < mc_file2; jj++) g_npc_last_social_turn[jj] = 0;
+                if (!fgets(buf, sizeof buf, fp)) goto bad;
+                chomp_line(buf);
+              } else {
+                strncpy(buf, ln, sizeof buf - 1);
+                buf[sizeof buf - 1] = '\0';
+              }
             }
             if (!strcmp(buf, "SOC2")) {
               char ln2[512];
@@ -2997,7 +3646,7 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
                 if (!fgets(ln2, sizeof ln2, fp)) goto bad;
                 chomp_line(ln2);
                 if (sscanf(ln2, "%47s %u %u %d", slugbuf, &uf, &ur, &ut) != 4)
-                  continue;
+                  goto bad;
                 if (uf > 100u) uf = 100u;
                 if (ur > 100u) ur = 100u;
                 if (!slugbuf[0] || aet_merchant_index(slugbuf) >= 0) continue;
@@ -3022,6 +3671,28 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
                 if (!fgets(buf, sizeof buf, fp)) goto bad;
                 chomp_line(buf);
                 trade_history_push_row(buf);
+              }
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+            }
+            if (!strcmp(buf, "RELHIST")) {
+              int rowwant, rr;
+              if (!fgets(buf, sizeof buf, fp)) goto bad;
+              chomp_line(buf);
+              rowwant = atoi(buf);
+              if (rowwant < 0) rowwant = 0;
+              if (rowwant > REL_HIST_RING) rowwant = REL_HIST_RING;
+              rel_hist_clear();
+              for (rr = 0; rr < rowwant; rr++) {
+                int rt, rdf, rdr, rdp;
+                char slugbuf[MAX_ITEM_LEN];
+                char actbuf[REL_HIST_ACT];
+                if (!fgets(buf, sizeof buf, fp)) goto bad;
+                chomp_line(buf);
+                slugbuf[0] = actbuf[0] = '\0';
+                if (sscanf(buf, "%d %47s %19s %d %d %d", &rt, slugbuf, actbuf,
+                           &rdf, &rdr, &rdp) >= 6)
+                  rel_hist_load_row(rt, slugbuf, actbuf, rdf, rdr, rdp);
               }
               if (!fgets(buf, sizeof buf, fp)) goto bad;
               chomp_line(buf);
@@ -3053,6 +3724,7 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
               copy_capped(g_barter_item, sizeof g_barter_item, buf);
               if (!fgets(buf, sizeof buf, fp)) goto bad;
               chomp_line(buf);
+              barter_sanitize_loaded();
             }
             if (strcmp(buf, "CHARACTER") == 0) {
               if (!pc_read_save(fp, buf, sizeof buf)) goto bad;
@@ -3068,23 +3740,76 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
                          g_ready_item);
               }
             }
-            eq_sync_ready_item();
-            if (strcmp(buf, "FOCUS") == 0 && fgets(buf, sizeof buf, fp)) {
-              size_t fl;
+      eq_sync_ready_item();
+      if (strcmp(buf, "FOCUS") == 0 && fgets(buf, sizeof buf, fp)) {
+        size_t fl;
+        chomp_line(buf);
+        focus_loaded = 1;
+        fl = strnlen(buf, sizeof g_last_focus - 1);
+        memcpy(g_last_focus, buf, fl);
+        g_last_focus[fl] = '\0';
+        if (!g_last_focus[0] || !inv_has(g_last_focus)) clear_focus();
+        if (fgets(buf, sizeof buf, fp)) {
+          chomp_line(buf);
+          if (strcmp(buf, "TOPIC") == 0 && fgets(buf, sizeof buf, fp)) {
+            chomp_line(buf);
+            fl = strnlen(buf, sizeof g_last_topic - 1);
+            memcpy(g_last_topic, buf, fl);
+            g_last_topic[fl] = '\0';
+            if (fgets(buf, sizeof buf, fp)) {
               chomp_line(buf);
-              focus_loaded = 1;
-              fl = strnlen(buf, sizeof g_last_focus - 1);
-              memcpy(g_last_focus, buf, fl);
-              g_last_focus[fl] = '\0';
-              if (!g_last_focus[0] || !inv_has(g_last_focus))
-                clear_focus();
-              if (fgets(buf, sizeof buf, fp)) {
+              if (strcmp(buf, "LASTNPC") == 0 && fgets(buf, sizeof buf, fp)) {
                 chomp_line(buf);
-                if (strcmp(buf, "TOPIC") == 0 && fgets(buf, sizeof buf, fp)) {
+                if (buf[0]) copy_capped(g_last_npc, sizeof g_last_npc, buf);
+                if (fgets(buf, sizeof buf, fp)) {
                   chomp_line(buf);
-                  fl = strnlen(buf, sizeof g_last_topic - 1);
-                  memcpy(g_last_topic, buf, fl);
-                  g_last_topic[fl] = '\0';
+                  if (strcmp(buf, "CONVMEM") == 0 && fgets(buf, sizeof buf, fp)) {
+                    int rowwant, rr;
+                    chomp_line(buf);
+                    rowwant = atoi(buf);
+                    if (rowwant < 0) rowwant = 0;
+                    if (rowwant > 256) rowwant = 256;
+                    memset(g_npc_topic_mem, 0, sizeof g_npc_topic_mem);
+                    memset(g_npc_topic_last, 0, sizeof g_npc_topic_last);
+                    memset(g_soc_topic_mem, 0, sizeof g_soc_topic_mem);
+                    memset(g_soc_topic_last, 0, sizeof g_soc_topic_last);
+                    for (rr = 0; rr < rowwant; rr++) {
+                      char slugbuf[MAX_ITEM_LEN];
+                      char tagsbuf[CONV_TOPIC_MEM_SZ];
+                      char lastbuf[CONV_TOPIC_MEM_SZ];
+                      char *tab, *tab2;
+                      int ix, si;
+                      if (!fgets(buf, sizeof buf, fp)) goto bad;
+                      chomp_line(buf);
+                      tab = strchr(buf, '\t');
+                      if (!tab) continue;
+                      *tab++ = '\0';
+                      tab2 = strchr(tab, '\t');
+                      if (!tab2) continue;
+                      *tab2++ = '\0';
+                      copy_capped(slugbuf, sizeof slugbuf, buf);
+                      copy_capped(tagsbuf, sizeof tagsbuf, tab);
+                      copy_capped(lastbuf, sizeof lastbuf, tab2);
+                      ix = aet_merchant_index(slugbuf);
+                      if (ix >= 0 && ix < AETER_REP_MAX) {
+                        copy_capped(g_npc_topic_mem[ix], sizeof g_npc_topic_mem[0],
+                                    tagsbuf);
+                        copy_capped(g_npc_topic_last[ix], sizeof g_npc_topic_last[0],
+                                    lastbuf);
+                        continue;
+                      }
+                      si = soc_npc_find(slugbuf);
+                      if (si < 0) si = soc_npc_ensure(slugbuf);
+                      if (si >= 0) {
+                        copy_capped(g_soc_topic_mem[si], sizeof g_soc_topic_mem[0],
+                                    tagsbuf);
+                        copy_capped(g_soc_topic_last[si], sizeof g_soc_topic_last[0],
+                                    lastbuf);
+                      }
+                    }
+                    if (!fgets(buf, sizeof buf, fp)) goto bad;
+                    chomp_line(buf);
+                  }
                 }
               }
             }
@@ -3093,6 +3818,23 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
       }
     }
   }
+#ifdef AETER_MINIGAMES
+  g_mgt_quicksave_valid = 0;
+  g_mgt_ready = 0;
+  if (strcmp(buf, "MGT") == 0) {
+    if (mgt_profile_read_embedded(fp, &g_mgt_quicksave_profile))
+      g_mgt_quicksave_valid = 1;
+  } else {
+    while (fgets(buf, sizeof buf, fp)) {
+      chomp_line(buf);
+      if (strcmp(buf, "MGT") == 0) {
+        if (mgt_profile_read_embedded(fp, &g_mgt_quicksave_profile))
+          g_mgt_quicksave_valid = 1;
+        break;
+      }
+    }
+  }
+#endif
   fclose(fp);
   if (!focus_loaded)
     clear_focus();
@@ -3104,6 +3846,7 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
   return 1;
 bad:
   snapshot_restore(&g_load_rollback);
+  eq_sync_ready_item();
   if (fp) fclose(fp);
   snprintf(msg, msgcap,
            "Save corrupt or built for a different world size. Regenerate and "
@@ -3142,8 +3885,11 @@ static unsigned long save_mgr_total_bytes_on_disk(void) {
   struct stat st;
   unsigned long t = 0;
   int s;
+  char apath[520];
   if (g_save_path[0] && stat(g_save_path, &st) == 0)
     t += (unsigned long)st.st_size;
+  make_autosave_path(apath, sizeof apath);
+  if (apath[0] && stat(apath, &st) == 0) t += (unsigned long)st.st_size;
   for (s = 1; s <= SAVE_SLOT_COUNT; s++) {
     char path[520];
     make_slot_save_path(s, path, sizeof path);
@@ -3285,6 +4031,18 @@ static int run_save_manager_ui(int *did_fullscreen, int esc_menu) {
         C_MUTED, C_RESET, C_MUTED, C_RESET);
     printf(" %s%s%s\n", C_MUTED, g_save_path[0] ? g_save_path : "(default)",
            C_RESET);
+    {
+      char apath[520];
+      struct stat ast;
+      make_autosave_path(apath, sizeof apath);
+      if (apath[0] && stat(apath, &ast) == 0)
+        printf(" %sAutosave shadow:%s %s (%lukB)  %sload autosave%s\n", C_MUTED,
+               C_RESET, apath, (unsigned long)(ast.st_size / 1024), C_ITEM,
+               C_RESET);
+      else if (g_autosave_enabled)
+        printf(" %sAutosave shadow:%s (none yet — advance a turn)%s\n", C_MUTED,
+               C_RESET, C_RESET);
+    }
     suf = aet_mods_character_saves_suffix();
     if (suf && suf[0]) printf(" %s%s%s\n", C_MUTED, suf, C_RESET);
     printf("\n %s>>%s ", C_TITLE, C_RESET);
@@ -3442,12 +4200,12 @@ static void world_clock_for_turn(int turns, AetWorldClock *out) {
 }
 
 static const AetNpcRoutine NPC_ROUTINES[] = {
-    {"miller", "abandoned_mill", "abandoned_mill", "mill_upper_level",
+    {"miller", "abandoned_mill", "river_shore", "river_shore",
      "mill_upper_level"},
     {"blacksmith", "blacksmith", "blacksmith", "blacksmith_waystone",
      "blacksmith_waystone"},
     {"forest_hermit", "hermit_hut", "deep_forest", "hermit_hut", "hermit_hut"},
-    {"general_store_owner", "general_store", "general_store", "village_road",
+    {"general_store_owner", "general_store", "village_square", "general_store",
      "general_store"},
     {"tavern_keeper", "tavern_kitchen", "tavern_common_room",
      "tavern_common_room", "tavern_back_room"},
@@ -3459,6 +4217,17 @@ static const AetNpcRoutine NPC_ROUTINES[] = {
      "inn_rooms"},
     {"village_guard", "village_square", "village_square", "town_square",
      "town_square"},
+    {"traveling_bard", "village_square", "bard_stage", "village_square",
+     "bard_stage"},
+    {"traveling_merchant", "west_of_house", "tavern_exterior", "village_road",
+     "west_of_house"},
+    {"farmer", "farm", "farm", "village_square", "farm"},
+    {"missionary_elena", "temple_of_architect", "village_square",
+     "temple_garden", "temple_of_architect"},
+    {"missionary_kira", "temple_garden", "village_road", "village_square",
+     "temple_garden"},
+    {"missionary_yuki", "village_square", "temple_garden",
+     "temple_of_architect", "village_square"},
 };
 
 static int npc_routine_count(void) {
@@ -3499,8 +4268,9 @@ static const char *npc_activity_for_period(const char *slug,
                                            const char *period) {
   if (!slug || !slug[0]) return "";
   if (str_ieq(slug, "miller")) {
-    if (str_ieq(period, "morning") || str_ieq(period, "afternoon"))
-      return "minding the millstones";
+    if (str_ieq(period, "morning")) return "minding the millstones";
+    if (str_ieq(period, "afternoon") || str_ieq(period, "evening"))
+      return "watching the river";
     return "checking the upper works";
   }
   if (str_ieq(slug, "blacksmith")) {
@@ -3513,7 +4283,8 @@ static const char *npc_activity_for_period(const char *slug,
     return "keeping to the hermit's hut";
   }
   if (str_ieq(slug, "general_store_owner")) {
-    if (str_ieq(period, "evening")) return "taking the road for trade gossip";
+    if (str_ieq(period, "afternoon")) return "chatting in the village square";
+    if (str_ieq(period, "evening")) return "closing ledgers at the counter";
     if (str_ieq(period, "night")) return "counting stock behind the counter";
     return "keeping the shop floor";
   }
@@ -3540,6 +4311,32 @@ static const char *npc_activity_for_period(const char *slug,
       return "watching the town square";
     return "patrolling the village square";
   }
+  if (str_ieq(slug, "traveling_bard")) {
+    if (str_ieq(period, "morning") || str_ieq(period, "evening"))
+      return "performing in the square";
+    return "holding court in the tavern";
+  }
+  if (str_ieq(slug, "traveling_merchant")) {
+    if (str_ieq(period, "morning") || str_ieq(period, "night"))
+      return "unpacking wares by the road";
+    if (str_ieq(period, "afternoon"))
+      return "pitching wares outside the Rusty Anchor";
+    return "counting coin and packing up";
+  }
+  if (str_ieq(slug, "farmer")) {
+    if (str_ieq(period, "evening")) return "shyly offering produce in the square";
+    return "working the fields";
+  }
+  if (str_ieq(slug, "bartender")) return "polishing glasses behind the bar";
+  if (str_ieq(slug, "missionary_elena"))
+    return str_ieq(period, "afternoon") ? "spreading love in the square"
+                                        : "tending temple rites";
+  if (str_ieq(slug, "missionary_kira"))
+    return str_ieq(period, "evening") ? "flirting with passersby in the square"
+                                      : "practicing playful devotion";
+  if (str_ieq(slug, "missionary_yuki"))
+    return str_ieq(period, "morning") ? "counseling in the village square"
+                                      : "meditating on temple wisdom";
   return "";
 }
 
@@ -3547,23 +4344,34 @@ static const char *runtime_room_entity(int room) {
   AetWorldClock wc;
   const char *base;
   const AetNpcRoutine *base_rt;
+  const char *scheduled;
   size_t i;
   if (room < 0 || room >= WORLD_ROOM_COUNT) return "";
   world_clock_for_turn(g_turns, &wc);
+  base = base_world_room_entity(room);
+  if (base && base[0]) {
+    base_rt = npc_routine_for(base);
+    if (!base_rt) return base;
+    scheduled = npc_routine_room_for_period(base_rt, wc.period);
+    if (scheduled && world_room_index(scheduled) == room) return base;
+    return "";
+  }
   for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
     const char *room_slug =
         npc_routine_room_for_period(&NPC_ROUTINES[i], wc.period);
     int rr = room_slug ? world_room_index(room_slug) : -1;
     if (rr == room) return NPC_ROUTINES[i].slug;
   }
-  base = base_world_room_entity(room);
-  if (!base || !base[0]) return "";
-  base_rt = npc_routine_for(base);
-  if (!base_rt) return base;
   return "";
 }
 
 static void get_world_clock(AetWorldClock *out) { world_clock_for_turn(g_turns, out); }
+
+static const char *game_mgt_weather_string(void) {
+  AetWorldClock wc;
+  get_world_clock(&wc);
+  return wc.weather && wc.weather[0] ? wc.weather : "clear";
+}
 
 static void note_npc_routine_changes(int prev_turn, int new_turn) {
   size_t i;
@@ -3589,7 +4397,6 @@ static void format_clock_time(char *out, size_t cap, const AetWorldClock *wc) {
   snprintf(out, cap, "%d:%02d %s", h12, wc->minute, ampm);
 }
 
-/** World clock tokens for mod lines (after character + scene passes). */
 static void expand_temporal_mod_text(const char *src, char *dst, size_t dstcap) {
   AetWorldClock wc;
   char timestr[40];
@@ -3621,9 +4428,6 @@ static void expand_temporal_mod_text(const char *src, char *dst, size_t dstcap) 
   (void)snprintf(dst, dstcap, "%s", a);
 }
 
-/** Live play-state tokens: purse, vitals, score, pack, readied item,
- *  visited-room tally, note count, dataset size, exploration %% (0–100),
- *  plus character fields and derived profile metrics. */
 static const char *topic_mood_for(const char *topic);
 static const char *topic_heat_for(const char *topic_mood, int risk);
 static const char *npc_trust_for(const char *slug, const char *role, int risk);
@@ -3997,7 +4801,6 @@ static void expand_state_mod_text(const char *src, char *dst, size_t dstcap) {
   (void)snprintf(dst, dstcap, "%s", a);
 }
 
-/** Character %NAME%…, room, clock, then live %COINS% / %PURSE% / %HP%… (see help modding). */
 static void expand_mod_overlay_flat(const char *suffix, char *out, size_t outcap) {
   char t1[4096], t2[4096], t3[4096];
   if (!out || outcap < 2) return;
@@ -4009,7 +4812,6 @@ static void expand_mod_overlay_flat(const char *suffix, char *out, size_t outcap
   expand_state_mod_text(t3, out, outcap);
 }
 
-/** Appends mod overlay with character + scene + clock placeholders expanded. */
 static void append_dlc_mod_to_body(char *body, size_t cap, const char *suffix) {
   char xp[4096];
   if (!body || cap < 64 || !suffix || !suffix[0]) return;
@@ -4173,6 +4975,10 @@ static const char *dir_name(int dir) {
   return (dir >= 0 && dir < DIR_COUNT) ? DIR_LABELS[dir] : "?";
 }
 
+static int has_hunting_weapon(void) {
+  return inv_has("bow") || inv_has("shortbow") || inv_has("hunting_bow");
+}
+
 static int has_lockpick_tool(void) {
   return inv_has("lockpick") || inv_has("fine_lockpick") ||
          inv_has("rusty_pick") || inv_has("skeleton_key");
@@ -4231,6 +5037,53 @@ static int count_adjacent_npcs(void) {
     if (ent && ent[0]) n++;
   }
   return n;
+}
+
+static void body_append_people_here(char *body, size_t cap) {
+  const char *primary = world_room_entity(g_room);
+  char others[320];
+  char pretty[96];
+  AetWorldClock wc;
+  size_t i, olen = 0;
+  int n_other = 0;
+
+  others[0] = '\0';
+  get_world_clock(&wc);
+  for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
+    const char *slug = NPC_ROUTINES[i].slug;
+    const char *rs =
+        npc_routine_room_for_period(&NPC_ROUTINES[i], wc.period);
+    int rr;
+    char op[64];
+    if (!rs) continue;
+    rr = world_room_index(rs);
+    if (rr != g_room) continue;
+    if (primary && primary[0] && str_ieq(slug, primary)) continue;
+    entity_pretty(slug, op, sizeof op);
+    if (olen + strlen(op) + 4 >= sizeof others) continue;
+    if (n_other > 0) {
+      others[olen++] = ',';
+      others[olen++] = ' ';
+    }
+    olen += snprintf(others + olen, sizeof others - olen, "%s", op);
+    n_other++;
+  }
+  if (primary && primary[0]) {
+    entity_pretty(primary, pretty, sizeof pretty);
+    if (n_other > 0)
+      body_append(body, cap,
+                  "\nPeople here: %s\nAlso scheduled here (one visible in this "
+                  "build): %s\n",
+                  pretty, others);
+    else
+      body_append(body, cap, "\nPeople here: %s\n", pretty);
+  } else if (n_other > 0) {
+    body_append(body, cap,
+                "\nPeople here: none visible\nAlso scheduled here: %s\n",
+                others);
+  } else {
+    body_append(body, cap, "\nPeople here: none\n");
+  }
 }
 
 static void format_exits(char *buf, size_t cap) {
@@ -4517,9 +5370,7 @@ static void age_disclaimer_wait(void) {
       "By continuing you confirm that you are at least 18 years old (or the age\n"
       "of majority where you live) and that viewing such content is lawful for\n"
       "you. If that is not true, close this program now.\n";
-  /* Golden exe skips cls in autotest (clear_frame already short-circuits then),
-   * so don't hard-clear — that emits a stray form-feed via cmd.exe `cls` and
-   * breaks line-for-line parity with the shipped binary. */
+  
   clear_frame();
   ui_print_title("18+ ADULT CONTENT");
   printf("%s", text);
@@ -4528,24 +5379,48 @@ static void age_disclaimer_wait(void) {
   if (!aet_autotest()) (void)fgets(buf, sizeof buf, stdin);
 }
 
-static void ui_fullscreen(const char *title, const char *body,
-                          const char *pending_acc, int *did_fullscreen) {
-  char snap[sizeof g_transcript];
+#define UI_SCROLL_PAGE_LINES 22
+#define UI_SCROLL_AUTO_THRESHOLD 24
+
+static void ui_transcript_snapshot(char *snap, size_t cap,
+                                   const char *pending_acc) {
   const char *src =
       (pending_acc && pending_acc[0]) ? pending_acc : g_transcript;
-  snprintf(snap, sizeof snap, "%s", src ? src : "");
+  if (!snap || cap < 2) return;
+  snprintf(snap, cap, "%s", src ? src : "");
+}
+
+static void ui_transcript_restore(const char *snap) {
+  if (!snap) return;
+  snprintf(g_transcript, sizeof g_transcript, "%s", snap);
+}
+
+static void ui_fullscreen_plain(const char *title, const char *body,
+                                const char *pending_acc, int *did_fullscreen) {
+  char snap[sizeof g_transcript];
+  ui_transcript_snapshot(snap, sizeof snap, pending_acc);
   clear_frame();
   ui_print_title(title);
-  printf("%s", body);
+  printf("%s", body ? body : "");
   ui_print_panel_footer("[Press Enter to return]");
   fflush(stdout);
   if (!aet_autotest()) {
     char b[256];
     (void)fgets(b, sizeof b, stdin);
   }
-  snprintf(g_transcript, sizeof g_transcript, "%s", snap);
-  *did_fullscreen = 1;
+  ui_transcript_restore(snap);
+  if (did_fullscreen) *did_fullscreen = 1;
   return_to_game_screen();
+}
+
+static void ui_fullscreen(const char *title, const char *body,
+                          const char *pending_acc, int *did_fullscreen) {
+  if (body && body[0] &&
+      guide_line_count(body) > UI_SCROLL_AUTO_THRESHOLD) {
+    ui_scrollable_panel(title, body, pending_acc, did_fullscreen);
+    return;
+  }
+  ui_fullscreen_plain(title, body, pending_acc, did_fullscreen);
 }
 
 typedef enum {
@@ -4719,45 +5594,50 @@ static void guide_print_lines(const char *start, int max_lines) {
   }
 }
 
-static void ui_modding_guide_pager(const char *pending_acc, int *did_fullscreen) {
-  const char *doc = aet_mod_guide_full_text();
+static void ui_scrollable_panel(const char *title, const char *body,
+                                const char *pending_acc, int *did_fullscreen) {
   char snap[sizeof g_transcript];
-  const char *src =
-      (pending_acc && pending_acc[0]) ? pending_acc : g_transcript;
-  int total = guide_line_count(doc);
+  int total;
   int scroll = 0;
-  const int page_lines = 22;
-  int max_scroll = total > page_lines ? total - page_lines : 0;
+  int max_scroll;
 #if !defined(_WIN32)
-  int raw_ok = guide_tty_raw_begin();
+  int raw_ok = 0;
 #endif
 
-  snprintf(snap, sizeof snap, "%s", src ? src : "");
+  if (!body) body = "";
+  ui_transcript_snapshot(snap, sizeof snap, pending_acc);
+  total = guide_line_count(body);
+  max_scroll =
+      total > UI_SCROLL_PAGE_LINES ? total - UI_SCROLL_PAGE_LINES : 0;
 
   if (aet_autotest()) {
     char prev[4800];
     size_t i, lim = sizeof prev - 200;
-    for (i = 0; doc[i] && i + 1 < lim; i++) prev[i] = doc[i];
+    for (i = 0; body[i] && i + 1 < lim; i++) prev[i] = body[i];
     prev[i] = '\0';
     strncat(prev,
-            "\n\n[CI autotest: arrow-key pager skipped; use help modding "
-            "interactively.]\n",
+            "\n\n[CI autotest: scroll pager skipped in this mode.]\n",
             sizeof prev - strlen(prev) - 1);
-    ui_fullscreen("MODDING & DLC GUIDE", prev, pending_acc, did_fullscreen);
+    ui_fullscreen_plain(title ? title : "SCREEN", prev, pending_acc,
+                        did_fullscreen);
     return;
   }
+
+#if !defined(_WIN32)
+  raw_ok = guide_tty_raw_begin();
+#endif
 
   for (;;) {
     GuideKey gk;
     int row_first = scroll + 1;
-    int row_last = scroll + page_lines;
+    int row_last = scroll + UI_SCROLL_PAGE_LINES;
     if (row_last > total) row_last = total;
     clear_frame();
-    ui_print_title("MODDING & DLC GUIDE");
+    ui_print_title(title ? title : "SCREEN");
     printf("%s", C_MUTED);
     printf("  Up/Down  PgUp/PgDn  Home/End    also j/k n/p    Q or Enter quit\n");
     printf("%s", C_RESET);
-    guide_print_lines(guide_skip_lines(doc, scroll), page_lines);
+    guide_print_lines(guide_skip_lines(body, scroll), UI_SCROLL_PAGE_LINES);
     printf("\n%s--- Lines %d-%d of %d ---%s\n", C_MUTED, row_first, row_last,
            total, C_RESET);
     fflush(stdout);
@@ -4772,10 +5652,10 @@ static void ui_modding_guide_pager(const char *pending_acc, int *did_fullscreen)
     } else if (gk == GK_DOWN) {
       if (scroll < max_scroll) scroll++;
     } else if (gk == GK_PGUP) {
-      scroll -= page_lines;
+      scroll -= UI_SCROLL_PAGE_LINES;
       if (scroll < 0) scroll = 0;
     } else if (gk == GK_PGDN) {
-      scroll += page_lines;
+      scroll += UI_SCROLL_PAGE_LINES;
       if (scroll > max_scroll) scroll = max_scroll;
     } else if (gk == GK_HOME) {
       scroll = 0;
@@ -4786,9 +5666,14 @@ static void ui_modding_guide_pager(const char *pending_acc, int *did_fullscreen)
 #if !defined(_WIN32)
   guide_tty_raw_end();
 #endif
-  snprintf(g_transcript, sizeof g_transcript, "%s", snap);
-  *did_fullscreen = 1;
+  ui_transcript_restore(snap);
+  if (did_fullscreen) *did_fullscreen = 1;
   return_to_game_screen();
+}
+
+static void ui_modding_guide_pager(const char *pending_acc, int *did_fullscreen) {
+  ui_scrollable_panel("MODDING & DLC GUIDE", aet_mod_guide_full_text(),
+                      pending_acc, did_fullscreen);
 }
 
 static void fill_help_smart_hint(char *buf, size_t cap) {
@@ -4838,6 +5723,7 @@ static void fill_help_text(char *buf, size_t cap) {
       "  where | whereami  —  here;  where <name> | locate <name>  —  NPC rooms\n"
       "  look | l  — room overview;  look/l <thing> | look at / examine /\n"
       "          inspect / x <thing>  (x me / self — compact sheet)\n"
+      "          read <item>  — open literature in pack or room (books, scrolls…)\n"
       "  exits | status | stat (quick status, character status…) | character |\n"
       "          sheet (full portrait) |\n"
       "          character brief | sheet brief | identity (compact sheet); who am i |\n"
@@ -4849,13 +5735,19 @@ static void fill_help_text(char *buf, size_t cap) {
       "          momentum | arc | progression | perks | perk\n"
       "          voice | speech | vocals | pronouns | bio | backstory | biography\n"
       "          tainting | corruption | taint | rapport | relationships | bonds\n"
+      "          relationship history [npc] | bond history [npc]\n"
       "          vitals | wellness | hp  (focused health;  status  for full snapshot)\n"
       "          progress | visited | seen (sitrep, world progress…) |\n"
       "          journal (quest log, diary, logbook…) | objectives | goals | quests\n"
-      "  inventory | i | inv | pack — same UI as loadout / gear / equipment / outfit\n"
+      "  inventory | i | inv | pack — equipment UI;  inventory list  for full pack\n"
+      "  inventory sort name|weight|type  |  inventory find <text>\n"
       "  score  (my score, game stats…)\n"
-      "  take | get | grab <item> | (get|grab|take) all [except a,b…]\n"
+      "  take | get | grab <item> | (get|grab|take) all [except a,b…]\n",
+      WORLD_ROOM_COUNT);
+  body_append(
+      buf, cap,
       "  wares | shop | prices  —  merchant lists in g/s/b/c;  buy | purchase | sell <item>\n"
+      "          price compare <item> | compare prices <item>  —  cross-shop buy quotes\n"
       "          buy/sell all [except a,b…]; haggle | barter [buy|sell] <item>\n"
       "          patron score and CHA tilt base prices; haggling quotes one item at a time\n"
       "          trade history | trade log | transactions  —  completed buy/sell ledger\n"
@@ -4871,7 +5763,15 @@ static void fill_help_text(char *buf, size_t cap) {
       "          fill bucket (well) | break bucket\n"
       "  lockcheck  —  nearby lock readiness;  noise | stealth | suspicion\n"
       "  intent | tone  —  show parsed modifier profile (quiet/loud/friendly/harsh)\n"
-      "  forge | crafting  —  fullscreen Material Forge (add/rem/prof/craft/clear/done)\n"
+      "  forge | crafting  —  a workbench (experiment; no recipe book)\n"
+#ifdef AETER_MINIGAMES
+      "  Minigames (ASCII fullscreen; ESC returns):  play piano (tavern);\n"
+      "          pick lock (shed);  fish (pond, piers);  farm;  cook (kitchen);\n"
+      "          gamble (tavern);  hunt (forest);  write;  read <item>\n"
+#endif
+      );
+  body_append(
+      buf, cap,
       "  time | clock (what time is it…) | time until <morning|HH:MM> |\n"
       "  weather (what's the weather, climate…) [forecast|impact] | temperature [c|f]\n"
       "  wait | wait <n> | wait <n> hours | wait until <period> | rest until <period>\n"
@@ -4880,6 +5780,8 @@ static void fill_help_text(char *buf, size_t cap) {
       "          jot … | jot down … | memo … | remember that …  —  same as note\n"
       "          notes clear\n"
       "  g | again | repeat  —  repeat last input (full chain);  chain with ; or \"then\"\n"
+      "  history | !<n>  —  numbered command recall (session);  history <n>  re-runs entry n\n"
+      "  utilities | room objects  —  fixtures here (fireplace, well, forge, lights…)\n"
       "  Parser: deterministic only (no model guessing): fillers/synonyms; bare i→inventory;\n"
       "  go <dir> alone→move; trailing thanks/please; unique near-verb autofix (edit distance,\n"
       "  ties and short tokens rejected; rest preserved); where can i find / point me to /\n"
@@ -4895,9 +5797,12 @@ static void fill_help_text(char *buf, size_t cap) {
       "  search | scan | loot [value|weight] | compare <a>/<b> | who |\n"
       "          who all | who global  —  current room vs world NPC placements | talk |\n"
       "          talk about <topic> | talk to <who> about <topic>\n"
+      "          (after talk, numbered menu — reply 1–5, a label, or  goodbye )\n"
       "  topic | last topic | topic mood | topic heat | npc trust | npc leverage  —  last successful\n"
       "          talk-about phrase (mods: %%LASTTOPIC%% %%LASTTOPICMOOD%% %%TOPICHEAT%%)\n"
-      "  say | shout | read | touch <thing>\n"
+      "  say | shout | read | touch <thing>\n");
+  body_append(
+      buf, cap,
       "  unstick | hints | hint | nudge | give me a hint  —  situational nudges;\n"
       "          errors | healthcheck | diag  —  session log; errors clear\n"
       "          causality [term] | because [term]  —  recent cause/effect traces;\n"
@@ -4905,28 +5810,34 @@ static void fill_help_text(char *buf, size_t cap) {
       "          causality turn <n> | causality lastturn | what changed last turn\n"
       "          causality explain | what triggered that\n"
       "          failed actions now include \"Because\" hints when context is known\n"
-      "          causality clear\n"
+      "          causality clear\n");
+  body_append(
+      buf, cap,
       "  save | quick save | qs   load | quick load | reload | ql | restore\n"
+      "  autosave on|off | load autosave  —  shadow backup beside quicksave each turn\n"
       "  saves | slots — fullscreen save manager (save/load/del N); also save <1-10> | "
       "load <1-10>\n"
       "  menu  —  ASCII pause menu; resume clears it and redraws this room\n"
+      "  Long panels (help, journal, status, …) scroll with arrows / PgUp/PgDn when "
+      "needed.\n"
       "  verbose | brief  —  main-window blurbs; readied item saved in qs\n"
       "  recap | transcript (what just happened, recent messages…) | recap clear\n"
+      "  lore [topic]  —  Veritasfurtum setting primer (veritasfurtum, architect, "
+      "hollow, …)\n"
       "  about | credits | version | ver  —  port notes / build info\n"
       "  mods reload  —  rescan data packs (path: see help modding / --mods)\n"
       "  mods list     —  show pack load order (priority / DLC debugging)\n"
       "  mods doctor   —  verify/repair runtime mod files and show bootstrap health\n"
       "  mods doctor verbose  —  same, plus full mod status summary\n"
       "  mods directory <path>  —  set mod pack root for this session, then reload\n"
-      "  mod crafting: packs may add crafting/profiles.txt and crafting/archetypes.txt\n"
+      "  mods may extend the workbench with extra profiles (undocumented in-game)\n"
       "  help modding  —  DLC / modding guide (arrow keys, PgUp/Dn; Q quits)\n"
       "  --------------------------------------------------------------------\n"
       "  DLC drops: folders under mods/ with manifest priority=; last load wins.\n"
       "  First run creates 000_aeternitas_sample (tutorial); see PACK_GUIDE.txt.\n"
       "  Aliases: get/grab/snag/lift/pluck/recover/pocket/scoop/pick up…->take, "
       "put down/deposit/stash…->drop\n"
-      "  Dark rooms: light source (see status).  clear | cls\n",
-      WORLD_ROOM_COUNT);
+      "  Dark rooms: light source (see status).  clear | cls\n");
 }
 
 static void format_lights_body(char *buf, size_t cap) {
@@ -4976,8 +5887,287 @@ static void format_about_body(char *buf, size_t cap) {
       "  Verbs are a pragmatic subset: travel, inventory, search, simple locks,\n"
       "  notes, routing hints, light heuristics by item id, and basic health "
       "(see status).\n\n"
+      "  Setting: you are in Hollow Ridge, a region of Veritasfurtum — see  lore  "
+      "for canon.\n"
       "  World size: %d locations in this build.\n",
       WORLD_ROOM_COUNT);
+}
+
+static void format_lore_body(char *body, size_t cap, const char *topic) {
+  char t[64];
+  if (!body || cap < 256) return;
+  t[0] = '\0';
+  if (topic && topic[0]) {
+    size_t n = strnlen(topic, sizeof t - 1);
+    memcpy(t, topic, n);
+    t[n] = '\0';
+    for (n = 0; t[n]; n++) t[n] = (char)tolower((unsigned char)t[n]);
+    strip_leading_articles(t);
+    strip_trailing_space(t);
+  }
+  if (!t[0] || !strcmp(t, "help") || !strcmp(t, "list")) {
+    snprintf(body, cap,
+             "Lore primer (Veritasfurtum canon)\n\n"
+             "Topics:  lore veritasfurtum  |  lore architect  |  lore hollow\n"
+             "         lore cosmology  |  lore csa  |  lore currency\n"
+             "         lore genetrix  |  lore seraphine  |  lore missionaries\n"
+             "         lore waystone  |  lore elysium  |  lore house\n"
+             "         lore artifacts  |  lore rift  |  lore thin\n\n"
+             "Veritasfurtum is the name of this universe — a creation of the "
+             "Architect,\n"
+             "now unstable: rifts, stolen fragments of other realities, and "
+             "thin places\n"
+             "where rules disagree. Your journey in this build centers on "
+             "Hollow Ridge,\n"
+             "a lived-in region of manor, village, temple, and wild country "
+             "(not the whole\n"
+             "multiverse at once).\n\n"
+             "Find deeper prose on scrolls and in the world; this screen is a "
+             "compass, not\n"
+             "a spoiler walkthrough.\n");
+    return;
+  }
+  if (!strcmp(t, "veritasfurtum") || !strcmp(t, "setting") ||
+      !strcmp(t, "world")) {
+    snprintf(body, cap,
+             "Veritasfurtum\n\n"
+             "The canonical name of Maddeline's universe — a cosmos the "
+             "Architect imagined\n"
+             "into being, then entered as mortal ruler of Amethystus. Without "
+             "constant divine\n"
+             "attention the weave frays: entropy, temporal slips, and "
+             "dimensional rifts.\n\n"
+             "Pieces of other realities sometimes overlap or duplicate into "
+             "this world. Travel\n"
+             "between unstable layers without authority is dangerous; agencies "
+             "like the CSA exist\n"
+             "to police the worst crossings.\n\n"
+             "Hollow Ridge is one region you can walk in this port — a local "
+             "chart, not the\n"
+             "entirety of Veritasfurtum.\n");
+    return;
+  }
+  if (!strcmp(t, "architect") || !strcmp(t, "maddeline") ||
+      !strcmp(t, "empress")) {
+    snprintf(body, cap,
+             "The Architect\n\n"
+             "A being of unfathomable vision who spoke a universe into shape — "
+             "laws, galaxies,\n"
+             "and countless lives. Longing to *feel* what had been made, the "
+             "Architect took mortal\n"
+             "form as Empress Maddeline of Amethystus: kind, progressive, and "
+             "beloved, often\n"
+             "appearing in her natural form as a symbol of bodily autonomy and "
+             "freedom.\n\n"
+             "Creation exacts a price. Even Architects answer to cosmic law; "
+             "when Maddeline walked\n"
+             "among mortals, divine guidance thinned and Veritasfurtum began "
+             "its slow unraveling.\n"
+             "Temples to the Architect in Hollow Ridge still carry that echo — "
+             "reverence mixed with\n"
+             "unease at a parent who stepped away.\n");
+    return;
+  }
+  if (!strcmp(t, "hollow") || !strcmp(t, "hollow ridge") ||
+      !strcmp(t, "ridge")) {
+    snprintf(body, cap,
+             "Hollow Ridge\n\n"
+             "A region of Veritasfurtum mapped in this build: manor and "
+             "outbuildings, village\n"
+             "square and shops, tavern life, Temple of the Architect, mills, "
+             "forest, ridge, and\n"
+             "cave. Room text tags the region as Hollow Ridge throughout.\n\n"
+             "Themes from the export: a boarded great house; commerce and "
+             "patron NPCs; waystones\n"
+             "and Elysium crystals on the ridge; rumors of things that move "
+             "between stones without\n"
+             "crossing open ground.\n\n"
+             "This port compiles %d locations here — enough to explore, not "
+             "every land named in\n"
+             "the wider lore bible.\n",
+             WORLD_ROOM_COUNT);
+    return;
+  }
+  if (!strcmp(t, "rift") || !strcmp(t, "rifts") || !strcmp(t, "thin") ||
+      !strcmp(t, "thin places") || !strcmp(t, "fray")) {
+    snprintf(body, cap,
+             "Rifts and thin places\n\n"
+             "When Maddeline walked among mortals, divine attention thinned and "
+             "Veritasfurtum\n"
+             "began to bruise. Rifts are not random holes — they are arguments "
+             "between layers\n"
+             "of reality that no longer agree.\n\n"
+             "Thin places feel like déjà vu with teeth: wrong weather, doubled "
+             "footsteps,\n"
+             "memories that belong to someone else's life. Nexus points and "
+             "waystones are\n"
+             "meant to cross safely; rifts are where safety was never negotiated.\n\n"
+             "Hollow Ridge has its share. Treat odd silence and overlapping "
+             "scenery as warnings,\n"
+             "not scenery.\n");
+    return;
+  }
+  if (!strcmp(t, "cosmology") || !strcmp(t, "void") ||
+      !strcmp(t, "drops") || !strcmp(t, "nexus")) {
+    snprintf(body, cap,
+             "Cosmology — Universe Drops\n\n"
+             "In the Void, reality gathers as Universe Drops: whole cosmoses "
+             "held by dark matter's\n"
+             "tension like droplets on still water. Inside each drop, "
+             "dimensions layer — facets of one\n"
+             "jewel, each with its own rules, sometimes touching at Nexus "
+             "Points where guardians,\n"
+             "crystals, or accident keep the borders from tearing.\n\n"
+             "Characters may hail from different layers; powers and "
+             "perspectives follow the layer\n"
+             "they were shaped in. Veritasfurtum is one such drop — presently "
+             "bruised, leaking, and\n"
+             "occasionally visited by what should not fit.\n");
+    return;
+  }
+  if (!strcmp(t, "csa") || !strcmp(t, "sentinel") ||
+      !strcmp(t, "agency")) {
+    snprintf(body, cap,
+             "Cosmic Sentinel Agency (CSA)\n\n"
+             "A high-tech interstellar authority tasked with threats to "
+             "galactic stability — invasion,\n"
+             "impact events, rogue physics, and misuse of dangerous travel.\n\n"
+             "Branches named in the lore guide include Threat Assessment, "
+             "Defense Operations,\n"
+             "Research and Development, Intelligence, Emergency Response, and "
+             "specialized Time\n"
+             "Affairs and Multiversal Travel Affairs desks that license "
+             "crossings and punish\n"
+             "unauthorized jumps that could delete people from history or swap "
+             "wrong souls into\n"
+             "the wrong reality.\n\n"
+             "In Hollow Ridge you feel their absence more than their presence "
+             "— until a scroll or\n"
+             "rift reminds you someone still watches the thresholds.\n");
+    return;
+  }
+  if (!strcmp(t, "genetrix") || !strcmp(t, "bridge")) {
+    snprintf(body, cap,
+             "The Genetrix\n\n"
+             "A living bridge between designs — named in temple rites and "
+             "hermit\n"
+             "lore alike. The priestess teaches that genetic exchange can be "
+             "sacrament:\n"
+             "two blueprints aligning, pleasure as current, union as hymn.\n\n"
+             "In this port, ask Seraphina at the temple or read grove offerings "
+             "for\n"
+             "local color; the wider bible ties the Genetrix to creation-law "
+             "and\n"
+             "sterile orders who serve without breeding.\n");
+    return;
+  }
+  if (!strcmp(t, "seraphine") || !strcmp(t, "seraphina") ||
+      !strcmp(t, "priestess race")) {
+    snprintf(body, cap,
+             "Seraphines\n\n"
+             "A people of the Architect's design: pale, sensitive skin; "
+             "ceremonial grace;\n"
+             "often four breasts in two rows beneath sheer vestments; velvet "
+             "fox-tails;\n"
+             "vivid green eyes that assess like a machine and forgive like a "
+             "soul.\n\n"
+             "High Priestess Seraphina in Hollow Ridge embodies the Blessed "
+             "Barren —\n"
+             "sterile by intent so devotion can be shared without reproduction's "
+             "burden.\n");
+    return;
+  }
+  if (!strcmp(t, "missionaries") || !strcmp(t, "missionary") ||
+      !strcmp(t, "elena") || !strcmp(t, "kira") || !strcmp(t, "yuki")) {
+    snprintf(body, cap,
+             "Temple Missionaries\n\n"
+             "Elena (human warmth), Kira (neko play), and Yuki (kitsune wisdom) "
+             "travel\n"
+             "between temple and village square, spreading the Architect's "
+             "message that\n"
+             "love has many sacred forms. Marcus the paladin stands as their "
+             "shield.\n\n"
+             "In this build they follow daily routes — find them by time of day "
+             "with\n"
+             "who / status, then talk and talk about architect or love.\n");
+    return;
+  }
+  if (!strcmp(t, "waystone") || !strcmp(t, "waystones") ||
+      !strcmp(t, "travel stone")) {
+    snprintf(body, cap,
+             "Waystones\n\n"
+             "Monoliths of dark stone set with Elysium crystal. Runes encode "
+             "consent,\n"
+             "origin, destination, and return — a travel grammar safer than "
+             "blind rifts.\n\n"
+             "The blacksmith's forge hosts one; Nexus Points in the grove and "
+             "square\n"
+             "are brighter, formal cousins. Attune before you trust a road that "
+             "folds\n"
+             "distance.\n");
+    return;
+  }
+  if (!strcmp(t, "house") || !strcmp(t, "white house") ||
+      !strcmp(t, "manor")) {
+    snprintf(body, cap,
+             "The White House\n\n"
+             "A boarded great house at the edge of Hollow Ridge — runes on the "
+             "door frame,\n"
+             "a keyhole that glows, and a journal on the altar grove that warns "
+             "about the\n"
+             "old well after midnight. The C build lets you explore the foyer, "
+             "attic,\n"
+             "kitchen, and grounds; deeper house secrets arrive through items "
+             "and notes.\n");
+    return;
+  }
+  if (!strcmp(t, "artifacts") || !strcmp(t, "curios") ||
+      !strcmp(t, "trader")) {
+    snprintf(body, cap,
+             "Artifacts & Curios\n\n"
+             "The marketplace hosts a mysterious stall: ancient artifacts, "
+             "magical items,\n"
+             "and rare curiosities — some glowing with residual law, others "
+             "beautiful\n"
+             "without power. Read the displays in the Artifact Trader room; "
+             "merchants\n"
+             "like Corbin and Sam trade in stranger stock on other days.\n");
+    return;
+  }
+  if (!strcmp(t, "elysium") || !strcmp(t, "crystal")) {
+    snprintf(body, cap,
+             "Elysium Crystal\n\n"
+             "Crystallized travel-light — holds luminance like water in a cup "
+             "and hums\n"
+             "when waystones wake. Merchants and temples both prize it; "
+             "mishandling\n"
+             "at a Nexus can invite attention from agencies that police "
+             "crossings.\n\n"
+             "Examine crystals at the forge waystone or village Nexus when you "
+             "want\n"
+             "the local fiction, not the whole cosmic manual.\n");
+    return;
+  }
+  if (!strcmp(t, "currency") || !strcmp(t, "coins") ||
+      !strcmp(t, "money") || !strcmp(t, "amethystus")) {
+    snprintf(body, cap,
+             "Currency (Amethystus ladder)\n\n"
+             "Lore denominations in Maddeline's empire (approximate copper "
+             "backing):\n"
+             "  Royal gold coin 1000 · Gold plate 500 · Gold coin 100\n"
+             "  Silver 50 · Bronze 10 · Copper 1\n\n"
+             "This port keeps one saved purse total internally and displays "
+             "gold / silver / bronze /\n"
+             "copper for readability. Merchants, status, and trade history "
+             "use the same wallet.\n");
+    return;
+  }
+  snprintf(body, cap,
+           "Unknown lore topic \"%s\".\n\n"
+           "Try: lore veritasfurtum | architect | hollow | cosmology | csa | "
+           "currency | genetrix | seraphine | missionaries | waystone | elysium "
+           "| house | artifacts\n",
+           t);
 }
 
 static void remember_npc_here(void) {
@@ -5092,16 +6282,15 @@ static int try_move(int dir, char *msg, size_t msgcap) {
   }
   if (slug[0] && strcmp(slug, "east_of_house") == 0 && dir == DIR_E &&
       !g_shed_unlocked) {
-    if (!inv_has("lockpick") && !inv_has("fine_lockpick")) {
-      snprintf(msg, msgcap,
-               "The shed door is locked tight. You might need a lockpick.");
-      causal_push("move-blocked", "shed door requires lockpick");
-      return 0;
-    }
-    g_shed_unlocked = 1;
+    snprintf(msg, msgcap,
+             "The shed door is locked. Use  pick lock  here with a lockpick "
+             "first.");
+    causal_push("move-blocked", "shed door locked");
+    return 0;
   }
   hist_push(g_room);
   g_room = dest;
+  conv_clear();
   if (dest >= 0 && dest < MAX_WORLD_ROOMS) g_visited[dest] = 1;
   if (g_last_npc[0]) {
     const char *ne = world_room_entity(g_room);
@@ -5277,6 +6466,769 @@ static int npc_keywords_match(const char *hay, const char *keywords) {
   return 0;
 }
 
+static const char *npc_stage_approach(const char *slug, unsigned char stage) {
+  if (!slug || !slug[0]) return NULL;
+  if (str_ieq(slug, "miller")) {
+    switch (stage) {
+      case 0:
+        return "The miller looks up from her work and gives you a nod.";
+      case 1:
+        return "The miller smiles: \"Hey! Good to see you again.\"";
+      case 2:
+        return "The miller grins: \"There you are! Come on in!\"";
+      case 3:
+        return "The miller beams: \"You're here! I was hoping you'd stop by.\"";
+      case 4:
+        return "The miller blushes slightly. \"Oh, hi! I'm glad you came by.\"";
+      case 5:
+        return "The miller smiles warmly. \"My love! I missed you.\"";
+      case 6:
+        return "The miller grins. \"Welcome back, partner.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "forest_hermit")) {
+    switch (stage) {
+      case 0:
+        return "The hermit's ancient eyes study you. \"So... you have found me. "
+               "Few do. What brings you to my domain, seeker of secrets?\"";
+      case 1:
+        return "The hermit nods slowly. \"Ah, you return. Your presence is... "
+               "interesting. What knowledge do you seek today?\"";
+      case 2:
+        return "The hermit's expression softens slightly. \"Friend... it is good "
+               "to see you again. The forest welcomes you.\"";
+      case 3:
+        return "The hermit's eyes gleam with rare warmth. \"Beloved seeker... "
+               "you have earned my trust. What ancient secrets shall I share?\"";
+      case 4:
+        return "The hermit's ancient eyes hold something new — curiosity, "
+               "perhaps desire. \"You... intrigue me. The old ways speak of "
+               "connections beyond the physical. Perhaps...\"";
+      case 5:
+        return "The hermit's voice carries rare emotion. \"My love... in all my "
+               "years, I have never felt such a connection. The forest itself "
+               "blesses our bond.\"";
+      case 6:
+        return "The hermit's ancient form seems to glow. \"My partner, my "
+               "heart... you have awakened something in me I thought long dead. "
+               "The forest and I are yours.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "general_store_owner")) {
+    switch (stage) {
+      case 0:
+        return "Sam looks you over with a merchant's smile — warm, measuring.";
+      case 1:
+        return "Sam leans on the counter. \"Back again? Good. I was hoping you'd "
+               "need something.\"";
+      case 2:
+        return "Sam's smile turns familiar. \"There you are, darling. Tell me "
+               "what you need — or what you're hiding.\"";
+      case 3:
+        return "Sam's eyes warm. \"Back again. I saved the good wine — and a "
+               "little privacy.\"";
+      case 4:
+        return "Sam steps closer, voice low. \"For you? The shop stays open as "
+               "long as you want.\"";
+      case 5:
+        return "Sam brushes your hand. \"I was about to close the curtains... "
+               "but for you I'll keep the lights on.\"";
+      case 6:
+        return "Sam murmurs, \"My shop, my secrets, my bed. You're welcome to "
+               "all three.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "blacksmith")) {
+    switch (stage) {
+      case 0:
+        return "Riven wipes soot from their hands and offers a warm, tired smile.";
+      case 1:
+        return "Riven nods. \"Back again? Good — I was just thinking about your "
+               "gear.\"";
+      case 2:
+        return "Riven grins. \"There you are. Bring me something worth heating.\"";
+      case 3:
+      case 4:
+        return "Riven leans on the anvil. \"Always good to see a familiar face by "
+               "the fire.\"";
+      case 5:
+      case 6:
+        return "Riven's smile softens. \"For you I'll keep the forge hot as long "
+               "as you need.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "tavern_keeper")) {
+    switch (stage) {
+      case 0:
+        return "Soren straightens his vest, smoothing nonexistent wrinkles. "
+               "\"A new face! How exciting! Please, let me get you a menu. Or a "
+               "drink. Or a cushion?\"";
+      case 1:
+        return "Soren beams, his tail wagging slightly. \"You're back! I was "
+               "hoping you would be. I saved the good wine just in case.\"";
+      case 2:
+        return "Soren hurries over, almost tripping. \"Oh, thank goodness you're "
+               "here! The bard is off-key and the merchant is boring me to tears. "
+               "Save me!\"";
+      case 3:
+        return "Soren leans on the table, looking up through his lashes. \"You "
+               "look exhausted. Let me take care of you tonight. On the house.\"";
+      case 4:
+        return "Soren grabs your hands, cheeks pink. \"You are my favorite person "
+               "in this entire establishment. Don't tell the others.\"";
+      case 5:
+        return "Soren pulls you into a quick, hidden hug behind the bar. \"I missed "
+               "you. Being professional is so hard when you're in the room.\"";
+      case 6:
+        return "Soren rests his forehead against your shoulder a moment. \"You're "
+               "my anchor. Get it? Because of the tavern name? ...Kiss me anyway?\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "village_guard")) {
+    switch (stage) {
+      case 0:
+        return "Garrett blocks your path, chest heaving slightly. \"Halt. I need "
+               "to inspect you for contraband. Don't move.\"";
+      case 1:
+        return "Garrett nods, eyes sweeping over you. \"You're clean. Move along, "
+               "but stay within shouting distance.\"";
+      case 2:
+        return "Garrett smirks. \"Back again? You're starting to like seeing me in "
+               "uniform, aren't you?\"";
+      case 3:
+        return "Garrett leans in close, invading your space. \"I was hoping you'd "
+               "walk by. The shift gets boring without someone to keep an eye on.\"";
+      case 4:
+        return "Garrett relaxes his posture. \"I trust you at my back. I'd prefer "
+               "you at my side. Stay safe out there.\"";
+      case 5:
+        return "Garrett grips your arm, pulling you into an alcove. \"I should "
+               "arrest you for what you did to me last night. I can't focus on "
+               "patrol.\"";
+      case 6:
+        return "Garrett's eyes darken. \"You're mine. Anyone touches you, they "
+               "answer to my blade.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "paladin_marcus")) {
+    switch (stage) {
+      case 0:
+        return "Marcus steps forward, his massive frame blocking the inner "
+               "sanctum. \"Welcome. Leave your malice at the threshold, and you "
+               "will find only warmth here.\"";
+      case 1:
+        return "Marcus smiles, tension leaving his shoulders. \"Good to see you "
+               "again. Have you come to rest, or to worship?\"";
+      case 2:
+        return "Marcus opens his arms for a warm embrace. \"Friend! The temple "
+               "feels lighter with you in it. Come, sit with me.\"";
+      case 3:
+        return "Marcus rests a heavy hand on the back of your neck. \"You look "
+               "tense. Let me carry that weight for a while. You are safe with me.\"";
+      case 4:
+        return "Marcus clasps your hands. \"You are precious to this temple, and "
+               "to me. If anyone makes you feel unsafe, tell me immediately.\"";
+      case 5:
+        return "Marcus pulls you gently against his chestplate, kissing the top "
+               "of your head. \"My armor is heavy, but my hands are gentle. Let "
+               "me take care of you tonight.\"";
+      case 6:
+        return "Marcus looks at you with unshakable devotion. \"My partner. My "
+               "heart. My greatest honor is being the one you trust when you close "
+               "your eyes.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "village_innkeeper")) {
+    switch (stage) {
+      case 0:
+        return "Lydia greets you warmly. \"Welcome! I'm Lydia. Need a room or "
+               "something to eat?\"";
+      case 1:
+        return "Lydia smiles. \"Ah, friend! Good to see you again! Come in, make "
+               "yourself comfortable!\"";
+      case 2:
+        return "Lydia's face lights up. \"My friend! So glad you're here! Let me "
+               "get you something to eat!\"";
+      case 3:
+        return "Lydia embraces you. \"Beloved friend! I've been hoping you'd "
+               "visit! Come, let's catch up!\"";
+      case 4:
+        return "Lydia hugs you tightly. \"Dearest friend! Your visits always "
+               "brighten my day! Stay as long as you like!\"";
+      case 5:
+        return "Lydia pulls you close. \"My love! I've missed you so! Your room "
+               "is always ready, and so am I.\"";
+      case 6:
+        return "Lydia kisses you deeply. \"My partner, my heart! This inn is our "
+               "home. Stay with me always.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "traveling_bard")) {
+    switch (stage) {
+      case 0:
+        return "The bard notices you and grins. \"Ah, a new face! Welcome! I'm "
+               "Aria! Care to hear a tale or share a story?\"";
+      case 1:
+        return "The bard's face lights up. \"Friend! Good to see you again! Ready "
+               "for another tale?\"";
+      case 2:
+        return "The bard embraces you. \"My friend! I've got a new story I've "
+               "been wanting to share with you!\"";
+      case 3:
+        return "The bard pulls you close. \"Beloved friend! I've been collecting "
+               "stories just for you! Let me tell you one!\"";
+      case 4:
+        return "The bard's eyes sparkle. \"Dearest friend! Your presence "
+               "inspires me! Let me sing you a song about our friendship!\"";
+      case 5:
+        return "The bard's voice softens. \"Oh, you're here! I... I've been "
+               "composing a song about you. Would you like to hear it?\"";
+      case 6:
+        return "The bard kisses you, voice full of emotion. \"My partner, my "
+               "muse! You inspire every song I sing. This one is for you, always.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "traveling_merchant")) {
+    switch (stage) {
+      case 0:
+        return "Corbin gives you a quick, appreciative glance. \"New face. Good. "
+               "I like figuring out exactly what a new customer is desperate for.\"";
+      case 1:
+        return "Corbin nods and shifts their pack strap. \"Back again? Tell me "
+               "what problem you're solving today — I'll find the right bottle.\"";
+      case 2:
+        return "Corbin opens a hidden side pouch and lowers their voice. \"For "
+               "you, I can show the stock I keep off the main tarp. The potent stuff.\"";
+      case 3:
+        return "Corbin offers you a folded route note. \"Read this before you "
+               "travel. Safer timings, inns with the softest beds.\"";
+      case 4:
+        return "Corbin taps their ledger and grins. \"Priority stock and honest "
+               "warnings. I don't extend that loyalty to just anyone.\"";
+      case 5:
+        return "Corbin's grin softens. \"Careful. Keep looking at me like that "
+               "and I'll start charging you for the view.\"";
+      case 6:
+        return "Corbin rests their forehead against yours. \"My roads, my profits, "
+               "my bed. You get half of all of it.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "priestess")) {
+    switch (stage) {
+      case 0:
+        return "Seraphina studies your form with clinical intensity. \"A new "
+               "vessel. You are welcome. Leave your inhibitions at the threshold.\"";
+      case 1:
+        return "She inclines her head, tail twitching. \"You returned. Good. "
+               "Conviction — and arousal — grows through repetition.\"";
+      case 2:
+        return "Her voice softens. \"Friend, your energy steadies this temple. "
+               "Come, let us speak of what your body craves.\"";
+      case 3:
+        return "Seraphina takes your hand, pale skin warm. \"You have earned the "
+               "right to see the deeper mysteries. I do not offer communion lightly.\"";
+      case 4:
+        return "A rare, serene smile. \"You are a vital part of this sacred design "
+               "now. What brings you heat brings me heat.\"";
+      case 5:
+        return "Her composure wavers, green eyes darkening. \"There are certain "
+               "rites... ceremonies of the flesh... I have wished to perform with you.\"";
+      case 6:
+        return "Her forehead touches yours, velvet tail coiling around your waist. "
+               "\"My partner in witness and in worship. We are the Architect's "
+               "perfect union.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "farmer")) {
+    switch (stage) {
+      case 0:
+        return "Jasper wipes sweat from his brow, shirt clinging. \"Howdy. Just "
+               "let me catch my breath... hot day, isn't it?\"";
+      case 1:
+        return "Jasper smiles shyly. \"You came back. I was hoping you would. The "
+               "farm's been feeling a little empty.\"";
+      case 2:
+        return "Jasper's eyes crinkle. \"Hey! I put aside the best strawberries for "
+               "you. They're sweet... really sweet.\"";
+      case 3:
+        return "Jasper leans on his hoe, soft adoration in his eyes. \"Seeing you "
+               "walking up that path... best part of my day. Honestly.\"";
+      case 4:
+        return "Jasper reaches out and squeezes your hand. \"You feel like home to "
+               "me. You know that, right?\"";
+      case 5:
+        return "Jasper blushes, rubbing his neck. \"I was thinking about you. "
+               "Maybe... wanted to ask if you'd stay for dinner? I can cook.\"";
+      case 6:
+        return "Jasper kisses your forehead tenderly. \"Look at this life we're "
+               "building. I never thought I could be this happy. I love you.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "bartender")) {
+    switch (stage) {
+      case 0:
+        return "Silas sets down a glass and meets your eyes. \"Evening. Stool's "
+               "open. Ale's honest.\"";
+      case 1:
+        return "Silas gives a small nod. \"Back again. Good. I'll keep the rowdy "
+               "ones off your table.\"";
+      case 2:
+        return "Silas slides a drink your way without being asked. \"For you — "
+               "on the house. Don't tell Soren.\"";
+      case 3:
+      case 4:
+        return "Silas leans on the bar. \"You're one of the reasons this place "
+               "feels like a sanctuary.\"";
+      case 5:
+        return "Silas's voice drops to a rumble. \"Stay close tonight. I don't "
+               "like how the room looks at you.\"";
+      case 6:
+        return "Silas rests a scarred hand over yours. \"My bar. My road. "
+               "You're half of both now.\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "missionary_elena")) {
+    switch (stage) {
+      case 0:
+        return "Elena turns with a warm smile. \"Hello! I'm Elena. Want to learn "
+               "about The Architect's love?\"";
+      case 1:
+        return "Elena's face lights up. \"Friend! Good to see you! Ready to spread "
+               "some love?\"";
+      case 2:
+        return "Elena embraces you. \"My friend! Let's share some love together!\"";
+      case 3:
+        return "Elena holds your hands. \"Beloved friend! The Architect's love "
+               "flows between us!\"";
+      case 4:
+        return "Elena hugs you tightly. \"Dearest friend! Your love makes me so "
+               "happy!\"";
+      case 5:
+        return "Elena blushes. \"Oh! You're here! I've been hoping to see you... "
+               "want to share some love?\"";
+      case 6:
+        return "Elena kisses you deeply. \"My partner, my heart! The Architect "
+               "has blessed us!\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "missionary_kira")) {
+    switch (stage) {
+      case 0:
+        return "Kira's ears perk up. \"Oh! Hello! I'm Kira! Want to learn about "
+               "The Architect's love?\"";
+      case 1:
+        return "Kira's tail swishes. \"Hey, friend! Ready to spread some love?\"";
+      case 2:
+        return "Kira bounds over. \"My friend! Let's share some love together!\"";
+      case 3:
+        return "Kira nuzzles you. \"Beloved friend! The Architect's love flows "
+               "between us!\"";
+      case 4:
+        return "Kira purrs. \"Dearest friend! Your love makes me so happy!\"";
+      case 5:
+        return "Kira's tail swishes excitedly. \"Oh! You're here! I've been "
+               "hoping to see you...\"";
+      case 6:
+        return "Kira purrs and presses close. \"My partner, my heart! Blessed "
+               "love!\"";
+      default:
+        return NULL;
+    }
+  }
+  if (str_ieq(slug, "missionary_yuki")) {
+    switch (stage) {
+      case 0:
+        return "Yuki's tails sway as she turns. \"Greetings, traveler. I am Yuki. "
+               "How may love guide you today?\"";
+      case 1:
+        return "Yuki's eyes sparkle. \"Ah, friend! The Architect's love shines "
+               "on our meeting.\"";
+      case 2:
+        return "Yuki's tails wrap around you gently. \"My friend! Come, share "
+               "the Architect's love.\"";
+      case 3:
+        return "Yuki nuzzles you with her tails. \"Beloved friend! I've been "
+               "thinking of you.\"";
+      case 4:
+        return "Yuki's tails caress you. \"Dearest friend! The Architect "
+               "blesses our bond.\"";
+      case 5:
+        return "Yuki's tails swish. \"Oh, you're here! I've been hoping to see "
+               "you...\"";
+      case 6:
+        return "Yuki's tails caress you intimately. \"My partner, my heart! "
+               "Beautiful love!\"";
+      default:
+        return NULL;
+    }
+  }
+  return NULL;
+}
+
+static const char *npc_period_talk(const char *slug, const char *period,
+                                   int want_greeting) {
+  if (!slug || !period || !period[0]) return NULL;
+  if (str_ieq(slug, "miller")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Morning! Just getting started for the day. Fresh start, "
+                   "fresh flour!"
+                 : "Mornings are when I'm most productive. There's something "
+                   "satisfying about starting the day with hard work.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening! Perfect time to wind down after a day's work. What "
+                   "brings you here?"
+                 : "Evenings are my favorite time. The mill's quiet, and I can "
+                   "just enjoy the peace. Want to sit and chat?";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night visit? Can't sleep either? I'm usually up working "
+                   "or just enjoying the quiet."
+                 : "Nighttime's peaceful here. Just me, the mill, and the stars. "
+                   "Sometimes I think about everything that's happened... want "
+                   "to talk?";
+  }
+  if (str_ieq(slug, "forest_hermit")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Dawn breaks... a time of new beginnings. What secrets call "
+                   "to you this morning?"
+                 : "Mornings are when the forest's magic is strongest. The old "
+                   "powers stir with the light.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening falls... the boundary between day and night, when "
+                   "secrets are most easily revealed. What do you seek?"
+                 : "Evenings are when the veil between worlds grows thin. "
+                   "Ancient knowledge flows more freely.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Night deepens... when the old powers are most active. Few "
+                   "dare seek me in the dark. What brings you?"
+                 : "Nights are sacred. The forest's true nature reveals itself "
+                   "only to those who are not afraid of the dark.";
+  }
+  if (str_ieq(slug, "general_store_owner")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Morning, sunshine. You look a little rumpled — rough night, "
+                   "or just a very good one?"
+                 : "Mornings are for organization. I like knowing exactly where "
+                   "everything is before the chaos messes it up.";
+    if (str_ieq(period, "afternoon"))
+      return want_greeting
+                 ? "Afternoon. The shop is hot and I was thinking about a break. "
+                   "Perfect timing."
+                 : "Everyone wants a piece of me in the afternoon. Exhausting "
+                   "being this essential, don't you think?";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening. I was about to lock the ledgers. Unless you brought "
+                   "something more interesting than coin?"
+                 : "When the sun goes down, the requests get much more specific. "
+                   "I keep the special inventory ready.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "You're out late. Looking for trouble, or a place to hide from "
+                   "it?"
+                 : "The shop is quiet at night. Just me, the shadows, and locks "
+                   "clicking into place. Very... intimate.";
+  }
+  if (str_ieq(slug, "blacksmith")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Morning! Just getting the forge hot. Early bird gets the "
+                   "best work done."
+                 : "Mornings are when I'm sharpest. The fire's fresh, the metal's "
+                   "ready, and I'm ready to create something great.";
+    if (str_ieq(period, "afternoon"))
+      return want_greeting
+                 ? "Afternoon heat's perfect for serious work. What needs "
+                   "forging or fixing?"
+                 : "Afternoons I organize stock and plan the next piece. Good "
+                   "time to bring me quality materials.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening! Winding down after a long day at the forge. What "
+                   "brings you by?"
+                 : "Evenings are for finishing touches and planning tomorrow's "
+                   "work. Always something to improve.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? Can't sleep? I'm usually up late on special "
+                   "projects or enjoying the quiet."
+                 : "Nighttime's peaceful. Just me, the forge, and the stars. "
+                   "Sometimes my best work happens when the world's asleep.";
+  }
+  if (str_ieq(slug, "tavern_keeper")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Morning! The sun is up, the floor is clean, and I have had "
+                   "three cups of tea. I am ready for anything!"
+                 : "Mornings are for preparation! Check the stock, polish the "
+                   "glasses, mentally prepare for the lunch rush. It's a "
+                   "performance!";
+    if (str_ieq(period, "afternoon"))
+      return want_greeting
+                 ? "Afternoon! It's getting busy! If I look frantic, it's just "
+                   "part of my charm, I promise."
+                 : "The lunch crowd is so demanding. I only have two hands — and "
+                   "they are very delicate hands!";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Good evening! The lights are dimmed, the mood is set... can "
+                   "I get you something to match the atmosphere?"
+                 : "This is my favorite time. Everyone is happy, the music is "
+                   "playing... I feel like I'm hosting a grand ball every night.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? Oh my. The respectable folk have gone to bed. "
+                   "Now it's just us... and the interesting people."
+                 : "I should be exhausted, but the nightlife energizes me! Or "
+                   "maybe that's just the fear of a bar fight.";
+  }
+  if (str_ieq(slug, "village_guard")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Morning. Too early for games. Stand straight when you "
+                   "address me."
+                 : "Morning drills. Sweating out the vices of the night before. "
+                   "Care to watch me spar?";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Sun's down. Shadows are getting long. Stick close to me if "
+                   "you don't want to get hurt."
+                 : "The tavern gets rowdy now. I might have to drag someone out. "
+                   "It's good exercise.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "It's late. Why aren't you in bed? Unless you're looking for "
+                   "the kind of company decent folk avoid."
+                 : "The night watch is lonely. And cold. I could use something — "
+                   "or someone — to keep the blood moving.";
+  }
+  if (str_ieq(slug, "paladin_marcus")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Dawn approaches. I have already finished my physical drills. "
+                   "The body must stay strong for the Architect's work."
+                 : "The morning light is beautiful on the altar. Are you here for "
+                   "morning prayers, or just a quiet place to breathe?";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "The sun sets, and the evening rites begin. I will stand guard "
+                   "so you may lose yourself in the moment."
+                 : "This is when the temple grows warm. I enjoy watching the "
+                   "tension leave the villagers' bodies.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "It is late. The dark brings out our deepest hungers. Speak "
+                   "yours freely; I do not judge."
+                 : "I take the night watch so the others can sleep — or entwine — "
+                   "in peace. You are welcome to keep me company.";
+  }
+  if (str_ieq(slug, "village_innkeeper")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Good morning! Fresh start to the day! Need breakfast or a "
+                   "room?"
+                 : "Mornings are busy with guests checking out and preparing for "
+                   "the day. But I always have time for friends!";
+    if (str_ieq(period, "afternoon"))
+      return want_greeting
+                 ? "Good afternoon! Lunch is ready, and the inn is lively today!"
+                 : "Afternoons are when travelers share their stories. I love "
+                   "hearing where everyone's been.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Good evening! Dinner's ready, and the fire's warm. Make "
+                   "yourself at home!"
+                 : "Evenings are cozy here. Guests gather, stories flow, and the "
+                   "inn feels alive.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? The inn is quiet now, but you're always welcome. "
+                   "Need a room?"
+                 : "Nights are peaceful. Just the crackle of the fire and the "
+                   "occasional traveler seeking rest.";
+  }
+  if (str_ieq(slug, "traveling_bard")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Good morning! Perfect time for a cheerful song to start the "
+                   "day! What tale interests you?"
+                 : "Mornings are great for upbeat songs and adventure tales! Gets "
+                   "everyone's spirits up!";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Good evening! Perfect time for stories around a fire! What "
+                   "would you like to hear?"
+                 : "Evenings are my favorite — everyone gathers, and I can share "
+                   "my best tales and songs!";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? Perfect for mysterious tales and haunting "
+                   "melodies! Care to listen?"
+                 : "Nights are magical for storytelling. Darkness makes every "
+                   "tale more compelling!";
+  }
+  if (str_ieq(slug, "traveling_merchant")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Morning run. Inventory is fresh and my patience is highest. "
+                   "Tell me what you need."
+                 : "Morning is for planning route risk. No sentiment — just cold, "
+                   "hard survival.";
+    if (str_ieq(period, "afternoon"))
+      return want_greeting
+                 ? "Afternoon rush. Keep requests specific and I can move fast. "
+                   "I have places to be."
+                 : "By midday I can tell who prepared for their journey, and who "
+                   "is just looking for a distraction.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening market energy is volatile. People buy with desire "
+                   "instead of their brains."
+                 : "Evenings are where rumors inflate and prices follow. Best "
+                   "margins of the day.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late trade is expensive trade. If you're here now, I assume "
+                   "you need something to keep you warm."
+                 : "At night I pack for contingencies. Sometimes that means a "
+                   "locked door and a bottle of wine.";
+  }
+  if (str_ieq(slug, "priestess")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Dawn is for new vows and waking blood. Does your body feel "
+                   "the morning's potential?"
+                 : "Morning prayer is a physical audit: check every nerve, "
+                   "acknowledge every hunger, and prepare to be filled.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening brings the accounting of the day's heat. Who did you "
+                   "touch, and who touched you?"
+                 : "At dusk we shed vestments and secrets. The night belongs to "
+                   "the Architect's deeper designs.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Night visitors usually seek the heat they lack. Sit. The "
+                   "lamps are low for a reason."
+                 : "In the quiet of the night we hear the body most clearly. No "
+                   "noise to hide your desires here.";
+  }
+  if (str_ieq(slug, "farmer")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Morning... quiet out here. The corn's whispering. Need "
+                   "something from the farm?"
+                 : "Mornings I watch the sun hit the fields. Good time to think.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening in the square... I brought extra produce. Thought "
+                   "you might stop by."
+                 : "Evenings in the village are loud. I like selling here — "
+                   "easier to see a friendly face.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? I should be in bed... but the stars are clear."
+                 : "Nights on the farm are honest. Just crickets and your "
+                   "thoughts.";
+  }
+  if (str_ieq(slug, "bartender")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Early start. Coffee's strong; ale's stronger after noon."
+                 : "Mornings I stock shelves before the keeper's drama wakes up.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Evening rush. Sit where I can see the door and your glass."
+                 : "Evenings I tell the short versions of the war stories.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night crowd's thinner. Easier to hear what you need."
+                 : "Nights I close slow. The quiet ones get the best pours.";
+  }
+  if (str_ieq(slug, "missionary_elena")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Good morning! The Architect's light shines! Ready to spread "
+                   "love today?"
+                 : "Mornings are peaceful — prayer, then out to spread love!";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Good evening! What a day of spreading love! How can I help?"
+                 : "Evenings are cozy — perfect to share love with friends.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? Perfect for intimate love-sharing! The Architect "
+                   "approves!"
+                 : "Nights are peaceful — perfect for sharing love in all its "
+                   "forms.";
+  }
+  if (str_ieq(slug, "missionary_kira")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Good morning! Ready to spread some love today?"
+                 : "Mornings are energetic — prayer, then mischief in the name "
+                   "of love!";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Good evening! How can I help you?"
+                 : "Evenings are cozy — perfect to cuddle and share love!";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? Perfect for intimate love-sharing!"
+                 : "Nights are my favorite — peaceful, and perfect for love.";
+  }
+  if (str_ieq(slug, "missionary_yuki")) {
+    if (str_ieq(period, "morning"))
+      return want_greeting
+                 ? "Good morning! May love and wisdom guide you."
+                 : "Mornings are perfect for meditation. I feel the Architect's "
+                   "wisdom strongest at dawn.";
+    if (str_ieq(period, "evening"))
+      return want_greeting
+                 ? "Good evening! As the day ends, we reflect on love shared."
+                 : "Evenings are for reflection and gratitude.";
+    if (str_ieq(period, "night"))
+      return want_greeting
+                 ? "Late night? The Architect's love never sleeps."
+                 : "Nights are sacred — quiet enough to feel presence deeply.";
+  }
+  return NULL;
+}
+
 static const char *npc_pick_chatter(const AetNpcLineSet *set) {
   size_t n = 0;
   const char *const *p;
@@ -5371,6 +7323,332 @@ static void cmd_who(char *msg, size_t msgcap, int global_mode) {
       (void)snprintf(msg + strlen(msg), msgcap - strlen(msg),
                      "\nCurrent routine: %s.", act);
   }
+  {
+    unsigned char st = soc_derive_stage_npc_slug(ent);
+    int fri = soc_friendship_for_slug(ent);
+    int mix = aet_merchant_index(ent);
+    char fbar[12];
+    meter_bar_pct(fbar, sizeof fbar, fri);
+    if (strlen(msg) + 96 < msgcap)
+      (void)snprintf(msg + strlen(msg), msgcap - strlen(msg),
+                     "\nBond: %s — friendship %d [%s].", soc_stage_name(st), fri,
+                     fbar);
+    if (mix >= 0 && strlen(msg) + 64 < msgcap) {
+      int rep = merchant_rep_score(mix);
+      char pbar[12];
+      int pp = rep > 220 ? 100 : (rep * 100) / 220;
+      meter_bar_pct(pbar, sizeof pbar, pp);
+      (void)snprintf(msg + strlen(msg), msgcap - strlen(msg),
+                     "\nPatron standing: %s (%d) [%s].",
+                     merchant_rep_tier_label(rep), rep, pbar);
+    }
+    if (strlen(msg) + 48 < msgcap)
+      (void)snprintf(msg + strlen(msg), msgcap - strlen(msg),
+                     "\nSee  rapport  for the full relationship board.");
+  }
+}
+
+static void conv_clear(void) {
+  g_conv_active = 0;
+  g_conv_npc[0] = '\0';
+  g_conv_pick_n = 0;
+}
+
+static char *conv_mem_tags(const char *slug) {
+  int ix, si;
+  if (!slug || !slug[0]) return NULL;
+  ix = aet_merchant_index(slug);
+  if (ix >= 0 && ix < AETER_REP_MAX) return g_npc_topic_mem[ix];
+  si = soc_npc_find(slug);
+  if (si >= 0) return g_soc_topic_mem[si];
+  return NULL;
+}
+
+static char *conv_mem_last(const char *slug) {
+  int ix, si;
+  if (!slug || !slug[0]) return NULL;
+  ix = aet_merchant_index(slug);
+  if (ix >= 0 && ix < AETER_REP_MAX) return g_npc_topic_last[ix];
+  si = soc_npc_find(slug);
+  if (si >= 0) return g_soc_topic_last[si];
+  return NULL;
+}
+
+static int conv_mem_has_tag(const char *slug, const char *tag) {
+  char *mem, needle[40];
+  char *p;
+  size_t tl;
+  if (!tag || !tag[0]) return 0;
+  mem = conv_mem_tags(slug);
+  if (!mem || !mem[0]) return 0;
+  snprintf(needle, sizeof needle, ",%s,", tag);
+  if (strstr(mem, needle)) return 1;
+  tl = strlen(tag);
+  if ((size_t)strlen(mem) == tl && str_ieq(mem, tag)) return 1;
+  if (!strncmp(mem, tag, tl) && mem[tl] == ',') return 1;
+  p = strstr(mem, tag);
+  while (p) {
+    if ((p == mem || p[-1] == ',') &&
+        (p[tl] == '\0' || p[tl] == ','))
+      return 1;
+    p = strstr(p + 1, tag);
+  }
+  return 0;
+}
+
+static int conv_mem_buf_has(const char *mem, const char *tag) {
+  char needle[40];
+  size_t tl;
+  if (!mem || !mem[0] || !tag || !tag[0]) return 0;
+  snprintf(needle, sizeof needle, ",%s,", tag);
+  if (strstr(mem, needle)) return 1;
+  tl = strlen(tag);
+  if ((size_t)strlen(mem) == tl && str_ieq(mem, tag)) return 1;
+  if (!strncmp(mem, tag, tl) && (mem[tl] == '\0' || mem[tl] == ',')) return 1;
+  return 0;
+}
+
+static void conv_mem_add_tag_buf(char *mem, const char *tag) {
+  size_t L, tl;
+  if (!mem || !tag || !tag[0]) return;
+  if (conv_mem_buf_has(mem, tag)) return;
+  L = strlen(mem);
+  tl = strlen(tag);
+  if (L + tl + 2 >= CONV_TOPIC_MEM_SZ) return;
+  if (L > 0) {
+    mem[L++] = ',';
+    mem[L] = '\0';
+  }
+  strncat(mem, tag, CONV_TOPIC_MEM_SZ - L - 1);
+}
+
+static void conv_mem_record(const char *slug, const char *topic_phrase) {
+  char tag[32];
+  char *tags, *last;
+  size_t i, wl, start;
+  if (!slug || !slug[0] || !topic_phrase || !topic_phrase[0]) return;
+  tags = conv_mem_tags(slug);
+  last = conv_mem_last(slug);
+  if (!tags || !last) {
+    if (aet_merchant_index(slug) < 0) (void)soc_npc_ensure(slug);
+    tags = conv_mem_tags(slug);
+    last = conv_mem_last(slug);
+  }
+  if (!tags || !last) return;
+  tag[0] = '\0';
+  for (i = 0; topic_phrase[i];) {
+    while (topic_phrase[i] == ' ') i++;
+    if (!topic_phrase[i]) break;
+    start = i;
+    while (topic_phrase[i] && topic_phrase[i] != ' ') i++;
+    wl = (size_t)(i - start);
+    if (wl >= sizeof tag) wl = sizeof tag - 1;
+    memcpy(tag, topic_phrase + start, wl);
+    tag[wl] = '\0';
+    for (start = 0; tag[start]; start++)
+      tag[start] = (char)tolower((unsigned char)tag[start]);
+    if (wl >= 3) break;
+  }
+  if (!tag[0]) snprintf(tag, sizeof tag, "chat");
+  conv_mem_add_tag_buf(tags, tag);
+  snprintf(last, CONV_TOPIC_MEM_SZ, "%.55s", topic_phrase);
+}
+
+static void conv_topic_label(const char *keywords, char *label, size_t cap) {
+  size_t i = 0, start, wl;
+  if (!label || cap < 2) return;
+  label[0] = '\0';
+  if (!keywords || !keywords[0]) {
+    snprintf(label, cap, "Something else");
+    return;
+  }
+  for (;;) {
+    while (keywords[i] == ' ') i++;
+    if (!keywords[i]) break;
+    start = i;
+    while (keywords[i] && keywords[i] != ' ') i++;
+    wl = (size_t)(i - start);
+    if (wl < 3) continue;
+    if (wl >= cap) wl = cap - 1;
+    memcpy(label, keywords + start, wl);
+    label[wl] = '\0';
+    label[0] = (char)toupper((unsigned char)label[0]);
+    return;
+  }
+  snprintf(label, cap, "Something else");
+}
+
+static void conv_primary_tag(const char *keywords, char *tag, size_t cap) {
+  size_t i = 0, start, wl;
+  if (!tag || cap < 2) return;
+  tag[0] = '\0';
+  if (!keywords || !keywords[0]) return;
+  for (;;) {
+    while (keywords[i] == ' ') i++;
+    if (!keywords[i]) break;
+    start = i;
+    while (keywords[i] && keywords[i] != ' ') i++;
+    wl = (size_t)(i - start);
+    if (wl < 3) continue;
+    if (wl >= cap) wl = cap - 1;
+    memcpy(tag, keywords + start, wl);
+    tag[wl] = '\0';
+    for (start = 0; tag[start]; start++)
+      tag[start] = (char)tolower((unsigned char)tag[start]);
+    return;
+  }
+}
+
+static void conv_append_menu(char *msg, size_t msgcap) {
+  int i;
+  size_t L;
+  if (!g_conv_active || g_conv_pick_n <= 0 || !msg) return;
+  L = strlen(msg);
+  if (L + 80 >= msgcap) return;
+  snprintf(msg + L, msgcap - L,
+           "\n\nContinue (reply with a number, a label, or  talk about … ):\n");
+  for (i = 0; i < g_conv_pick_n; i++) {
+    L = strlen(msg);
+    if (L + 96 >= msgcap) break;
+    snprintf(msg + L, msgcap - L, "  %d) %s\n", i + 1, g_conv_pick_label[i]);
+  }
+  L = strlen(msg);
+  if (L + 64 < msgcap)
+  snprintf(msg + L, msgcap - L, "  (or type  goodbye  to end the conversation.)");
+}
+
+static void conv_open_menu(const char *ent, const AetNpcLineSet *dlg, char *msg,
+                           size_t msgcap) {
+  const AetNpcTopic *tp;
+  char tag[32];
+  char label[72];
+  int n = 0;
+  if (!ent || !ent[0] || !dlg) {
+    conv_clear();
+    return;
+  }
+  conv_clear();
+  snprintf(g_conv_npc, sizeof g_conv_npc, "%s", ent);
+  if (dlg->topics) {
+    for (tp = dlg->topics; tp->keywords && tp->response && n < CONV_MENU_MAX - 2;
+         tp++) {
+      conv_primary_tag(tp->keywords, tag, sizeof tag);
+      if (!tag[0] || conv_mem_has_tag(ent, tag)) continue;
+      conv_topic_label(tp->keywords, label, sizeof label);
+      g_conv_pick_kind[n] = CONV_PICK_TOPIC;
+      snprintf(g_conv_pick_label[n], sizeof g_conv_pick_label[n], "%s", label);
+      snprintf(g_conv_pick_phrase[n], sizeof g_conv_pick_phrase[n], "%s",
+               tp->keywords);
+      n++;
+      if (n >= 3) break;
+    }
+  }
+  if (n < CONV_MENU_MAX - 1) {
+    g_conv_pick_kind[n] = CONV_PICK_MORE;
+    snprintf(g_conv_pick_label[n], sizeof g_conv_pick_label[n], "Tell me more");
+    if (g_last_topic[0] && str_ieq(g_last_npc, ent))
+      copy_capped(g_conv_pick_phrase[n], sizeof g_conv_pick_phrase[n], g_last_topic);
+    else
+      snprintf(g_conv_pick_phrase[n], sizeof g_conv_pick_phrase[n],
+               "tell me more");
+    n++;
+  }
+  if (n < CONV_MENU_MAX) {
+    g_conv_pick_kind[n] = CONV_PICK_GOODBYE;
+    snprintf(g_conv_pick_label[n], sizeof g_conv_pick_label[n], "Say goodbye");
+    g_conv_pick_phrase[n][0] = '\0';
+    n++;
+  }
+  g_conv_pick_n = n;
+  if (n > 0) {
+    g_conv_active = 1;
+    conv_append_menu(msg, msgcap);
+  }
+}
+
+static void conv_finish_talk(const char *ent, const AetNpcLineSet *dlg,
+                             const char *topic_phrase, char *msg, size_t msgcap) {
+  if (topic_phrase && topic_phrase[0]) conv_mem_record(ent, topic_phrase);
+  if (dlg)
+    conv_open_menu(ent, dlg, msg, msgcap);
+  else
+    conv_clear();
+}
+
+static int conv_try_followup(const char *line, char *msg, size_t msgcap,
+                             int *turn_advance) {
+  char work[INPUT_LINE_MAX];
+  const char *p;
+  int pick = 0, i;
+  const char *ent;
+  char pretty[128];
+  if (!line || !line[0] || !g_conv_active || g_conv_pick_n <= 0 || !msg ||
+      !turn_advance)
+    return 0;
+  p = line;
+  while (*p == ' ') p++;
+  if (!strncasecmp(p, "talk about ", 11)) return 0;
+  if (!strncasecmp(p, "talk to ", 8)) return 0;
+  if (str_ieq(p, "talk") || str_ieq(p, "greet") || str_ieq(p, "hello") ||
+      str_ieq(p, "hi"))
+    return 0;
+  if (str_ieq(p, "goodbye") || str_ieq(p, "bye") || str_ieq(p, "farewell") ||
+      str_ieq(p, "done") || str_ieq(p, "leave")) {
+    ent = world_room_entity(g_room);
+    conv_clear();
+    if (ent && ent[0]) {
+      entity_pretty(ent, pretty, sizeof pretty);
+      snprintf(msg, msgcap, "You take your leave of %s.", pretty);
+    } else
+      snprintf(msg, msgcap, "You end the conversation.");
+    *turn_advance = 1;
+    return 1;
+  }
+  if (*p >= '1' && *p <= '9') {
+    pick = (int)(*p - '0');
+    p++;
+    while (*p == ' ') p++;
+    if (*p == ')' || *p == '.' || *p == ':') p++;
+    while (*p == ' ') p++;
+    if (*p) return 0;
+  } else {
+    strncpy(work, p, sizeof work - 1);
+    work[sizeof work - 1] = '\0';
+    for (i = 0; i < g_conv_pick_n; i++) {
+      if (str_ieq(work, g_conv_pick_label[i]) ||
+          text_has_word_ci(g_conv_pick_label[i], work)) {
+        pick = i + 1;
+        break;
+      }
+    }
+    if (!pick) return 0;
+  }
+  if (pick < 1 || pick > g_conv_pick_n) return 0;
+  ent = world_room_entity(g_room);
+  if (!ent || !ent[0] || !str_ieq(ent, g_conv_npc)) {
+    conv_clear();
+    snprintf(msg, msgcap,
+             "The conversation broke off — %s is no longer here.",
+             g_conv_npc);
+    *turn_advance = 1;
+    return 1;
+  }
+  if (g_conv_pick_kind[pick - 1] == CONV_PICK_GOODBYE) {
+    entity_pretty(ent, pretty, sizeof pretty);
+    conv_clear();
+    snprintf(msg, msgcap, "You say goodbye to %s.", pretty);
+    *turn_advance = 1;
+    return 1;
+  }
+  if (g_conv_pick_kind[pick - 1] == CONV_PICK_MORE) {
+    const char *more = g_conv_pick_phrase[pick - 1];
+    cmd_talk("", more[0] ? more : "tell me more", msg, msgcap);
+    *turn_advance = 1;
+    return 1;
+  }
+  cmd_talk("", g_conv_pick_phrase[pick - 1], msg, msgcap);
+  *turn_advance = 1;
+  return 1;
 }
 
 static void cmd_talk(const char *target, const char *topic, char *msg,
@@ -5428,10 +7706,12 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
   }
 
   if (!ent[0]) {
+    conv_clear();
     snprintf(msg, msgcap, "Nobody to talk to — just you, %s, and the scene.",
              pc_display_name());
     return;
   }
+  if (g_conv_active && g_conv_npc[0] && !str_ieq(ent, g_conv_npc)) conv_clear();
   entity_pretty(ent, pretty, sizeof pretty);
   if (target && target[0]) {
     if (str_ieq(target, "it") || str_ieq(target, "that") ||
@@ -5470,21 +7750,37 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
     for (p = tlc; *p; p++) *p = (char)tolower((unsigned char)*p);
     mt = aet_mods_npc_topic_response(ent, tlc);
     if (mt && mt[0]) {
+      char tag[32];
       pc_expand_world_placeholders(mt, xp, sizeof xp);
-      snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
+      conv_primary_tag(twork, tag, sizeof tag);
+      if (conv_mem_has_tag(ent, tag))
+        snprintf(msg, msgcap,
+                 "%s says, \"%s\"\n\n(They nod — you have raised this before.)",
+                 pretty, xp);
+      else
+        snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
       remember_npc_here();
       remember_talk_topic(twork);
       merchant_rep_bump_conversation(ent, 2);
+      conv_finish_talk(ent, dlg, twork, msg, msgcap);
       return;
     }
     if (dlg && dlg->topics) {
       for (tp = dlg->topics; tp->keywords && tp->response; tp++) {
         if (npc_keywords_match(twork, tp->keywords)) {
+          char tag[32];
           pc_expand_world_placeholders(tp->response, xp, sizeof xp);
-          snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
+          conv_primary_tag(tp->keywords, tag, sizeof tag);
+          if (conv_mem_has_tag(ent, tag))
+            snprintf(msg, msgcap,
+                     "%s says, \"%s\"\n\n(They nod — you have raised this before.)",
+                     pretty, xp);
+          else
+            snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
           remember_npc_here();
           remember_talk_topic(twork);
           merchant_rep_bump_conversation(ent, 2);
+          conv_finish_talk(ent, dlg, twork, msg, msgcap);
           return;
         }
       }
@@ -5499,17 +7795,48 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
   }
 
   if (dlg) {
+    AetWorldClock wc;
+    unsigned char bond = soc_derive_stage_npc_slug(ent);
+    unsigned pick = (unsigned)(g_turns + g_room * 3 + (int)strlen(ent));
+    const char *approach;
+    const char *period_ln;
+    get_world_clock(&wc);
+    approach = npc_stage_approach(ent, bond);
+    if (!twork[0] && approach && approach[0] && bond >= 1u &&
+        (pick % 3u) != 2u) {
+      char *prev = conv_mem_last(ent);
+      pc_expand_world_placeholders(approach, xp, sizeof xp);
+      if (prev && prev[0])
+        snprintf(msg, msgcap, "%s still has \"%s\" on their mind.\n\n%s", pretty,
+                 prev, xp);
+      else
+        snprintf(msg, msgcap, "%s", xp);
+      remember_npc_here();
+      merchant_rep_bump_conversation(ent, 2);
+      conv_finish_talk(ent, dlg, NULL, msg, msgcap);
+      return;
+    }
+    period_ln = npc_period_talk(ent, wc.period, (pick % 2u) == 0u);
+    if (!twork[0] && period_ln && period_ln[0] && (pick % 5u) < 2u) {
+      pc_expand_world_placeholders(period_ln, xp, sizeof xp);
+      snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
+      remember_npc_here();
+      merchant_rep_bump_conversation(ent, 2);
+      conv_finish_talk(ent, dlg, NULL, msg, msgcap);
+      return;
+    }
+    {
     const char *mod_gr = aet_mods_npc_greeting(ent);
     const char *use_gr =
         (mod_gr && mod_gr[0]) ? mod_gr
                               : (dlg->greeting && dlg->greeting[0] ? dlg->greeting
                                                                    : NULL);
-    unsigned pick = (unsigned)(g_turns + g_room * 3 + (int)strlen(ent));
     if (use_gr && use_gr[0] && (pick % 3u) == 0u) {
       pc_expand_world_placeholders(use_gr, xp, sizeof xp);
       snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
       remember_npc_here();
       merchant_rep_bump_conversation(ent, 2);
+      conv_finish_talk(ent, dlg, NULL, msg, msgcap);
       return;
     }
     if (dlg->chatter && dlg->chatter[0]) {
@@ -5519,6 +7846,7 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
         snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
         remember_npc_here();
         merchant_rep_bump_conversation(ent, 2);
+        conv_finish_talk(ent, dlg, NULL, msg, msgcap);
         return;
       }
     }
@@ -5527,7 +7855,9 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
       snprintf(msg, msgcap, "%s says, \"%s\"", pretty, xp);
       remember_npc_here();
       merchant_rep_bump_conversation(ent, 2);
+      conv_finish_talk(ent, dlg, NULL, msg, msgcap);
       return;
+    }
     }
   }
   {
@@ -5540,6 +7870,7 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
   }
   remember_npc_here();
   merchant_rep_bump_conversation(ent, 2);
+  conv_finish_talk(ent, dlg, NULL, msg, msgcap);
 }
 
 static int take_item(const char *name, char *msg, size_t msgcap) {
@@ -5560,6 +7891,7 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
              MAX_INV);
     return 0;
   }
+  g_disambig_next_act = DISAMBIG_ACT_TAKE;
   i = resolve_room_item_query(name, target, sizeof target, msg, msgcap);
   if (i < 0) return 0;
   if (i == 0) {
@@ -5595,6 +7927,10 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
                 "knows it is in the wrong genre. Somewhere, a narrator clears "
                 "their throat — or maybe that is only wind through the Nexus.",
                 pretty);
+          else if (item_has_read_text(taken))
+            snprintf(msg, msgcap,
+                     "Taken: %s\n\n(Try  read %s  when you want the full text.)",
+                     pretty, taken);
           else
             snprintf(msg, msgcap, "Taken: %s", pretty);
         }
@@ -6087,6 +8423,8 @@ static int inv_take_out(int ix, char *taken, size_t taken_cap) {
   for (j = ix; j < g_inv_n - 1; j++)
     memcpy(g_inv[j], g_inv[j + 1], MAX_ITEM_LEN);
   g_inv_n--;
+  if (str_ieq(g_ready_item, taken)) g_ready_item[0] = '\0';
+  eq_remove_item_from_slots(taken);
   return 1;
 }
 
@@ -6108,6 +8446,7 @@ static int drop_item(const char *name, char *msg, size_t msgcap) {
     name = g_last_focus;
   }
   ix = -1;
+  g_disambig_next_act = DISAMBIG_ACT_DROP;
   j = resolve_inv_item_query(name, &ix, msg, msgcap);
   if (j < 0) return 0;
   if (j == 0 || ix < 0) {
@@ -6163,7 +8502,9 @@ static void cmd_equip(const char *rest, char *msg, size_t msgcap) {
   } else {
     ix = -1;
     {
-      int r = resolve_inv_item_query(work, &ix, msg, msgcap);
+      int r;
+      g_disambig_next_act = DISAMBIG_ACT_EQUIP;
+      r = resolve_inv_item_query(work, &ix, msg, msgcap);
       if (r < 0) return;
       if (r == 0 || ix < 0) {
         snprintf(msg, msgcap, "You are not carrying that.");
@@ -6715,10 +9056,104 @@ static void format_locate_body(char *body, size_t cap, const char *raw) {
             cap - strlen(body) - 1);
 }
 
+static int soc_friendship_for_slug(const char *slug) {
+  int mix, si;
+  if (!slug || !slug[0]) return 0;
+  mix = aet_merchant_index(slug);
+  if (mix >= 0 && mix < AETER_REP_MAX)
+    return (int)g_npc_friendship[mix];
+  si = soc_npc_find(slug);
+  if (si >= 0 && si < AETER_SOC_NPC_MAX)
+    return (int)g_soc_npc_friendship[si];
+  return 0;
+}
+
+static int quest_journal_hint_state(const char *hint) {
+  int n, f, st;
+  if (!hint || !hint[0]) return 0;
+  if (strstr(hint, "scrap_metal")) {
+    n = inv_count("scrap_metal");
+    return n >= 10 ? 2 : (n > 0 ? 1 : 0);
+  }
+  if (strstr(hint, "iron_ingot")) {
+    n = inv_count("iron_ingot");
+    return n >= 2 ? 2 : (n > 0 ? 1 : 0);
+  }
+  if (strstr(hint, "flour")) {
+    n = inv_count("flour");
+    return n >= 3 ? 2 : (n > 0 ? 1 : 0);
+  }
+  if (strstr(hint, "wood_scrap")) {
+    n = inv_count("wood_scrap");
+    return n >= 5 ? 2 : (n > 0 ? 1 : 0);
+  }
+  if (strstr(hint, "meat")) {
+    n = inv_count("meat");
+    return n >= 3 ? 2 : (n > 0 ? 1 : 0);
+  }
+  if (strstr(hint, "gold_coin")) {
+    n = inv_count("gold_coin");
+    return n >= 5 ? 2 : (n > 0 ? 1 : 0);
+  }
+  if (strstr(hint, "Visit The Blacksmith")) {
+    {
+      int br = world_room_index("blacksmith");
+      if ((br >= 0 && g_visited[br]) ||
+          str_ieq(world_slug(g_room), "blacksmith"))
+        return 2;
+    }
+    {
+      const char *ent = world_room_entity(g_room);
+      if (ent && str_ieq(ent, "blacksmith")) return 1;
+    }
+    return 0;
+  }
+  if (strstr(hint, "Help The Miller Today")) {
+    f = soc_friendship_for_slug("miller");
+    return f >= 35 ? 2 : (f >= 12 ? 1 : 0);
+  }
+  if (strstr(hint, "Help The Miller") && !strstr(hint, "Today")) {
+    f = soc_friendship_for_slug("miller");
+    return f >= 28 ? 2 : (f >= 8 ? 1 : 0);
+  }
+  if (strstr(hint, "Become Partners with The Miller")) {
+    st = (int)soc_derive_stage_npc_slug("miller");
+    return st >= 6 ? 2 : (st >= 4 ? 1 : 0);
+  }
+  if (strstr(hint, "Win The Miller's Heart")) {
+    st = (int)soc_derive_stage_npc_slug("miller");
+    return st >= 5 ? 2 : (st >= 3 ? 1 : 0);
+  }
+  if (strstr(hint, "Become Friends with The Miller")) {
+    st = (int)soc_derive_stage_npc_slug("miller");
+    return st >= 3 ? 2 : (st >= 1 ? 1 : 0);
+  }
+  if (strstr(hint, "Befriend The Tavern Keeper")) {
+    st = (int)soc_derive_stage_npc_slug("tavern_keeper");
+    return st >= 3 ? 2 : (st >= 1 ? 1 : 0);
+  }
+  if (strstr(hint, "Befriend The Traveling Merchant")) {
+    st = (int)soc_derive_stage_npc_slug("traveling_merchant");
+    return st >= 3 ? 2 : (st >= 1 ? 1 : 0);
+  }
+  if (strstr(hint, "Bartender")) {
+    f = soc_friendship_for_slug("bartender");
+    if (f < 8) f = soc_friendship_for_slug("tavern_keeper");
+    return f >= 45 ? 2 : (f >= 18 ? 1 : 0);
+  }
+  return 0;
+}
+
+static const char *quest_journal_state_label(int st) {
+  if (st >= 2) return "done";
+  if (st == 1) return "active";
+  return "open";
+}
+
 static void format_journal_body(char *body, size_t cap) {
   const char *const *qh = world_quest_hints();
   size_t len;
-  int w;
+  int w, done_n = 0, active_n = 0, open_n = 0, daily_n = 0;
   char role[96];
   char pr[64];
   char purseb[48];
@@ -6729,63 +9164,112 @@ static void format_journal_body(char *body, size_t cap) {
   pc_format_pronouns_short(jp.gender[0] ? jp.gender : "they", pr, sizeof pr);
   currency_format_compact(g_coins, purseb, sizeof purseb);
   snprintf(body, cap,
-           "Journal (ASCII port)\n\n"
+           "Journal\n\n"
            "  Character: %s (%s)\n"
            "  Pronouns: %s\n\n"
-           "  Location: %s\n"
+           "  Location: %s  [%s]\n"
            "  Explored: %d / %d locations\n"
            "  Health: %d / %d   Purse: %s   Score: %d   Turns: %d\n\n"
-           "  Loose goals: find light for dark rooms, open the house, search "
-           "for caches,\n"
-           "  talk to anyone present, map exits with \"nearby\" and \"route\".\n",
+           "  Story arc: use  objectives  for the house-to-treasure checklist.\n"
+           "  This board tracks village dailies and relationship goals from the "
+           "quest list.\n",
            pc_display_name(), role, pr, resolve_world_title(g_room),
-           count_visited(), WORLD_ROOM_COUNT, g_health, g_max_health, purseb,
-           g_score, g_turns);
+           world_slug(g_room), count_visited(), WORLD_ROOM_COUNT, g_health,
+           g_max_health, purseb, g_score, g_turns);
   len = strlen(body);
   if (!qh || !*qh || len + 80 >= cap) return;
-  w = snprintf(
-      body + len, cap - len,
-      "\nQuest & daily templates (reference list; progress not tracked "
-      "here):\n\n");
+  for (const char *const *hq = qh; *hq; hq++) {
+    int st = quest_journal_hint_state(*hq);
+    if (strstr(*hq, "[Daily]")) daily_n++;
+    if (st >= 2)
+      done_n++;
+    else if (st == 1)
+      active_n++;
+    else
+      open_n++;
+  }
+  w = snprintf(body + len, cap - len,
+               "\nQuest board  (done %d · active %d · open %d · %d daily)\n"
+               "  [x] met   [~] in progress   [ ] not started\n\n",
+               done_n, active_n, open_n, daily_n);
   if (w < 0 || (size_t)w >= cap - len) return;
   len += (size_t)w;
-  for (; *qh && len + 8 < cap; qh++) {
-    w = snprintf(body + len, cap - len, "  - %s\n", *qh);
+  for (; *qh && len + 12 < cap; qh++) {
+    int st = quest_journal_hint_state(*qh);
+    char mark = (st >= 2) ? 'x' : (st == 1 ? '~' : ' ');
+    w = snprintf(body + len, cap - len, "  [%c] (%s) %s\n", mark,
+                 quest_journal_state_label(st), *qh);
     if (w < 0 || (size_t)w >= cap - len) break;
     len += (size_t)w;
   }
+  if (len + 48 < cap)
+    body_append(body, cap,
+                "\nTip: carry delivery goods before visiting; talk and trade to "
+                "raise social goals.\n");
+}
+
+static void aptitude_format_bar(char *out, size_t cap, int stat) {
+  int filled, i;
+  if (!out || cap < 12) return;
+  if (stat < 1) stat = 1;
+  if (stat > 20) stat = 20;
+  filled = (stat * 10 + 19) / 20;
+  for (i = 0; i < 10; i++) out[i] = (i < filled) ? '#' : '-';
+  out[10] = '\0';
+}
+
+static const char *aptitude_tier(int stat) {
+  if (stat >= 16) return "peak";
+  if (stat >= 13) return "solid";
+  if (stat >= 10) return "capable";
+  if (stat >= 7) return "developing";
+  return "feeble";
+}
+
+static void aptitude_stat_line(char *body, size_t cap, const char *label, int val) {
+  char bar[12];
+  aptitude_format_bar(bar, sizeof bar, val);
+  body_append(body, cap, "    %-4s %2d  [%s]  %s\n", label, val, bar,
+              aptitude_tier(val));
 }
 
 static void format_aptitudes_body(char *body, size_t cap) {
   AetPcSave p;
   int any = 0;
   int buy_edge, sell_edge;
+  int prof = g_craft_proficiency;
+  char prof_bar[12];
   char pr[64];
+  if (prof < 1) prof = 1;
+  if (prof > 10) prof = 10;
   pc_capture(&p);
   pc_fill_narrative_defaults(&p);
   buy_edge = merchant_trade_buy_skill_pct(p.cha);
   sell_edge = merchant_trade_sell_skill_pct(p.cha);
   pc_format_pronouns_short(p.gender[0] ? p.gender : "they", pr, sizeof pr);
+  aptitude_format_bar(prof_bar, sizeof prof_bar, prof * 2);
   snprintf(
       body, cap,
       "Aptitudes\n\n"
-      "Some editions layer trainable skills, XP, and perk trees on top of "
-      "raw stats.\n"
-      "This build keeps the math light but the fantasy sharp: your saved "
-      "attributes are\n"
-      "read as tendencies — a compass for narration and for whatever training "
-      "hooks land\n"
-      "next, without cloning the old UI verbatim.\n\n");
+      "Saved attributes read as tendencies — each lane shows a ten-block bar "
+      "(# = strength).\n\n");
   body_append(body, cap, "Name: %s\nClass: %s\nPronouns: %s\n\n",
               p.name[0] ? p.name : "(unnamed)",
               p.class_[0] ? p.class_ : "adventurer", pr);
-  body_append(body, cap,
-                "Lanes (numbers from character creation / save)\n"
-                "  Physical — STR %d  TOU %d  SPE %d  AGI %d\n"
-                "  Mental   — INT %d  WIS %d  WILL %d  PER %d\n"
-                "  Social   — CHA %d          COR %d\n\n",
-                p.str, p.tou, p.spe, p.agi, p.intl, p.wis, p.will, p.per, p.cha,
-                p.cor);
+  body_append(body, cap, "Physical\n");
+  aptitude_stat_line(body, cap, "STR", p.str);
+  aptitude_stat_line(body, cap, "TOU", p.tou);
+  aptitude_stat_line(body, cap, "SPE", p.spe);
+  aptitude_stat_line(body, cap, "AGI", p.agi);
+  body_append(body, cap, "\nMental\n");
+  aptitude_stat_line(body, cap, "INT", p.intl);
+  aptitude_stat_line(body, cap, "WIS", p.wis);
+  aptitude_stat_line(body, cap, "WILL", p.will);
+  aptitude_stat_line(body, cap, "PER", p.per);
+  body_append(body, cap, "\nSocial\n");
+  aptitude_stat_line(body, cap, "CHA", p.cha);
+  aptitude_stat_line(body, cap, "COR", p.cor);
+  body_append(body, cap, "\nWorkbench familiarity: %d / 10  [%s]\n\n", prof, prof_bar);
   body_append(body, cap, "Knacks (when two strengths line up)\n");
   if (p.str >= 10 && p.tou >= 10) {
     any = 1;
@@ -7355,6 +9839,81 @@ static void format_tainting_body(char *body, size_t cap) {
       "Mods can append cult ranks, resistances, or relapse hooks below.\n");
 }
 
+static void rel_hist_append_delta(char *body, size_t cap, int df, int dr, int dp) {
+  int any = 0;
+  if (!body || cap < 8) return;
+  if (df) {
+    body_append(body, cap, "%sfriendship %+d", any ? "  " : "", df);
+    any = 1;
+  }
+  if (dr) {
+    body_append(body, cap, "%sromance %+d", any ? "  " : "", dr);
+    any = 1;
+  }
+  if (dp) {
+    body_append(body, cap, "%spatron %+d", any ? "  " : "", dp);
+    any = 1;
+  }
+  if (!any) body_append(body, cap, "(no meter change)");
+}
+
+static void format_relationship_history_body(char *body, size_t cap,
+                                             const char *filter_slug) {
+  int i, start, shown = 0;
+  char filt[MAX_ITEM_LEN];
+  if (!body || cap < 128) return;
+  filt[0] = '\0';
+  if (filter_slug && filter_slug[0]) {
+    size_t n = strnlen(filter_slug, sizeof filt - 1);
+    memcpy(filt, filter_slug, n);
+    filt[n] = '\0';
+    strip_leading_articles(filt);
+    strip_trailing_space(filt);
+  }
+  snprintf(body, cap,
+           "Relationship history\n\n"
+           "Recent social meter changes (newest last; max %d rows).\n"
+           "%s%s%s\n\n",
+           REL_HIST_RING, filt[0] ? "Filter: " : "", filt[0] ? filt : "",
+           filt[0] ? "\n" : "");
+  if (g_rel_hist_count == 0) {
+    body_append(body, cap,
+                "  (none yet — talk, gift, or trade with someone first.)\n");
+    return;
+  }
+  start = (g_rel_hist_head - g_rel_hist_count + REL_HIST_RING) % REL_HIST_RING;
+  for (i = 0; i < g_rel_hist_count && strlen(body) + 96 < cap; i++) {
+    int idx = (start + i) % REL_HIST_RING;
+    const RelHistRow *row = &g_rel_hist[idx];
+    char pretty[96];
+    char deltas[80];
+    if (filt[0] && !str_ieq(row->slug, filt) &&
+        !str_contains_ci(row->slug, filt))
+      continue;
+    entity_pretty(row->slug, pretty, sizeof pretty);
+    deltas[0] = '\0';
+    rel_hist_append_delta(deltas, sizeof deltas, row->df, row->dr, row->dp);
+    body_append(body, cap, "  T%04d  %-22s  %-12s  %s\n", row->turn, pretty,
+                row->act, deltas);
+    shown++;
+  }
+  if (!shown)
+    body_append(body, cap, "  (no rows match that name.)\n");
+  else
+    body_append(body, cap,
+                "\nSee  rapport  for current bars;  causality social  for raw "
+                "event tags.\n");
+}
+
+static const char *rapport_decay_hint(int last_turn, unsigned friendship) {
+  int gap;
+  if (friendship < 10u || last_turn <= 0) return NULL;
+  gap = g_turns - last_turn;
+  if (gap >= 50) return "stale — friendship may decay on idle turns";
+  if (gap >= 40) return "quiet — check in soon or rapport fades";
+  return NULL;
+}
+
 static void format_rapport_body(char *body, size_t cap) {
   char ents[96][48];
   int first_room[96];
@@ -7410,7 +9969,9 @@ static void format_rapport_body(char *body, size_t cap) {
       "block).\n"
       "Other room NPCs (not on the merchant roster) use the SOC2 extension: "
       "same bars,\n"
-      "patron rep omitted — rows keyed by entity slug.\n\n",
+      "patron rep omitted — rows keyed by entity slug.\n"
+      "Friendship 10+ decays 1 point every 20 turns after 50 turns without "
+      "contact.\n\n",
       pc_display_name(), role, pr);
   body_append(body, cap,
                 "Anchored cast (from room.entity — sorted by id)\n\n");
@@ -7450,16 +10011,30 @@ static void format_rapport_body(char *body, size_t cap) {
       entity_pretty(slug, pretty_m, sizeof pretty_m);
       st = soc_derive_stage(si);
       rep_s = merchant_rep_score(si);
-      body_append(body, cap,
-                  "  • %-22s\n"
-                  "    stage %-18s | friendship %u | romance %u | patron %d (%s)\n",
-                  pretty_m, soc_stage_name(st),
-                  (unsigned)g_npc_friendship[si],
-                  (unsigned)g_npc_romance[si], rep_s,
-                  merchant_rep_tier_label(rep_s));
+      {
+        char fbar[12], rbar[12], pbar[12];
+        int pp = rep_s > 220 ? 100 : (rep_s * 100) / 220;
+        meter_bar_pct(fbar, sizeof fbar, (int)g_npc_friendship[si]);
+        meter_bar_pct(rbar, sizeof rbar, (int)g_npc_romance[si]);
+        meter_bar_pct(pbar, sizeof pbar, pp);
+        body_append(body, cap,
+                    "  • %-22s\n"
+                    "    stage %-18s\n"
+                    "    friendship %3u [%s]   romance %3u [%s]\n"
+                    "    patron %3d (%s) [%s]\n",
+                    pretty_m, soc_stage_name(st),
+                    (unsigned)g_npc_friendship[si], fbar,
+                    (unsigned)g_npc_romance[si], rbar, rep_s,
+                    merchant_rep_tier_label(rep_s), pbar);
+      }
       if (g_npc_last_social_turn[si] > 0)
         body_append(body, cap, "    last social interaction: turn %d\n",
                     g_npc_last_social_turn[si]);
+      {
+        const char *dh = rapport_decay_hint(g_npc_last_social_turn[si],
+                                            g_npc_friendship[si]);
+        if (dh) body_append(body, cap, "    %s\n", dh);
+      }
     }
   }
   body_append(body, cap,
@@ -7476,15 +10051,26 @@ static void format_rapport_body(char *body, size_t cap) {
       if (strlen(body) + 180 >= cap) break;
       entity_pretty(g_soc_npc_slug[si], pretty_o, sizeof pretty_o);
       st = soc_derive_stage_npc_slug(g_soc_npc_slug[si]);
-      body_append(body, cap,
-                  "  • %-22s\n"
-                  "    stage %-18s | friendship %u | romance %u\n",
-                  pretty_o, soc_stage_name(st),
-                  (unsigned)g_soc_npc_friendship[si],
-                  (unsigned)g_soc_npc_romance[si]);
+      {
+        char fbar[12], rbar[12];
+        meter_bar_pct(fbar, sizeof fbar, (int)g_soc_npc_friendship[si]);
+        meter_bar_pct(rbar, sizeof rbar, (int)g_soc_npc_romance[si]);
+        body_append(body, cap,
+                    "  • %-22s\n"
+                    "    stage %-18s\n"
+                    "    friendship %3u [%s]   romance %3u [%s]\n",
+                    pretty_o, soc_stage_name(st),
+                    (unsigned)g_soc_npc_friendship[si], fbar,
+                    (unsigned)g_soc_npc_romance[si], rbar);
+      }
       if (g_soc_npc_last_turn[si] > 0)
         body_append(body, cap, "    last social interaction: turn %d\n",
                     g_soc_npc_last_turn[si]);
+      {
+        const char *dh = rapport_decay_hint(g_soc_npc_last_turn[si],
+                                            g_soc_npc_friendship[si]);
+        if (dh) body_append(body, cap, "    %s\n", dh);
+      }
     }
     if (!any)
       body_append(body, cap,
@@ -7574,6 +10160,259 @@ static unsigned inventory_total_bulk(void) {
   unsigned total = 0;
   for (i = 0; i < g_inv_n; i++) total += inventory_item_bulk(g_inv[i]);
   return total;
+}
+
+static int slug_compare_ci(const char *a, const char *b) {
+  if (!a) a = "";
+  if (!b) b = "";
+  while (*a && *b) {
+    int ca = tolower((unsigned char)*a);
+    int cb = tolower((unsigned char)*b);
+    if (ca != cb) return ca - cb;
+    a++;
+    b++;
+  }
+  if (*a) return 1;
+  if (*b) return -1;
+  return 0;
+}
+
+static int inv_category_rank(const char *slug) {
+  const AetItemCatalogEntry *e;
+  const char *const *p;
+  if (!slug || !slug[0]) return 9;
+  e = aet_item_catalog_by_slug(slug);
+  for (p = world_consume_food_ids(); p && *p; p++)
+    if (str_ieq(slug, *p)) return 3;
+  for (p = world_consume_drink_ids(); p && *p; p++)
+    if (str_ieq(slug, *p)) return 4;
+  if (e) {
+    if (e->slot_index == 6 || e->atk > 0) return 0;
+    if (e->def > 0 || (e->slot_index >= 0 && e->slot_index <= 5)) return 1;
+    if (e->wgt >= 8) return 2;
+  }
+  if (strstr(slug, "key") || strstr(slug, "lockpick") || strstr(slug, "pick"))
+    return 5;
+  if (strstr(slug, "book") || strstr(slug, "tome") || strstr(slug, "scroll") ||
+      strstr(slug, "ledger") || strstr(slug, "leaflet") ||
+      strstr(slug, "textbook") || strstr(slug, "guide") ||
+      strstr(slug, "manual") || strstr(slug, "primer") ||
+      strstr(slug, "journal") || strstr(slug, "logbook") ||
+      strstr(slug, "sheet") || strstr(slug, "missive"))
+    return 7;
+  return 6;
+}
+
+static const char *inv_category_label(int rank) {
+  switch (rank) {
+    case 0:
+      return "weapon";
+    case 1:
+      return "armor";
+    case 2:
+      return "material";
+    case 3:
+      return "food";
+    case 4:
+      return "drink";
+    case 5:
+      return "tool";
+    case 7:
+      return "literature";
+    default:
+      return "misc";
+  }
+}
+
+typedef struct {
+  int idx;
+} InvSortEntry;
+
+static int inv_sort_name_cmp(const void *a, const void *b) {
+  const InvSortEntry *ia = a;
+  const InvSortEntry *ib = b;
+  return slug_compare_ci(g_inv[ia->idx], g_inv[ib->idx]);
+}
+
+static int inv_sort_weight_cmp(const void *a, const void *b) {
+  const InvSortEntry *ia = a;
+  const InvSortEntry *ib = b;
+  unsigned ba = inventory_item_bulk(g_inv[ia->idx]);
+  unsigned bb = inventory_item_bulk(g_inv[ib->idx]);
+  if (ba != bb) return (bb > ba) - (bb < ba);
+  return slug_compare_ci(g_inv[ia->idx], g_inv[ib->idx]);
+}
+
+static int inv_sort_type_cmp(const void *a, const void *b) {
+  const InvSortEntry *ia = a;
+  const InvSortEntry *ib = b;
+  int ca = inv_category_rank(g_inv[ia->idx]);
+  int cb = inv_category_rank(g_inv[ib->idx]);
+  if (ca != cb) return ca - cb;
+  return slug_compare_ci(g_inv[ia->idx], g_inv[ib->idx]);
+}
+
+static void format_inventory_list_body(char *body, size_t cap, int sort_mode,
+                                       const char *filter) {
+  InvSortEntry order[MAX_INV];
+  int i, shown = 0;
+  char banner[256];
+  const char *sort_label = "name";
+  if (!body || cap < 64) return;
+  if (sort_mode == 1) sort_label = "weight (heavy first)";
+  else if (sort_mode == 2) sort_label = "category";
+  pc_format_identity_banner(banner, sizeof banner);
+  snprintf(body, cap,
+           "Pack list\n\n"
+           "%s\n\n"
+           "Items: %d / %d   Sort: %s%s%s\n\n",
+           banner, g_inv_n, MAX_INV, sort_label,
+           filter && filter[0] ? "   Filter: \"" : "",
+           filter && filter[0] ? filter : "");
+  if (filter && filter[0] && strlen(body) + strlen(filter) + 4 < cap)
+    strncat(body, "\"\n\n", cap - strlen(body) - 1);
+  else if (!filter || !filter[0])
+    body_append(body, cap, "\n");
+  if (g_inv_n == 0) {
+    body_append(body, cap, "  (empty pack)\n");
+    return;
+  }
+  for (i = 0; i < g_inv_n; i++) order[i].idx = i;
+  if (sort_mode == 1)
+    qsort(order, (size_t)g_inv_n, sizeof order[0], inv_sort_weight_cmp);
+  else if (sort_mode == 2)
+    qsort(order, (size_t)g_inv_n, sizeof order[0], inv_sort_type_cmp);
+  else
+    qsort(order, (size_t)g_inv_n, sizeof order[0], inv_sort_name_cmp);
+  for (i = 0; i < g_inv_n && strlen(body) + 96 < cap; i++) {
+    const char *slug = g_inv[order[i].idx];
+    char pretty[96];
+    unsigned bulk;
+    int cat;
+    if (filter && filter[0] && !str_contains_ci(slug, filter)) {
+      const char *lbl = aet_item_catalog_label_for_slug(slug);
+      if (!lbl || !str_contains_ci(lbl, filter)) continue;
+    }
+    item_pretty(slug, pretty, sizeof pretty);
+    bulk = inventory_item_bulk(slug);
+    cat = inv_category_rank(slug);
+    body_append(body, cap, "  %3d. %-28s [%s]  %s  bulk %u",
+                shown + 1, pretty, slug, inv_category_label(cat), bulk);
+    if (item_has_read_text(slug))
+      body_append(body, cap, "  · readable");
+    body_append(body, cap, "\n");
+    shown++;
+  }
+  if (shown == 0)
+    body_append(body, cap, "  (no items match that filter)\n");
+  else
+    body_append(body, cap,
+                "\nListed: %d item%s · pack bulk ~%u (heuristic)\n"
+                "Readable literature:  read <item>  opens the in-game reader.\n"
+                "Equipment UI shows the first 12 rows; use catalog [id] there.\n"
+                "Try  inventory sort weight  |  inventory find <text>\n",
+                shown, shown == 1 ? "" : "s", inventory_total_bulk());
+}
+
+static void util_append_row(char *body, size_t cap, const char *name,
+                            const char *state, const char *actions) {
+  body_append(body, cap, "  • %-20s\n    state: %s\n    try: %s\n\n", name, state,
+              actions);
+}
+
+static void format_utilities_body(char *body, size_t cap) {
+  const char *slug = world_slug(g_room);
+  const char *blurb = resolve_world_blurb(g_room);
+  int any = 0;
+  int i;
+  char banner[256];
+  if (!body || cap < 128) return;
+  pc_format_identity_banner(banner, sizeof banner);
+  snprintf(body, cap,
+           "Room utilities\n\n"
+           "%s\n\n"
+           "Location: %s  [%s]\n\n"
+           "Fixtures and interactables the parser knows about here (not every "
+           "prop in the blurb).\n\n",
+           banner, resolve_world_title(g_room), slug);
+  if (blurb && strstr(blurb, "fireplace")) {
+    const char *st =
+        (strstr(blurb, "cold") || strstr(blurb, "dark") || strstr(blurb, "unlit"))
+            ? "cold hearth, unlit"
+            : (strstr(blurb, "warm") || strstr(blurb, "embers") ||
+               strstr(blurb, "glow"))
+                  ? "warm embers"
+                  : "hearth present";
+    util_append_row(body, cap, "Fireplace", st,
+                    "examine fireplace; search mantel; listen");
+    any = 1;
+  }
+  if (blurb && strstr(blurb, "stove")) {
+    util_append_row(body, cap, "Kitchen stove",
+                    strstr(blurb, "smoke") ? "cool, old smoke smell"
+                                           : "cast-iron, idle",
+                    "examine stove; search cupboards");
+    any = 1;
+  }
+  if (blurb && strstr(blurb, "fountain")) {
+    util_append_row(body, cap, "Fountain", "water running", "examine fountain; listen");
+    any = 1;
+  }
+  if (strstr(slug, "well") || (blurb && strstr(blurb, "well"))) {
+    util_append_row(body, cap, "Well",
+                    room_floor_has_id("bucket") ? "bucket on rim"
+                                                : "stone rim, rope wear",
+                    "examine well; search; take bucket (if present)");
+    any = 1;
+  }
+  if (strstr(slug, "blacksmith") || (blurb && strstr(blurb, "forge"))) {
+    util_append_row(body, cap, "Forge",
+                    (blurb && strstr(blurb, "hot")) ? "working heat"
+                                                    : "forge bench ready",
+                    "talk; wares; forge");
+    any = 1;
+  }
+  if (strstr(slug, "waystone") || strstr(slug, "nexus")) {
+    util_append_row(body, cap, "Travel anchor", "attuned waypoint",
+                    "waypoints; waypoint <name>; route <place>");
+    any = 1;
+  }
+  if (strstr(slug, "ferry") || (blurb && strstr(blurb, "ferry"))) {
+    util_append_row(body, cap, "Ferry", "dock service", "examine dock; talk; wait");
+    any = 1;
+  }
+  if (strstr(slug, "stage") || (blurb && strstr(blurb, "stage"))) {
+    util_append_row(body, cap, "Performance stage", "acoustics tuned",
+                    "examine stage; listen; talk");
+    any = 1;
+  }
+  if (room_has_visible_item(g_room, "tavern_piano")) {
+    util_append_row(body, cap, "Tavern piano", "upright, playable",
+                    "examine piano; play piano; listen; gamble; fish");
+    any = 1;
+  }
+  for (i = 0; i < g_room_item_n[g_room]; i++) {
+    const char *id = g_room_items[g_room][i];
+    if (!id || !id[0]) continue;
+    if (str_ieq(id, "bucket")) {
+      util_append_row(body, cap, "Bucket (floor)", "portable", "take bucket; examine bucket");
+      any = 1;
+    } else if (str_ieq(id, "lantern") || str_ieq(id, "brass_lantern") ||
+               str_ieq(id, "torch") || str_ieq(id, "candle")) {
+      char pretty[64];
+      item_pretty(id, pretty, sizeof pretty);
+      util_append_row(body, cap, pretty, "portable light", "take; ready; examine");
+      any = 1;
+    }
+  }
+  if (!any)
+    body_append(body, cap,
+                "  (No utility fixtures tagged for this room — try  look ,  "
+                "search ,  examine <thing>.\n"
+                "  Mentioned scenery may still respond to plain examine.)\n");
+  else
+    body_append(body, cap,
+                "Tip:  look  for room prose;  utilities  refreshes this panel.\n");
 }
 
 static int inventory_heaviest_items(char out[][MAX_ITEM_LEN], unsigned out_bulk[],
@@ -7849,14 +10688,19 @@ static void format_notes_stats_body(char *body, size_t cap) {
     if (note_is_done(g_notes[i])) done++;
   todo = g_note_n - done;
   pct = g_note_n ? (done * 100) / g_note_n : 0;
-  snprintf(body, cap,
-           "%s\n\n"
-           "Notes progress\n\n"
-           "  Total: %d\n"
-           "  Todo: %d\n"
-           "  Done: %d\n"
-           "  Completion: %d%%\n",
-           banner, g_note_n, todo, done, pct);
+  {
+    char bar[12];
+    meter_bar_pct(bar, sizeof bar, pct);
+    snprintf(body, cap,
+             "%s\n\n"
+             "Notes progress\n\n"
+             "  Total: %d\n"
+             "  Todo: %d\n"
+             "  Done: %d\n"
+             "  Completion: %d%%  [%s]\n\n"
+             "  Use  notes purge done  to clear finished lines.\n",
+             banner, g_note_n, todo, done, pct, bar);
+  }
 }
 
 static void cmd_give(const char *rest, char *msg, size_t msgcap) {
@@ -7888,10 +10732,10 @@ static void cmd_give(const char *rest, char *msg, size_t msgcap) {
   {
     int r = resolve_inv_item_query(work, &ix, msg, msgcap);
     if (r < 0) return;
-  }
-  if (ix < 0) {
-    snprintf(msg, msgcap, "You are not carrying \"%s\".", work);
-    return;
+    if (r <= 0 || ix < 0) {
+      snprintf(msg, msgcap, "You are not carrying \"%s\".", work);
+      return;
+    }
   }
   entity_pretty(ent, pretty, sizeof pretty);
   inv_take_out(ix, taken, sizeof taken);
@@ -8255,8 +11099,12 @@ static void cmd_trade_haggle(const char *rest, char *msg, size_t msgcap) {
     }
   }
   {
-    int r = resolve_inv_item_query(item, &ix, NULL, 0);
-    if (r == 0) r = resolve_inv_item_query(norm, &ix, NULL, 0);
+    int r = resolve_inv_item_query(item, &ix, msg, msgcap);
+    if (r < 0) return;
+    if (r == 0) {
+      r = resolve_inv_item_query(norm, &ix, msg, msgcap);
+      if (r < 0) return;
+    }
     if (r > 0 && ix >= 0 && merchant_buys_item(mt, g_inv[ix])) {
       can_sell = 1;
       snprintf(itembuf, sizeof itembuf, "%s", g_inv[ix]);
@@ -8392,8 +11240,42 @@ static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap) {
     return;
   }
   query_norm_underscore(norm, sizeof norm, work);
-  for (o = mt->stock; o->item && o->item[0]; o++) {
-    if (merchant_offer_matches_query(o->item, work, norm)) {
+  {
+    const AetMerchantOffer *matches[10];
+    int match_n = 0;
+    char picks[10][MAX_ITEM_LEN];
+    int k;
+    for (o = mt->stock; o->item && o->item[0]; o++) {
+      if (!merchant_offer_matches_query(o->item, work, norm)) continue;
+      if (match_n < (int)(sizeof matches / sizeof matches[0]))
+        matches[match_n++] = o;
+    }
+    if (match_n == 0) {
+      snprintf(msg, msgcap, "They are not offering that here.");
+      return;
+    }
+    if (match_n > 1) {
+      char slug[MAX_ITEM_LEN];
+      int r;
+      for (k = 0; k < match_n; k++)
+        snprintf(picks[k], sizeof picks[0], "%s", matches[k]->item);
+      g_disambig_next_act = DISAMBIG_ACT_BUY;
+      r = disambig_resolve_ambiguous(DISAMBIG_ACT_BUY, 0, work, picks, match_n,
+                                     slug, sizeof slug, msg, msgcap);
+      if (r < 0) return;
+      if (r == 1) {
+        for (k = 0; k < match_n; k++) {
+          if (str_ieq(matches[k]->item, slug)) {
+            o = matches[k];
+            goto buy_matched_offer;
+          }
+        }
+      }
+      return;
+    }
+    o = matches[0];
+buy_matched_offer:
+    {
       int mix = aet_merchant_index(ent);
       int rep0 = merchant_rep_score(mix);
       int used_barter = 0;
@@ -8439,10 +11321,8 @@ static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap) {
           (void)snprintf(msg + L, msgcap - L,
                          " The trade lands smoothly — you've done this before.");
       }
-      return;
     }
   }
-  snprintf(msg, msgcap, "They are not offering that here.");
 }
 
 static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap) {
@@ -8487,11 +11367,14 @@ static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap) {
   {
     int r = resolve_inv_item_query(work, &ix, msg, msgcap);
     if (r < 0) return;
-    if (r == 0) (void)resolve_inv_item_query(norm, &ix, msg, msgcap);
-  }
-  if (ix < 0) {
-    snprintf(msg, msgcap, "You are not carrying that.");
-    return;
+    if (r == 0) {
+      r = resolve_inv_item_query(norm, &ix, msg, msgcap);
+      if (r < 0) return;
+    }
+    if (r <= 0 || ix < 0) {
+      snprintf(msg, msgcap, "You are not carrying that.");
+      return;
+    }
   }
   for (o = mt->buys; o->item && o->item[0]; o++) {
     int mix;
@@ -8545,7 +11428,8 @@ static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap) {
 static const char *const CONSUME_FOOD_IDS[] = {
     "bread",       "fresh_bread", "cheese",      "stew",        "flour",
     "eggs",        "rations",       "fish",        "dried_meat",  "roasted_meat",
-    "meat",        "fancy_cakes", "coffee_beans", NULL};
+    "meat",        "fancy_cakes", "coffee_beans", "carrots",     "turnip",
+    "pumpkin",     NULL};
 
 static const char *const CONSUME_DRINK_IDS[] = {
     "ale",          "wine",      "wine_bottle", "old_wine", "mead",
@@ -8783,6 +11667,179 @@ static void sensory_line(const char *sense, char *msg, size_t msgcap) {
              "in your teeth than in your ears.");
     goto sensory_tail;
   }
+  if (!listening && slug && strstr(slug, "temple") != NULL) {
+    snprintf(msg, msgcap,
+             "Incense, cool stone, and a faint ozone thread from carved runes. "
+             "The air tastes like prayer held too long in the throat.");
+    goto sensory_tail;
+  }
+  if (listening && slug && strstr(slug, "temple") != NULL) {
+    snprintf(msg, msgcap,
+             "Footsteps fade into silence. Somewhere water drips; somewhere "
+             "else a crystal ticks like a patient heart. No judgment — only "
+             "witness.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "mill") != NULL) {
+    snprintf(msg, msgcap,
+             "Flour dust, river mud, old grease, and cold wood. The mill "
+             "smells like work that refuses to quit.");
+    goto sensory_tail;
+  }
+  if (listening && slug && strstr(slug, "mill") != NULL) {
+    snprintf(msg, msgcap,
+             "A stuck wheel creaks once and stops. Gears tick when the wind "
+             "nudges them — the building still trying to remember motion.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "farm") != NULL) {
+    snprintf(msg, msgcap,
+             "Warm hay, turned soil, animal musk, and sun on linen. The farm "
+             "smells like honest exhaustion.");
+    goto sensory_tail;
+  }
+  if (listening && slug && strstr(slug, "farm") != NULL) {
+    snprintf(msg, msgcap,
+             "Chickens mutter. Wind combs the crops. Somewhere a gate clicks "
+             "and Jasper hums without knowing he is heard.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && (strstr(slug, "village_square") != NULL ||
+                             strstr(slug, "town_square") != NULL ||
+                             strstr(slug, "market") != NULL)) {
+    snprintf(msg, msgcap,
+             "Bread, livestock, dust, and a hundred small trades. The square "
+             "smells like coin changing hands.");
+    goto sensory_tail;
+  }
+  if (listening && slug && (strstr(slug, "village_square") != NULL ||
+                            strstr(slug, "town_square") != NULL ||
+                            strstr(slug, "market") != NULL)) {
+    snprintf(msg, msgcap,
+             "Haggling, cart wheels, a bard's note testing the air, and "
+             "missionaries laughing with someone shy.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "cave") != NULL) {
+    snprintf(msg, msgcap,
+             "Cold stone, wet mineral, and old smoke. The dark has a taste "
+             "like forgotten iron.");
+    goto sensory_tail;
+  }
+  if (listening && slug && strstr(slug, "cave") != NULL) {
+    snprintf(msg, msgcap,
+             "Water ticks far off. Your footstep returns too late, as if the "
+             "cave is deciding whether to answer.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "cellar") != NULL) {
+    snprintf(msg, msgcap,
+             "Oak barrels, spilled ale, and cool stone. The cellar keeps the "
+             "tavern's honest secrets.");
+    goto sensory_tail;
+  }
+  if (listening && slug && strstr(slug, "cellar") != NULL) {
+    snprintf(msg, msgcap,
+             "A barrel tap drips. Somewhere above, muffled laughter; down here, "
+             "Silas moves with deliberate quiet.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "bard_stage") != NULL) {
+    snprintf(msg, msgcap,
+             "Old sawdust, rosin, and perfume from crowds long gone. The stage "
+             "still expects applause.");
+    goto sensory_tail;
+  }
+  if (!listening && (strstr(slug, "blacksmith") != NULL ||
+                     strstr(slug, "forge") != NULL)) {
+    snprintf(msg, msgcap,
+             "Hot iron, coal smoke, leather oil, and sweat. The forge smells "
+             "like work that refuses to cool down.");
+    goto sensory_tail;
+  }
+  if (listening && (strstr(slug, "blacksmith") != NULL ||
+                    strstr(slug, "forge") != NULL)) {
+    snprintf(msg, msgcap,
+             "Hammer rhythm, bellows sigh, quench hiss — the forge speaks in "
+             "metal dialects.");
+    goto sensory_tail;
+  }
+  if (!listening && (strstr(slug, "village_inn") != NULL ||
+                     strstr(slug, "inn_") != NULL)) {
+    snprintf(msg, msgcap,
+             "Clean linen, stew, beeswax, and a quieter hospitality than the "
+             "tavern — Lydia keeps this place gentle.");
+    goto sensory_tail;
+  }
+  if (!listening && (strstr(slug, "nexus") != NULL)) {
+    snprintf(msg, msgcap,
+             "Ozone, warm crystal, and a pressure behind your teeth — as if "
+             "distance is stacked nearby, waiting for permission.");
+    goto sensory_tail;
+  }
+  if (listening && (strstr(slug, "nexus") != NULL)) {
+    snprintf(msg, msgcap,
+             "The monolith hums below hearing. Runes tick like polite "
+             "machinery deciding which road may open.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "west_of_house") != NULL) {
+    snprintf(msg, msgcap,
+             "Boarded wood, grass, and a chill from runes carved in the door "
+             "frame — the house holds its breath.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "artifact_trader") != NULL) {
+    snprintf(msg, msgcap,
+             "Ozone, old velvet, and metal that remembers magic. Each display "
+             "hums at a different pitch.");
+    goto sensory_tail;
+  }
+  if (listening && slug && strstr(slug, "artifact_trader") != NULL) {
+    snprintf(msg, msgcap,
+             "Cloth rustles when no wind blows. Somewhere a crystal ticks like "
+             "a patient auctioneer.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "general_store") != NULL) {
+    snprintf(msg, msgcap,
+             "Soap, rope, lamp oil, and something sweeter from the back room. "
+             "Sam keeps the front respectable.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "marketplace") != NULL) {
+    snprintf(msg, msgcap,
+             "Spices, leather, livestock, and a dozen competing ambitions. "
+             "Coin changes hands faster than gossip.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "exotic_pet") != NULL) {
+    snprintf(msg, msgcap,
+             "Feathers, fur, and exotic musk. Cages click; something trills "
+             "a note you cannot place.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && (strstr(slug, "vault") != NULL ||
+                             strstr(slug, "underground") != NULL)) {
+    snprintf(msg, msgcap,
+             "Cold stone, lamp smoke, and locked air. Wealth here smells "
+             "like patience.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && strstr(slug, "watchtower") != NULL) {
+    snprintf(msg, msgcap,
+             "Wind, tar, and far woodsmoke. Height turns the ridge into a "
+             "map you can almost read.");
+    goto sensory_tail;
+  }
+  if (!listening && slug && (strstr(slug, "inside_house") != NULL ||
+                             strstr(slug, "foyer") != NULL ||
+                             strstr(slug, "attic") != NULL)) {
+    snprintf(msg, msgcap,
+             "Dust, closed rooms, and old varnish. The house keeps stories "
+             "in its walls.");
+    goto sensory_tail;
+  }
   if (!listening && slug && (strstr(slug, "library") || strstr(slug, "study"))) {
     snprintf(msg, msgcap,
              "Old paper, dry glue, candle smoke, and dust. Knowledge has a "
@@ -8870,25 +11927,152 @@ static int room_entity_matches_query_here(const char *q, char *pretty_out,
   return 1;
 }
 
-static void format_item_choices(char *out, size_t outcap, const char *prefix,
-                                char items[][MAX_ITEM_LEN], int n) {
-  int i, shown;
-  char pretty[96];
-  if (!out || outcap < 2) return;
-  out[0] = '\0';
-  if (!items || n <= 0) return;
-  (void)snprintf(out, outcap, "%s", prefix ? prefix : "");
-  shown = n > 6 ? 6 : n;
-  for (i = 0; i < shown; i++) {
-    size_t L;
-    item_pretty(items[i], pretty, sizeof pretty);
-    L = strlen(out);
-    if (L + strlen(pretty) + 4 >= outcap) break;
-    if (i > 0) strncat(out, ", ", outcap - strlen(out) - 1);
-    strncat(out, pretty, outcap - strlen(out) - 1);
+static void disambig_clear(void) {
+  g_disambig_act = DISAMBIG_ACT_NONE;
+  g_disambig_next_act = DISAMBIG_ACT_NONE;
+  g_disambig_inv = 0;
+  g_disambig_query[0] = '\0';
+  g_disambig_pick_n = 0;
+}
+
+static void disambig_reset_all(void) {
+  disambig_clear();
+  g_disambig_mem_n = 0;
+}
+
+static void disambig_remember(const char *query, const char *slug) {
+  char qnorm[MAX_ITEM_LEN];
+  int i;
+  if (!query || !query[0] || !slug || !slug[0]) return;
+  query_norm_underscore(qnorm, sizeof qnorm, query);
+  for (i = 0; i < g_disambig_mem_n; i++) {
+    if (str_ieq(g_disambig_mem[i].q, qnorm)) {
+      snprintf(g_disambig_mem[i].slug, sizeof g_disambig_mem[i].slug, "%s",
+               slug);
+      return;
+    }
   }
-  if (n > shown && strlen(out) + 16 < outcap)
-    strncat(out, ", ...", outcap - strlen(out) - 1);
+  if (g_disambig_mem_n >= DISAMBIG_MEM_MAX) {
+    memmove(g_disambig_mem, g_disambig_mem + 1,
+            (size_t)(DISAMBIG_MEM_MAX - 1) * sizeof g_disambig_mem[0]);
+    g_disambig_mem_n = DISAMBIG_MEM_MAX - 1;
+  }
+  snprintf(g_disambig_mem[g_disambig_mem_n].q, sizeof g_disambig_mem[0].q, "%s",
+           qnorm);
+  snprintf(g_disambig_mem[g_disambig_mem_n].slug,
+           sizeof g_disambig_mem[0].slug, "%s", slug);
+  g_disambig_mem_n++;
+}
+
+static const char *disambig_recall(const char *query) {
+  char qnorm[MAX_ITEM_LEN];
+  int i;
+  if (!query || !query[0]) return NULL;
+  query_norm_underscore(qnorm, sizeof qnorm, query);
+  for (i = 0; i < g_disambig_mem_n; i++)
+    if (str_ieq(g_disambig_mem[i].q, qnorm)) return g_disambig_mem[i].slug;
+  return NULL;
+}
+
+static void disambig_set_pending(int act, int inv, const char *query,
+                                 char items[][MAX_ITEM_LEN], int n) {
+  int i, cap = n > DISAMBIG_PICK_MAX ? DISAMBIG_PICK_MAX : n;
+  g_disambig_act = act;
+  g_disambig_inv = inv;
+  g_disambig_pick_n = cap;
+  query_norm_underscore(g_disambig_query, sizeof g_disambig_query, query);
+  for (i = 0; i < cap; i++)
+    snprintf(g_disambig_picks[i], sizeof g_disambig_picks[i], "%s", items[i]);
+}
+
+static void format_disambig_prompt(char *msg, size_t msgcap, int inv,
+                                   char items[][MAX_ITEM_LEN], int n) {
+  int i;
+  char pretty[96];
+  size_t L;
+  if (!msg || msgcap < 32 || n <= 0) return;
+  snprintf(msg, msgcap, "Did you mean");
+  for (i = 0; i < n && i < DISAMBIG_PICK_MAX; i++) {
+    item_pretty(items[i], pretty, sizeof pretty);
+    L = strlen(msg);
+    if (L + strlen(pretty) + 16 >= msgcap) break;
+    snprintf(msg + L, msgcap - L, "%s (%d) %s", i == 0 ? "" : " or", i + 1,
+             pretty);
+  }
+  L = strlen(msg);
+  snprintf(msg + L, msgcap - L,
+           "? Reply with the number or name — I'll remember your choice.");
+  if (inv)
+    strncat(msg, " (in your pack)", msgcap - strlen(msg) - 1);
+}
+
+static int disambig_pick_slug(const char *line, char *slug_out, size_t cap) {
+  char qnorm[MAX_ITEM_LEN];
+  char work[INPUT_LINE_MAX];
+  int i, pick = 0;
+  const char *p;
+  if (!line || !line[0] || g_disambig_pick_n <= 0 || !slug_out || cap < 2)
+    return 0;
+  p = line;
+  while (*p == ' ') p++;
+  if (*p >= '1' && *p <= '9') {
+    pick = (int)(*p - '0');
+    p++;
+    while (*p >= '0' && *p <= '9') {
+      pick = pick * 10 + (int)(*p - '0');
+      p++;
+    }
+    while (*p == ' ') p++;
+    if (*p != '\0') pick = 0;
+  }
+  if (pick >= 1 && pick <= g_disambig_pick_n) {
+    copy_capped(slug_out, cap, g_disambig_picks[pick - 1]);
+    return 1;
+  }
+  strncpy(work, line, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  strip_leading_articles(work);
+  query_norm_underscore(qnorm, sizeof qnorm, work);
+  for (i = 0; i < g_disambig_pick_n; i++) {
+    char pnorm[MAX_ITEM_LEN];
+    if (str_ieq(g_disambig_picks[i], work) || str_ieq(g_disambig_picks[i], qnorm)) {
+      copy_capped(slug_out, cap, g_disambig_picks[i]);
+      return 1;
+    }
+    item_pretty(g_disambig_picks[i], pnorm, sizeof pnorm);
+    if (str_ieq(pnorm, work) || str_ieq(pnorm, qnorm)) {
+      copy_capped(slug_out, cap, g_disambig_picks[i]);
+      return 1;
+    }
+    if (room_item_matches_query(g_disambig_picks[i], work, qnorm)) {
+      copy_capped(slug_out, cap, g_disambig_picks[i]);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int disambig_resolve_ambiguous(int act, int inv, const char *query,
+                                      char picks[][MAX_ITEM_LEN], int n,
+                                      char *resolved, size_t resolved_cap,
+                                      char *msg, size_t msgcap) {
+  const char *mem;
+  int i;
+  if (n <= 0) return 0;
+  mem = disambig_recall(query);
+  if (mem && mem[0]) {
+    for (i = 0; i < n; i++) {
+      if (str_ieq(picks[i], mem)) {
+        if (resolved && resolved_cap >= 2)
+          snprintf(resolved, resolved_cap, "%s", mem);
+        return 1;
+      }
+    }
+  }
+  if (act != DISAMBIG_ACT_NONE)
+    disambig_set_pending(act, inv, query, picks, n);
+  format_disambig_prompt(msg, msgcap, inv, picks, n);
+  return -1;
 }
 
 static int resolve_room_item_query(const char *name, char *resolved,
@@ -8914,13 +12098,14 @@ static int resolve_room_item_query(const char *name, char *resolved,
   }
   if (n == 1) {
     snprintf(resolved, resolved_cap, "%s", picks[0]);
+    disambig_remember(name, picks[0]);
     return 1;
   }
   if (n > 1) {
-    char hint[240];
-    format_item_choices(hint, sizeof hint, "", picks, n);
-    snprintf(msg, msgcap, "Be specific — did you mean: %s?", hint);
-    return -1;
+    int act = g_disambig_next_act;
+    g_disambig_next_act = DISAMBIG_ACT_NONE;
+    return disambig_resolve_ambiguous(act, 0, name, picks, n, resolved,
+                                    resolved_cap, msg, msgcap);
   }
   {
     char pretty[64];
@@ -8953,19 +12138,30 @@ static int resolve_inv_item_query(const char *name, int *ix_out, char *msg,
   }
   if (n == 1) {
     *ix_out = picks[0];
+    disambig_remember(name, g_inv[picks[0]]);
     return 1;
   }
   if (n > 1) {
     char names[10][MAX_ITEM_LEN];
-    char hint[240];
+    char slug[MAX_ITEM_LEN];
     int k, shown = n > 10 ? 10 : n;
+    int act = g_disambig_next_act;
+    int r;
+    g_disambig_next_act = DISAMBIG_ACT_NONE;
     for (k = 0; k < shown; k++)
       snprintf(names[k], sizeof names[k], "%s", g_inv[picks[k]]);
-    format_item_choices(hint, sizeof hint, "", names, n);
-    if (msg && msgcap > 1)
-      snprintf(msg, msgcap, "You carry multiple matches: %s. Name one exactly.",
-               hint);
-    return -1;
+    r = disambig_resolve_ambiguous(act, 1, name, names, shown, slug,
+                                   sizeof slug, msg, msgcap);
+    if (r == 1) {
+      for (k = 0; k < shown; k++) {
+        if (str_ieq(g_inv[picks[k]], slug)) {
+          *ix_out = picks[k];
+          return 1;
+        }
+      }
+      r = -1;
+    }
+    return r;
   }
   return 0;
 }
@@ -9034,6 +12230,73 @@ static void format_find_item_body(char *body, size_t cap, const char *raw) {
 }
 
 static int content_item_response(const char *id, const char *mode, char *msg,
+                                 size_t msgcap);
+
+static int item_has_read_text(const char *id) {
+  char buf[512];
+  if (!id || !id[0]) return 0;
+  if (aet_mods_item_description(id, buf, sizeof buf) && buf[0]) return 1;
+  return content_item_response(id, "read", buf, sizeof buf);
+}
+
+static int reveal_hidden_item(const char *id) {
+  int i, j;
+  if (!id || !id[0]) return 0;
+  for (i = 0; i < g_hidden_n[g_room]; i++) {
+    if (!str_ieq(g_hidden_items[g_room][i], id)) continue;
+    if (g_room_item_n[g_room] >= MAX_ITEMS_ROOM) return -1;
+    memcpy(g_room_items[g_room][g_room_item_n[g_room]], id, strlen(id) + 1);
+    g_room_item_n[g_room]++;
+    for (j = i; j < g_hidden_n[g_room] - 1; j++)
+      memcpy(g_hidden_items[g_room][j], g_hidden_items[g_room][j + 1],
+             MAX_ITEM_LEN);
+    g_hidden_n[g_room]--;
+    remember_focus_item(id);
+    return 1;
+  }
+  return 0;
+}
+
+static void cmd_open_mailbox(char *msg, size_t msgcap) {
+  char pretty[96];
+  int i, r;
+  const char *slug = world_slug(g_room);
+  if (!slug || strcmp(slug, "west_of_house") != 0) {
+    snprintf(msg, msgcap, "Nothing like that to open here.");
+    return;
+  }
+  if (inv_has("leaflet")) {
+    snprintf(msg, msgcap,
+             "The mailbox is empty now — the orientation leaflet is in your pack.");
+    return;
+  }
+  for (i = 0; i < g_room_item_n[g_room]; i++) {
+    if (str_ieq(g_room_items[g_room][i], "leaflet")) {
+      item_pretty("leaflet", pretty, sizeof pretty);
+      snprintf(msg, msgcap,
+               "The small mailbox is open. %s sits inside, ready to take.",
+               pretty);
+      return;
+    }
+  }
+  r = reveal_hidden_item("leaflet");
+  if (r == 1) {
+    item_pretty("leaflet", pretty, sizeof pretty);
+    snprintf(msg, msgcap,
+             "Opening the small mailbox reveals %s.", pretty);
+    return;
+  }
+  if (r < 0) {
+    snprintf(msg, msgcap,
+             "Something paper-thin is inside, but the ground is too cluttered "
+             "to pull it free.");
+    return;
+  }
+  snprintf(msg, msgcap,
+           "The mailbox creaks open. Rust, emptiness, and the memory of mail.");
+}
+
+static int content_item_response(const char *id, const char *mode, char *msg,
                                  size_t msgcap) {
   int is_read = mode && !strcmp(mode, "read");
   int is_touch = mode && !strcmp(mode, "touch");
@@ -9064,6 +12327,38 @@ static int content_item_response(const char *id, const char *mode, char *msg,
                "A brittle leaflet folded into quarters. The ink is cheap, the "
                "paper is stubborn, and the margin carries a tiny floppy-disk "
                "stamp.");
+    return 1;
+  }
+  if (str_ieq(id, "hollow_ridge_primer")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Hollow Ridge Primer — excerpt:\n\n"
+               "Veritasfurtum frays where divine attention thins. This ridge is "
+               "not a border but a seam: manor, village, temple, and the wild "
+               "between. Waystones mark crossings the Architect still recognizes; "
+               "rifts are arguments between layers that no longer agree.\n\n"
+               "Practical counsel: carry light, read signs twice, and never "
+               "mistake a locked door for a wall. When the fog comes in, trust "
+               "coin, compass, and the person who knows the exits.");
+    else
+      snprintf(msg, msgcap,
+               "A saddle-stitched primer stamped with the Hollow Ridge seal. It "
+               "smells of cheap ink and honest worry.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_tome")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The tome speaks in layered hands — temple rubric, miller's "
+               "marginalia, and a later scribe's warning about waystones. Core "
+               "doctrine: the Architect's lattice holds reality together; "
+               "Elysium crystals answer when the lattice is stressed; rifts form "
+               "where borrowed worlds refuse to leave. One line repeats: \"A "
+               "return must be earned before it is trusted.\"");
+    else
+      snprintf(msg, msgcap,
+               "An ancient tome with bowed covers and a spine that crackles like "
+               "a warning label.");
     return 1;
   }
   if (str_ieq(id, "scrap_metal")) {
@@ -9173,12 +12468,12 @@ static int content_item_response(const char *id, const char *mode, char *msg,
   if (str_ieq(id, "crafting_manual")) {
     if (is_read)
       snprintf(msg, msgcap,
-               "The manual starts with humility: measure twice, waste nothing, "
-               "and learn the grain before asking wood to become useful.");
+               "Most pages are obvious; a few margins suggest combinations "
+               "without naming them. You close it no wiser, only curious.");
     else
       snprintf(msg, msgcap,
-               "A worn crafting manual with diagrams for simple joints, field "
-               "repairs, and tool care.");
+               "A worn manual of joints and repairs. The useful parts seem "
+               "to assume you already have a bench.");
     return 1;
   }
   if (str_ieq(id, "armor_crafting_manual")) {
@@ -9229,13 +12524,56 @@ static int content_item_response(const char *id, const char *mode, char *msg,
       str_ieq(id, "hidden_scroll")) {
     if (is_read)
       snprintf(msg, msgcap,
-               "The scroll names thresholds, crystals, and a road folded "
-               "through light. One phrase repeats: \"A return must be earned "
-               "before it is trusted.\"");
+               "The scroll tells of Veritasfurtum, where the Architect's "
+               "creations still echo. It names an Empress who rules across "
+               "dimensions, Nexus Points where realities converge, and "
+               "Dimensional Rifts that can tear through space and time. "
+               "The Cosmic Sentinel Agency watches the crossings; Universe "
+               "Drops sometimes fall in. One line repeats: \"A return must be "
+               "earned before it is trusted.\"");
     else
       snprintf(msg, msgcap,
                "A fragile scroll with ink that has browned at the edges. It "
                "feels ceremonial rather than decorative.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_artifact")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Under the grime, sigils match temple rubrics for the "
+               "Architect and for waystones. A marginal note warns that "
+               "Hollow Ridge sits inside Veritasfurtum like a room inside a "
+               "storm — stable only until something knocks.");
+    else
+      snprintf(msg, msgcap,
+               "A heavy relic crusted with ridge dust. It hums faintly, as if "
+               "remembering a larger sky.");
+    return 1;
+  }
+  if (str_ieq(id, "miller_journal")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Brenna's hand — strong, impatient — tracks grain yields, gear "
+               "stress, and river height. Margins note the '67 and '89 floods; "
+               "the last pages obsess over the stuck wheel and a dream of the "
+               "river \"moving wrong,\" as if Veritasfurtum were borrowing "
+               "water from somewhere else.");
+    else
+      snprintf(msg, msgcap,
+               "A leather-bound journal of daily mill operations and uneasy "
+               "notes about the river.");
+    return 1;
+  }
+  if (str_ieq(id, "sheet_candlelight_reel")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "A pub reel in G major — \"Candlelight Reel of Hollow Ridge.\" "
+               "Tempo scratches show it was played often; someone wrote "
+               "\"third night, louder\" in the margin.");
+    else
+      snprintf(msg, msgcap,
+               "A folded music sheet marked with pub notations and tempo "
+               "scratches from frequent performances.");
     return 1;
   }
   if (str_ieq(id, "tower_logbook")) {
@@ -9325,6 +12663,99 @@ static int content_item_response(const char *id, const char *mode, char *msg,
                "breathe politely.");
     return 1;
   }
+  if (str_ieq(id, "altar_stone")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The runes describe consent, offering, and return — the same "
+               "grammar as waystones, but bent toward worship. Moss keeps the "
+               "stone cool; the light does not.");
+    else
+      snprintf(msg, msgcap,
+               "An ancient altar stone under moss and runes that pulse with "
+               "faint, otherworldly light.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_carvings")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "You cannot read the language, but the story is clear: a "
+               "journey into the Void, a Drop held together, and a figure — "
+               "the Architect — who walked inside what had been made.");
+    else
+      snprintf(msg, msgcap,
+               "Mysterious symbols carved into the rock. They seem to tell a "
+               "story in a tongue long forgotten.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_map")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The map charts Hollow Ridge and wild country beyond, but "
+               "several marks sit in blank parchment — places the cartographer "
+               "feared or could not see. One symbol matches temple waystone "
+               "rubrics.");
+    else
+      snprintf(msg, msgcap,
+               "A weathered map of wilderness landmarks, ink faded at the "
+               "folds.");
+    return 1;
+  }
+  if (str_ieq(id, "carved_stone")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The tablet repeats temple motifs: threshold, witness, return. "
+               "A marginal scratch reads: \"Earn the road before you trust it.\"");
+    else
+      snprintf(msg, msgcap,
+               "A small stone tablet bearing the same symbols as the temple "
+               "walls.");
+    return 1;
+  }
+  if (str_ieq(id, "cave_painting")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Crude pigments show figures at a monolith, beasts with too "
+               "many joints, and a rain of colored lines — as if someone saw "
+               "Universe Drops falling through the Void.");
+    else
+      snprintf(msg, msgcap,
+               "Primitive paintings on the cave wall: strange creatures and "
+               "spiral symbols.");
+    return 1;
+  }
+  if (str_ieq(id, "grove_offering")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Inside the leaf-wrapped bundle: dried herbs, a small crystal, "
+               "and a note — \"For the grove that remembers Maddeline's name. "
+               "Leave nothing that cannot rot.\"");
+    else
+      snprintf(msg, msgcap,
+               "A bundle left at the base of an ancient tree — herbs, crystal, "
+               "and a folded note inside.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_prayer_beads")) {
+    snprintf(msg, msgcap,
+             is_read
+                 ? "Each bead warms in turn as you count them, as if approving "
+                   "the rhythm of your breath."
+                 : "Polished wood and tiny crystals on a string; they pulse with "
+                   "gentle heat against your palm.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_temple_ruins")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Broken columns frame a sermon in stone: the Architect made "
+               "Veritasfurtum to be felt, not only ruled; rifts are scars where "
+               "feeling outpaced law.");
+    else
+      snprintf(msg, msgcap,
+               "Weathered temple ruins. Moss and runes compete for every "
+               "crevice.");
+    return 1;
+  }
   if (str_ieq(id, "fishing_spot")) {
     snprintf(msg, msgcap,
              "A quiet patch of water where ripples cross against the current. "
@@ -9362,6 +12793,260 @@ static int content_item_response(const char *id, const char *mode, char *msg,
       snprintf(msg, msgcap,
                "A leather tavern ledger with careful handwriting and a cover "
                "worn smooth at the corners.");
+    return 1;
+  }
+  if (str_ieq(id, "holy_symbols") || str_ieq(id, "holy_symbol")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Architect sigils for threshold, witness, and return — the same "
+               "grammar as waystones, bent toward worship. A missionary's note "
+               "tucked inside reads: \"Shame is the only heresy.\"");
+    else
+      snprintf(msg, msgcap,
+               "Symbols of the Architect on cloth and metal, warm from handling "
+               "in the temple.");
+    return 1;
+  }
+  if (str_ieq(id, "protective_charm")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The charm is braided wire and crystal shard. The inscription "
+               "promises not invulnerability — only a moment to choose the "
+               "wiser road.");
+    else
+      snprintf(msg, msgcap,
+               "A small protective charm merchants prize and temples bless "
+               "in passing.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_coin")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Unknown symbols circle a profile worn smooth by pockets. The "
+               "metal is too well preserved — as if Veritasfurtum forgot to "
+               "age it.");
+    else
+      snprintf(msg, msgcap,
+               "A golden coin etched with symbols no local mint admits to "
+               "knowing.");
+    return 1;
+  }
+  if (str_ieq(id, "stone_marker")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The runes shimmer: threshold, witness, return — and a warning "
+               "that Hollow Ridge sits inside a larger storm. Touching them "
+               "warms your palm.");
+    else
+      snprintf(msg, msgcap,
+               "A weathered marker covered in ancient runes that seem to "
+               "shimmer in the light.");
+    return 1;
+  }
+  if (str_ieq(id, "journal")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Strange diagrams of the white house, notes on boarded doors, "
+               "and a recurring sketch of runes that match the front threshold. "
+               "The last entry: \"Do not trust the well after midnight.\"");
+    else
+      snprintf(msg, msgcap,
+               "A weathered journal with leather binding and pages full of "
+               "diagrams about the house.");
+    return 1;
+  }
+  if (str_ieq(id, "old_maps")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Coastlines, trade routes, and Hollow Ridge marked with pins. "
+               "Several destinations sit in blank parchment — places the "
+               "cartographer feared or could not see.");
+    else
+      snprintf(msg, msgcap,
+               "Framed maps showing coastlines, trade routes, and distant "
+               "lands marked with notes.");
+    return 1;
+  }
+  if (str_ieq(id, "sheet_last_call_etude")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "A dense tavern piece in B minor — \"Last Call at the Copper "
+               "Cup.\" Margins warn: \"third night, play slower or chairs "
+               "start flying.\"");
+    else
+      snprintf(msg, msgcap,
+               "A music sheet copied by a veteran tavern performer — advanced, "
+               "crowd-tested, unforgiving.");
+    return 1;
+  }
+  if (str_ieq(id, "tavern_secret")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "A folded note: \"If Soren asks, you saw nothing. The back stair "
+               "is for friends. — Silas\" A few coins remain as earnest.");
+    else
+      snprintf(msg, msgcap,
+               "A hidden compartment behind a loose board — note and coins "
+               "left by a previous patron.");
+    return 1;
+  }
+  if (str_ieq(id, "crystal_heart") || str_ieq(id, "mysterious_gem")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Light lives inside the crystal like a second pulse. It "
+               "approves of warmth and honest intent — and grows cold around "
+               "malice.");
+    else
+      snprintf(msg, msgcap,
+               "A perfect crystal containing living light. It pulses in your "
+               "hand like a heartbeat.");
+    return 1;
+  }
+  if (str_ieq(id, "buried_coin")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Tarnished but legible — mint marks from before the ridge was "
+               "named. Someone hid it and never came back.");
+    else
+      snprintf(msg, msgcap,
+               "An old coin half-buried in the dirt, tarnished but still "
+               "recognizable.");
+    return 1;
+  }
+  if (str_ieq(id, "shrine_offering")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Dried herbs, a coin, and a prayer: \"For the Architect who "
+               "wanted us to feel.\" The cloth smells of rain and incense.");
+    else
+      snprintf(msg, msgcap,
+               "A small offering left at a roadside shrine — herbs, coin, "
+               "folded cloth.");
+    return 1;
+  }
+  if (str_ieq(id, "ancient_artifacts")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Shards of pre-ridge civilization: a crown bent by rift heat, "
+               "a tablet naming Maddeline before the fall, a nail that still "
+               "points north toward a Nexus that is not there yet.");
+    else
+      snprintf(msg, msgcap,
+               "A display of ancient artifacts — some beautiful, some "
+               "dangerous, all expensive.");
+    return 1;
+  }
+  if (str_ieq(id, "magical_items")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Charms, charged glass, and a vial that hums when lied to. "
+               "The trader's card reads: \"Residual magic is honest magic — "
+               "it admits what it was.\"");
+    else
+      snprintf(msg, msgcap,
+               "Magical items arranged on velvet — faint glow, careful labels.");
+    return 1;
+  }
+  if (str_ieq(id, "rare_curiosities")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "A music box from another Drop, a comb that remembers hair "
+               "color, and a map drawn on skin-thin parchment. None of it "
+               "belongs to Hollow Ridge — all of it wants to stay.");
+    else
+      snprintf(msg, msgcap,
+               "Rare curiosities under glass — odd, lovely, and slightly wrong.");
+    return 1;
+  }
+  if (str_ieq(id, "exotic_animals")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Care sheets in three languages. One cage holds a bird "
+               "whose song makes listeners confess; the trader keeps it "
+               "covered for everyone's safety.");
+    else
+      snprintf(msg, msgcap,
+               "Exotic animals in clean cages — colorful, restless, and "
+               "clearly well fed.");
+    return 1;
+  }
+  if (str_ieq(id, "pet_cages") || str_ieq(id, "pet_supplies")) {
+    snprintf(msg, msgcap,
+             is_read
+                 ? "Feed charts, muzzle sizes, and a note: \"Match the pet to "
+                   "the owner's courage, not their purse.\""
+                 : "Cages and supplies for creatures stranger than village dogs.");
+    return 1;
+  }
+  if (str_ieq(id, "bookshelves") || str_ieq(id, "open_books")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Histories of Amethystus, grammars of old runes, and a romance "
+               "novel someone shelved upside down on purpose. The useful "
+               "margins point toward the grove altar.");
+    else
+      snprintf(msg, msgcap,
+               "Floor-to-ceiling bookshelves — dust, leather, and the "
+               "promise of secrets.");
+    return 1;
+  }
+  if (str_ieq(id, "fountain") || str_ieq(id, "crystal_pool")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The water is clear enough to shame a mirror. Reflected light "
+               "has no source; drinking might heal — or invite something "
+               "that watches through your eyes.");
+    else
+      snprintf(msg, msgcap,
+               "Water so clear it seems to glow from within, reflecting "
+               "lights that have no source.");
+    return 1;
+  }
+  if (str_ieq(id, "number_plates")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "House numbers from a village that moved. One plate reads "
+               "a street that no longer exists on any map in this build.");
+    else
+      snprintf(msg, msgcap,
+               "Ceramic number plates stacked in a crate — relics of "
+               "rearranged roads.");
+    return 1;
+  }
+  if (str_ieq(id, "obsidian_shard")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "The shard drinks light. Held long enough, you see a Drop "
+               "floating in void — then your reflection returns, older.");
+    else
+      snprintf(msg, msgcap,
+               "A shard of obsidian so black it feels wet. Or a gem that "
+               "catches light wrong.");
+    return 1;
+  }
+  if (str_ieq(id, "buried_treasure")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               "Someone buried coins and a protective charm beneath the "
+               "roots. The charm's note: \"For whoever digs with kind hands.\"");
+    else
+      snprintf(msg, msgcap,
+               "A hidden cache beneath tree roots — earth still soft from "
+               "recent digging.");
+    return 1;
+  }
+  if (str_ieq(id, "gem") || str_ieq(id, "gold_coin")) {
+    if (is_read)
+      snprintf(msg, msgcap,
+               str_ieq(id, "gem")
+                   ? "Facets hold a cold fire. Merchants will haggle; temples "
+                     "will bless; thieves will memorize your face."
+                   : "Standard Amethystus mint — honest weight, honest metal. "
+                     "Still, every coin remembers every hand.");
+    else
+      snprintf(msg, msgcap,
+               str_ieq(id, "gem") ? "A cut gem that catches the light."
+                                  : "A gold coin, warm from trade.");
     return 1;
   }
   if (str_ieq(id, "spyglass")) {
@@ -9404,14 +13089,50 @@ static int content_item_response(const char *id, const char *mode, char *msg,
              "and one is probably pretending to be both.");
     return 1;
   }
+  if (str_ieq(id, "incense_burner")) {
+    if (is_touch)
+      snprintf(msg, msgcap,
+               "Brass warm from recent use; ash clings in the bowl like grey "
+               "snow.");
+    else if (is_read)
+      snprintf(msg, msgcap,
+               "A temple-style burner: vent holes spell witness in an old "
+               "script. The web edition kept these near confessionals — smoke "
+               "as punctuation, not disguise.");
+    else
+      snprintf(msg, msgcap,
+               "A brass incense burner, recently used. The scent of myrrh and "
+               "stone still clings.");
+    return 1;
+  }
+  if (str_ieq(id, "pickled_vegetables")) {
+    snprintf(msg, msgcap,
+             is_read
+                 ? "The brine recipe is village-practical: vinegar, dill, and "
+                   "a pinch of temple salt. Someone wrote \"for winter mouths\" "
+                   "on the lid."
+                 : "A crock of pickled vegetables — sharp, honest, and meant to "
+                   "survive long cellar nights.");
+    return 1;
+  }
+  if (str_ieq(id, "dried_meat")) {
+    snprintf(msg, msgcap,
+             is_read
+                 ? "No label — only a butcher's mark and a date scratched in "
+                   "grease. Travel rations from the web road menus, adapted here "
+                   "as tavern stock."
+                 : "Strips of dried meat, salted and smoked. Trail food that "
+                   "refuses to apologize.");
+    return 1;
+  }
   if (str_ieq(id, "tavern_piano")) {
     if (is_touch)
       snprintf(msg, msgcap,
                "The keys dip under your fingers with a tired but honest action.");
     else
       snprintf(msg, msgcap,
-               "A sturdy upright piano with worn keys. Maintained, playable, "
-               "and waiting for a full ASCII performance mode.");
+               "A sturdy upright piano with worn keys. Use  play piano  for "
+               "the rhythm performance.");
     return 1;
   }
   if (strstr(id, "music_sheet") != NULL) {
@@ -9451,6 +13172,125 @@ static int content_item_response(const char *id, const char *mode, char *msg,
     }
   }
   return 0;
+}
+
+static int disambig_try_followup(const char *line, char *msg, size_t msgcap,
+                                 int *turn_advance) {
+  char slug[MAX_ITEM_LEN];
+  int act;
+  if (!line || !line[0] || g_disambig_pick_n <= 0 || !msg || !turn_advance)
+    return 0;
+  if (!disambig_pick_slug(line, slug, sizeof slug)) return 0;
+  act = g_disambig_act;
+  disambig_remember(g_disambig_query, slug);
+  disambig_clear();
+  switch (act) {
+  case DISAMBIG_ACT_TAKE:
+    *turn_advance = take_item(slug, msg, msgcap) ? 1 : 0;
+    return 1;
+  case DISAMBIG_ACT_DROP:
+    *turn_advance = drop_item(slug, msg, msgcap) ? 1 : 0;
+    return 1;
+  case DISAMBIG_ACT_EXAMINE:
+    *turn_advance = 0;
+    examine_target(slug, msg, msgcap);
+    return 1;
+  case DISAMBIG_ACT_EQUIP:
+    *turn_advance = 0;
+    cmd_equip(slug, msg, msgcap);
+    return 1;
+  case DISAMBIG_ACT_BUY:
+    *turn_advance = 0;
+    cmd_trade_buy(slug, msg, msgcap);
+    return 1;
+  case DISAMBIG_ACT_SELL:
+    *turn_advance = 0;
+    cmd_trade_sell(slug, msg, msgcap);
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+static void cmd_price_compare(const char *rest, char *body, size_t cap) {
+  char work[256];
+  char qnorm[MAX_ITEM_LEN];
+  char banner[256];
+  AetPcSave pc;
+  int mc, i, hits = 0;
+  int best_buy = -1, worst_buy = -1;
+  if (!body || cap < 128) return;
+  strncpy(work, rest, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  strip_trailing_space(work);
+  strip_leading_articles(work);
+  if (!work[0]) {
+    snprintf(body, cap,
+             "Compare prices for what?\n\n"
+             "Examples:\n"
+             "  price compare rope\n"
+             "  compare prices torch\n"
+             "  market compare wheat\n");
+    return;
+  }
+  query_norm_underscore(qnorm, sizeof qnorm, work);
+  pc_capture(&pc);
+  pc_fill_narrative_defaults(&pc);
+  pc_format_identity_banner(banner, sizeof banner);
+  mc = aet_merchant_count();
+  snprintf(body, cap,
+           "=== PRICE COMPARISON ===\n\n"
+           "%s\n\n"
+           "Buy prices for \"%s\" (your CHA %d and patron standing per shop):\n\n",
+           banner, work, pc.cha);
+  for (i = 0; i < mc; i++) {
+    const char *mslug = aet_merchant_slug_at(i);
+    const AetMerchantTable *mt;
+    const AetMerchantOffer *o;
+    char pretty[96];
+    int rep0;
+    if (!mslug || !mslug[0]) continue;
+    mt = aet_merchant_trades(mslug);
+    if (!mt) continue;
+    rep0 = merchant_rep_score(i);
+    entity_pretty(mslug, pretty, sizeof pretty);
+    for (o = mt->stock; o->item && o->item[0]; o++) {
+      int pay;
+      char payb[24], listb[24], itempretty[96];
+      if (!merchant_offer_matches_query(o->item, work, qnorm)) continue;
+      pay = merchant_adjust_buy_price(o->price, rep0, pc.cha);
+      currency_format_compact(pay, payb, sizeof payb);
+      currency_format_compact(o->price, listb, sizeof listb);
+      item_pretty(o->item, itempretty, sizeof itempretty);
+      body_append(body, cap, "  %-22s  %-24s  pay %s", pretty, itempretty, payb);
+      if (pay != o->price)
+        body_append(body, cap, "  (list %s)", listb);
+      body_append(body, cap, "  — %s\n", merchant_rep_tier_label(rep0));
+      hits++;
+      if (best_buy < 0 || pay < best_buy) best_buy = pay;
+      if (worst_buy < 0 || pay > worst_buy) worst_buy = pay;
+    }
+  }
+  if (!hits) {
+    snprintf(body, cap,
+             "=== PRICE COMPARISON ===\n\n"
+             "%s\n\n"
+             "No merchant stocks a match for \"%s\" in world data.\n"
+             "Try a shorter name (rope, torch, wheat) or  wares  at a trader.\n",
+             banner, work);
+    return;
+  }
+  if (best_buy >= 0 && worst_buy >= 0 && best_buy != worst_buy) {
+    char lo[24], hi[24];
+    currency_format_compact(best_buy, lo, sizeof lo);
+    currency_format_compact(worst_buy, hi, sizeof hi);
+    body_append(body, cap,
+                "\nSpread: %s (cheapest listed) to %s (priciest listed) for this "
+                "query.\n",
+                lo, hi);
+  }
+  body_append(body, cap,
+              "\nVisit the trader and use  wares  or  buy <item>  to purchase.\n");
 }
 
 static void examine_target_mode(const char *raw, const char *mode, char *msg,
@@ -9546,31 +13386,61 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
     return;
   }
 
-  for (i = 0; i < g_room_item_n[g_room]; i++) {
-    if (room_item_matches_query(g_room_items[g_room][i], q, qnorm)) {
+  {
+    char picks[DISAMBIG_PICK_MAX][MAX_ITEM_LEN];
+    int pn = 0, j;
+    for (i = 0; i < g_room_item_n[g_room]; i++) {
+      if (!room_item_matches_query(g_room_items[g_room][i], q, qnorm)) continue;
+      for (j = 0; j < pn; j++)
+        if (str_ieq(picks[j], g_room_items[g_room][i])) break;
+      if (j < pn) continue;
+      if (pn < DISAMBIG_PICK_MAX) {
+        copy_capped(picks[pn], sizeof picks[0], g_room_items[g_room][i]);
+        pn++;
+      }
+    }
+    for (i = 0; i < g_inv_n; i++) {
+      if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
+      for (j = 0; j < pn; j++)
+        if (str_ieq(picks[j], g_inv[i])) break;
+      if (j < pn) continue;
+      if (pn < DISAMBIG_PICK_MAX) {
+        copy_capped(picks[pn], sizeof picks[0], g_inv[i]);
+        pn++;
+      }
+    }
+    if (pn == 0) {
+      snprintf(msg, msgcap, "You do not see anything like that here.");
+      return;
+    }
+    if (pn == 1) {
       char pretty[96];
-      remember_focus_item(g_room_items[g_room][i]);
-      if (content_item_response(g_room_items[g_room][i], mode, msg, msgcap))
+      remember_focus_item(picks[0]);
+      if (content_item_response(picks[0], mode, msg, msgcap)) return;
+      item_pretty(picks[0], pretty, sizeof pretty);
+      if (inv_has(picks[0]))
+        snprintf(msg, msgcap,
+                 "You inspect %.40s in your pack. It is exactly what you are "
+                 "carrying.",
+                 pretty);
+      else
+        snprintf(msg, msgcap, "You look closely at %.40s.", pretty);
+      disambig_remember(q, picks[0]);
+      return;
+    }
+    {
+      char slug[MAX_ITEM_LEN];
+      int r;
+      g_disambig_next_act = DISAMBIG_ACT_EXAMINE;
+      r = disambig_resolve_ambiguous(DISAMBIG_ACT_EXAMINE, 0, q, picks, pn, slug,
+                                     sizeof slug, msg, msgcap);
+      if (r == 1) {
+        examine_target_mode(slug, mode, msg, msgcap);
         return;
-      item_pretty(g_room_items[g_room][i], pretty, sizeof pretty);
-      snprintf(msg, msgcap, "You look closely at %.40s.", pretty);
+      }
       return;
     }
   }
-  for (i = 0; i < g_inv_n; i++) {
-    if (room_item_matches_query(g_inv[i], q, qnorm)) {
-      char pretty[96];
-      remember_focus_item(g_inv[i]);
-      if (content_item_response(g_inv[i], mode, msg, msgcap)) return;
-      item_pretty(g_inv[i], pretty, sizeof pretty);
-      snprintf(msg, msgcap,
-               "You inspect %.40s in your pack. It is exactly what you are "
-               "carrying.",
-               pretty);
-      return;
-    }
-  }
-  snprintf(msg, msgcap, "You do not see anything like that here.");
 }
 
 static void examine_target(const char *raw, char *msg, size_t msgcap) {
@@ -9578,11 +13448,139 @@ static void examine_target(const char *raw, char *msg, size_t msgcap) {
 }
 
 static void read_target(const char *raw, char *msg, size_t msgcap) {
+  char id[MAX_ITEM_LEN];
+  int r = resolve_visible_item(raw, id, sizeof id, msg, msgcap);
+  if (r != 1) return;
+#ifdef AETER_MINIGAMES
+  game_open_reader(id, msg, msgcap);
+#else
   examine_target_mode(raw, "read", msg, msgcap);
+#endif
 }
 
 static void touch_target(const char *raw, char *msg, size_t msgcap) {
   examine_target_mode(raw, "touch", msg, msgcap);
+}
+
+#ifdef AETER_MINIGAMES
+static int content_item_read_body(const char *id, char *out, size_t outcap) {
+  return content_item_response(id, "read", out, outcap);
+}
+
+static int game_read_resolve(const char *item_id, MgtReadDocument *doc) {
+  if (!item_id || !item_id[0] || !doc) return 0;
+  memset(doc, 0, sizeof *doc);
+  if (aet_mods_item_description(item_id, doc->body, sizeof doc->body) &&
+      doc->body[0]) {
+    /* mod item text is the readable body */
+  } else if (!content_item_read_body(item_id, doc->body, sizeof doc->body) ||
+             !doc->body[0]) {
+    return 0;
+  }
+  item_pretty(item_id, doc->title, sizeof doc->title);
+  snprintf(doc->source_id, sizeof doc->source_id, "%s", item_id);
+  doc->kind = mgt_read_classify_source_id(item_id);
+  doc->valid = 1;
+  return 1;
+}
+
+static int game_open_reader(const char *item_id, char *msg, size_t msgcap) {
+  MgtReadDocument doc;
+  if (!game_read_resolve(item_id, &doc)) {
+    snprintf(msg, msgcap, "You cannot read anything meaningful there.");
+    return 0;
+  }
+  mgt_read_set_document(&doc);
+  if (try_minigame("reading", msg, msgcap)) return 1;
+  mgt_read_clear_document();
+  snprintf(msg, msgcap, "You finish reading %s.", doc.title);
+  return 0;
+}
+#endif
+
+static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
+                                char *msg, size_t msgcap) {
+  char q[256];
+  char qnorm[MAX_ITEM_LEN];
+  char picks[DISAMBIG_PICK_MAX][MAX_ITEM_LEN];
+  int i, j, pn = 0;
+
+  if (!id_out || idcap < 2) return 0;
+  id_out[0] = '\0';
+  strncpy(q, raw, sizeof q - 1);
+  q[sizeof q - 1] = '\0';
+  strip_trailing_space(q);
+  strip_leading_articles(q);
+  if (!q[0]) {
+    snprintf(msg, msgcap, "Read what?");
+    return 0;
+  }
+  if (str_ieq(q, "it") || str_ieq(q, "that") || str_ieq(q, "this")) {
+    if (!g_last_focus[0]) {
+      snprintf(msg, msgcap, "You have nothing in mind to read yet.");
+      return 0;
+    }
+    strncpy(q, g_last_focus, sizeof q - 1);
+    q[sizeof q - 1] = '\0';
+  }
+  query_norm_underscore(qnorm, sizeof qnorm, q);
+
+  if (world_room_is_dark(g_room) && !player_has_light_source()) {
+    for (i = 0; i < g_inv_n; i++) {
+      if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
+      remember_focus_item(g_inv[i]);
+      copy_capped(id_out, idcap, g_inv[i]);
+      return 1;
+    }
+    snprintf(msg, msgcap,
+             "Too dark to read anything here. Try a light source or an item "
+             "already in your pack.");
+    return 0;
+  }
+
+  for (i = 0; i < g_room_item_n[g_room]; i++) {
+    if (!room_item_matches_query(g_room_items[g_room][i], q, qnorm)) continue;
+    for (j = 0; j < pn; j++)
+      if (str_ieq(picks[j], g_room_items[g_room][i])) break;
+    if (j < pn) continue;
+    if (pn < DISAMBIG_PICK_MAX) {
+      copy_capped(picks[pn], sizeof picks[0], g_room_items[g_room][i]);
+      pn++;
+    }
+  }
+  for (i = 0; i < g_inv_n; i++) {
+    if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
+    for (j = 0; j < pn; j++)
+      if (str_ieq(picks[j], g_inv[i])) break;
+    if (j < pn) continue;
+    if (pn < DISAMBIG_PICK_MAX) {
+      copy_capped(picks[pn], sizeof picks[0], g_inv[i]);
+      pn++;
+    }
+  }
+  if (pn == 0) {
+    snprintf(msg, msgcap, "You do not see anything readable like that here.");
+    return 0;
+  }
+  if (pn == 1) {
+    remember_focus_item(picks[0]);
+    copy_capped(id_out, idcap, picks[0]);
+    disambig_remember(q, picks[0]);
+    return 1;
+  }
+  {
+    char slug[MAX_ITEM_LEN];
+    int r;
+    g_disambig_next_act = DISAMBIG_ACT_EXAMINE;
+    r = disambig_resolve_ambiguous(DISAMBIG_ACT_EXAMINE, 0, q, picks, pn, slug,
+                                     sizeof slug, msg, msgcap);
+    if (r == 1) {
+      copy_capped(id_out, idcap, slug);
+      remember_focus_item(slug);
+      return 1;
+    }
+    return -1;
+  }
 }
 
 static int try_direction_parse(const char *tok, char *msg, size_t msgcap) {
@@ -9830,8 +13828,7 @@ static int parser_rewrite_question_examine(char *line) {
     size_t n = strlen(kQ[i]);
     char *p;
     if (strncmp(line, kQ[i], n) != 0) continue;
-    /* Rest after the question stem (avoid strchr on first word — wrong for
-     * multi-word stems like "what is "). */
+    
     p = line + n;
     while (*p == ' ') p++;
     if (!strncmp(p, "is ", 3))
@@ -9879,7 +13876,6 @@ static int parser_rewrite_look_preposition(char *line) {
   return 0;
 }
 
-/* Single-token direction after articles -> bare compass command; else examine <rest>. */
 static int parser_interaction_rest_dir_or_examine(char *line, const char *rest) {
   char work[INPUT_LINE_MAX];
   char tok[64];
@@ -9916,7 +13912,6 @@ static int parser_interaction_rest_dir_or_examine(char *line, const char *rest) 
   return 1;
 }
 
-/* Plain-English interaction stems -> deterministic examine / movement / talk. */
 static int parser_rewrite_interaction_phrases(char *line) {
   static const char *const kExamineOnly[] = {
       "give me a look at ",
@@ -10149,6 +14144,9 @@ static int parser_rewrite_plain_english_queries(char *line) {
       {"inventory", "inventory", ""}, {"pack", "inventory", ""},
       {"bag", "inventory", ""},       {"stuff", "inventory", ""},
       {"items", "inventory", ""},     {"belongings", "inventory", ""},
+      {"inventory list", "inventory list", ""},
+      {"pack list", "inventory list", ""},
+      {"inventory sort name", "inventory sort", ""},
       {"gear", "gear", ""},           {"equipment", "equipment", ""},
       {"loadout", "loadout", ""},     {"health", "vitals", ""},
       {"hp", "vitals", ""},           {"status", "status", ""},
@@ -10198,7 +14196,7 @@ static int parser_rewrite_plain_english_queries(char *line) {
       while (*tail == ' ') tail++;
       if (!strcmp(tail, "screen") || !strcmp(tail, "menu") ||
           !strcmp(tail, "panel")) {
-        /* keep single topic */
+        
       } else if (rn + 1 < sizeof topic) {
         topic[rn++] = ' ';
         for (i = 0; tail[i] && rn + 1 < sizeof topic; i++) {
@@ -10230,8 +14228,6 @@ static int parser_rewrite_plain_english_queries(char *line) {
   return 0;
 }
 
-/* Normalize "go to / into / in / to / travel to ..." before other verb rewrites.
- * Order and early-return rules match the historical decompiled chain. */
 static int parser_rewrite_movement_phrases(char *line) {
   static const struct {
     const char *pfx;
@@ -10267,10 +14263,9 @@ static int parser_rewrite_go_through_where_find(char *line) {
 }
 
 static int parser_rewrite_mailbox_search_find(char *line) {
-  if (!strncmp(line, "open mailbox", 12)) {
-    rewrite_command(line, "examine", line + 5);
-    return 1;
-  }
+  if (!strncmp(line, "open mailbox", 12) ||
+      !strncmp(line, "open the mailbox", 16))
+    return 0;
   if (!strncmp(line, "search ", 7) && strcmp(line, "search")) {
     rewrite_command(line, "find", line + 7);
     return 1;
@@ -10278,8 +14273,6 @@ static int parser_rewrite_mailbox_search_find(char *line) {
   return 0;
 }
 
-/* Whole line "go <dir>" with exactly one direction token -> bare direction (north…).
- * Avoids ambiguous prefix matching (e.g. "go north" vs "go northeast"). */
 static int parser_rewrite_go_single_direction(char *line) {
   const char *p;
   char tok[64];
@@ -10389,6 +14382,15 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("open forge", "forge", ""),
       EXACT_RW("material forge", "forge", ""),
       EXACT_RW("forge menu", "forge", ""),
+      EXACT_RW("play piano", "play piano", ""),
+      EXACT_RW("play the piano", "play piano", ""),
+      EXACT_RW("perform on piano", "play piano", ""),
+      EXACT_RW("go fishing", "fish", ""),
+      EXACT_RW("tend farm", "farm", ""),
+      EXACT_RW("work kitchen", "cook", ""),
+      EXACT_RW("play dice", "gamble", ""),
+      EXACT_RW("play cards", "gamble", ""),
+      EXACT_RW("track game", "hunt", ""),
       EXACT_RW("instructions", "help", ""),
       EXACT_RW("how do i play", "help", ""),
       EXACT_RW("show help", "help", ""),
@@ -10402,6 +14404,13 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("who made this", "about", ""),
       EXACT_RW("developers", "about", ""),
       EXACT_RW("attribution", "about", ""),
+      EXACT_RW("world lore", "lore", ""),
+      EXACT_RW("tell me about veritasfurtum", "lore veritasfurtum", ""),
+      EXACT_RW("what is veritasfurtum", "lore veritasfurtum", ""),
+      EXACT_RW("who is the architect", "lore architect", ""),
+      EXACT_RW("what is hollow ridge", "lore hollow", ""),
+      EXACT_RW("universe drops", "lore cosmology", ""),
+      EXACT_RW("cosmic sentinel agency", "lore csa", ""),
       EXACT_RW("identity", "character brief", ""),
       EXACT_RW("who am i", "character", ""),
       EXACT_RW("whoami", "character", ""),
@@ -10478,6 +14487,9 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("moral vector", "tainting", ""),
       EXACT_RW("alignment drift", "tainting", ""),
       EXACT_RW("social stance", "rapport", ""),
+      EXACT_RW("relationship history", "relationship history", ""),
+      EXACT_RW("bond history", "relationship history", ""),
+      EXACT_RW("social history", "relationship history", ""),
       EXACT_RW("who matters here", "rapport", ""),
       EXACT_RW("who can i talk to", "rapport", ""),
       EXACT_RW("npc list", "rapport", ""),
@@ -10537,6 +14549,12 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("transaction log", "trade history", ""),
       EXACT_RW("transaction history", "trade history", ""),
       EXACT_RW("history trade", "trade history", ""),
+      EXACT_RW("command history", "history", ""),
+      EXACT_RW("cmd history", "history", ""),
+      EXACT_RW("history list", "history", ""),
+      EXACT_RW("room utilities", "utilities", ""),
+      EXACT_RW("room objects", "utilities", ""),
+      EXACT_RW("utility objects", "utilities", ""),
       EXACT_RW("save game", "save", ""),
       EXACT_RW("load game", "load", ""),
       EXACT_RW("quick save", "qs", ""),
@@ -10852,11 +14870,26 @@ static void format_progress_body(char *body, size_t cap) {
   int adj_locks = count_adjacent_locks(1);
   int adj_npcs = count_adjacent_npcs();
   int done_notes = 0;
+  int quest_done = 0, quest_active = 0, quest_open = 0;
   int i;
   AetWorldClock wc;
   char t[32];
   for (i = 0; i < g_note_n; i++)
     if (note_is_done(g_notes[i])) done_notes++;
+  {
+    const char *const *qh = world_quest_hints();
+    if (qh) {
+      for (; *qh; qh++) {
+        int st = quest_journal_hint_state(*qh);
+        if (st >= 2)
+          quest_done++;
+        else if (st == 1)
+          quest_active++;
+        else
+          quest_open++;
+      }
+    }
+  }
   get_world_clock(&wc);
   format_clock_time(t, sizeof t, &wc);
   {
@@ -10895,7 +14928,10 @@ static void format_progress_body(char *body, size_t cap) {
              "  Purse: %s\n"
              "  Score: %d\n"
              "  Turns: %d\n"
-             "  Notes: %d todo, %d done\n",
+             "  Notes: %d todo, %d done\n"
+             "  Quest board: %d done, %d active, %d open\n"
+             "  Autosave shadow: %s\n"
+             "  Social history rows: %d (relationship history)\n",
              pc_display_name(), role, pr, visited, WORLD_ROOM_COUNT,
              WORLD_ROOM_COUNT ? (visited * 100) / WORLD_ROOM_COUNT : 0,
              resolve_world_title(g_room), world_slug(g_room),
@@ -10906,7 +14942,9 @@ static void format_progress_body(char *body, size_t cap) {
              player_has_light_source() ? "carried" : "not carried", wp_seen,
              wp_total, npc_seen, adj_locks, adj_npcs, best_lock_tool(),
              g_inv_n, MAX_INV, g_health, g_max_health, purseb, g_score,
-             g_turns, g_note_n - done_notes, done_notes);
+             g_turns, g_note_n - done_notes, done_notes, quest_done,
+             quest_active, quest_open,
+             g_autosave_enabled ? "on" : "off", g_rel_hist_count);
   }
 }
 
@@ -11313,15 +15351,21 @@ static void grant_starting_loadout(void) {
   else if (!strcmp(p.class_, "mercenary")) {
     inv_add_unique("sword");
     inv_add_unique("lockpick");
-  } else
+  }   else
     inv_add_unique("club");
 
-  /* Optional character creation picks should map into inventory. */
+  if (aet_autotest()) {
+    inv_add_unique("lockpick");
+    inv_add_unique("bow");
+    inv_add_unique("leaflet");
+  }
+
+  
   if (p.weapon[0] && !str_ieq(p.weapon, "none")) {
     query_norm_underscore(chosen, sizeof chosen, p.weapon);
     inv_add_unique(chosen);
   }
-  /* Honor user's rule: no clothing loadout when armor is explicitly None. */
+  
   if (p.armor[0] && !str_ieq(p.armor, "none")) {
     query_norm_underscore(chosen, sizeof chosen, p.armor);
     inv_add_unique(chosen);
@@ -11338,7 +15382,7 @@ static void grant_starting_loadout(void) {
     }
   }
 
-  /* Universal survival starter kit. */
+  
   inv_add_unique("bandage");
   inv_add_unique("flint");
 }
@@ -11357,8 +15401,6 @@ static void eq_copy_slug(char *dst, size_t cap, const char *src) {
   dst[n] = '\0';
 }
 
-/** Mirror primary weapon / chest armor into the CHARACTER sheet so saves,
- * loadout text, and mods see what is actually equipped (live slots win). */
 static void eq_sync_pc_sheet(void) {
   AetPcSave p;
   pc_capture(&p);
@@ -11396,7 +15438,6 @@ static void eq_bootstrap_from_character(void) {
   eq_sync_pc_sheet();
 }
 
-/* Human-readable label for forge/equipment (catalog display name, else slug → spaces). */
 static void craft_short_display_name(const char *slug, char *dst, size_t cap) {
   const AetItemCatalogEntry *cat;
   char tmp[MAX_ITEM_LEN];
@@ -11456,7 +15497,6 @@ static void eq_sync_ready_item(void) {
   g_ready_item[0] = '\0';
 }
 
-/* Keep equipment state anchored to actual carried inventory. */
 static void eq_prune_slots_not_in_inventory(void) {
   int i, changed = 0;
   for (i = 0; i < EQ_SLOT_COUNT; i++) {
@@ -11486,7 +15526,6 @@ static void eq_remove_item_from_slots(const char *slug) {
   }
 }
 
-/* Single source of truth for item combat stats used by equip/inventory/forge UIs. */
 static void eq_compute_item_stats(const char *slug, int equipped_slot, int *def_out,
                                   int *atk_out, int *wgt_out, int *slot_out,
                                   const char **label_out) {
@@ -11579,7 +15618,6 @@ static void ui_fit_cell(char *out, size_t cap, const char *src, int width) {
   out[i] = '\0';
 }
 
-/* Visible width of a string (CSI SGR sequences do not count). */
 static int aet_sgr_vis_len(const char *s) {
   int n = 0;
   if (!s) return 0;
@@ -11607,7 +15645,6 @@ static void aet_sgr_pad_to(char *dst, size_t cap, int target_vis) {
   }
 }
 
-/* Material forge tripanel: inner 38 + 38 + 36 + six pipes + 2-space indent = 120 cols. */
 enum { FORGE_CELL_L = 38, FORGE_CELL_M = 38, FORGE_CELL_R = 36 };
 
 static void forge_cell_pad(char *dst, size_t cap, const char *src, int visw) {
@@ -11657,7 +15694,6 @@ static void forge_print_row(const char *l, const char *m, const char *r) {
   fputc('\n', stdout);
 }
 
-/* Pause menu: bipanel 55 + 55 + pipes + 2-space indent = 120 cols (matches HTML mock). */
 enum { PAUSE_CELL_W = 55 };
 
 static void pause_print_row(const char *l, const char *r) {
@@ -11688,7 +15724,6 @@ static void pause_print_divider_cell(void) {
   pause_print_row(d, d);
 }
 
-/* Settings UI: 40 + 75 inner cells; 120-column terminal frame. */
 enum { SETTINGS_CELL_L = 40, SETTINGS_CELL_R = 75 };
 
 typedef struct {
@@ -12054,9 +16089,6 @@ static void ui_line_pad(UiLineBuf *b) {
   b->dst[b->len] = '\0';
 }
 
-/* Compact full-screen frame helper for inventory, forge, saves, and future
- * minigames. It deliberately owns no heap memory and no callbacks: floppy-sized
- * builds get shared frame/prompt/input behavior without a widget framework. */
 static void screen_frame_init(AetScreenFrame *f, const char *title,
                               const char *pending_acc, int *did_fullscreen,
                               int width) {
@@ -12169,22 +16201,17 @@ static void craft_compute_stats(const CraftAttr *a, const char *name, int *dur,
   if (quality) *quality = q;
 }
 
-/** Binding / strap materials: high bend + flex, low hardness (cord, leather,
- * modded fibers with similar stats). Not slug-specific. */
 static int craft_mp_like_binding_wrap(const CraftMatProfile *mp) {
   if (!mp) return 0;
   return mp->bnd >= 6 && mp->flx >= 7 && mp->hrd <= 4;
 }
 
-/** Metal reinforcement: shard, rod, or any profile that reads as hard+edged. */
 static int craft_mp_like_metal_reinforcement(const CraftMatProfile *mp) {
   if (!mp) return 0;
   return (mp->hrd >= 6 && mp->shp >= 4) || mp->hrd >= 8;
 }
 
-/** Soft plant fiber on bench (reed-like) without requiring the vanilla id. */
-static int craft_bench_has_soft_plant_fiber(const char bench[][MAX_ITEM_LEN],
-                                           int bench_n) {
+static int craft_bench_has_soft_plant_fiber(char bench[][MAX_ITEM_LEN], int bench_n) {
   int i;
   for (i = 0; i < bench_n; i++) {
     CraftMatProfile mp;
@@ -12277,10 +16304,6 @@ static int craft_blend_synergy(char bench[][MAX_ITEM_LEN], int bench_n,
   return edge + core + handle + binding + fuel + ward;
 }
 
-/* craft_predict: sum material profiles (weighted substitution), then either
- * upgrade an existing base tool or snap blended sums to the nearest archetype
- * distance (mods may replace CRAFT_ARCHETYPES). Not memorized recipes — same
- * inputs can swap reed for stick etc.; stats come from CraftMatProfile sums. */
 static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
                           char *out_name, size_t out_name_cap, CraftAttr *out_attr,
                           char *d1, size_t d1cap, char *d2, size_t d2cap,
@@ -12312,8 +16335,8 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
   *out_attr = sum;
   if (bench_n <= 0) {
     snprintf(out_name, out_name_cap, "Unknown / Debris");
-    snprintf(d1, d1cap, "Add items to the bench.");
-    snprintf(d2, d2cap, "Use add <#> from listed inventory.");
+    snprintf(d1, d1cap, "The bench is empty.");
+    snprintf(d2, d2cap, "Silence where something might form.");
     if (d3cap) d3[0] = '\0';
     return;
   }
@@ -12324,8 +16347,8 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
     int mods_used = 0;
     char built_name[160];
     copy_capped(out_name, out_name_cap, base_tool);
-    snprintf(d1, d1cap, "Existing tool detected.");
-    snprintf(d2, d2cap, "Applying material deltas.");
+    snprintf(d1, d1cap, "A core piece anchors the pile.");
+    snprintf(d2, d2cap, "Other matter presses against it.");
     if (d3cap) d3[0] = '\0';
     for (i = 0; i < bench_n; i++) {
       CraftMatProfile mp;
@@ -12368,18 +16391,18 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
       copy_capped(built_name, sizeof built_name, t);
     }
     copy_capped(out_name, out_name_cap, built_name);
-    snprintf(d2, d2cap, "Applying %d material modifier(s).", mods_used + synergy / 3);
+    snprintf(d2, d2cap, "The mix wants to change shape.");
     if (has_reinforce)
-      snprintf(d3, d3cap, "Structure reinforced by hard/edged materials.");
+      snprintf(d3, d3cap, "Hard matter bites into the frame.");
     else if (has_wrap)
-      snprintf(d3, d3cap, "Leather improves grip/comfort.");
+      snprintf(d3, d3cap, "Soft binding creeps along the haft.");
     else if (has_edge)
-      snprintf(d3, d3cap, "Edge tuning improves sharpness.");
+      snprintf(d3, d3cap, "An edge wakes, hungry and thin.");
     *out_attr = sum;
     if (bench_n <= 1) {
-      snprintf(d1, d1cap, "No improvement materials supplied.");
-      snprintf(d2, d2cap, "Add wrap, spike, rod, or binding.");
-      snprintf(d3, d3cap, "Base-item echo blocked.");
+      snprintf(d1, d1cap, "Only the core remains.");
+      snprintf(d2, d2cap, "Nothing else leans against it.");
+      snprintf(d3, d3cap, "No change worth keeping.");
       if (ok_out) *ok_out = 0;
       return;
     }
@@ -12418,8 +16441,8 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
     }
     if (bench_n < 2 || best > 28) {
       snprintf(out_name, out_name_cap, "Worthless Debris");
-      snprintf(d1, d1cap, "Lacks required structure.");
-      snprintf(d2, d2cap, "Try stronger handle + edge + binding.");
+      snprintf(d1, d1cap, "The heap collapses into slack scrap.");
+      snprintf(d2, d2cap, "No coherent form emerges.");
       if (d3cap) d3[0] = '\0';
       return;
     }
@@ -12449,16 +16472,16 @@ static void craft_predict(char bench[][MAX_ITEM_LEN], int bench_n,
         char *p = strstr(out_name, "  ");
         memmove(p, p + 1, strlen(p));
       }
-      snprintf(d1, d1cap, "%s form interpreted from", prefix);
-      snprintf(d2, d2cap, "match score: %d (lower is better)", best);
+      snprintf(d1, d1cap, "Something like a %s takes shape.", best_type);
+      snprintf(d2, d2cap, "The materials agree — for now.");
       if (!strcmp(prefix, "Flimsy"))
-        snprintf(d3, d3cap, "Fast but fragile.");
+        snprintf(d3, d3cap, "Light. Probably temporary.");
       else if (!strcmp(prefix, "Heavy Scrap"))
-        snprintf(d3, d3cap, "Heavy, durable, stamina hungry.");
+        snprintf(d3, d3cap, "Ugly weight. It might endure.");
       else if (!strcmp(prefix, "Reliable"))
-        snprintf(d3, d3cap, "Balanced and sturdy.");
+        snprintf(d3, d3cap, "Steady enough to trust once.");
       else
-        snprintf(d3, d3cap, "Improvised but functional.");
+        snprintf(d3, d3cap, "Improvised, but not nothing.");
     }
     if (ok_out) *ok_out = 1;
   }
@@ -12472,8 +16495,6 @@ static int line_equals_one_of(const char *line, const char *const *candidates) {
   return 0;
 }
 
-/* Material Forge: 120 cols, tripanel 38+38+36 (mockup); 14 rows; live pack,
- * bench, blended attrs, predicted stats + analysis. */
 static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
   enum { FORGE_ROWS = 14 };
   static const char *const kForgeExit[] = {"done", "back", "exit", "resume",
@@ -12618,10 +16639,7 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
     }
 
     forge_print_sep();
-    printf(
-        " %sCOMMANDS: [ADD #]  [REM #]  [PROF 1-10]  [CLEAR]  [CRAFT]  [DONE]  "
-        "(blend · q%d)%s\n",
-        C_MUTED, q_score, C_RESET);
+    printf(" %sADD  REM  CLEAR  CRAFT  DONE%s\n", C_MUTED, C_RESET);
     screen_frame_prompt(&frame);
     if (!screen_read_command(line, sizeof line, 1)) break;
     if (!line[0]) continue;
@@ -12629,10 +16647,6 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
       break;
     } else if (!strcmp(line, "clear")) {
       bench_n = 0;
-      continue;
-    } else if (!strncmp(line, "prof ", 5)) {
-      long v = strtol(line + 5, NULL, 10);
-      if (v >= 1 && v <= 10) g_craft_proficiency = (int)v;
       continue;
     } else if (!strncmp(line, "add ", 4)) {
       long v = strtol(line + 4, NULL, 10);
@@ -12692,7 +16706,7 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
       inv_add(made);
       g_score += 8 + g_craft_proficiency;
       if (g_craft_proficiency < 10 && (rand() % 3 == 0)) g_craft_proficiency++;
-      snprintf(msg, sizeof msg, "Forged: %s\nProficiency: %d", made, g_craft_proficiency);
+      snprintf(msg, sizeof msg, "You set aside: %s", made);
       causal_push("craft", made);
       ui_block_pause("FORGE COMPLETE", msg);
       bench_n = 0;
@@ -12702,7 +16716,6 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
   screen_frame_finish(&frame);
 }
 
-/* --- Equipment / inventory UI (120 cols: 50 + 4 + 66; inner 48 / 64) --- */
 static void eq_ui_emit_left_h48(void) {
   int k;
   printf("%s+", C_BORDER);
@@ -12823,8 +16836,6 @@ static void eq_ui_emit_inv_empty(void) {
   printf("%s|%s%s|%s%s", C_BORDER, C_RESET, inner, C_BORDER, C_RESET);
 }
 
-/* Equipment/inventory fullscreen: fixed 120-column layout (50 + 4 + 66; inner
- * grids 48 / 64; 16 rows; 12 pack lines). Matches equipment UI mockup. */
 static void run_equipment_inventory_ui(const char *pending_acc, int *did_fullscreen) {
   enum { EQ_INV_ROWS = 12, EQ_ROWS = 3 + EQ_INV_ROWS + 1 };
   static const char *const kEqUiExit[] = {"done", "back", "exit", "resume", NULL};
@@ -13283,6 +17294,9 @@ static void process_command(char *line, char *msg, size_t msgcap,
                             int *did_fullscreen) {
   char body[AETER_HELP_BODY_CAP];
   const char *slug;
+
+  if (disambig_try_followup(line, msg, msgcap, turn_advance)) return;
+  if (conv_try_followup(line, msg, msgcap, turn_advance)) return;
   static const char *const kQuit[] = {"quit", "q", "exit", NULL};
   static const char *const kMenu[] = {"menu", "mainmenu", "main menu", NULL};
   static const char *const kHelp[] = {"help", "?", NULL};
@@ -13424,6 +17438,20 @@ static void process_command(char *line, char *msg, size_t msgcap,
     return;
   }
 
+  if (!strcmp(line, "lore") || !strcmp(line, "lore primer") ||
+      !strcmp(line, "world lore")) {
+    *turn_advance = 0;
+    format_lore_body(body, sizeof body, NULL);
+    ui_fullscreen("LORE", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strncmp(line, "lore ", 5)) {
+    *turn_advance = 0;
+    format_lore_body(body, sizeof body, line + 5);
+    ui_fullscreen("LORE", body, pending_acc, did_fullscreen);
+    return;
+  }
+
   if (line_equals_one_of(line, kAbout)) {
     *turn_advance = 0;
     format_about_body(body, sizeof body);
@@ -13525,6 +17553,83 @@ static void process_command(char *line, char *msg, size_t msgcap,
     return;
   }
 
+  if (!strcmp(line, "inventory list") || !strcmp(line, "inv list") ||
+      !strcmp(line, "pack list") || !strcmp(line, "inventory") ||
+      !strcmp(line, "inv") || !strcmp(line, "pack")) {
+    int sort_mode = 0;
+    const char *filter = NULL;
+    if (!strcmp(line, "inventory") || !strcmp(line, "inv") ||
+        !strcmp(line, "pack"))
+      run_equipment_inventory_ui(pending_acc, did_fullscreen);
+    else {
+      *turn_advance = 0;
+      format_inventory_list_body(body, sizeof body, sort_mode, filter);
+      ui_fullscreen("INVENTORY", body, pending_acc, did_fullscreen);
+    }
+    return;
+  }
+  if (!strcmp(line, "inventory sort") || !strcmp(line, "inv sort") ||
+      !strcmp(line, "pack sort")) {
+    *turn_advance = 0;
+    format_inventory_list_body(body, sizeof body, 0, NULL);
+    ui_fullscreen("INVENTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strncmp(line, "inventory sort ", 15) ||
+      !strncmp(line, "inv sort ", 9) || !strncmp(line, "pack sort ", 10)) {
+    const char *mode =
+        !strncmp(line, "inventory sort ", 15)
+            ? line + 15
+            : (!strncmp(line, "inv sort ", 9) ? line + 9 : line + 10);
+    int sort_mode = 0;
+    while (*mode == ' ') mode++;
+    if (str_ieq(mode, "weight") || str_ieq(mode, "bulk") ||
+        str_ieq(mode, "heavy"))
+      sort_mode = 1;
+    else if (str_ieq(mode, "type") || str_ieq(mode, "category") ||
+             str_ieq(mode, "cat"))
+      sort_mode = 2;
+    *turn_advance = 0;
+    format_inventory_list_body(body, sizeof body, sort_mode, NULL);
+    ui_fullscreen("INVENTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strncmp(line, "inventory find ", 15) ||
+      !strncmp(line, "inv find ", 9) || !strncmp(line, "pack find ", 10) ||
+      !strncmp(line, "inventory search ", 17) ||
+      !strncmp(line, "inv search ", 11)) {
+    const char *q;
+    int sort_mode = 0;
+    if (!strncmp(line, "inventory find ", 15))
+      q = line + 15;
+    else if (!strncmp(line, "inv find ", 9))
+      q = line + 9;
+    else if (!strncmp(line, "pack find ", 10))
+      q = line + 10;
+    else if (!strncmp(line, "inventory search ", 17))
+      q = line + 17;
+    else
+      q = line + 11;
+    while (*q == ' ') q++;
+    if (!q[0]) {
+      snprintf(msg, msgcap, "Usage: inventory find <text>");
+      return;
+    }
+    *turn_advance = 0;
+    format_inventory_list_body(body, sizeof body, sort_mode, q);
+    ui_fullscreen("INVENTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strcmp(line, "crafting guide") || !strcmp(line, "craft guide") ||
+      !strcmp(line, "forge guide") || !strcmp(line, "forge help") ||
+      !strcmp(line, "crafting help") || !strcmp(line, "recipe") ||
+      !strcmp(line, "recipes") || !strcmp(line, "crafting recipes")) {
+    *turn_advance = 0;
+    snprintf(msg, msgcap,
+             "No recipe book — only trial, scrap, and whatever the bench shows "
+             "when you use  forge .");
+    return;
+  }
   if (line_equals_one_of(line, kInv)) {
     *turn_advance = 0;
     run_equipment_inventory_ui(pending_acc, did_fullscreen);
@@ -13739,6 +17844,32 @@ static void process_command(char *line, char *msg, size_t msgcap,
     ui_fullscreen("TAINTING", body, pending_acc, did_fullscreen);
     return;
   }
+  if (!strcmp(line, "relationship history") ||
+      !strcmp(line, "bond history") || !strcmp(line, "rapport history") ||
+      !strcmp(line, "social history")) {
+    *turn_advance = 0;
+    format_relationship_history_body(body, sizeof body, NULL);
+    ui_fullscreen("RELATIONSHIP HISTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strncmp(line, "relationship history ", 21)) {
+    *turn_advance = 0;
+    format_relationship_history_body(body, sizeof body, line + 21);
+    ui_fullscreen("RELATIONSHIP HISTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strncmp(line, "bond history ", 13)) {
+    *turn_advance = 0;
+    format_relationship_history_body(body, sizeof body, line + 13);
+    ui_fullscreen("RELATIONSHIP HISTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strncmp(line, "rapport history ", 16)) {
+    *turn_advance = 0;
+    format_relationship_history_body(body, sizeof body, line + 16);
+    ui_fullscreen("RELATIONSHIP HISTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
   if (!strcmp(line, "rapport") || !strcmp(line, "relationships") ||
       !strcmp(line, "bonds")) {
     *turn_advance = 0;
@@ -13766,6 +17897,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
     char purseb[48];
     AetPcSave pcs;
     const char *lit;
+    int si, n_eq = 0;
     *turn_advance = 0;
     get_world_clock(&wc);
     format_clock_time(t, sizeof t, &wc);
@@ -13778,7 +17910,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
     pc_capture(&pcs);
     pc_fill_narrative_defaults(&pcs);
     pc_format_pronouns_short(pcs.gender[0] ? pcs.gender : "they", pr, sizeof pr);
-  currency_format_long(g_coins, purseb, sizeof purseb);
+    currency_format_long(g_coins, purseb, sizeof purseb);
     snprintf(who, sizeof who, "%s (%s %s)",
              pcs.name[0] ? pcs.name : "Adventurer",
              pcs.race[0] ? pcs.race : "Human",
@@ -13791,7 +17923,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
         "Weather: %s, %dC\nLighting: %s\nRoom text: %s\n"
         "Readied: %s\n"
         "It / last examined: %s\n"
-        "Inventory slots: %d\n"
+        "Inventory slots: %d / %d\n"
         "Health: %d / %d\n"
         "Purse: %s\n"
         "Score: %d\nTurns: %d\n",
@@ -13801,7 +17933,23 @@ static void process_command(char *line, char *msg, size_t msgcap,
         g_verbose_room ? "full (verbose)" : "short (brief)",
         (g_ready_item[0] && inv_has(g_ready_item)) ? g_ready_item : "—",
         (g_last_focus[0] && inv_has(g_last_focus)) ? g_last_focus : "—",
-        g_inv_n, g_health, g_max_health, purseb, g_score, g_turns);
+        g_inv_n, MAX_INV, g_health, g_max_health, purseb, g_score, g_turns);
+    body_append(body, sizeof body, "\nEquipped\n");
+    for (si = 0; si < EQ_SLOT_COUNT; si++) {
+      if (!g_eq_slots[si][0]) continue;
+      n_eq++;
+      body_append(body, sizeof body, "  %-10s  %s\n", EQ_SLOT_NAME[si],
+                  g_eq_slots[si]);
+    }
+    if (!n_eq) body_append(body, sizeof body, "  (nothing worn)\n");
+    body_append_people_here(body, sizeof body);
+    body_append(body, sizeof body, "Pack bulk (est.): ~%u\n",
+                inventory_total_bulk());
+    if (g_barter_mode != BARTER_NONE && g_barter_item[0])
+      body_append(body, sizeof body, "Barter: pending quote on %s\n",
+                  g_barter_item);
+    if (g_autosave_enabled)
+      body_append(body, sizeof body, "Autosave shadow: on (after each turn)\n");
     append_causal_status_overlay(body, sizeof body);
     append_dlc_mod_to_body(body, sizeof body,
                            aet_mods_character_status_suffix());
@@ -13908,6 +18056,22 @@ static void process_command(char *line, char *msg, size_t msgcap,
     *turn_advance = 0;
     causal_clear();
     snprintf(msg, msgcap, "Causality trace cleared.");
+    return;
+  }
+
+  if (!strcmp(line, "history") || !strcmp(line, "command history") ||
+      !strcmp(line, "cmd history")) {
+    *turn_advance = 0;
+    format_cmd_history_body(body, sizeof body);
+    ui_fullscreen("HISTORY", body, pending_acc, did_fullscreen);
+    return;
+  }
+  if (!strcmp(line, "utilities") || !strcmp(line, "utility") ||
+      !strcmp(line, "room utilities") || !strcmp(line, "room objects") ||
+      !strcmp(line, "objects")) {
+    *turn_advance = 0;
+    format_utilities_body(body, sizeof body);
+    ui_fullscreen("UTILITIES", body, pending_acc, did_fullscreen);
     return;
   }
 
@@ -14338,7 +18502,8 @@ static void process_command(char *line, char *msg, size_t msgcap,
     ui_fullscreen("NOTES", body, pending_acc, did_fullscreen);
     return;
   }
-  if (!strcmp(line, "notes todo") || !strcmp(line, "notes pending")) {
+  if (!strcmp(line, "notes todo") || !strcmp(line, "notes pending") ||
+      !strcmp(line, "notes checklist")) {
     *turn_advance = 0;
     format_notes_filtered_body(body, sizeof body, "Todo notes", 1, NULL);
     append_dlc_mod_to_body(body, sizeof body,
@@ -14527,12 +18692,44 @@ static void process_command(char *line, char *msg, size_t msgcap,
     load_game(msg, msgcap);
     return;
   }
+  if (!strcmp(line, "load autosave") || !strcmp(line, "load shadow") ||
+      !strcmp(line, "restore autosave") || !strcmp(line, "restore shadow")) {
+    char apath[520];
+    *turn_advance = 0;
+    make_autosave_path(apath, sizeof apath);
+    if (!load_game_path(apath, msg, msgcap))
+      snprintf(msg, msgcap,
+               "No autosave shadow at %s — play a turn with autosave on first.",
+               apath);
+    return;
+  }
+  if (!strcmp(line, "autosave") || !strcmp(line, "autosave status")) {
+    char apath[520];
+    *turn_advance = 0;
+    make_autosave_path(apath, sizeof apath);
+    snprintf(msg, msgcap, "Autosave shadow is %s.\nFile: %s\nLoad with: load autosave",
+             g_autosave_enabled ? "ON (written after each advancing turn)" : "OFF",
+             apath);
+    return;
+  }
+  if (!strcmp(line, "autosave on") || !strcmp(line, "autosave enable")) {
+    *turn_advance = 0;
+    g_autosave_enabled = 1;
+    snprintf(msg, msgcap, "Autosave shadow enabled — a backup copy is written beside your quicksave after each turn.");
+    return;
+  }
+  if (!strcmp(line, "autosave off") || !strcmp(line, "autosave disable")) {
+    *turn_advance = 0;
+    g_autosave_enabled = 0;
+    snprintf(msg, msgcap, "Autosave shadow disabled — only the main quicksave updates each turn.");
+    return;
+  }
   if (!strncmp(line, "load ", 5) || !strncmp(line, "restore ", 8)) {
     const char *r = !strncmp(line, "load ", 5) ? line + 5 : line + 8;
     int slot;
     *turn_advance = 0;
     if (!parse_save_slot(r, &slot)) {
-      snprintf(msg, msgcap, "Use: load <1-%d>  or  saves.", SAVE_SLOT_COUNT);
+      snprintf(msg, msgcap, "Use: load <1-%d> | load autosave  or  saves.", SAVE_SLOT_COUNT);
       return;
     }
     load_game_slot(slot, msg, msgcap);
@@ -14616,6 +18813,11 @@ static void process_command(char *line, char *msg, size_t msgcap,
     return;
   }
 
+  if (!strcmp(line, "play piano") || !strncmp(line, "play piano ", 11)) {
+    cmd_play_piano(msg, msgcap);
+    return;
+  }
+
   if (!strncmp(line, "say ", 4) || !strncmp(line, "shout ", 6) ||
       !strncmp(line, "yell ", 5)) {
     const char *t;
@@ -14650,6 +18852,13 @@ static void process_command(char *line, char *msg, size_t msgcap,
   if (!strncmp(line, "read ", 5)) {
     *turn_advance = 0;
     read_target(line + 5, msg, msgcap);
+    return;
+  }
+
+  if (!strncmp(line, "open mailbox", 12) ||
+      !strncmp(line, "open the mailbox", 16)) {
+    *turn_advance = 0;
+    cmd_open_mailbox(msg, msgcap);
     return;
   }
 
@@ -14710,6 +18919,19 @@ static void process_command(char *line, char *msg, size_t msgcap,
     append_dlc_mod_to_body(body, sizeof body,
                            aet_mods_character_compare_suffix());
     ui_fullscreen("COMPARE", body, pending_acc, did_fullscreen);
+    return;
+  }
+
+  if (!strncmp(line, "price compare ", 14) ||
+      !strncmp(line, "compare prices ", 15) ||
+      !strncmp(line, "market compare ", 15)) {
+    const char *rest = line;
+    if (!strncmp(line, "price compare ", 14)) rest = line + 14;
+    else if (!strncmp(line, "compare prices ", 15)) rest = line + 15;
+    else rest = line + 15;
+    *turn_advance = 0;
+    cmd_price_compare(rest, body, sizeof body);
+    ui_fullscreen("PRICE COMPARISON", body, pending_acc, did_fullscreen);
     return;
   }
 
@@ -14921,9 +19143,16 @@ static void process_command(char *line, char *msg, size_t msgcap,
     }
     if (strcmp(slug, "east_of_house") == 0 &&
         (strstr(r, "lockpick") != NULL || strstr(r, "pick") != NULL)) {
-      if (!inv_has("lockpick") && !inv_has("fine_lockpick")) {
+      if (!has_lockpick_tool()) {
         snprintf(msg, msgcap, "You need a working lockpick.");
       } else {
+#ifdef AETER_MINIGAMES
+        if (try_minigame("lockpick", msg, msgcap)) {
+          MgtPersistentState *st = mgt_host_state();
+          if (st && st->last_success == 1) g_shed_unlocked = 1;
+          return;
+        }
+#endif
         g_shed_unlocked = 1;
         snprintf(msg, msgcap,
                  "You coax the shed lock with your tools until it yields.");
@@ -14944,15 +19173,100 @@ static void process_command(char *line, char *msg, size_t msgcap,
   if (!strcmp(line, "pick lock") || !strcmp(line, "pick")) {
     if (strcmp(slug, "east_of_house") != 0) {
       snprintf(msg, msgcap, "Nothing to pick here.");
-    } else if (!inv_has("lockpick") && !inv_has("fine_lockpick")) {
+    } else if (!has_lockpick_tool()) {
       snprintf(msg, msgcap, "You need a lockpick.");
     } else {
+#ifdef AETER_MINIGAMES
+      if (try_minigame("lockpick", msg, msgcap)) {
+        MgtPersistentState *st = mgt_host_state();
+        if (st && st->last_success == 1) g_shed_unlocked = 1;
+        return;
+      }
+#endif
       g_shed_unlocked = 1;
       snprintf(msg, msgcap,
                "The shed lock gives way with a quiet snick. The door can open.");
     }
     return;
   }
+
+  if (!strcmp(line, "fish") || !strcmp(line, "go fishing")) {
+    if (!room_can_fish()) {
+      snprintf(msg, msgcap, "There is no good place to fish here.");
+      return;
+    }
+#ifdef AETER_MINIGAMES
+    if (try_minigame("fishing", msg, msgcap)) return;
+#endif
+    snprintf(msg, msgcap, "You cast a line but the moment passes without a bite.");
+    return;
+  }
+
+  if (!strcmp(line, "farm") || !strcmp(line, "tend farm") ||
+      !strcmp(line, "work farm")) {
+    if (!room_can_farm()) {
+      snprintf(msg, msgcap, "This is not farmland.");
+      return;
+    }
+#ifdef AETER_MINIGAMES
+    if (try_minigame("farming", msg, msgcap)) return;
+#endif
+    snprintf(msg, msgcap, "You pull a few weeds and call it enough for now.");
+    return;
+  }
+
+  if (!strcmp(line, "cook") || !strcmp(line, "work kitchen") ||
+      !strcmp(line, "work shift")) {
+    if (!room_can_cook()) {
+      snprintf(msg, msgcap, "There is no kitchen to work here.");
+      return;
+    }
+#ifdef AETER_MINIGAMES
+    if (try_minigame("cooking", msg, msgcap)) return;
+#endif
+    snprintf(msg, msgcap, "You stir a pot and leave the real service to memory.");
+    return;
+  }
+
+  if (!strcmp(line, "gamble") || !strcmp(line, "play dice") ||
+      !strcmp(line, "play cards")) {
+    if (!room_can_gamble()) {
+      snprintf(msg, msgcap, "No dice or cards are laid out here.");
+      return;
+    }
+#ifdef AETER_MINIGAMES
+    if (try_minigame("gambling", msg, msgcap)) return;
+#endif
+    snprintf(msg, msgcap, "You watch a hand of cards without joining in.");
+    return;
+  }
+
+  if (!strcmp(line, "hunt") || !strcmp(line, "track game")) {
+    const char *slug = world_slug(g_room);
+    if (!slug || (strstr(slug, "forest") == NULL && strcmp(slug, "meadow") != 0 &&
+                  strcmp(slug, "deep_forest") != 0)) {
+      snprintf(msg, msgcap, "No game trails worth following here.");
+      return;
+    }
+    if (!has_hunting_weapon()) {
+      snprintf(msg, msgcap, "You need a bow to hunt here.");
+      return;
+    }
+#ifdef AETER_MINIGAMES
+    if (try_minigame("hunting", msg, msgcap)) return;
+#endif
+    snprintf(msg, msgcap, "You stalk the treeline but find only prints and silence.");
+    return;
+  }
+
+  if (!strcmp(line, "write") || !strcmp(line, "scribe")) {
+#ifdef AETER_MINIGAMES
+    if (try_minigame("writing", msg, msgcap)) return;
+#endif
+    snprintf(msg, msgcap, "You have no desk handy for a proper writing session.");
+    return;
+  }
+
 
   if (!strncmp(line, "give ", 5)) {
     const char *r = line + 5;
@@ -15283,6 +19597,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
 
 static void init_new_game(int start_room) {
   if (start_room < 0 || start_room >= WORLD_ROOM_COUNT) return;
+  disambig_reset_all();
   init_items_from_world();
   place_persistent_story_items();
   apply_reference_new_game_bootstrap();
@@ -15308,16 +19623,21 @@ static void init_new_game(int start_room) {
   g_transcript[0] = '\0';
   clear_focus();
   g_last_cmd[0] = '\0';
+  cmd_hist_clear();
   g_craft_proficiency = 1;
   diag_clear();
   causal_clear();
   trade_history_clear();
+  rel_hist_clear();
   barter_clear();
   g_npc_validation_checked = 0;
   g_npc_validation_warnings = 0;
+  g_autosave_enabled = 1;
   validate_npc_world_refs();
-  /* grant_starting_loadout + eq_bootstrap_from_character run after
-   * run_character_creation() so class / weapon / armor picks apply. */
+#ifdef AETER_MINIGAMES
+  g_mgt_quicksave_valid = 0;
+  g_mgt_ready = 0;
+#endif
 }
 
 static void main_menu_box_row(char d, const char *it, const char *al) {
@@ -15482,6 +19802,43 @@ static void handle_line(char *line) {
       is_repeat = 1;
       strncpy(work, g_last_cmd, sizeof work - 1);
       work[sizeof work - 1] = '\0';
+    } else if (chk[0] == '!' && chk[1] >= '1' && chk[1] <= '9') {
+      char *end = NULL;
+      long hn = strtol(chk + 1, &end, 10);
+      char recalled[INPUT_LINE_MAX];
+      if (end && *end == '\0' && hn >= 1 &&
+          cmd_hist_get_from_latest((int)hn, recalled, sizeof recalled)) {
+        strncpy(work, recalled, sizeof work - 1);
+        work[sizeof work - 1] = '\0';
+      } else {
+        snprintf(g_transcript, sizeof g_transcript,
+                 "%s — no command history entry #%ld.", pc_display_name(), hn);
+        paint_normal();
+        return;
+      }
+    } else if (!strncmp(chk, "history ", 8)) {
+      const char *arg = chk + 8;
+      char *end = NULL;
+      long hn;
+      while (*arg == ' ') arg++;
+      if (str_ieq(arg, "list")) {
+        format_cmd_history_body(g_transcript, sizeof g_transcript);
+        paint_normal();
+        return;
+      }
+      hn = strtol(arg, &end, 10);
+      if (end > arg && *end == '\0' && hn >= 1) {
+        char recalled[INPUT_LINE_MAX];
+        if (cmd_hist_get_from_latest((int)hn, recalled, sizeof recalled)) {
+          strncpy(work, recalled, sizeof work - 1);
+          work[sizeof work - 1] = '\0';
+        } else {
+          snprintf(g_transcript, sizeof g_transcript,
+                   "%s — no command history entry #%ld.", pc_display_name(), hn);
+          paint_normal();
+          return;
+        }
+      }
     }
   }
 
@@ -15518,11 +19875,13 @@ static void handle_line(char *line) {
         int adv = 0;
         int did_fs = 0;
         process_command(seg, msg, sizeof msg, &adv, acc, &did_fs);
-        /* Fullscreen segments used to abort the whole chain here; that broke
-         * zero-turn flows like `exits; n` or `help; whereami`. Each fullscreen
-         * returns before we continue; remaining segments still run. */
+        
         if (g_return_to_menu) {
-          if (any_adv) (void)write_save_file();
+          if (any_adv) {
+            relationship_decay_tick();
+            (void)write_save_file();
+            autosave_write_shadow();
+          }
           return;
         }
         if (adv > 0) {
@@ -15539,10 +19898,15 @@ static void handle_line(char *line) {
     snprintf(g_transcript, sizeof g_transcript, "%s", acc);
     if (acc[0]) recap_push(acc);
     paint_normal();
-    if (any_adv) (void)write_save_file();
+    if (any_adv) {
+      relationship_decay_tick();
+      (void)write_save_file();
+      autosave_write_shadow();
+    }
     if (!is_repeat) {
       strncpy(g_last_cmd, chain_for_repeat, sizeof g_last_cmd - 1);
       g_last_cmd[sizeof g_last_cmd - 1] = '\0';
+      cmd_hist_push(chain_for_repeat);
     }
   }
 }

@@ -833,7 +833,7 @@ static const char *const WORLD_ENTITIES_REC[WORLD_ROOM_COUNT] = {
   "",
   "",
   "",
-  "",
+  "bartender",
   "tavern_keeper",
   "",
   "",
@@ -1701,6 +1701,9 @@ static const char *const WORLD_ITEM_LISTS_REC_107[] = {
 };
 static const char *const WORLD_ITEM_LISTS_REC_108[] = {
   "ancient_tomes",
+  "ancient_tome",
+  "lore_scroll",
+  "hollow_ridge_primer",
   "scrolls",
   "reading_chairs",
   "fireplace",
@@ -2263,6 +2266,7 @@ static const char *const WORLD_HIDDEN_ITEM_LISTS_REC_156[] = {
   NULL
 };
 static const char *const WORLD_HIDDEN_ITEM_LISTS_REC_158[] = {
+  "leaflet",
   "hidden_cash",
   "buried_coin",
   NULL
@@ -2489,11 +2493,15 @@ static const AetNpcTopic NPC_blacksmith_TOPICS[] = {
   {"thanks thank you appreciate grateful", "You're welcome! Always happy to help. Come back anytime you need smithing work done."},
   {"upgrade improve enhance make better strengthen", "I can upgrade your weapons and armor! What would you like me to work on?"},
   {"weapons sword blade weapon", "A good weapon is a balance of strength, sharpness, and weight. I can make you something that'll last a lifetime, or upgrade what you've got to be even better."},
+  {"architect temple divine waystone", "Steel's honest; gods are complicated. I hear the Architect built more than temples. My part's simpler — metal that doesn't fail you on a bad day."},
   {"what do you have what can i buy what's for sale materials", "I've got ingots, leather, and tools. Let me show you..."},
   {NULL, NULL}
 };
 static const char *const NPC_farmer_CHATTER[] = {
-  "He has the kind of beauty that comes from the sun and soil—broad shoulders softened by a loose linen shirt, and forearms corded with muscle from years of honest labor. His hair is messy and sun-bleached, and he smells like fresh rain and warm hay. There is a gentleness in his eyes that suggests he prefers listening to ",
+  "Jasper wipes his brow and offers a shy smile, eyes on the horizon more than on you.",
+  "The soil here is rich. You have to treat it right — touch it gently, and it gives you everything.",
+  "Don't rush. Slow down. Breathe. The answer usually comes when you stop forcing it.",
+  "The village is noisy. I prefer it here. You can hear yourself think.",
   NULL
 };
 static const AetNpcTopic NPC_farmer_TOPICS[] = {
@@ -2507,14 +2515,27 @@ static const AetNpcTopic NPC_farmer_TOPICS[] = {
   {"trade buy sell prices what do you have inventory", "I grew these myself. Picked the best ones just in case you stopped by. Take a look."},
   {"village people locals community home", "The village is noisy. I prefer it here. You can hear yourself think. You can hear yourself breathe. It's intimate."},
   {"weather rain storm drought season hot", "It's hot today. The kind of heat that sticks to your skin and makes your clothes heavy. I don't mind the sweat, though. Makes the water feel better later."},
+  {"architect temple divine faith blessing prayer", "The Architect made the land fertile before making the people. I don't preach — I just try not to waste what was given."},
   {"work job occupation what do you do chores", "I work with my hands. It's physical. Exhausting. But at the end of the day, when I wash the dirt off... I feel useful. Strong."},
   {NULL, NULL}
 };
 static const char *const NPC_forest_hermit_CHATTER[] = {
-  "An ancient, mysterious figure who lives deep in the forest. Their age is impossible to determine, and their eyes hold the wisdom of countless years. They wear tattered robes that blend with the forest, and move with an almost supernatural silence. Their knowledge of ancient secrets and forgotten lore is vast, and they ",
+  "I have lived in these woods for longer than most can remember. The forest holds many secrets, and I am its keeper.",
+  "Ancient powers sleep beneath these trees. The Architect's creation runs deep, deeper than most realize.",
+  "The old ways are not forgotten, merely hidden. Those who seek with true intent may find what they need.",
+  "Time flows differently in the deep forest. Here, past and present blur, and the future whispers in the wind.",
+  "I know things that others have forgotten. Secrets of Veritasfurtum, of Hollow Ridge, of the Architect's true nature.",
   NULL
 };
 static const AetNpcTopic NPC_forest_hermit_TOPICS[] = {
+  {"architect creation divine old ways temple", "Ancient powers sleep beneath these trees. The Architect's creation runs deep, deeper than most realize."},
+  {"veritasfurtum hollow ridge realm world universe", "Veritasfurtum frays at the edges; Hollow Ridge is but one charted room inside the storm. I keep watch where the map grows thin."},
+  {"secret secrets ancient lore knowledge riddle", "The old ways are not forgotten, merely hidden. Those who seek with true intent may find what they need."},
+  {"forest woods trees nature deep grove", "Time flows differently in the deep forest. Here, past and present blur, and the future whispers in the wind."},
+  {"hello hi greetings wanderer seeker visitor", "Ah... a visitor. Few find their way here. What secrets do you seek, wanderer?"},
+  {"help assist guidance counsel lost", "Speak your need plainly. The forest answers those who listen, not those who demand."},
+  {"name who are you thorn hermit", "Names are for mortals who forget. You may call me Thorn, if you must call me anything."},
+  {"thanks thank you grateful", "Gratitude is a seed. Plant it; do not clutch it."},
   {NULL, NULL}
 };
 static const char *const NPC_general_store_owner_CHATTER[] = {
@@ -2551,6 +2572,10 @@ static const AetNpcTopic NPC_general_store_owner_TOPICS[] = {
   {"store shop business inventory wares goods", "This shop is the heart of the village. I provide the light to see, the rope to climb, and the oil to... well, let's just say I have you covered."},
   {"thanks thank you appreciate grateful", "Don't thank me yet. You haven't seen the full service. Come back soon."},
   {"village town people community villagers", "It's a quiet little place, but everyone has their 'needs'. I'm just the one brave enough to stock the solution."},
+  {"rumor rumors gossip secrets whispers scandal", "I hear everything, honey. Who's sleeping where, who owes whom. Discretion costs extra — unless you're buying."},
+  {"discretion secret private back room special inventory", "Discretion is my most expensive item. For the right customer, the back room has silk rope and no witnesses."},
+  {"architect faith temple divine blessing", "Even the faithful need rope and lamp oil. I don't judge — I stock what keeps people alive and honest about their appetites."},
+  {"sam name who are you introduce yourself", "Sam. I run this shop. Most folks leave happier than they arrived."},
   {"work working job occupation what do you do", "I run the shop. I keep the village provisioned and the travelers happy. It's a heavy load, but I've got the stamina for it."},
   {NULL, NULL}
 };
@@ -2587,7 +2612,11 @@ static const AetNpcTopic NPC_miller_TOPICS[] = {
   {"river water stream", "Love this river. It's strong, steady, and never gives up. Reminds me of myself."},
   {"sell trade give you offer have anything to sell", "Sure, I'm always looking for materials. What've you got?"},
   {"thanks thank you appreciate grateful", "You're welcome! Always happy to help a friend."},
-  {"water wheel wheel mill wheel gears", "That wheel? Been broken for a while. River shifted after a big storm. I'll fix it eventually - just need the right parts and some muscle."},
+  {"water wheel wheel mill wheel gears broken fix repair", "That wheel? Been broken for a while. River shifted after a big storm. I'll fix it eventually - just need the right parts and some muscle."},
+  {"fix repair help assist wheel parts wood scrap metal", "You'd help me fix it? I could use wood scraps and scrap metal. Gather some and come back — I'll be here."},
+  {"architect temple divine faith blessing", "The Architect built more than stone. This mill, this river, this ridge — all borrowed breath. I keep working; that's my prayer."},
+  {"veritasfurtum hollow ridge realm world", "We're a piece of Veritasfurtum, not the whole sky. Hollow Ridge is home enough for me. Let the rifts happen elsewhere."},
+  {"fish fishing catch river shore noon", "River's got good fish. I usually cast around noon at the shore. Meet me there if you want company."},
   {"weather rain storm sunny clouds", "Weather affects everything here. Rain means the river's stronger, which would help if that wheel worked. But I manage either way."},
   {"what do you have what can i buy what's for sale inventory wares goods", "Let me show you what I've got..."},
   {"work working job occupation what do you do", "I run this mill. It's hard work, but I love it. There's something satisfying about grinding grain and making flour."},
@@ -2637,6 +2666,15 @@ static const char *const NPC_priestess_CHATTER[] = {
   NULL
 };
 static const AetNpcTopic NPC_priestess_TOPICS[] = {
+  {"architect faith divine temple blessing sacrament", "The Architect gave us bodies to enjoy. A blessing is simply the transfer of intent — yours, mine, and the blueprint's."},
+  {"body desire pleasure calibration confession", "Knowledge of your own body is the first step to true worship. Do not be afraid to explore the map."},
+  {"help assist guidance counsel heal", "Tell me what you carry in flesh and heart. Confession is the first calibration."},
+  {"genetrix bridge union", "The Genetrix is a living bridge. It knows the joy of genetic exchange; we have much to learn from it."},
+  {"seraphine seraphina race four breasts", "Seraphines are the Architect's living sacrament: pale skin, velvet tails, and bodies built for disciplined ecstasy. I am one."},
+  {"blessed barren sterile sacrament", "My order is Blessed Barren — sterile by design so we may share love without the burden of reproduction. Shame is the only heresy here."},
+  {"marcus paladin guard missionaries elena kira yuki", "Marcus is the iron wall around our soft work. I would not survive this temple without his devotion."},
+  {"hello hi greetings welcome", "Step gently. This is a place for confession, physical repair, and the calibration of your deepest desires."},
+  {"thanks thank you grateful", "You owe no thanks. Serving you is a blessing in itself."},
   {NULL, NULL}
 };
 static const char *const NPC_tavern_keeper_CHATTER[] = {
@@ -2685,6 +2723,138 @@ static const char *const NPC_village_innkeeper_CHATTER[] = {
   NULL
 };
 static const AetNpcTopic NPC_village_innkeeper_TOPICS[] = {
+  {"room rent stay lodging bed meal breakfast dinner", "Rooms are clean, meals are hot, and you're welcome to stay as long as you need. The village inn is a home, not just a stop."},
+  {"hello hi greetings welcome", "Welcome to the village inn! I'm Lydia. Need a room or something to eat?"},
+  {"help assist lost directions", "Lost? The square's east of here, the tavern's louder than us, and the temple's where the bells come from. Rest first if you need to."},
+  {"name who are you lydia", "I'm Lydia. I run this inn — rooms, meals, and a quiet ear when travelers need one."},
+  {"rumor gossip news village", "Travelers tell me everything. I don't spread it all — but I listen, and I remember who was kind."},
+  {"thanks thank you grateful", "You're always welcome here. That's what an innkeeper's for."},
+  {"tavern rusty anchor soren", "Soren runs the Rusty Anchor — all velvet and drama. We're quieter here. Some folks prefer that."},
+  {"architect temple faith rest prayer", "You're welcome to rest under this roof. The Architect's love isn't only for temples — sometimes it's a clean sheet and hot stew."},
+  {"meal food breakfast dinner hungry", "Kitchen's open when the pot's on. Tell me if you need plain fare or something that'll keep you walking till dusk."},
+  {NULL, NULL}
+};
+static const char *const NPC_bartender_CHATTER[] = {
+  "I spent half my life breaking things on the battlefield. I prefer pouring drinks and making sure no one touches Soren without asking.",
+  "You've got the look of someone who hasn't slept in a soft bed in weeks. Drink your ale. You're safe while I'm behind this counter.",
+  "The tavern keeper is a whirlwind of lace and panic. I keep him grounded; he keeps me from getting bored.",
+  "I have scars that tell stories you probably shouldn't hear before a hot meal. Let's stick to lighter tales for now.",
+  NULL
+};
+static const AetNpcTopic NPC_bartender_TOPICS[] = {
+  {"war veteran service military battle soldier scars", "The war took good years and made me hard. It also taught me how to protect what's mine. This bar is my sanctuary."},
+  {"story tale tell me adventure experience", "Most of my stories end in blood or heartbreak. I'll pour you something strong and we can enjoy the quiet instead."},
+  {"bartender bar wolf this job working here", "I've got the size to stop a fight before it starts and the patience to listen to a drunk cry. Perfect job for an old wolf."},
+  {"keeper owner boss soren tavern keeper femboy", "Soren's dramatic — worries about ribbons while I worry about the perimeter. Good soul. I'd snap the arm of anyone who hurt him."},
+  {"drink ale mead wine beer something to drink", "Heavy stout that'll put hair on your chest, or spiced wine like velvet. Pick your poison."},
+  {"piano music play song performance", "The piano's tuned. Soren frets about the lighting; I fret about who starts fights near it. Play if you've got the hands."},
+  {"flirt handsome hot big muscles kiss date", "Easy there, cub. I'm a lot of wolf to handle. Drink your ale before you make promises you can't keep."},
+  {"help assist need help advice", "Need a drink, a seat, or someone to watch your back? That's what I'm here for."},
+  {"hello hi hey greetings good day evening", "Evening. Pull up a stool. If you need trouble, walk back out that door."},
+  {"thanks thank you grateful", "Anytime. Finish that ale before it gets warm."},
+  {NULL, NULL}
+};
+static const char *const NPC_missionary_elena_CHATTER[] = {
+  "As a human missionary, I bring a relatable perspective to spreading The Architect's love.",
+  "I'm blessed to be sterile, so I can share love freely. It's The Architect's beautiful gift!",
+  "The Architect loves Veritasfurtum and Hollow Ridge with infinite compassion.",
+  "Love comes in many forms — friendship, romance, passion — all are sacred.",
+  "I work alongside Kira, Yuki, and Marcus. Together we spread the Architect's message.",
+  NULL
+};
+static const AetNpcTopic NPC_missionary_elena_TOPICS[] = {
+  {"architect faith love blessing temple", "The Architect's love is infinite. I honor it by sharing warmth with everyone I meet."},
+  {"marcus paladin guard protect", "Marcus keeps us safe when we travel. Strong, kind — the Architect truly blessed us."},
+  {"kira yuki missionaries sisters", "Kira brings play; Yuki brings wisdom. We're different hands on the same altar."},
+  {"hello hi greetings welcome elena", "Hello, friend! I'm Elena, missionary of The Architect. May love guide your path."},
+  {"help assist counsel advice", "Tell me what's heavy. Love listens before it lectures."},
+  {"thanks thank you grateful", "You're welcome. Spreading love is its own reward."},
+  {NULL, NULL}
+};
+static const char *const NPC_missionary_kira_CHATTER[] = {
+  "As a neko, I bring a unique perspective to spreading The Architect's love! My playful nature helps people open up.",
+  "I'm blessed to be sterile — The Architect's gift! I can share love freely.",
+  "The Architect loves all creatures. Love knows no boundaries.",
+  "I love to flirt and have fun! Spreading love should be joyful.",
+  "Marcus protects us missionaries when we travel. So strong and kind!",
+  NULL
+};
+static const AetNpcTopic NPC_missionary_kira_TOPICS[] = {
+  {"architect faith love neko cat", "Meow! The Architect made all of us — ears, tails, and hungers included. Love them all."},
+  {"marcus paladin guard", "Marcus is our wall. I tease him; he pretends not to like it. We all feel safer with him near."},
+  {"elena yuki missionaries", "Elena is warmth; Yuki is wisdom. I'm the trouble they send to make you smile."},
+  {"hello hi greetings kira meow", "Meow! Hello! I'm Kira, missionary of The Architect! Ready to spread some love?"},
+  {"flirt cute pretty kiss romance", "Ooh, bold! Tail's swishing already. Buy me a treat first and we'll see where this goes."},
+  {"thanks thank you grateful", "You're welcome! Come back when you need more love — or more mischief."},
+  {NULL, NULL}
+};
+static const char *const NPC_missionary_yuki_CHATTER[] = {
+  "As a kitsune, I bring ancient wisdom to spreading The Architect's love. My tails represent the many forms love can take.",
+  "I am blessed to be sterile, sharing love freely without reproduction's burden.",
+  "The Architect's love for Veritasfurtum is infinite. I honor it with wisdom and passion.",
+  "Love is both playful and profound. I enjoy light flirting and deep connection alike.",
+  "My kitsune nature makes me naturally charming. I use that gift for the Architect.",
+  NULL
+};
+static const AetNpcTopic NPC_missionary_yuki_TOPICS[] = {
+  {"architect faith wisdom love kitsune fox", "Greetings. The Architect wove desire into law. Wisdom is knowing when to be gentle."},
+  {"marcus paladin guard temple", "Marcus stands between us and harm. His strength lets our softness travel farther."},
+  {"elena kira missionaries", "Elena heals hearts; Kira opens them. I try to help you understand what opened."},
+  {"hello hi greetings yuki", "Greetings, dear one. I am Yuki, missionary of The Architect. May love and wisdom guide you."},
+  {"flirt beautiful tails romance kiss", "Careful. My tails have minds of their own when I like someone. Do you mind being wrapped up?"},
+  {"thanks thank you grateful", "Gratitude suits you. Return when the road grows cold."},
+  {NULL, NULL}
+};
+static const char *const NPC_traveling_bard_CHATTER[] = {
+  "I've traveled far and wide, collecting stories and songs from every corner of Veritasfurtum and Hollow Ridge.",
+  "A good story can teach, inspire, or simply entertain. That's what I do — I bring stories to life through song and tale.",
+  "I know legends of The Architect, tales of ancient heroes, and songs of love and adventure. What interests you?",
+  "Every place I visit has its own stories. I collect them like treasures, and share them with those who will listen.",
+  "Music and stories have power. They can heal, inspire, and bring people together. That's my gift to the world.",
+  NULL
+};
+static const AetNpcTopic NPC_traveling_bard_TOPICS[] = {
+  {"music song sing melody lute perform play", "Music is rhythm and friction, sweetheart. It makes hips sway and crowds sweat. Want something that makes you blush?"},
+  {"story stories tale legend lore myth architect", "I know the dirty little secrets this kingdom tries to hide — and the legends the history books leave out."},
+  {"architect faith temple divine blessing", "The Architect built the cage; we rattle the bars. Fanatics pray with the same desperate look as lovers. Passion is passion."},
+  {"travel journey road places caravan where have you been", "I've warmed beds from the capital to the coast. You learn a culture by how it handles liquor and lovers."},
+  {"perform play something sing for me entertain show me a song", "Alright, eyes on me. I like an audience. Something slow that hits hard — try to keep up."},
+  {"rumor rumors gossip news whispers", "Word is the guards are distracted — too much wine, too many loose companions. Perfect time for bad behavior."},
+  {"help assist advice hint stuck", "Don't force a lock you can pick. Charm the guard or slip through the back window. Brute force is boring."},
+  {"work job occupation bard what do you do", "I sell pleasure, distraction, and noise. Coin good, audience pretty — I'm happy."},
+  {"poem poetry verse rhyme write", "Real poetry is a moan in the dark, a gasp, a curse — the raw stuff when you lose control."},
+  {"flirt beautiful cute kiss romance like you", "Bold. Hungry eyes. Buy me a drink first and we'll see if you can keep up."},
+  {"name who are you aria introduce yourself", "Aria. Call me whatever you want in the heat of the moment."},
+  {"adventure quest hero danger where next", "Adrenaline is the best aphrodisiac. Find something dangerous, survive, come back — scars are sexy."},
+  {"thanks thank you appreciate grateful", "My pleasure. Literally. Come back when you want more."},
+  {"hello hi hey greetings good day", "Hey there, gorgeous. Drink or a song? Luckily I'm excellent at both."},
+  {NULL, NULL}
+};
+static const char *const NPC_traveling_merchant_CHATTER[] = {
+  "You can tell a lot about a settlement by what sells out first. Here? The lustful liquor goes faster than the bandages.",
+  "I trade in goods, but information keeps me alive. Knowing who sleeps in whose bed is vital for route planning.",
+  "I do not mind haggling. I mind vague haggling. Want a discount? Offer me something of equal value — and I don't just mean coin.",
+  "If you want road advice, ask before dusk. My best answers cost less when there's still daylight.",
+  "Every pack compartment has a purpose. The top is for survival. The hidden seams are for... recreation.",
+  NULL
+};
+static const AetNpcTopic NPC_traveling_merchant_TOPICS[] = {
+  {"travel journey road places where route", "I've walked from the capital to the edge of the anomalies. Rough roads — worthwhile company."},
+  {"routes route road safety safe path pathing", "Route intelligence isn't free. Buy something and I'll tell you which paths have bandits waiting."},
+  {"price prices cost haggling bargain expensive cheap", "I price on rarity and desperation. Bleeding? Bandages cost more. Lonely? Liquor costs more."},
+  {"rumor rumors gossip market news counterfeit", "People are getting bolder — more desires, less restraint. Drives up my specialty goods."},
+  {"trust loyalty terms proof honest", "Trust is a currency. Earn it and I'll show what I keep at the bottom of the bag."},
+  {"items wares goods what do you have what do you sell inventory stock", "Survival and pleasure — potions, tonics, things that make the night go faster. Take your pick."},
+  {"buy purchase get take", "Excellent. Don't be shy if something scandalous catches your eye."},
+  {"sell trade give you offer", "Always looking for rare stock. Impress me."},
+  {"work job occupation merchant what do you do", "I bring people what they want when they need it most. Lucrative calling."},
+  {"story stories road story tell me a story", "I could tell you about a noble's guard and a crate of virility boosters — but I respect privacy. Usually."},
+  {"flirt attractive cute handsome beautiful date kiss", "Bold approach. Keep that confidence and I might demonstrate the wares privately."},
+  {"help assist aid need help can you help", "Fight gear or celebration gear — tell me what you need."},
+  {"thanks thank you appreciate grateful", "Pleasure doing business. Come back when supplies run low."},
+  {"hello hi greetings hey well met", "Well met, traveler. Items for the road, items for the bedroom — depends where you're headed."},
+  {"corbin name who are you discreet privacy", "Corbin, when I'm not being formal. Discretion costs extra — or earns trust. Your choice."},
+  {"architect temple faith divine blessing", "Even merchants pray at waystones. The Architect keeps the roads from forgetting their purpose."},
   {NULL, NULL}
 };
 static const AetNpcLineSet AET_NPC_LINES_REC[] = {
@@ -2698,6 +2868,12 @@ static const AetNpcLineSet AET_NPC_LINES_REC[] = {
   {"tavern_keeper", "Welcome! Welcome to The Rusty Anchor! Please, sit anywhere-oh, not there, the lighting is terrible. Here! Sit here. You look magnificent.", NPC_tavern_keeper_CHATTER, NPC_tavern_keeper_TOPICS},
   {"village_guard", "Hold it right there. I don't recognize you, and I don't like surprises. Hands where I can see them.", NPC_village_guard_CHATTER, NPC_village_guard_TOPICS},
   {"village_innkeeper", "Welcome to the village inn! I'm Lydia, the innkeeper. Need a room or a meal? Make yourself at home!", NPC_village_innkeeper_CHATTER, NPC_village_innkeeper_TOPICS},
+  {"traveling_bard", "Greetings, friend! I'm Aria, a traveling bard! Care to hear a tale or a song? I've got stories from all across the land!", NPC_traveling_bard_CHATTER, NPC_traveling_bard_TOPICS},
+  {"traveling_merchant", "Traveler. Good timing. I've got fresh stock, fair prices, and a few specialized items for those long, lonely nights on the road.", NPC_traveling_merchant_CHATTER, NPC_traveling_merchant_TOPICS},
+  {"bartender", "Take a load off, traveler. The stool will hold your weight, and the ale will take the edge off the cold. What are you drinking?", NPC_bartender_CHATTER, NPC_bartender_TOPICS},
+  {"missionary_elena", "Hello, friend! I'm Elena, missionary of The Architect. Welcome! May love guide your path.", NPC_missionary_elena_CHATTER, NPC_missionary_elena_TOPICS},
+  {"missionary_kira", "Meow! Hello there! I'm Kira, missionary of The Architect! Ready to spread some love?", NPC_missionary_kira_CHATTER, NPC_missionary_kira_TOPICS},
+  {"missionary_yuki", "Greetings, dear one. I am Yuki, missionary of The Architect. May love and wisdom guide your path.", NPC_missionary_yuki_CHATTER, NPC_missionary_yuki_TOPICS},
 };
 static const AetMerchantOffer MERCHANT_blacksmith_STOCK[] = {
   {"iron_ingot", 15},

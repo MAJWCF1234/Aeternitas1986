@@ -1,7 +1,10 @@
 # Local runtime saves / tool output (do not commit)
 aeternitas64_save.txt
+aeternitas64_save_autosave.txt
 aeternitas64_dev_save.txt
 autotest_out.txt
+harness_save.mgt
+*.out
 tools/_*.txt
 
 # Build outputs

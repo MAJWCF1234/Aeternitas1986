@@ -37,7 +37,6 @@ static int race_is_construct(const AetPcSave *pc);
 static int race_is_slime_like(const AetPcSave *pc);
 static int race_reads_construct_adjacent(const AetPcSave *pc);
 
-/* Avoid "Slender muscle softened by Slender flesh"; merge when labels match. */
 static void muscle_and_softness_clause(const AetPcSave *pc, char *buf,
                                        size_t cap) {
   const char *m = S(pc->muscle_tone, "steady");
@@ -294,8 +293,7 @@ static int lactation_rank(int milk) {
 
 static int fullness_rank(int bf) {
   if (bf <= 0) return 0;
-  /* Character creation stores 1=Slight, 2=Heavy (see ball_fullness = r - 1).
-     Legacy tests / saves may use a rough 0–100 scale instead. */
+  
   if (bf <= 3) {
     if (bf == 1)
       return 1;
@@ -493,8 +491,6 @@ static int race_is_slime_like(const AetPcSave *pc) {
   return has_token_ci(r, "slime") || has_token_ci(r, "goo") || ieq(r, "Goomurali");
 }
 
-/* Stock construct races or composite strings carrying construct tokens (e.g.
- * Cyborg wolf morph). Slime-like races always lose to slime prose elsewhere. */
 static int race_reads_construct_adjacent(const AetPcSave *pc) {
   const char *r = pc && pc->race[0] ? pc->race : "";
   if (race_is_slime_like(pc))
@@ -504,7 +500,6 @@ static int race_reads_construct_adjacent(const AetPcSave *pc) {
          has_token_ci(r, "golem");
 }
 
-/* Full-body scar summary in the marks paragraph (not only the face). */
 static const char *scar_ledger_for_pc(const AetPcSave *pc, int n) {
   if (!pc)
     return scar_phrase(n);
@@ -537,7 +532,6 @@ static const char *scar_ledger_for_pc(const AetPcSave *pc, int n) {
   return scar_phrase(n);
 }
 
-/* Tattoo / dye summary beside scars in the marks paragraph. */
 static const char *tattoo_ledger_for_pc(const AetPcSave *pc, int n) {
   if (!pc)
     return tattoo_phrase(n);
@@ -699,7 +693,6 @@ static const char *silhouette_motion_phrase(const AetPcSave *pc) {
   return "the swing of hip against gravity";
 }
 
-/* Between collarbone cant and motion phrase in the silhouette/tags paragraph. */
 static const char *silhouette_scan_clause(const AetPcSave *pc) {
   if (race_reads_construct_adjacent(pc))
     return "the cant of casing where linen lies about torque paths";
@@ -708,7 +701,6 @@ static const char *silhouette_scan_clause(const AetPcSave *pc) {
   return "the tilt of ribs under linen";
 }
 
-/* Second clause of the voice paragraph — vary spatial metaphor off biped rooms. */
 static const char *voice_space_opening(const AetPcSave *pc) {
   const char *r = pc && pc->race[0] ? pc->race : "";
   if (has_token_ci(r, "centaur"))
@@ -758,7 +750,6 @@ static const char *voice_space_opening(const AetPcSave *pc) {
   return "It fills a doorway differently depending on temper";
 }
 
-/* Voice §: what braids into sound before "that carries farther…". */
 static const char *voice_braid_phrase(const AetPcSave *pc) {
   if (race_reads_construct_adjacent(pc))
     return "coil, exciter mesh, and mapped habit braided into sound";
@@ -903,17 +894,14 @@ static void append_default_vag_anatomy(char *out, size_t cap, size_t *n,
            "humidity cloth tries and fails to hide entirely.\n\n");
 }
 
-/* Non-human / extra morphology; empty buffer means nothing to add (human norm). */
 static void infer_modification_prose(const AetPcSave *pc, char *buf, size_t cap) {
   size_t p = 0;
   const char *r = pc->race[0] ? pc->race : "Human";
   if (!buf || cap < 2) return;
   buf[0] = '\0';
 
-  /* Harpy + Seraph/Angel: wing and flight muscle live in race_extra_clause so
-   * we do not repeat wing beats here. */
-  /* Cow morph gets creature body copy in race_extra_clause; omit duplicate
-   * herd-flavor here. */
+  
+  
   if (has_token_ci(r, "wolf") || has_token_ci(r, "kitsune") ||
       has_token_ci(r, "neko")) {
     if (race_is_slime_like(pc))
@@ -932,8 +920,7 @@ static void infer_modification_prose(const AetPcSave *pc, char *buf, size_t cap)
              "movement no tailor can fully hide.",
              p ? " " : "");
   }
-  /* Dragon morph gets scales in race_extra; plain dragon/gorgon/lizard keep
-   * this gloss without duplicating morph paragraphs. */
+  
   if (has_token_ci(r, "gorgon") || has_token_ci(r, "lizard") ||
       (has_token_ci(r, "dragon") && !strstr(r, "morph"))) {
     if (race_reads_construct_adjacent(pc))
@@ -951,8 +938,7 @@ static void infer_modification_prose(const AetPcSave *pc, char *buf, size_t cap)
              p ? " " : "");
   }
   if (has_token_ci(r, "slime") || has_token_ci(r, "goo")) {
-    /* race_extra_clause already glosses pure slime races; avoid doubling moist
-     * gleam when the race line carries it. */
+    
     if (!(strstr(r, "Slime") || ieq(r, "Goomurali"))) {
       if (race_reads_construct_adjacent(pc))
         append(buf, cap, &p,
@@ -973,8 +959,7 @@ static void infer_modification_prose(const AetPcSave *pc, char *buf, size_t cap)
   }
   if (has_token_ci(r, "android") || has_token_ci(r, "cyborg") ||
       has_token_ci(r, "golem")) {
-    /* Construct stock races get seams gloss in race_extra_clause; keep this for
-     * partial tokens (e.g. mixed morphs) without repeating polish cadence. */
+    
     if (!race_is_construct(pc))
       append(buf, cap, &p,
              "%sSeams, polish, and engineered weight interrupt what biology alone "
@@ -1139,7 +1124,7 @@ static void race_extra_clause(const AetPcSave *pc, char *buf, size_t bufcap) {
     return;
   }
 
-  /* What this body *is* — centaur, drider, serpent, harpy, morphs, etc. */
+  
   if (has_token_ci(r, "centaur")) {
     snprintf(buf, bufcap,
              "You are centaur-built — human torso and arms mount above an "
@@ -1306,7 +1291,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
   infer_modification_prose(pc, modbuf, sizeof modbuf);
   muscle_and_softness_clause(pc, musfat, sizeof musfat);
 
-  /* --- Paragraph 1: identity, stature, race gloss --- */
+  
   append(out, outcap, &n,
          "You are %s — %s, %s %s, presenting as %s, with the habits and "
          "bearing of %s. ",
@@ -1444,7 +1429,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
              tagsbuf, silhouette_scan_clause(pc), silhouette_motion_phrase(pc));
   }
 
-  /* --- Paragraph 2: face, eyes, hair, skin --- */
+  
   append(out, outcap, &n, "%s ", gender_face_hint(pc));
   append(out, outcap, &n,
          "Light finds %s eyes and %s hair worn %s — strand, shadow, and sheen "
@@ -1532,7 +1517,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
          "At distance the silhouette still arrives first — color becomes rumor, "
          "shape becomes fact.\n\n");
 
-  /* --- Paragraph 3: voice --- */
+  
   append(out, outcap, &n,
          "Voice sits %s in register and %s in texture — %s that carries farther "
          "than your footsteps "
@@ -1544,7 +1529,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
          voice_braid_phrase(pc),
          voice_space_opening(pc));
 
-  /* --- Paragraph 4: carriage, hips/seat, marks, stats, extras --- */
+  
   append(out, outcap, &n,
          "%s.\n%s.\n%s\n\n",
          hips_clause_for_pc(pc), butt_clause_for_pc(pc), statbuf);
@@ -1601,7 +1586,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
              "yet.\n\n");
   }
 
-  /* --- Paragraph 5: intimate anatomy (continuous prose) --- */
+  
   if (ieq(pc->genitalia, "None")) {
     if (race_reads_construct_adjacent(pc))
     append(out, outcap, &n,
@@ -1979,8 +1964,7 @@ void aet_describe_pc(const AetPcSave *pc, char *out, size_t outcap) {
                "permission.\n\n",
                pussy);
     } else if (!(pen && vag)) {
-      /* Herm with default pussy: skip — the dual-sex paragraph below covers
-       * integration without repeating the generic stride/cunt line. */
+      
       append_default_vag_anatomy(out, outcap, &n, pc);
     }
   }

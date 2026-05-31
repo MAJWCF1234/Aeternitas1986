@@ -3,11 +3,6 @@
 #include <ctype.h>
 #include <string.h>
 
-/* Room blurbs and many item slugs track AeternitasWebEdition/index.html (this.world,
- * this.items). Equipment ids 1–10 were prototype rows: descriptions here match that
- * edition's tone (sensory, dry wit) for examine/catalog depth in the 64-bit port. */
-
-/* clang-format off — compact item catalog (slug, display label, equip hints). */
 static const AetItemCatalogEntry CATALOG[] = {
     {1,  "leather_cowl",       "Leather Cowl",
      "Soft hood cut for weather, not fashion; the eye-slits trade vanity for staying dry.",
@@ -346,8 +341,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {112, "meal",             "Meal",
      "Bread, stew, or plates — proof someone still tends hunger.",
      0, 0, 3, 7},
-    /* Foyer props: web edition this.items (table / coat_rack / mirror) — fills catalog fallback
-     * in content_item_response when no bespoke branch exists (house_key and book already do). */
+    
     {113, "table",            "Table",
      "An old wooden surface filmed with dust; rings and scratches map meals that outlasted their guests.",
      0, 0, 12, 7},
@@ -357,7 +351,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {115, "mirror",           "Mirror",
      "Small glass in a worked frame — clear enough to return your face without commentary.",
      0, 0, 2, 7},
-    /* Living room (web living_room item set + same room description in world blurbs) */
+    
     {116, "armchair",         "Armchair",
      "A comfortable corpse of upholstery: splits at the seams, stuffing honest about "
      "how long no one has sat here.",
@@ -382,7 +376,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {122, "curtains",         "Curtains",
      "Fabric once proud, now gray-beige and tired; light leaks past like an apology.",
      0, 0, 4, 7},
-    /* Garden / approach (web this.items) */
+    
     {123, "fountain",         "Fountain",
      "Stone bowl and low murmur of water — clear enough to trust for a drink or a "
      "wish, depending on your mood.",
@@ -390,7 +384,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {124, "gate",             "Gate",
      "Iron gone dull with rust; beyond it, stone hints at steps and a cellar's breath.",
      0, 0, 14, 7},
-    /* Kitchen (web inside_house kitchen item list; room blurb in world_generated) */
+    
     {125, "stove",            "Stove",
      "Cast iron gone soft with age; the kind of stove that remembers every winter it "
      "refused to quit.",
@@ -413,7 +407,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {131, "pans",             "Pans",
      "Skillets and saucepans cooled to silence; grease ghosts mark the best ones.",
      0, 0, 6, 7},
-    /* Library / study (web library room item list + world blurb) */
+    
     {132, "bookshelves",      "Bookshelves",
      "Floor-to-ceiling shelves; ladders lean in like polite excuses to climb toward dust.",
      0, 0, 18, 7},
@@ -423,14 +417,14 @@ static const AetItemCatalogEntry CATALOG[] = {
     {134, "reading_nook",     "Reading Nook",
      "A pocket of chair and shadow where drafts carry the smell of old paper.",
      0, 0, 9, 7},
-    /* Simple inn / guest props (world lists; web uses similar bedroom vocabulary) */
+    
     {135, "bed",              "Bed",
      "Frame and mattress holding the hollow shape of sleep; linens forget their color.",
      0, 0, 14, 7},
     {136, "window",           "Window",
      "Glass filmed or boarded; light negotiates its way in on someone else's terms.",
      0, 0, 8, 7},
-    /* Dining room (web dining_room items + room blurb) */
+    
     {137, "dining_table",     "Dining Table",
      "A long plank of oak meant for twelve; dust has claimed the polish, but the grain "
      "still remembers feasts.",
@@ -458,7 +452,7 @@ static const AetItemCatalogEntry CATALOG[] = {
      "Stern ancestors in gilt frames — eyes that follow you the way guilt follows a "
      "footstep.",
      0, 0, 22, 7},
-    /* Pantry (web pantry) */
+    
     {144, "empty_jars",       "Empty Jars",
      "Glass soldiers on a shelf, labels peeled; a few still smell faintly of fruit that "
      "is long gone.",
@@ -474,7 +468,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {147, "shelves",          "Shelves",
      "Bare wood and nail holes; the pantry exhaled its stores and kept the skeleton.",
      0, 0, 14, 7},
-    /* Bedroom hallway (web bedroom_hallway) */
+    
     {148, "hallway_window",   "Hallway Window",
      "A narrow pane at the hall's end; the garden outside looks gentler through dust and "
      "old putty.",
@@ -482,7 +476,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {149, "door_frames",      "Door Frames",
      "Paint chipped along the jambs; each threshold is a small treaty between rooms.",
      0, 0, 10, 7},
-    /* Master bedroom (web master_bedroom) */
+    
     {150, "four_poster_bed",  "Four-Poster Bed",
      "Turned posts and a canopy of faded cloth; the mattress holds a hollow where sleep "
      "used to live.",
@@ -504,7 +498,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {155, "dresser",          "Dresser",
      "Drawers on stiff runners; one sticks as if hiding a thought worth keeping.",
      0, 0, 11, 7},
-    /* Bathrooms (web master_bathroom + shared bathroom) */
+    
     {156, "bathtub",          "Bathtub",
      "Claw feet and porcelain worn thin; the drain gurgles like it remembers every soak.",
      0, 0, 12, 7},
@@ -521,18 +515,18 @@ static const AetItemCatalogEntry CATALOG[] = {
     {160, "shower",           "Shower",
      "A stall of cracked tile and a head that weeps rust; steam ghosts mark the ceiling.",
      0, 0, 8, 7},
-    /* Basement (web basement) */
+    
     {161, "old_box",          "Old Box",
      "Wood swollen with damp; whatever it holds has waited in the dark longer than you.",
      0, 0, 4, 7},
-    /* Guest bedroom (web guest_bedroom — bed/window already catalogued) */
+    
     {162, "desk",             "Desk",
      "Small writing surface, ink ghost in one corner; a drawer resists as if shy.",
      0, 0, 9, 7},
     {163, "chair",            "Chair",
      "Straight-backed and honest; the cane seat sighs when you look at it too long.",
      0, 0, 8, 7},
-    /* Study (web study items — tomes/ledger/lockpick have bespoke examine in ascii) */
+    
     {164, "inkwell",          "Inkwell",
      "A shallow well of ink gone thick at the rim; a ring of old fingerprints judges your "
      "penmanship.",
@@ -551,11 +545,11 @@ static const AetItemCatalogEntry CATALOG[] = {
      "Wingback leather cracked at the elbows — the shape of someone who read until the "
      "candles complained.",
      0, 0, 14, 7},
-    /* Backyard path (web backyard) */
+    
     {169, "stone_path",       "Stone Path",
      "Irregular flags sunk in grass; moss negotiates the joints like a quiet treaty.",
      0, 0, 18, 7},
-    /* Shed (web backyard_shed) */
+    
     {170, "rake",             "Rake",
      "Tines rust-freckled; the handle remembers hands that cleared leaves before giving up.",
      0, 0, 5, 7},
@@ -569,7 +563,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {173, "seeds",            "Seeds",
      "Paper packets soft with oil; some rattles promise parsley, others only hope.",
      0, 0, 1, 7},
-    /* Forest path (web forest_path) */
+    
     {174, "stone_marker",     "Stone Marker",
      "Weathered rock carved with symbols that refuse a single reading — trail, warning, or "
      "joke.",
@@ -577,7 +571,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {175, "fallen_branch",    "Fallen Branch",
      "Bark scaled, heartwood pale; good for a fire, a bridge, or a lesson in humility.",
      0, 0, 6, 7},
-    /* Deep forest floor (web deep_forest) */
+    
     {176, "glowing_mushrooms", "Glowing Mushrooms",
      "Caps lit with a sickly patience; they paint the loam in coin-sized constellations.",
      0, 0, 2, 7},
@@ -588,7 +582,7 @@ static const AetItemCatalogEntry CATALOG[] = {
      "Plates of bark thick as armor; resin ghosts the air where the trunk was wounded long "
      "ago.",
      0, 0, 4, 7},
-    /* Hermit's hut (web hermit_hut) */
+    
     {179, "ancient_tome",     "Ancient Tome",
      "Covers bowed under their own seriousness; the spine crackles like a warning label.",
      0, 0, 8, 7},
@@ -599,14 +593,14 @@ static const AetItemCatalogEntry CATALOG[] = {
      "Metal and stone in a shape that suggests function without confessing it — small "
      "enough to steal, heavy enough to doubt.",
      0, 0, 3, 7},
-    /* Meadow (web meadow) */
+    
     {182, "butterflies",      "Butterflies",
      "Wings like torn sunlight; they refuse to sit still long enough to be catalogued.",
      0, 0, 1, 7},
     {183, "tall_grass",       "Tall Grass",
      "Seed heads brush your wrists; the meadow whispers against your boots.",
      0, 0, 4, 7},
-    /* Pond (web pond) */
+    
     {184, "water_lilies",     "Water Lilies",
      "Pads and pale blooms asleep on glass; the water keeps their secrets without ripples.",
      0, 0, 3, 7},
@@ -616,11 +610,11 @@ static const AetItemCatalogEntry CATALOG[] = {
     {186, "wooden_dock",      "Wooden Dock",
      "Planks gray and nail-sick; it extends faith over depth you cannot quite see.",
      0, 0, 20, 7},
-    /* Stream (web stream — stream_water/fish already catalogued) */
+    
     {187, "smooth_stones",    "Smooth Stones",
      "Rounds worn by patience; cold through the fingers and honest about the current.",
      0, 0, 8, 7},
-    /* Stream source (web stream_source) */
+    
     {188, "natural_spring",   "Natural Spring",
      "Water rises clear and rude with cold; ferns lean in to steal the chill.",
      0, 0, 12, 7},
@@ -630,7 +624,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {190, "ferns",            "Ferns",
      "Fronds uncurl in the spray's gossip; green that refuses to apologize for damp.",
      0, 0, 3, 7},
-    /* Hilltop (web hilltop) */
+    
     {191, "boulder",          "Boulder",
      "A seat for the wind; lichen maps continents you could cross in a lazy afternoon.",
      0, 0, 40, 7},
@@ -641,7 +635,7 @@ static const AetItemCatalogEntry CATALOG[] = {
      "Air thins and brightens; the house, the forest, and the village arrange themselves "
      "without asking.",
      0, 0, 2, 7},
-    /* Rocky outcrop (web rocky_outcrop) */
+    
     {194, "boulders",         "Boulders",
      "Tumbled giants shoulder to shoulder; animal paths thread the gaps like polite "
      "afterthoughts.",
@@ -652,7 +646,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {196, "rock_crevices",    "Rock Crevices",
      "Shadowed splits that hoard grit, seed, and the occasional nervous skitter.",
      0, 0, 6, 7},
-    /* Cave approach & interior (web cave_entrance / cave_interior) */
+    
     {197, "overgrown_vegetation", "Overgrown Vegetation",
      "Bramble and vine claiming the mouth — the cave inhales past them anyway.",
      0, 0, 8, 7},
@@ -671,7 +665,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {202, "stone_formations", "Stone Formations",
      "Flow and fold frozen mid-thought — geology pretending to be sculpture.",
      0, 0, 16, 7},
-    /* Deep cave (web cave_deep) */
+    
     {203, "ancient_markings", "Ancient Markings",
      "Carved lines repeat until pattern feels like pressure; the wall insists on being "
      "read.",
@@ -682,7 +676,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {205, "hidden_chamber",   "Hidden Chamber",
      "Air changes here — tighter, older — as if space learned to hold its breath.",
      0, 0, 3, 7},
-    /* Old well & garden shed (web old_well / shed) */
+    
     {206, "well_bucket",      "Well Bucket",
      "Rust and oak staves; rope frayed where hands worried it on the way up from darkness.",
      0, 0, 6, 7},
@@ -692,7 +686,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {208, "tension_wrench",   "Tension Wrench",
      "A slim bar for torque and patience; lockwork respects it more than muscle.",
      0, 0, 1, 7},
-    /* Hollow Ridge — village road & tavern (web village_road … tavern_privy) */
+    
     {209, "roadside_stone",   "Roadside Stone",
      "A low marker rubbed smooth by cart wheels; mud dries in the letters of old directions.",
      0, 0, 20, 7},
@@ -815,7 +809,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {248, "inn_chair",        "Inn Chair",
      "Spindle back, seat hollowed by honest sitting.",
      0, 0, 8, 7},
-    /* Temple & farm (web temple_of_architect … farm) */
+    
     {249, "altar",            "Altar",
      "Marble cool as a held breath; cloth and smoke argue about holiness.",
      0, 0, 20, 7},
@@ -855,7 +849,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {261, "cow_pen",          "Cow Pen",
      "Rails and churned mud; warm breath greets you at nose height.",
      0, 0, 14, 7},
-    /* Village commerce & forge (web general_store, blacksmith) */
+    
     {262, "store_counter",    "Store Counter",
      "Polished grain and a bell's ghost; commerce begins at the edge of this plank.",
      0, 0, 18, 7},
@@ -871,7 +865,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {266, "water_trough",     "Water Trough",
      "Stone or timber long enough for steam to die; rings mark where metal cooled.",
      0, 0, 20, 7},
-    /* Forest secrets & cellar (web forest_clearing, hidden_grove, hidden_cellar) */
+    
     {267, "altar_stone",      "Altar Stone",
      "Moss-choked slab; runes hold a pulse the forest pretends not to notice.",
      0, 0, 25, 7},
@@ -890,7 +884,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {272, "dusty_jars",       "Dusty Jars",
      "Glass under fur; labels faded into rumor.",
      0, 0, 5, 7},
-    /* Swamp (web swamp_clearing … swamp_island) */
+    
     {273, "bog_fungi",        "Bog Fungi",
      "Shelves of damp color; spores tickle the throat like bad advice.",
      0, 0, 2, 7},
@@ -906,7 +900,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {277, "mysterious_shovel", "Mysterious Shovel",
      "Blade dark with peat; the handle remembers hands that dug for more than turnips.",
      0, 0, 8, 7},
-    /* Ridge & hollow cave (web hollow_ridge, hollow_ridge_cave); hillside path_markers */
+    
     {278, "weathered_stone",  "Weathered Stone",
      "Ridge bones scoured by wind; tool marks argue with rain.",
      0, 0, 22, 7},
@@ -928,7 +922,7 @@ static const AetItemCatalogEntry CATALOG[] = {
     {284, "path_markers",     "Path Markers",
      "Stacked stones and blazes — the trail's polite argument with getting lost.",
      0, 0, 5, 7},
-    /* Currency & cash finds */
+    
     {285, "silver_coin",      "Silver Coin",
      "Cool stamp and clipped rim; enough buying power to make you pat your pocket twice.",
      0, 0, 1, 7},
@@ -947,8 +941,53 @@ static const AetItemCatalogEntry CATALOG[] = {
     {290, "buried_coin",      "Buried Coin",
      "Soil still clings to the face; luck only counts if you were stubborn enough to dig.",
      0, 0, 1, 7},
+
+    {291, "leaflet",          "Orientation Leaflet",
+     "Brittle quarters-fold paper with cheap ink and a floppy-disk stamp in the margin.",
+     0, 0, 1, 7},
+    {292, "engineering_tome", "Engineering Tome",
+     "Hinges, mills, and gear trains — a workshop lineage bound in cracked leather.",
+     0, 0, 6, 7},
+    {293, "merchant_ledger",  "Merchant Ledger",
+     "Columns of prices, favors, and debts; margins full of practical superstition.",
+     0, 0, 4, 7},
+    {294, "herbalism_guide",  "Herbalism Guide",
+     "Stained field notes on roots, poultices, and lookalikes that want to kill you.",
+     0, 0, 3, 7},
+    {295, "linguistics_textbook", "Linguistics Textbook",
+     "Scripts, dialects, and the posture speakers adopt before they trust a stranger.",
+     0, 0, 5, 7},
+    {296, "lore_scroll",      "Lore Scroll",
+     "Fragile parchment with browned ink and ceremonial weight.",
+     0, 0, 2, 7},
+    {297, "crafting_manual",  "Crafting Manual",
+     "Worn joints-and-repairs manual; margins hint at combinations without naming them.",
+     0, 0, 4, 7},
+    {298, "armor_crafting_manual", "Armor Crafting Manual",
+     "Layering, rivets, and why comfort matters in a long fight.",
+     0, 0, 5, 7},
+    {299, "advanced_crafting_tome", "Advanced Crafting Tome",
+     "Master diagrams for bending workshop rules without breaking the work.",
+     0, 0, 6, 7},
+    {300, "hollow_ridge_primer", "Hollow Ridge Primer",
+     "A village primer on waystones, rifts, and surviving Veritasfurtum's thin places.",
+     0, 0, 3, 7},
+    {301, "miller_journal",   "Miller's Journal",
+     "Brenna's impatient hand tracking grain, gears, and a river that moves wrong.",
+     0, 0, 3, 7},
+    {302, "tower_logbook",    "Tower Logbook",
+     "Watch entries that slowly stop trusting the horizon.",
+     0, 0, 4, 7},
+    {303, "sheet_candlelight_reel", "Candlelight Reel (sheet)",
+     "Pub reel in G major — tempo scratches from many third-night performances.",
+     0, 0, 1, 7},
+    {304, "bow",                  "Shortbow",
+     "Ash limbs and sinew cord — enough reach for timber margins and wary game.",
+     0, 3, 3, 5},
+    {305, "animal_pelt",          "Animal Pelt",
+     "Still holds the shape of something that ran; trade or stitch at your leisure.",
+     0, 0, 2, 7},
 };
-/* clang-format on */
 
 static int slug_ieq(const char *a, const char *b) {
   unsigned char ca, cb;

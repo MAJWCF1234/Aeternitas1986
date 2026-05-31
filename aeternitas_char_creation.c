@@ -188,8 +188,7 @@ static int write_kv_i(FILE *fp, const char *k, int v) { return fprintf(fp, "%s %
 
 int pc_write_save(FILE *fp) {
   if (!fp) return 0;
-  /* Golden binary: fwrite("CHARACTER\n", 1, 10, fp) — not "CHARACTER \n".
-   * Loader uses strcmp(buf, "CHARACTER") before pc_read_save; a stray space breaks load. */
+  
   if (fwrite("CHARACTER\n", 1, 10, fp) != 10)
     return 0;
   write_kv_s(fp, "name", g_pc.name);
@@ -234,7 +233,6 @@ int pc_write_save(FILE *fp) {
   return fprintf(fp, "ENDCHAR\n") > 0;
 }
 
-/* Keys matched case-sensitively like shipped binary (strcmp). */
 static void parse_kv(const char *key, const char *val) {
   if (!key || !val) return;
   if (strcmp(key, "name") == 0) copy_s(g_pc.name, sizeof g_pc.name, val);
@@ -314,9 +312,6 @@ void pc_format_summary(char *out, size_t outcap) {
            g_pc.class_[0] ? g_pc.class_ : "adventurer", g_pc.str, g_pc.tou, g_pc.spe,
            g_pc.agi, g_pc.intl, g_pc.wis, g_pc.will, g_pc.cha, g_pc.per, g_pc.cor);
 }
-
-/* --- Interactive character creation (matches shipped exe prompts; see
- * recovery_artifacts/raw_original_char_defaults.txt). --- */
 
 static void cc_cls(void) {
 #ifdef _WIN32
@@ -432,15 +427,10 @@ static const char *cc_subject_pronoun(void) {
   return "They";
 }
 
-/** Penis / testicles / fullness prompts only when anatomy includes a penis. */
 static int cc_should_prompt_penis_and_balls(void) {
   return ieq(g_pc.genitalia, "Penis") || ieq(g_pc.genitalia, "Both");
 }
 
-/**
- * Breast sizing is omitted for typical cis-male (male + penis-only): later 18+
- * questions should not appear when that combination cannot apply.
- */
 static int cc_should_prompt_breasts(void) {
   if (ieq(g_pc.genitalia, "Penis") && ieq(g_pc.gender, "male")) return 0;
   return 1;
@@ -456,7 +446,7 @@ static void cc_print_created_summary(void) {
   char identity[256];
   char hud[160];
   int ci = 1;
-  /* Recover class index from slug for role title (best-effort). */
+  
   {
     int i;
     for (i = 0; i < 15; i++) {
@@ -828,7 +818,7 @@ static void cc_run_interactive(void) {
 
 void run_character_creation(int autotest_mode) {
   if (autotest_mode) {
-    /* CI / golden playthrough: match original EXE output (see dual_exe_compare). */
+    
     pc_set_default_adventurer();
     copy_s(g_pc.name, sizeof g_pc.name, "Autotest Hero");
     copy_s(g_pc.race, sizeof g_pc.race, "Human");

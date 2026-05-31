@@ -1,12 +1,4 @@
-/*
- * Thin launcher for the recovered Windows build: runs aeternitas64.exe from
- * the same directory as this program (the directory of the running module).
- *
- * The fat embedded-PE version (~600k+ bytes of hex in one .c file) is optional.
- * Regenerate it with: py tools/generate_binary_rehost_c.py
- *
- * Normal workflow: place or build aeternitas64.exe next to aeternitas64_binary_rehost.exe.
- */
+
 
 #include <errno.h>
 #include <process.h>

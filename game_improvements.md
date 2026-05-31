@@ -26,12 +26,15 @@ Status policy:
 - [~] Causality exists, but parser/social/crafting explanations need clearer grouping.
 - [~] Screen framework exists, but save/help/settings/mod screens are not all unified yet.
 - [~] Crafting outputs currently persist mostly as item names; generated stat profiles need persistence.
-- Inform-class noun resolution, pronoun memory, disambiguation, and relative references are still open work.
+- [x] **Better Disambiguation** — ambiguous room/pack targets prompt numbered choices (`Did you mean (1) … or (2) …?`); reply with number or name; session remembers query→slug for auto-resolve next time. Verified: `take metal` at West of House, `examine` with multiple matches.
+- Inform-class noun resolution, pronoun memory, and relative references are still open work.
 - Chained commands that enter full-screen submenus need a screen-framework pass.
 - [x] Chained commands after fullscreen zero-turn commands — `handle_line` no longer stops the whole chain when a segment opens a fullscreen UI (`help`, `exits`, `status`, etc.); later segments run after the screen closes. Verified: smoke (`help; whereami`, `exits; brief`), parser regression (`fullscreen chain continues`, `exits then inline command`).
 - Artificer/Lucid-Blocks-style mid-to-late-game fusion menu is still open work.
-- Minigame host API and individual minigames are still open work for the C build.
-- Full Web Edition relationship, economy, quest, parser, and minigame parity remains a goal, not a fact.
+- [x] Minigame host API and nine ASCII minigames wired into `aeternitas64.exe` via `-DAETER_MINIGAMES` (`build_aeternitas64.bat`). Implementations in `minigames/`; harness framework in `tools/testing/` (bench registry = linked cubes only, default TESTCUBE).
+- [x] Minigame profile embedded in adventure quicksave/load (`MGT` section). `harness_save.mgt` is dev-side bench cache only. Verified: `tools/tester/tester.bat embed`.
+- [x] Module bench (`minigame_tester.exe`) — linked modules only, Up/Down/Enter/Q, auto-wiring bus sim. Verified: `tools/testing/verify_bench.bat`.
+- [x] Minigame CI verify — `tools/tester/tester.bat` (smoke, launch, adventure hooks).
 
 ## Preserved Goal Backlog
 
@@ -43,6 +46,8 @@ Status policy:
 - **Goal:** reintroduce minigames through a compact shared C screen/minigame framework
 
 > **C-port note**: This document preserves the full Web Edition ambition, but old `[x]` / `[OK] IMPLEMENTED` claims are not trusted for the native C executable. Treat unchecked items as desired goals until verified in `aeternitas64.exe`.
+>
+> **Lore canon** for new text: see `docs/LORE_SOURCES.md` and the original web bible at `D:\light\Veritasfurtum Guides and Docs\` (Complete Lore guide, GAME_BRANCHING_TREE.md, Obsidian vault).
 
 ## NPCs & Relationships
 
@@ -73,12 +78,12 @@ Status policy:
 - **NPC-to-NPC Relationships** - NPCs can form relationships with each other
 - **Family System** - NPCs can have families, introduce player to relatives (Added family data structure to NPCs with parents, siblings, children, spouse. Use 'introduce' or 'meet_family' command when close_friend+ to meet family. Relationship improves when introduced.) (web-era claim; verify/rebuild for C)
 - **Relationship Preferences** - NPCs have preferences for gifts, activities, conversation topics (Expanded preference system: gift preferences affect relationship gains (loved=4x, liked=2x, disliked=0.5x, hated=0.2x). Topic preferences affect conversation relationship gains. Activity preferences defined for all NPCs.) (web-era claim; verify/rebuild for C)
-- **Relationship Decay** - Relationships slowly decrease if not maintained (Added relationship decay system: friend+ relationships decay 0.1 points every 20 turns if no interaction for 50+ turns. Prevents relationships from staying high indefinitely without maintenance.) (web-era claim; verify/rebuild for C)
+- [x] **Relationship Decay** - Friendship (merchant patron + SOC2 NPCs) drops 1 point every 20 turns when no social contact for 50+ turns and friendship ≥ 10. Verified in `relationship_decay_tick()` on turn advance.
 - **Relationship Events** - Random events based on relationship status (Added random relationship events: 5% chance per turn. Friend-level events (gifts, shared meals) and romantic events (thoughtful gestures, meaningful moments). Events grant relationship bonuses and items.) (web-era claim; verify/rebuild for C)
 - **Relationship Quests** - Special quests tied to relationship milestones
 - **Relationship Dialogue Trees** - More branching dialogue based on relationship
 - **Relationship Status Display v2** - Comparative relationship timeline view (delta since last visit, trust/romance trend, key triggers)
-- **Relationship History** - Detailed log of relationship progression (Added comprehensive relationship history tracking that records all interactions with NPCs - gifts, talks, kisses, hugs, etc. - along with friendship/romance changes and relationship stage transitions. View with 'relationship history [npc]' command.) (web-era claim; verify/rebuild for C)
+- [x] **Relationship History** - Save-persisted ring (`RELHIST`) logs talk/gift/patron/idle-decay with friendship/romance/patron deltas. `relationship history` / `bond history [npc]`. Verified in C source.
 
 ### NPC Intelligence
 
@@ -261,38 +266,38 @@ Status policy:
 
 ## UI & Quality of Life
 
-- **Save/Load System** - Multiple save slots (1-10) (web-era claim; verify/rebuild for C)
-- **Help Command** - Comprehensive help system with all commands (web-era claim; verify/rebuild for C)
-- **18+ Warning Screen** - Age verification on boot (web-era claim; verify/rebuild for C)
-- **Better Inventory UI** - Sort, filter, search inventory (web-era claim; verify/rebuild for C)
-- **Inventory Categories** - Organize items by type (web-era claim; verify/rebuild for C)
-- **Command History** - Better command history navigation (web-era claim; verify/rebuild for C)
-- **Settings Menu** - Graphics, sound, gameplay options (web-era claim; verify/rebuild for C) (basic: explicit content, accessibility, modal UI)
-- **Save Slots** - Multiple named save slots (web-era claim; verify/rebuild for C)
-- **Auto-Save** - Automatic saving at key moments (web-era claim; verify/rebuild for C)
-- **Hints System** - Contextual hints when stuck (web-era claim; verify/rebuild for C)
-- **Expanded Status Readout** - `status` now shows time-of-day, weather/season, equipped gear, and NPC count in current room (web-era claim; verify/rebuild for C)
-- **Checklist Notes** - `notes done <n>` / `notes undone <n>` for lightweight task tracking (web-era claim; verify/rebuild for C)
-- **Notes Search** - `notes find <text>` to quickly filter notes by keyword (web-era claim; verify/rebuild for C)
-- **Weather Report Command** - Added `weather` / `weather forecast` for current conditions, season, temperature, and short forecast window (web-era claim; verify/rebuild for C)
-- **Advanced Wait Command** - Added `wait <hours>` and `wait until <morning|afternoon|evening|night>` with proper multi-turn time advancement (web-era claim; verify/rebuild for C)
-- **Targeted Long Rest** - Added `rest until <morning|afternoon|evening|night>` for controlled long rests with cumulative recovery (web-era claim; verify/rebuild for C)
-- **Clock-Time Queries** - Added `time until <HH[:MM]>` and `time until <H:MMam/pm>` for exact clock-target checks (web-era claim; verify/rebuild for C)
-- **Weather Impact Readout** - Added `weather impact`/`weather effects` to summarize visibility, traversal, and gathering penalties (web-era claim; verify/rebuild for C)
-- **Temperature Unit Toggle** - Added `temperature c` / `temperature f` (default shows both C/F) (web-era claim; verify/rebuild for C)
-- **Notes Cleanup Command** - Added `notes purge done` to remove completed notes in bulk (web-era claim; verify/rebuild for C)
-- **Notes Progress Summary** - Added `notes stats` to show total/todo/done counts and completion percentage (web-era claim; verify/rebuild for C)
+- [x] **Save/Load System** - Quick save, 10 numbered slots, fullscreen `saves` manager, autosave shadow. Verified in C source.
+- [x] **Help Command** - `help` with smart hint, command map, and full reference (`fill_help_text`). Verified in C source.
+- [x] **18+ Warning Screen** - `age_disclaimer_wait()` on boot (skipped under `AETER_AUTOTEST`). Verified in C source.
+- [x] **Better Inventory UI** - `inventory list` / `pack list` fullscreen pack; `inventory sort name|weight|type`; `inventory find <text>` keyword filter.
+- [x] **Inventory Categories** - Pack list tags rows as weapon/armor/material/food/drink/tool/misc from catalog + consume tables.
+- [x] **Command History** - Session ring (32 entries): `history` numbered list, `history <n>` / `!n` re-run, `history list`; dedupes consecutive repeats; cleared on new game.
+- [x] **Settings Menu** - Pause menu option 8 / `settings`: color mode, room verbosity, audio stubs, hints toggle, ironman stub; persists in quicksave. Verified in `run_settings_ui()`.
+- [x] **Save Slots** - `save <1-10>` / `load <1-10>` plus fullscreen `saves` manager (10 slots). Verified in C source.
+- [x] **Auto-Save** - Main quicksave after each advancing turn; optional shadow file `*_autosave.txt` (`autosave on|off`, `load autosave`). Verified in `handle_line` + `autosave_write_shadow()`.
+- [x] **Hints System** - `hint` / `hints` / `unstick` contextual panel; toggle via settings (`hintena` in save). Verified in `format_contextual_hints_body()`.
+- [x] **Expanded Status Readout** - `status` shows clock/weather, equipped slots, people here, pack bulk estimate, barter quote, autosave flag. Verified in C source.
+- [x] **Checklist Notes** - `notes done <n|all>` / `notes undone <n|all>` for task tracking. Verified in parser.
+- [x] **Notes Search** - `notes find <text>` / `notes search <text>` keyword filter. Verified in parser.
+- [x] **Weather Report Command** - `weather`, `weather forecast`, `weather impact` / `weather effects`. Verified in C source.
+- [x] **Advanced Wait Command** - `wait <n>`, `wait <n> hours`, `wait until <period>`. Verified in parser.
+- [x] **Targeted Long Rest** - `rest until <morning|afternoon|evening|night>`. Verified in parser (`kWaitUntil` shares handler).
+- [x] **Clock-Time Queries** - `time until <HH[:MM]>` and 12h forms. Verified in C source.
+- [x] **Weather Impact Readout** - `weather impact` / `weather effects`. Verified in C source.
+- [x] **Temperature Unit Toggle** - `temperature c` / `temperature f` (default dual display). Verified in C source.
+- [x] **Notes Cleanup Command** - `notes purge done` removes completed `[x]` notes in bulk.
+- [x] **Notes Progress Summary** - `notes stats` shows total/todo/done, completion %, and a progress bar.
 - **Accessibility Options** - Text size, color blind mode, etc. (web-era claim; verify/rebuild for C)
-- **Relationship Status UI** - Visual display of relationship levels (web-era claim; verify/rebuild for C)
-- **Skill Display UI** - Better visualization of skill levels (web-era claim; verify/rebuild for C)
-- **Quest Journal UI** - Better quest tracking interface (web-era claim; verify/rebuild for C)
-- **Trade History UI** - View past trading transactions (web-era claim; verify/rebuild for C)
-- **Crafting UI** - Visual crafting interface with recipe browser (web-era claim; verify/rebuild for C) (ASCII-based)
-- **NPC Status UI** - Display NPC location, emotional state, relationship (web-era claim; verify/rebuild for C) (ASCII-based)
-- **Utility Objects UI** - ASCII-based display of utility objects in rooms with status, fuel, temperature, capacity, and interaction options (web-era claim; verify/rebuild for C)
-- **Who Is Here Command** - Added `who` with direct NPC presence/activity checks (web-era claim; verify/rebuild for C)
-- **Progress Command** - Added `progress` for exploration and quest summary (web-era claim; verify/rebuild for C)
-- **Nearby Scan Command** - Added `nearby` to inspect adjacent rooms with lock/NPC context (web-era claim; verify/rebuild for C)
+- [x] **Relationship Status UI** - `rapport` / `bonds` show friendship, romance, and patron `#` bars per NPC; `who` summarizes bond for the present NPC.
+- [x] **Skill Display UI** - `aptitudes` / `skills` show per-stat `#` bars, tier labels (feeble→peak), and forge craft rank bar (1–10).
+- [x] **Quest Journal UI** - `journal` quest board with `[x]` / `[~]` / `[ ]` markers, done/active/open counts, and heuristic progress for dailies and social goals.
+- [x] **Trade History UI** - `trade history` adds buy/sell summary, recent (newest-first) block, and full ledger.
+- [x] **Crafting UI** - Material Forge (`forge` / `crafting`) works via experimentation; no in-game recipe book (`forge guide` / `recipes` deflected). Help stays vague; bench analysis text is atmospheric only.
+- [x] **NPC Status UI** - `who` shows routine, bond stage, friendship bar, and patron standing when a merchant is present; `who all` for global scan.
+- [x] **Utility Objects UI** - `utilities` / `room objects` panel lists room fixtures (fireplace, stove, well, forge, waystone, ferry, stage, floor lights) with heuristic state and suggested verbs.
+- [x] **Who Is Here Command** - `who` / `who all` with presence, routine, and relationship readout.
+- [x] **Progress Command** - `progress` exploration summary plus quest-board counts, autosave flag, and social-history row count.
+- [x] **Nearby Scan Command** - `nearby` (+ detail/locked/npc modes) for adjacent rooms.
 - [x] **Global NPC Where Lookup** - `where <npc>` reports live NPC location even when not in the current room, and scheduled NPCs include the current routine period (`afternoon routine`, `night routine`, etc.). Verified via parser regression (`npc routine relocation`).
 - [x] **Exit NPC Density Tags** - `exits` now surfaces destination NPC counts (`[npc:n]`). Verified via parser regression (`exit npc density tags`) and smoke.
 - [x] **Extended Trail Depth** - `trail <n>` now supports adjustable history depth (up to 25). Verified via parser regression (`trail depth view`, `trail depth bounds`) and smoke.
@@ -326,7 +331,7 @@ Status policy:
 - **Auction System** - Bid on rare items
 - **Trade Contracts** - Long-term trading agreements with merchants
 - **Merchant Relationship Memory v2** - Persistent merchant trust profiles (credit terms, blacklist thresholds, fraud suspicion, negotiation stance)
-- **Price Comparison** - Compare prices across different merchants
+- [x] **Price Comparison** - `price compare <item>`, `compare prices <item>`, and `market compare <item>` list buy quotes across all merchants (CHA + patron standing per shop). Verified in C executable.
 - **Trade Skills Specialization** - Focus on specific trade types (weapons, food, etc.)
 - **Merchant Favor System** - Do favors for merchants to unlock special items
 
@@ -342,17 +347,19 @@ Status policy:
 
 ## Mini-Games & Activities
 
-- **Fishing Mini-Game** - Interactive fishing mechanics (Full Terminal Fisher integration with keyboard controls, full-screen overlay, inventory sync) (web-era claim; verify/rebuild for C)
-- **Cooking System** - Prepare meals with recipes (Terminal Diner minigame for tavern shifts, full-screen overlay, earnings sync) (web-era claim; verify/rebuild for C)
-- **Gardening/Farming** - Terminal Farm minigame for plowing, planting, watering, harvesting with weather sync (web-era claim; verify/rebuild for C)
-- **Gambling** - Card games, dice games at tavern (Terminal gambling minigame with Dice Duel and Blackjack, full-screen overlay, money sync) (web-era claim; verify/rebuild for C)
-- **Writing** - Write books, poems, letters (Terminal Writer minigame with full-screen overlay, inventory sync, shop system) (web-era claim; verify/rebuild for C)
-- **Reading** - Read books, letters, and written works (Terminal reading interface with scrollable content, full-screen overlay) (web-era claim; verify/rebuild for C)
-- **Hunting** - Track and hunt animals (Integrated area-gated hunting minigame: track read -> approach pacing -> shot timing, accessible via `hunt` in valid wilderness areas) (web-era claim; verify/rebuild for C)
-- **Hunting Tuning Pass** - Added cooldown, retry-capable track read, wait/listen approach action, approach turn-limit, and perfect-shot quality outcomes (web-era claim; verify/rebuild for C)
-- **Piano Performance** - Play piano from a music book in rooms that actually contain a piano; starter sheet unlocked, additional sheets collected in-world (web-era claim; verify/rebuild for C)
-- **Lockpicking** - Use a findable `lockpick` near locked doors to launch a timing/skill lockpicking minigame and unlock the door on success (web-era claim; verify/rebuild for C)
-- **Lockpicking Stealth And Tool Pass** - Added noise-band risk feedback (`LOW/MEDIUM/HIGH`), NPC hearing/suspicion reactions, guard movement response, canine bark alerts, and tool-specific behavior (rusty/fine pick, tension wrench, skeleton key) (web-era claim; verify/rebuild for C)
+Verified in C (`aeternitas64.exe` + `minigames/`). Automated: `tools/tester/tester.bat` (instant ESC via `MGT_AUTOTEST` / `AETER_AUTOTEST`). Manual playthrough of full win/lose loops still recommended.
+
+- [x] **Fishing Mini-Game** — `fish` / `go fishing` at pond, river, piers, stream, ferry. Fullscreen overlay + purse/pack sync. Verified launch + adventure hook.
+- [x] **Cooking System** — `cook` / `work kitchen` in kitchen rooms. Terminal Diner shift minigame. Verified launch + adventure hook (tavern kitchen).
+- [x] **Gardening/Farming** — `farm` / `tend farm` at `farm`. Terminal Farm minigame. Verified launch + adventure hook.
+- [x] **Gambling** — `gamble` / `play dice` / `play cards` in tavern rooms. Dice Duel + Blackjack. Verified launch + adventure hook.
+- [x] **Writing** — `write` / `scribe` (no room gate). Terminal Writer minigame. Verified launch + adventure hook.
+- [x] **Reading** — `read <item>` on literature in pack/room (e.g. leaflet). Terminal reader overlay. Verified launch + adventure hook.
+- [x] **Hunting** — `hunt` / `track game` in forest/meadow with bow equipped. Track → approach → shot phases; cooldown + wait/listen in source. Verified launch + adventure hook; full balance pass still manual.
+- [x] **Piano Performance** — `play piano` where `tavern_piano` is visible. Verified launch + adventure hook.
+- [x] **Lockpicking** — `pick lock` / `use lockpick` at `east_of_house` shed. Timing/skill pins, noise bands, tool variants in source. Verified launch + adventure hook (ESC → "You abandon the lock.").
+- [~] **Lockpicking Stealth And Tool Pass** — noise-band / NPC hearing / guard reactions coded in `mg_lockpick.c`; not re-verified against live NPC stealth in adventure after minigame exit.
+- [~] **Hunting Tuning Pass** — cooldown, misread cap, wait/listen, perfect-shot tier present in `mg_hunting.c`; autotest only confirms entry/exit, not a full successful hunt.
 
 ## Social Systems
 
@@ -406,7 +413,7 @@ Status policy:
 
 - **Preposition Handling** - Support commands like "PUT THE BLUE BALL IN THE LARGE BASKET", "GIVE COIN TO TROLL", "UNLOCK DOOR WITH KEY" (web-era claim; verify/rebuild for C)
 - **Preposition Awareness** - Map common prepositions (in/inside/into → IN, on/onto → ON, to/at → TO, with/using → WITH) (web-era claim; verify/rebuild for C)
-- **Better Disambiguation** - When multiple items match, ask "Did you mean the rusted key or the ornate key?" and remember the answer (web-era claim; verify/rebuild for C)
+- [x] **Better Disambiguation** - When multiple items match, numbered `Did you mean (1) … or (2) …?` prompts; reply with number or name; session remembers query→slug for the next ambiguous match. Verified in C executable (`take`, `drop`, `equip`, `examine`).
 - **Edge-Case Grammar Rules** - Handle tons of tiny grammar variations and edge cases (web-era claim; verify/rebuild for C)
 
 ## Technical Improvements

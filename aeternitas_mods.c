@@ -1746,6 +1746,20 @@ const char *aet_mods_npc_greeting(const char *entity_slug) {
   return NULL;
 }
 
+static int topic_has_word_ci(const char *haystack, const char *needle) {
+  size_t nl;
+  const char *p;
+  if (!haystack || !needle || !needle[0]) return 0;
+  nl = strlen(needle);
+  for (p = haystack; *p; p++) {
+    if (strncasecmp(p, needle, nl) != 0) continue;
+    if (p > haystack && (isalnum((unsigned char)p[-1]) || p[-1] == '_')) continue;
+    if (p[nl] && (isalnum((unsigned char)p[nl]) || p[nl] == '_')) continue;
+    return 1;
+  }
+  return 0;
+}
+
 const char *aet_mods_npc_topic_response(const char *entity_slug,
                                       const char *topic_phrase_lc) {
   int i;
@@ -1755,7 +1769,8 @@ const char *aet_mods_npc_topic_response(const char *entity_slug,
   for (i = 0; i < g_topics_n; i++) {
     size_t klen;
     if (!str_ieq_local(g_topics[i].entity, entity_slug)) continue;
-    if (!g_topics[i].keyword || strstr(topic_phrase_lc, g_topics[i].keyword) == NULL)
+    if (!g_topics[i].keyword ||
+        !topic_has_word_ci(topic_phrase_lc, g_topics[i].keyword))
       continue;
     klen = strlen(g_topics[i].keyword);
     if (klen >= best_len) {
