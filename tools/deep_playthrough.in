@@ -1,0 +1,22 @@
+1
+scan
+open mailbox
+take leaflet from mailbox
+drop leaflet
+take dropped
+unlock locked chest with skeleton key
+open it
+take all from it
+go north
+go east
+go west
+go north
+go north
+who
+talk to him about work
+where miller
+qs
+ql
+status
+inventory list
+quit

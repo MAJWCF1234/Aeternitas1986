@@ -1082,7 +1082,8 @@ static const char *const kNaturalLanguageStrip[] = {
     "let me please ",
     "i'm trying to ",       "im trying to ",        "go ahead and ",
     "i'm going to ",        "can i please ",        "im going to ",
-    "i'd like to ",         "i want to ",           "could you ",
+    "i'd like to ",         "i want to ",           "i wanna ",
+    "gonna ",               "could you ",
     "would you ",           "i need to ",           "i should ",
     "might as well ",       "i have to ",           "i've got to ",
     "ive got to ",          "i gotta ",             "i'm gonna ",
@@ -1091,7 +1092,7 @@ static const char *const kNaturalLanguageStrip[] = {
     "i am trying to ",      "i'm about to ",        "im about to ",
     "try and ",             "could i ",             "let me ",
     "please ",              "try to ",              "can i ",
-    "i ",
+    "lemme ",               "i ",
     NULL};
 
 static void strip_natural_prefixes(char *line) {
@@ -15962,6 +15963,11 @@ static void normalize_parser_intent(char *line) {
       PREFIX_RW("can you check what is in ", "examine", 1),
       PREFIX_RW("i want to see what's in ", "examine", 1),
       PREFIX_RW("i want to see what is in ", "examine", 1),
+      PREFIX_RW("what's in ", "examine", 1),
+      PREFIX_RW("whats in ", "examine", 1),
+      PREFIX_RW("what is in ", "examine", 1),
+      PREFIX_RW("what's on ", "examine", 1),
+      PREFIX_RW("whats on ", "examine", 1),
       PREFIX_RW("could you tell me who is here", "who", 0),
       PREFIX_RW("can you tell me who is here", "who", 0),
       PREFIX_RW("who's here", "who", 0),
@@ -20630,19 +20636,28 @@ static void process_command(char *line, char *msg, size_t msgcap,
 
   if (!strncmp(line, "open ", 5)) {
     const char *rest = line + 5;
+    char work[INPUT_LINE_MAX];
     while (*rest == ' ') rest++;
     if (rest[0] && strcmp(line, "open door") && strcmp(line, "open the door")) {
+      int prep;
       *turn_advance = 0;
-      if (container_open_cmd(g_room, rest, msg, msgcap)) return;
+      prep = parser_prepare_object_query(rest, work, sizeof work, NULL, NULL,
+                                         msg, msgcap);
+      if (prep < 0) return;
+      if (prep > 0 && container_open_cmd(g_room, work, msg, msgcap)) return;
     }
   }
 
   if (!strncmp(line, "close ", 6)) {
     const char *rest = line + 6;
+    char work[INPUT_LINE_MAX];
     while (*rest == ' ') rest++;
     if (rest[0] && strcmp(line, "close door") && strcmp(line, "close the door") &&
         strcmp(line, "shut door")) {
-      if (container_close_cmd(g_room, rest, msg, msgcap)) return;
+      int prep = parser_prepare_object_query(rest, work, sizeof work, NULL, NULL,
+                                             msg, msgcap);
+      if (prep < 0) return;
+      if (prep > 0 && container_close_cmd(g_room, work, msg, msgcap)) return;
     }
   }
 
@@ -20676,9 +20691,13 @@ static void process_command(char *line, char *msg, size_t msgcap,
       keyp += 6;
       while (*keyp == ' ') keyp++;
     }
-    strip_leading_articles(work);
-    if (work[0] && container_unlock_cmd(g_room, work, keyp, msg, msgcap))
-      return;
+    {
+      int prep = parser_prepare_object_query(work, work, sizeof work, NULL, NULL,
+                                             msg, msgcap);
+      if (prep < 0) return;
+      if (prep > 0 && container_unlock_cmd(g_room, work, keyp, msg, msgcap))
+        return;
+    }
     snprintf(msg, msgcap, "Nothing to unlock here.");
     return;
   }

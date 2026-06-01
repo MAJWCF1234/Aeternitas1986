@@ -17,9 +17,11 @@ OUT = Path(__file__).with_name("parser_nl_stress.out")
 
 COMMANDS = [
     "1",
+    "lemme see what's in the mailbox",
     "hey can you show me what's in the mailbox please?",
     "could you open the mailbox for me",
     "can you check what is in mailbox",
+    "whats in mailbox",
     "grab the leaflet from there",
     "drop it",
     "take the thing i dropped",
@@ -32,6 +34,7 @@ COMMANDS = [
     "i wanna look around",
     "what can i see",
     "is there a lockpick here?",
+    "gonna pick up the lockpick",
     "pick up the lockpick",
     "head east",
     "please pick lock",
@@ -51,6 +54,7 @@ COMMANDS = [
     "take reed from old box",
     "inventory please",
     "what do i have on me",
+    "whats on me",
     "quick save",
     "quick load",
     "quit",
