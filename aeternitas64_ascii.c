@@ -312,7 +312,25 @@ static int g_hist[BACK_HIST];
 static int g_hist_n;
 static unsigned char g_visited[MAX_WORLD_ROOMS];
 static char g_last_focus[MAX_ITEM_LEN];
+static char g_last_dropped[MAX_ITEM_LEN];
 static char g_last_npc[MAX_ITEM_LEN];
+
+#define AET_CONTAINER_MAX 48
+#define AET_CONTAINER_SLOTS 6
+#define AET_CONTAINER_ROOM_INV (-1)
+#define AET_CONTAINER_NESTED_BASE (-1000)
+
+typedef struct {
+  int room;
+  char id[MAX_ITEM_LEN];
+  unsigned char open;
+  unsigned char locked;
+  char contents[AET_CONTAINER_SLOTS][MAX_ITEM_LEN];
+  int content_n;
+} AetContainerRec;
+
+static AetContainerRec g_containers[AET_CONTAINER_MAX];
+static int g_container_n;
 #define AETER_LAST_TOPIC_CAP 256
 static char g_last_topic[AETER_LAST_TOPIC_CAP];
 static char g_ready_item[MAX_ITEM_LEN];
@@ -388,6 +406,18 @@ static int g_ironman_stub = 0;
 static char g_recap[RECAP_MAX][RECAP_W];
 static int g_recap_n;
 static int g_craft_proficiency = 1;
+#define MAX_CRAFT_PROFILES 64
+typedef struct {
+  char name[MAX_ITEM_LEN];
+  int hrd, shp, flx, dur, wgt, grp, bnd, utl;
+  int quality;
+  int disp_dur, disp_shp, disp_hnd, disp_wgt;
+} CraftSavedProfile;
+static int g_craft_prof_n;
+static CraftSavedProfile g_craft_prof[MAX_CRAFT_PROFILES];
+static CraftSavedProfile *craft_profile_lookup(const char *item);
+static int g_lockpick_last_noise;
+static int g_lockpick_suspicion;
 #define CAUSAL_RING 32
 #define CAUSAL_W 224
 static char g_causal_ring[CAUSAL_RING][CAUSAL_W];
@@ -606,6 +636,10 @@ static int write_save_file_path(const char *path);
 static void cmd_trade_buy(const char *rest, char *msg, size_t msgcap);
 static void cmd_trade_sell(const char *rest, char *msg, size_t msgcap);
 static void item_pretty(const char *item, char *out, size_t cap);
+static void entity_pretty(const char *ent, char *out, size_t cap);
+static int str_ieq(const char *a, const char *b);
+static void strip_trailing_space(char *s);
+static void query_norm_underscore(char *dst, size_t cap, const char *src);
 static int cmd_waypoint_travel(const char *raw, char *msg, size_t msgcap);
 static void run_game_menu(void);
 static void run_settings_ui(void);
@@ -616,6 +650,11 @@ static void ui_scrollable_panel(const char *title, const char *body,
                               const char *pending_acc, int *did_fullscreen);
 static void cmd_play_piano(char *msg, size_t msgcap);
 static int try_minigame(const char *id, char *msg, size_t msgcap);
+static int has_lockpick_tool(void);
+static int resolve_inv_item_query(const char *name, int *ix_out, char *msg,
+                                  size_t msgcap);
+static void game_mgt_apply_lockpick_stealth(MgtPersistentState *st, char *msg,
+                                            size_t msgcap);
 static int room_can_fish(void);
 static int room_can_farm(void);
 static int room_can_cook(void);
@@ -656,11 +695,32 @@ static void examine_target(const char *raw, char *msg, size_t msgcap);
 static int item_has_read_text(const char *id);
 static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
                                 char *msg, size_t msgcap);
+static int room_entity_matches_query_here(const char *q, char *pretty_out,
+                                          size_t pretty_cap);
+static int inv_has(const char *name);
+static void inv_add(const char *name);
+static int inv_take_out(int ix, char *out, size_t outcap);
+static int resolve_inv_item_query(const char *name, int *ix_out, char *msg,
+                                  size_t msgcap);
+static int resolve_room_item_query(const char *name, char *resolved,
+                                   size_t resolved_cap, char *msg,
+                                   size_t msgcap);
+static int room_item_matches_query(const char *item, const char *q,
+                                   const char *qnorm);
+static void copy_capped(char *dst, size_t cap, const char *src);
+static void chomp_line(char *s);
 #ifdef AETER_MINIGAMES
 static int game_open_reader(const char *item_id, char *msg, size_t msgcap);
 static int game_read_resolve(const char *item_id, MgtReadDocument *doc);
 #endif
 static void strip_leading_articles(char *s);
+static int parser_query_is_object_pronoun(const char *q);
+static int parser_query_is_npc_pronoun(const char *q);
+static int parser_expand_object_pronoun(const char *q, char *out, size_t cap,
+                                        char *msg, size_t msgcap);
+static int parser_expand_npc_pronoun(const char *q, char *out, size_t cap,
+                                     char *msg, size_t msgcap);
+static int parser_qualify_noun_query(char *q, int *ordinal, int *exclude_last);
 static int str_contains_ci(const char *haystack, const char *needle);
 static int text_has_word_ci(const char *text, const char *word);
 static int protective_phrase_has_danger_context(const char *text);
@@ -686,6 +746,171 @@ static void remember_focus_item(const char *item_id) {
 }
 
 static void clear_focus(void) { g_last_focus[0] = '\0'; }
+
+static void remember_dropped_item(const char *item_id) {
+  size_t n;
+  if (!item_id || !item_id[0]) return;
+  n = strlen(item_id);
+  if (n >= sizeof g_last_dropped) n = sizeof g_last_dropped - 1;
+  memcpy(g_last_dropped, item_id, n);
+  g_last_dropped[n] = '\0';
+}
+
+static int parser_rhs_is_surface(const char *rhs) {
+  char buf[64];
+  if (!rhs || !rhs[0]) return 0;
+  strncpy(buf, rhs, sizeof buf - 1);
+  buf[sizeof buf - 1] = '\0';
+  strip_trailing_space(buf);
+  strip_leading_articles(buf);
+  return str_ieq(buf, "ground") || str_ieq(buf, "floor") || str_ieq(buf, "here") ||
+         str_ieq(buf, "room") || str_ieq(buf, "the room");
+}
+
+static int parser_expand_dropped_ref(char *q, size_t cap) {
+  if (!q || !q[0] || !g_last_dropped[0]) return 0;
+  if (str_ieq(q, "dropped") || str_ieq(q, "the dropped") ||
+      strstr(q, "i dropped") != NULL || strstr(q, "I dropped") != NULL ||
+      (strstr(q, "dropped") != NULL &&
+       (strstr(q, "what") != NULL || strstr(q, "one") != NULL ||
+        strstr(q, "thing") != NULL || strstr(q, "item") != NULL))) {
+    snprintf(q, cap, "%s", g_last_dropped);
+    return 1;
+  }
+  return 0;
+}
+
+static int parser_query_is_object_pronoun(const char *q) {
+  if (!q || !q[0]) return 0;
+  return str_ieq(q, "it") || str_ieq(q, "that") || str_ieq(q, "this");
+}
+
+static int parser_query_is_npc_pronoun(const char *q) {
+  if (!q || !q[0]) return 0;
+  return str_ieq(q, "him") || str_ieq(q, "her") || str_ieq(q, "them") ||
+         str_ieq(q, "he") || str_ieq(q, "she");
+}
+
+static int parser_expand_object_pronoun(const char *q, char *out, size_t cap,
+                                        char *msg, size_t msgcap) {
+  if (!parser_query_is_object_pronoun(q)) return 0;
+  if (!g_last_focus[0]) {
+    if (msg && msgcap)
+      snprintf(msg, msgcap,
+               "Nothing in mind — examine, take, or search something first.");
+    return -1;
+  }
+  if (out && cap >= 2) snprintf(out, cap, "%s", g_last_focus);
+  return 1;
+}
+
+static int parser_expand_npc_pronoun(const char *q, char *out, size_t cap,
+                                     char *msg, size_t msgcap) {
+  const char *ent;
+  if (!parser_query_is_npc_pronoun(q)) return 0;
+  ent = world_room_entity(g_room);
+  if (g_last_npc[0] && ent && ent[0] && str_ieq(ent, g_last_npc)) {
+    if (out && cap >= 2) snprintf(out, cap, "%s", g_last_npc);
+    return 1;
+  }
+  if (ent && ent[0]) {
+    if (out && cap >= 2) snprintf(out, cap, "%s", ent);
+    return 1;
+  }
+  if (g_last_npc[0]) {
+    char pretty[64];
+    entity_pretty(g_last_npc, pretty, sizeof pretty);
+    if (msg && msgcap)
+      snprintf(msg, msgcap,
+               "%s is not here now. Try  where %s  or  who all.", pretty,
+               pretty);
+    return -1;
+  }
+  if (msg && msgcap)
+    snprintf(msg, msgcap,
+             "No one in mind — try  who  or  talk to <name>.");
+  return -1;
+}
+
+static int parser_qualify_noun_query(char *q, int *ordinal, int *exclude_last) {
+  static const struct {
+    const char *word;
+    int n;
+  } ord[] = {{"first ", 1},  {"second ", 2}, {"third ", 3},
+             {"1st ", 1},    {"2nd ", 2},    {"3rd ", 3},
+             {"fourth ", 4}, {"4th ", 4},    {NULL, 0}};
+  size_t i;
+  int o = 0, ex = 0;
+  if (!q) return 0;
+  strip_trailing_space(q);
+  strip_leading_articles(q);
+  if (!strncmp(q, "other ", 6)) {
+    ex = 1;
+    memmove(q, q + 6, strlen(q + 6) + 1);
+    strip_leading_articles(q);
+  }
+  for (i = 0; ord[i].word; i++) {
+    size_t wl = strlen(ord[i].word);
+    if (!strncmp(q, ord[i].word, wl)) {
+      o = ord[i].n;
+      memmove(q, q + wl, strlen(q + wl) + 1);
+      break;
+    }
+  }
+  if (!o && q[0] >= '1' && q[0] <= '9') {
+    char *p = q;
+    o = 0;
+    while (*p >= '0' && *p <= '9') {
+      o = o * 10 + (int)(*p - '0');
+      p++;
+    }
+    if (*p == ' ' || *p == '\0') {
+      while (*p == ' ') p++;
+      memmove(q, p, strlen(p) + 1);
+    } else {
+      o = 0;
+    }
+  }
+  strip_leading_articles(q);
+  strip_trailing_space(q);
+  if (ordinal) *ordinal = o;
+  if (exclude_last) *exclude_last = ex;
+  return 1;
+}
+
+static int parser_token_matches_item(const char *tok, const char *item) {
+  char inorm[MAX_ITEM_LEN];
+  char pretty[96];
+  char pnorm[96];
+  char tnorm[MAX_ITEM_LEN];
+  if (!tok || !tok[0] || !item || !item[0]) return 0;
+  query_norm_underscore(tnorm, sizeof tnorm, tok);
+  query_norm_underscore(inorm, sizeof inorm, item);
+  item_pretty(item, pretty, sizeof pretty);
+  query_norm_underscore(pnorm, sizeof pnorm, pretty);
+  if (str_ieq(item, tok) || str_ieq(inorm, tnorm)) return 1;
+  if (str_ieq(pretty, tok) || str_ieq(pnorm, tnorm)) return 1;
+  if (strstr(item, tnorm) != NULL) return 1;
+  if (strstr(inorm, tnorm) != NULL) return 1;
+  if (strstr(pnorm, tnorm) != NULL) return 1;
+  return 0;
+}
+
+static int parser_prepare_object_query(const char *raw, char *work, size_t wcap,
+                                       int *ordinal, int *exclude_last,
+                                       char *msg, size_t msgcap) {
+  int pr;
+  if (!raw || !work || wcap < 2) return 0;
+  strncpy(work, raw, wcap - 1);
+  work[wcap - 1] = '\0';
+  strip_trailing_space(work);
+  strip_leading_articles(work);
+  pr = parser_expand_object_pronoun(work, work, wcap, msg, msgcap);
+  if (pr < 0) return -1;
+  (void)parser_expand_dropped_ref(work, wcap);
+  if (!parser_qualify_noun_query(work, ordinal, exclude_last)) return 0;
+  return work[0] ? 1 : 0;
+}
 
 static int min3_int(int a, int b, int c) {
   int m = a;
@@ -1458,6 +1683,820 @@ static void place_persistent_story_items(void) {
   if (r >= 0) room_add_visible_item(r, "bucket");
 }
 
+static int item_is_container(const char *slug) {
+  if (!slug || !slug[0]) return 0;
+  return str_ieq(slug, "mailbox") || str_ieq(slug, "chest") ||
+         str_ieq(slug, "old_box") || str_ieq(slug, "locked_chest") ||
+         str_ieq(slug, "storage_chests") || str_ieq(slug, "crates");
+}
+
+static void containers_clear(void) {
+  g_container_n = 0;
+  memset(g_containers, 0, sizeof g_containers);
+}
+
+static int container_carried_here(const char *id) {
+  return inv_has(id);
+}
+
+static int container_find_idx(int room, const char *id) {
+  int i;
+  if (!id || !id[0]) return -1;
+  for (i = 0; i < g_container_n; i++) {
+    if (g_containers[i].room != room) continue;
+    if (str_ieq(g_containers[i].id, id)) return i;
+  }
+  return -1;
+}
+
+static int container_find_idx_any(const char *id) {
+  int i;
+  if (!id || !id[0]) return -1;
+  for (i = 0; i < g_container_n; i++)
+    if (str_ieq(g_containers[i].id, id)) return i;
+  return -1;
+}
+
+static int container_room_is_nested(int room) {
+  return room <= AET_CONTAINER_NESTED_BASE &&
+         room > AET_CONTAINER_NESTED_BASE - AET_CONTAINER_MAX;
+}
+
+static int container_nested_parent_cix(int room) {
+  return AET_CONTAINER_NESTED_BASE - room;
+}
+
+static int container_make_nested_room(int parent_cix) {
+  return AET_CONTAINER_NESTED_BASE - parent_cix;
+}
+
+static int container_room_valid(int room) {
+  if (room == AET_CONTAINER_ROOM_INV) return 1;
+  if (room >= 0 && room < WORLD_ROOM_COUNT) return 1;
+  return container_room_is_nested(room);
+}
+
+static int container_parent_lists_item(int parent_cix, const char *id) {
+  int i;
+  if (parent_cix < 0 || parent_cix >= g_container_n || !id || !id[0])
+    return 0;
+  for (i = 0; i < g_containers[parent_cix].content_n; i++)
+    if (str_ieq(g_containers[parent_cix].contents[i], id)) return 1;
+  return 0;
+}
+
+static int container_nested_accessible(int cix) {
+  int pcix;
+  if (cix < 0 || cix >= g_container_n) return 0;
+  if (!container_room_is_nested(g_containers[cix].room)) return 0;
+  pcix = container_nested_parent_cix(g_containers[cix].room);
+  if (pcix < 0 || pcix >= g_container_n) return 0;
+  if (!g_containers[pcix].open) return 0;
+  return container_parent_lists_item(pcix, g_containers[cix].id);
+}
+
+static int container_accessible_here(int room, int cix) {
+  const AetContainerRec *c;
+  if (cix < 0 || cix >= g_container_n) return 0;
+  c = &g_containers[cix];
+  if (c->room == AET_CONTAINER_ROOM_INV) return container_carried_here(c->id);
+  if (container_room_is_nested(c->room)) return container_nested_accessible(cix);
+  return c->room == room && room_has_visible_item(room, c->id);
+}
+
+static void container_set_location(const char *id, int room) {
+  int cix = container_find_idx_any(id);
+  if (cix >= 0) g_containers[cix].room = room;
+}
+
+static int container_ensure(int room, const char *id) {
+  int ix;
+  if (!id || !id[0]) return -1;
+  ix = container_find_idx(room, id);
+  if (ix >= 0) return ix;
+  if (g_container_n >= AET_CONTAINER_MAX) return -1;
+  ix = g_container_n++;
+  g_containers[ix].room = room;
+  copy_capped(g_containers[ix].id, sizeof g_containers[ix].id, id);
+  return ix;
+}
+
+static int container_content_add(int cix, const char *item) {
+  int nix;
+  if (cix < 0 || cix >= g_container_n || !item || !item[0]) return 0;
+  if (g_containers[cix].content_n >= AET_CONTAINER_SLOTS) return 0;
+  copy_capped(g_containers[cix].contents[g_containers[cix].content_n],
+              sizeof g_containers[cix].contents[0], item);
+  g_containers[cix].content_n++;
+  if (item_is_container(item)) {
+    nix = container_find_idx_any(item);
+    if (nix < 0) {
+      if (g_container_n >= AET_CONTAINER_MAX) {
+        g_containers[cix].content_n--;
+        g_containers[cix].contents[g_containers[cix].content_n][0] = '\0';
+        return 0;
+      }
+      nix = g_container_n++;
+      g_containers[nix].room = container_make_nested_room(cix);
+      copy_capped(g_containers[nix].id, sizeof g_containers[nix].id, item);
+    } else {
+      g_containers[nix].room = container_make_nested_room(cix);
+    }
+  }
+  return 1;
+}
+
+static int container_content_remove(int cix, const char *item) {
+  int i, j;
+  if (cix < 0 || cix >= g_container_n || !item || !item[0]) return 0;
+  for (i = 0; i < g_containers[cix].content_n; i++) {
+    if (!str_ieq(g_containers[cix].contents[i], item)) continue;
+    for (j = i; j < g_containers[cix].content_n - 1; j++)
+      copy_capped(g_containers[cix].contents[j],
+                  sizeof g_containers[cix].contents[0],
+                  g_containers[cix].contents[j + 1]);
+    g_containers[cix].content_n--;
+    return 1;
+  }
+  return 0;
+}
+
+static void hidden_remove_item(int room, const char *id) {
+  int i, j;
+  if (room < 0 || room >= WORLD_ROOM_COUNT || !id || !id[0]) return;
+  for (i = 0; i < g_hidden_n[room]; i++) {
+    if (!str_ieq(g_hidden_items[room][i], id)) continue;
+    for (j = i; j < g_hidden_n[room] - 1; j++)
+      memcpy(g_hidden_items[room][j], g_hidden_items[room][j + 1], MAX_ITEM_LEN);
+    g_hidden_n[room]--;
+    return;
+  }
+}
+
+static const char *container_unlock_key_slug(const char *container_id) {
+  if (!container_id || !container_id[0]) return NULL;
+  if (str_ieq(container_id, "locked_chest")) return "skeleton_key";
+  return NULL;
+}
+
+static int container_key_item_ok(const char *key_item,
+                                 const char *container_id) {
+  const char *need;
+  if (!key_item || !key_item[0] || !container_id || !container_id[0]) return 0;
+  if (str_ieq(key_item, "skeleton_key")) return 1;
+  need = container_unlock_key_slug(container_id);
+  return need && str_ieq(key_item, need);
+}
+
+static int container_inv_has_key(const char *container_id, char *key_out,
+                                 size_t keycap) {
+  int i;
+  if (key_out && keycap > 0) key_out[0] = '\0';
+  for (i = 0; i < g_inv_n; i++) {
+    if (!container_key_item_ok(g_inv[i], container_id)) continue;
+    if (key_out && keycap > 1)
+      copy_capped(key_out, keycap, g_inv[i]);
+    return 1;
+  }
+  return 0;
+}
+
+static int container_resolve_here(int room, const char *query, char *id_out,
+                                size_t idcap, int *cix_out) {
+  char work[256], qnorm[MAX_ITEM_LEN];
+  int i;
+  if (!query || !query[0] || !id_out || idcap < 2) return 0;
+  strncpy(work, query, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  strip_leading_articles(work);
+  strip_trailing_space(work);
+  query_norm_underscore(qnorm, sizeof qnorm, work);
+  for (i = 0; i < g_container_n; i++) {
+    char inorm[MAX_ITEM_LEN], pretty[96], pnorm[96];
+    const AetContainerRec *c = &g_containers[i];
+    if (!container_accessible_here(room, i)) continue;
+    query_norm_underscore(inorm, sizeof inorm, c->id);
+    item_pretty(c->id, pretty, sizeof pretty);
+    query_norm_underscore(pnorm, sizeof pnorm, pretty);
+    if (!(str_ieq(c->id, work) || str_ieq(inorm, qnorm) || str_ieq(pretty, work) ||
+          str_ieq(pnorm, qnorm) || strstr(inorm, qnorm) != NULL))
+      continue;
+    copy_capped(id_out, idcap, c->id);
+    if (cix_out) *cix_out = i;
+    return 1;
+  }
+  return 0;
+}
+
+static void container_format_contents(int cix, char *msg, size_t msgcap) {
+  int i;
+  char pretty[96];
+  if (cix < 0 || cix >= g_container_n) return;
+  if (g_containers[cix].content_n == 0) {
+    strncat(msg, "It is empty.", msgcap - strlen(msg) - 1);
+    return;
+  }
+  strncat(msg, "Inside: ", msgcap - strlen(msg) - 1);
+  for (i = 0; i < g_containers[cix].content_n; i++) {
+    item_pretty(g_containers[cix].contents[i], pretty, sizeof pretty);
+    if (i) strncat(msg, ", ", msgcap - strlen(msg) - 1);
+    strncat(msg, pretty, msgcap - strlen(msg) - 1);
+  }
+  strncat(msg, ".", msgcap - strlen(msg) - 1);
+}
+
+static void containers_init_new_game(void) {
+  int ix, west, attic;
+  containers_clear();
+  west = world_room_index("west_of_house");
+  attic = world_room_index("attic");
+  if (west >= 0) {
+    ix = container_ensure(west, "mailbox");
+    if (ix >= 0) {
+      g_containers[ix].open = 0;
+      g_containers[ix].locked = 0;
+      container_content_add(ix, "leaflet");
+      hidden_remove_item(west, "leaflet");
+      if (container_content_add(ix, "old_box")) {
+        int box_ix = container_find_idx_any("old_box");
+        if (box_ix >= 0) container_content_add(box_ix, "reed");
+      }
+    }
+  }
+  if (attic >= 0) {
+    ix = container_ensure(attic, "chest");
+    if (ix >= 0) {
+      g_containers[ix].open = 0;
+      g_containers[ix].locked = 0;
+      container_content_add(ix, "ancient_coin");
+    }
+  }
+  if (west >= 0) {
+    room_add_visible_item(west, "locked_chest");
+    ix = container_ensure(west, "locked_chest");
+    if (ix >= 0) {
+      g_containers[ix].open = 0;
+      g_containers[ix].locked = 1;
+      container_content_add(ix, "house_key");
+    }
+  }
+}
+
+static int containers_write_section(FILE *fp) {
+  int i, j;
+  fprintf(fp, "CONTAINERS\n%d\n", g_container_n);
+  for (i = 0; i < g_container_n; i++) {
+    const AetContainerRec *c = &g_containers[i];
+    fprintf(fp, "%d %s %d %d %d\n", c->room, c->id, (int)c->open,
+            (int)c->locked, c->content_n);
+    for (j = 0; j < c->content_n; j++) fprintf(fp, "%s\n", c->contents[j]);
+  }
+  return 1;
+}
+
+static int containers_read_section(FILE *fp) {
+  char buf[512];
+  int n, i, k;
+  if (!fgets(buf, sizeof buf, fp)) return 0;
+  chomp_line(buf);
+  n = atoi(buf);
+  if (n < 0 || n > AET_CONTAINER_MAX) return 0;
+  containers_clear();
+  for (i = 0; i < n; i++) {
+    int room, open, locked, cn;
+    char id[MAX_ITEM_LEN];
+    if (!fgets(buf, sizeof buf, fp)) return 0;
+    chomp_line(buf);
+    if (sscanf(buf, "%d %47s %d %d %d", &room, id, &open, &locked, &cn) != 5)
+      return 0;
+    if (!container_room_valid(room)) return 0;
+    if (cn < 0 || cn > AET_CONTAINER_SLOTS) return 0;
+    if (g_container_n >= AET_CONTAINER_MAX) return 0;
+    g_containers[g_container_n].room = room;
+    copy_capped(g_containers[g_container_n].id, MAX_ITEM_LEN, id);
+    g_containers[g_container_n].open = (unsigned char)(open ? 1 : 0);
+    g_containers[g_container_n].locked = (unsigned char)(locked ? 1 : 0);
+    g_containers[g_container_n].content_n = cn;
+    for (k = 0; k < cn; k++) {
+      if (!fgets(buf, sizeof buf, fp)) return 0;
+      chomp_line(buf);
+      copy_capped(g_containers[g_container_n].contents[k],
+                  sizeof g_containers[g_container_n].contents[0], buf);
+    }
+    g_container_n++;
+  }
+  return 1;
+}
+
+static void container_sync_carried(int cix, int to_room) {
+  if (cix < 0 || cix >= g_container_n) return;
+  g_containers[cix].room = to_room;
+}
+
+static void container_on_item_taken(int room, const char *id) {
+  int cix = container_find_idx(room, id);
+  if (cix < 0) return;
+  container_sync_carried(cix, AET_CONTAINER_ROOM_INV);
+}
+
+static void container_on_item_dropped(int room, const char *id) {
+  int cix = container_find_idx(AET_CONTAINER_ROOM_INV, id);
+  if (cix < 0) return;
+  container_sync_carried(cix, room);
+}
+
+static int container_open_cmd(int room, const char *query, char *msg,
+                              size_t msgcap) {
+  char cid[MAX_ITEM_LEN];
+  int cix = -1;
+  char pretty[96];
+  if (!container_resolve_here(room, query, cid, sizeof cid, &cix) || cix < 0) {
+    snprintf(msg, msgcap, "Nothing like that to open here.");
+    return 0;
+  }
+  item_pretty(cid, pretty, sizeof pretty);
+  if (g_containers[cix].locked) {
+    const char *need = container_unlock_key_slug(cid);
+    if (need)
+      snprintf(msg, msgcap,
+               "The %s is locked shut. You need the right key (try  unlock %s  "
+               "or  use key on %s).",
+               pretty, cid, cid);
+    else
+      snprintf(msg, msgcap, "The %s is locked shut.", pretty);
+    return 0;
+  }
+  g_containers[cix].open = 1;
+  remember_focus_item(cid);
+  if (g_containers[cix].content_n == 0) {
+    snprintf(msg, msgcap, "You open the %s. It is empty.", pretty);
+  } else {
+    snprintf(msg, msgcap, "You open the %s. ", pretty);
+    container_format_contents(cix, msg, msgcap);
+  }
+  return 1;
+}
+
+static int container_unlock_cmd(int room, const char *cont_q, const char *key_q,
+                              char *msg, size_t msgcap) {
+  char cont_id[MAX_ITEM_LEN], key_id[MAX_ITEM_LEN];
+  char cont_pretty[96], key_pretty[96];
+  int cix = -1, kix = -1, kr;
+  const char *need;
+  if (!cont_q || !cont_q[0]) return 0;
+  if (!container_resolve_here(room, cont_q, cont_id, sizeof cont_id, &cix) ||
+      cix < 0)
+    return 0;
+  item_pretty(cont_id, cont_pretty, sizeof cont_pretty);
+  if (!g_containers[cix].locked) {
+    snprintf(msg, msgcap, "The %s is not locked.", cont_pretty);
+    return 1;
+  }
+  if (key_q && key_q[0]) {
+    kr = resolve_inv_item_query(key_q, &kix, msg, msgcap);
+    if (kr < 0) return 1;
+    if (kr <= 0 || kix < 0) {
+      snprintf(msg, msgcap, "You are not carrying that key.");
+      return 1;
+    }
+    copy_capped(key_id, sizeof key_id, g_inv[kix]);
+  } else if (!container_inv_has_key(cont_id, key_id, sizeof key_id)) {
+    need = container_unlock_key_slug(cont_id);
+    if (need) {
+      item_pretty(need, key_pretty, sizeof key_pretty);
+      snprintf(msg, msgcap,
+               "The %s is locked. You need something like a %s — or try  use "
+               "%s on %s.",
+               cont_pretty, key_pretty, need, cont_id);
+    } else if (has_lockpick_tool())
+      snprintf(msg, msgcap,
+               "The %s is locked. Try a key or  use lockpick on %s.", cont_pretty,
+               cont_id);
+    else
+      snprintf(msg, msgcap, "The %s is locked, and you have no key that fits.",
+               cont_pretty);
+    return 1;
+  }
+  if (!container_key_item_ok(key_id, cont_id)) {
+    item_pretty(key_id, key_pretty, sizeof key_pretty);
+    snprintf(msg, msgcap, "The %s does not fit the %s.", key_pretty,
+             cont_pretty);
+    return 1;
+  }
+  g_containers[cix].locked = 0;
+  remember_focus_item(cont_id);
+  item_pretty(key_id, key_pretty, sizeof key_pretty);
+  snprintf(msg, msgcap, "You unlock the %s with the %s.", cont_pretty,
+           key_pretty);
+  g_score += 3;
+  return 1;
+}
+
+static int container_lockpick_cmd(int room, const char *cont_q, char *msg,
+                                  size_t msgcap) {
+  char cont_id[MAX_ITEM_LEN], cont_pretty[96];
+  int cix = -1;
+  if (!has_lockpick_tool()) return 0;
+  if (!container_resolve_here(room, cont_q, cont_id, sizeof cont_id, &cix) ||
+      cix < 0)
+    return 0;
+  if (!g_containers[cix].locked) return 0;
+  item_pretty(cont_id, cont_pretty, sizeof cont_pretty);
+#ifdef AETER_MINIGAMES
+  if (try_minigame("lockpick", msg, msgcap)) {
+    MgtPersistentState *st = mgt_host_state();
+    game_mgt_apply_lockpick_stealth(st, msg, msgcap);
+    if (st && st->last_success == 1) {
+      g_containers[cix].locked = 0;
+      snprintf(msg, msgcap, "The %s gives way under your tools.", cont_pretty);
+      remember_focus_item(cont_id);
+      g_score += 5;
+    }
+    return 1;
+  }
+#endif
+  g_containers[cix].locked = 0;
+  snprintf(msg, msgcap, "You coax the %s lock until it yields.", cont_pretty);
+  remember_focus_item(cont_id);
+  g_score += 5;
+  return 1;
+}
+
+static int container_take_all_from(int room, const char *cont_q, char *msg,
+                                   size_t msgcap) {
+  char cont_id[MAX_ITEM_LEN], item_id[MAX_ITEM_LEN];
+  char cont_pretty[96], item_pretty_buf[96], line[512];
+  int cix = -1, n = 0;
+  size_t len;
+  if (!container_resolve_here(room, cont_q, cont_id, sizeof cont_id, &cix) ||
+      cix < 0) {
+    snprintf(msg, msgcap, "You do not see that container here.");
+    return 0;
+  }
+  item_pretty(cont_id, cont_pretty, sizeof cont_pretty);
+  if (!g_containers[cix].open) {
+    snprintf(msg, msgcap, "The %s is closed.", cont_pretty);
+    return 0;
+  }
+  if (g_containers[cix].content_n == 0) {
+    snprintf(msg, msgcap, "There is nothing to take from the %s.", cont_pretty);
+    return 0;
+  }
+  line[0] = '\0';
+  while (g_containers[cix].content_n > 0) {
+    if (g_inv_n >= MAX_INV) {
+      if (n == 0)
+        snprintf(msg, msgcap,
+                 "You cannot carry more (%d-item limit). Drop something first.",
+                 MAX_INV);
+      else
+        snprintf(msg, msgcap,
+                 "You take what you can from the %s; something remains inside.\n%s",
+                 cont_pretty, line);
+      return n > 0;
+    }
+    copy_capped(item_id, sizeof item_id, g_containers[cix].contents[0]);
+    container_content_remove(cix, item_id);
+    if (item_is_container(item_id))
+      container_set_location(item_id, AET_CONTAINER_ROOM_INV);
+    inv_add(item_id);
+    remember_focus_item(item_id);
+    item_pretty(item_id, item_pretty_buf, sizeof item_pretty_buf);
+    if (n == 0)
+      snprintf(line, sizeof line, "Taken from %s: %s", cont_pretty,
+               item_pretty_buf);
+    else {
+      len = strlen(line);
+      snprintf(line + len, sizeof line - len, ", %s", item_pretty_buf);
+    }
+    n++;
+    g_score += 5;
+  }
+  snprintf(msg, msgcap, "%s", line);
+  return 1;
+}
+
+static int container_close_cmd(int room, const char *query, char *msg,
+                               size_t msgcap) {
+  char cid[MAX_ITEM_LEN];
+  int cix = -1;
+  char pretty[96];
+  if (!container_resolve_here(room, query, cid, sizeof cid, &cix) || cix < 0) {
+    snprintf(msg, msgcap, "Nothing like that to close here.");
+    return 0;
+  }
+  item_pretty(cid, pretty, sizeof pretty);
+  if (!g_containers[cix].open) {
+    snprintf(msg, msgcap, "The %s is already closed.", pretty);
+    return 0;
+  }
+  g_containers[cix].open = 0;
+  snprintf(msg, msgcap, "You close the %s.", pretty);
+  return 1;
+}
+
+static int container_take_from(int room, const char *item_q, const char *cont_q,
+                               char *msg, size_t msgcap) {
+  char cont_id[MAX_ITEM_LEN], work[256], qnorm[MAX_ITEM_LEN];
+  char picks[6][MAX_ITEM_LEN], item_id[MAX_ITEM_LEN];
+  char item_pretty_buf[96], cont_pretty[96];
+  int cix = -1, pn = 0, ordinal = 0, exclude_last = 0, prep, ii;
+  if (!container_resolve_here(room, cont_q, cont_id, sizeof cont_id, &cix) ||
+      cix < 0) {
+    snprintf(msg, msgcap, "You do not see that container here.");
+    return 0;
+  }
+  item_pretty(cont_id, cont_pretty, sizeof cont_pretty);
+  if (!g_containers[cix].open) {
+    snprintf(msg, msgcap, "The %s is closed.", cont_pretty);
+    return 0;
+  }
+  prep = parser_prepare_object_query(item_q, work, sizeof work, &ordinal,
+                                     &exclude_last, msg, msgcap);
+  if (prep < 0) return 0;
+  if (!work[0]) {
+    snprintf(msg, msgcap, "Take what from the %s?", cont_pretty);
+    return 0;
+  }
+  query_norm_underscore(qnorm, sizeof qnorm, work);
+  for (ii = 0; ii < g_containers[cix].content_n; ii++) {
+    if (exclude_last && g_last_focus[0] &&
+        str_ieq(g_containers[cix].contents[ii], g_last_focus))
+      continue;
+    if (!room_item_matches_query(g_containers[cix].contents[ii], work, qnorm))
+      continue;
+    if (pn < 6)
+      copy_capped(picks[pn++], MAX_ITEM_LEN, g_containers[cix].contents[ii]);
+  }
+  if (pn == 0) {
+    snprintf(msg, msgcap, "That is not inside the %s.", cont_pretty);
+    return 0;
+  }
+  if (pn > 1 && ordinal >= 1 && ordinal <= pn)
+    copy_capped(item_id, sizeof item_id, picks[ordinal - 1]);
+  else if (pn == 1)
+    copy_capped(item_id, sizeof item_id, picks[0]);
+  else {
+    snprintf(msg, msgcap,
+             "Which one inside the %s? (%d matches — try an ordinal.)",
+             cont_pretty, pn);
+    return 0;
+  }
+  if (g_inv_n >= MAX_INV) {
+    snprintf(msg, msgcap,
+             "You cannot carry more (%d-item limit). Drop something first.",
+             MAX_INV);
+    return 0;
+  }
+  container_content_remove(cix, item_id);
+  if (item_is_container(item_id))
+    container_set_location(item_id, AET_CONTAINER_ROOM_INV);
+  inv_add(item_id);
+  remember_focus_item(item_id);
+  item_pretty(item_id, item_pretty_buf, sizeof item_pretty_buf);
+  snprintf(msg, msgcap, "Taken from %s: %s", cont_pretty, item_pretty_buf);
+  g_score += 5;
+  return 1;
+}
+
+static int container_put_in(int room, const char *item_q, const char *cont_q,
+                            char *msg, size_t msgcap) {
+  char cont_id[MAX_ITEM_LEN], taken[MAX_ITEM_LEN];
+  char item_pretty_buf[96], cont_pretty[96];
+  int cix = -1, ix = -1, r;
+  if (!container_resolve_here(room, cont_q, cont_id, sizeof cont_id, &cix) ||
+      cix < 0) {
+    snprintf(msg, msgcap, "You do not see that container here.");
+    return 0;
+  }
+  item_pretty(cont_id, cont_pretty, sizeof cont_pretty);
+  if (!g_containers[cix].open) {
+    snprintf(msg, msgcap, "The %s is closed.", cont_pretty);
+    return 0;
+  }
+  if (g_containers[cix].content_n >= AET_CONTAINER_SLOTS) {
+    snprintf(msg, msgcap, "There is no room left inside the %s.", cont_pretty);
+    return 0;
+  }
+  g_disambig_next_act = DISAMBIG_ACT_DROP;
+  r = resolve_inv_item_query(item_q, &ix, msg, msgcap);
+  if (r < 0) return 0;
+  if (r <= 0 || ix < 0) {
+    snprintf(msg, msgcap, "You are not carrying that.");
+    return 0;
+  }
+  if (str_ieq(g_inv[ix], cont_id)) {
+    snprintf(msg, msgcap, "You cannot put a container inside itself.");
+    return 0;
+  }
+  inv_take_out(ix, taken, sizeof taken);
+  if (str_ieq(g_ready_item, taken)) g_ready_item[0] = '\0';
+  eq_remove_item_from_slots(taken);
+  if (str_ieq(g_last_focus, taken)) clear_focus();
+  container_content_add(cix, taken);
+  remember_focus_item(cont_id);
+  item_pretty(taken, item_pretty_buf, sizeof item_pretty_buf);
+  snprintf(msg, msgcap, "You put %s in the %s.", item_pretty_buf, cont_pretty);
+  g_score += 1;
+  return 1;
+}
+
+static void container_append_open_contents_picks(int room, const char *name,
+                                                 const char *qnorm,
+                                                 char picks[][MAX_ITEM_LEN],
+                                                 int *pn, int exclude_last) {
+  int ci, ii, j, n = pn ? *pn : 0;
+  if (!pn || n >= DISAMBIG_PICK_MAX) return;
+  for (ci = 0; ci < g_container_n; ci++) {
+    if (!g_containers[ci].open) continue;
+    if (!container_accessible_here(room, ci)) continue;
+    for (ii = 0; ii < g_containers[ci].content_n; ii++) {
+      if (exclude_last && g_last_focus[0] &&
+          str_ieq(g_containers[ci].contents[ii], g_last_focus))
+        continue;
+      if (!room_item_matches_query(g_containers[ci].contents[ii], name, qnorm))
+        continue;
+      for (j = 0; j < n; j++)
+        if (str_ieq(picks[j], g_containers[ci].contents[ii])) break;
+      if (j < n) continue;
+      if (n < DISAMBIG_PICK_MAX) {
+        copy_capped(picks[n], MAX_ITEM_LEN, g_containers[ci].contents[ii]);
+        n++;
+      }
+    }
+  }
+  *pn = n;
+}
+
+static int container_take_by_query(int room, const char *name, char *msg,
+                                   size_t msgcap) {
+  char work[256], qnorm[MAX_ITEM_LEN], picks[6][MAX_ITEM_LEN], slug[MAX_ITEM_LEN];
+  char pretty[96], ip[96];
+  int pn = 0, ordinal = 0, exclude_last = 0, prep, ci, ii;
+  prep = parser_prepare_object_query(name, work, sizeof work, &ordinal,
+                                     &exclude_last, msg, msgcap);
+  if (prep < 0) return 0;
+  if (!work[0]) return 0;
+  query_norm_underscore(qnorm, sizeof qnorm, work);
+  container_append_open_contents_picks(room, work, qnorm, picks, &pn,
+                                       exclude_last);
+  if (pn == 0) return 0;
+  if (pn > 1 && ordinal >= 1 && ordinal <= pn)
+    copy_capped(slug, sizeof slug, picks[ordinal - 1]);
+  else if (pn == 1)
+    copy_capped(slug, sizeof slug, picks[0]);
+  else {
+    snprintf(msg, msgcap,
+             "Which one? (%d matches in open containers — try an ordinal.)", pn);
+    return 0;
+  }
+  for (ci = 0; ci < g_container_n; ci++) {
+    if (!g_containers[ci].open) continue;
+    if (!container_accessible_here(room, ci)) continue;
+    for (ii = 0; ii < g_containers[ci].content_n; ii++) {
+      if (!str_ieq(g_containers[ci].contents[ii], slug)) continue;
+      if (g_inv_n >= MAX_INV) {
+        snprintf(msg, msgcap,
+                 "You cannot carry more (%d-item limit). Drop something first.",
+                 MAX_INV);
+        return 0;
+      }
+      container_content_remove(ci, slug);
+      if (item_is_container(slug))
+        container_set_location(slug, AET_CONTAINER_ROOM_INV);
+      inv_add(slug);
+      item_pretty(g_containers[ci].id, pretty, sizeof pretty);
+      item_pretty(slug, ip, sizeof ip);
+      snprintf(msg, msgcap, "Taken from %s: %s", pretty, ip);
+      remember_focus_item(slug);
+      g_score += 5;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static void container_examine(int cix, char *msg, size_t msgcap) {
+  char pretty[96], body[512];
+  const AetContainerRec *c;
+  if (cix < 0 || cix >= g_container_n) return;
+  c = &g_containers[cix];
+  item_pretty(c->id, pretty, sizeof pretty);
+  body[0] = '\0';
+  if (aet_item_catalog_description_for_slug(c->id))
+    snprintf(body, sizeof body, "%s",
+             aet_item_catalog_description_for_slug(c->id));
+  snprintf(msg, msgcap, "%s%s%s", pretty, body[0] ? "\n\n" : "", body);
+  if (c->locked) {
+    const char *need = container_unlock_key_slug(c->id);
+    if (need) {
+      char kp[96];
+      item_pretty(need, kp, sizeof kp);
+      snprintf(body, sizeof body, "\n\nIt is locked. A %s might fit.", kp);
+      strncat(msg, body, msgcap - strlen(msg) - 1);
+    } else
+      strncat(msg, "\n\nIt is locked.", msgcap - strlen(msg) - 1);
+  } else if (c->open) {
+    strncat(msg, "\n\nIt is open. ", msgcap - strlen(msg) - 1);
+    container_format_contents(cix, msg, msgcap);
+  } else {
+    if (c->content_n > 0)
+      strncat(msg,
+              "\n\nIt is closed. You would need to open it to see or reach "
+              "what is inside.",
+              msgcap - strlen(msg) - 1);
+    else
+      strncat(msg, "\n\nIt is closed.", msgcap - strlen(msg) - 1);
+  }
+  remember_focus_item(c->id);
+}
+
+static void container_scan_append(char *msg, size_t msgcap, int room) {
+  int ci, any = 0;
+  char line[320], pretty[96], ip[96];
+  for (ci = 0; ci < g_container_n; ci++) {
+    const AetContainerRec *c = &g_containers[ci];
+    size_t len;
+    char parent_pretty[96];
+    int pcix;
+    if (!container_accessible_here(room, ci)) continue;
+    if (container_room_is_nested(c->room)) {
+      pcix = container_nested_parent_cix(c->room);
+      if (pcix < 0 || pcix >= g_container_n) continue;
+      item_pretty(g_containers[pcix].id, parent_pretty, sizeof parent_pretty);
+    } else if (c->room != room) {
+      continue;
+    }
+    if (!any) {
+      strncat(msg, "\nContainers:\n", msgcap - strlen(msg) - 1);
+      any = 1;
+    }
+    item_pretty(c->id, pretty, sizeof pretty);
+    if (container_room_is_nested(c->room)) {
+      if (c->locked)
+        snprintf(line, sizeof line, "  %s (in %s) — locked closed", pretty,
+                 parent_pretty);
+      else if (c->open) {
+        if (c->content_n == 0)
+          snprintf(line, sizeof line, "  %s (in %s) — open, empty", pretty,
+                   parent_pretty);
+        else if (c->content_n == 1) {
+          item_pretty(c->contents[0], ip, sizeof ip);
+          snprintf(line, sizeof line, "  %s (in %s) — open; inside: %s", pretty,
+                   parent_pretty, ip);
+        } else
+          snprintf(line, sizeof line, "  %s (in %s) — open; %d items inside",
+                   pretty, parent_pretty, c->content_n);
+      } else if (c->content_n > 0)
+        snprintf(line, sizeof line, "  %s (in %s) — closed (%d item(s) within)",
+                 pretty, parent_pretty, c->content_n);
+      else
+        snprintf(line, sizeof line, "  %s (in %s) — closed", pretty,
+                 parent_pretty);
+    } else if (c->locked)
+      snprintf(line, sizeof line, "  %s — locked closed", pretty);
+    else if (c->open) {
+      if (c->content_n == 0)
+        snprintf(line, sizeof line, "  %s — open, empty", pretty);
+      else if (c->content_n == 1) {
+        item_pretty(c->contents[0], ip, sizeof ip);
+        snprintf(line, sizeof line, "  %s — open; inside: %s", pretty, ip);
+      } else
+        snprintf(line, sizeof line, "  %s — open; %d items inside", pretty,
+                 c->content_n);
+    } else if (c->content_n > 0)
+      snprintf(line, sizeof line, "  %s — closed (%d item(s) within)", pretty,
+               c->content_n);
+    else
+      snprintf(line, sizeof line, "  %s — closed", pretty);
+    len = strlen(msg);
+    if (len + 2 < msgcap) strncat(msg, line, msgcap - len - 1);
+    if (len + 2 < msgcap) strncat(msg, "\n", msgcap - strlen(msg) - 1);
+  }
+}
+
+static int container_hint_closed_item(int room, const char *work,
+                                      const char *qnorm, char *msg,
+                                      size_t msgcap) {
+  int ci, ii;
+  char cp[96], ip[96];
+  for (ci = 0; ci < g_container_n; ci++) {
+    const AetContainerRec *c = &g_containers[ci];
+    if (c->open) continue;
+    if (!container_accessible_here(room, ci)) continue;
+    for (ii = 0; ii < c->content_n; ii++) {
+      if (!room_item_matches_query(c->contents[ii], work, qnorm)) continue;
+      item_pretty(c->id, cp, sizeof cp);
+      item_pretty(c->contents[ii], ip, sizeof ip);
+      snprintf(msg, msgcap,
+               "The %s is inside the closed %s. Try  open %s  first.", ip, cp,
+               c->id);
+      return 1;
+    }
+  }
+  return 0;
+}
+
 static void body_append(char *body, size_t cap, const char *fmt, ...) {
   size_t len;
   va_list ap;
@@ -1566,6 +2605,7 @@ static int inv_count(const char *name) {
 #ifdef AETER_MINIGAMES
 static const char *game_mgt_weather_string(void);
 static void inv_add(const char *name);
+static int inv_remove_exact_one(const char *name);
 
 static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
                                 char *msg, size_t msgcap);
@@ -1692,7 +2732,33 @@ static int try_minigame(const char *id, char *msg, size_t msgcap) {
     game_mgt_bootstrap_profile();
     g_mgt_ready = 1;
   }
+  if (aet_autotest()) {
+#if defined(_WIN32)
+    _putenv("MGT_AUTOTEST=1");
+    if (!strcmp(id, "lockpick"))
+      _putenv("MGT_AUTOTEST_SCRIPT=lock_win");
+    else if (!strcmp(id, "hunting"))
+      _putenv("MGT_AUTOTEST_SCRIPT=hunt_win");
+    else
+      _putenv("MGT_AUTOTEST_SCRIPT=");
+#else
+    setenv("MGT_AUTOTEST", "1", 1);
+    if (!strcmp(id, "lockpick"))
+      setenv("MGT_AUTOTEST_SCRIPT", "lock_win", 1);
+    else if (!strcmp(id, "hunting"))
+      setenv("MGT_AUTOTEST_SCRIPT", "hunt_win", 1);
+    else
+      unsetenv("MGT_AUTOTEST_SCRIPT");
+#endif
+  }
   rc = aet_minigame_takeover(id);
+  if (aet_autotest()) {
+#if defined(_WIN32)
+    _putenv("MGT_AUTOTEST_SCRIPT=");
+#else
+    unsetenv("MGT_AUTOTEST_SCRIPT");
+#endif
+  }
   if (rc == (int)MGT_HOST_ABORT) {
     if (msg && msgcap)
       snprintf(msg, msgcap, "Could not start that activity.");
@@ -3200,6 +4266,7 @@ static int write_save_file_path(const char *path) {
     for (i = 0; i < g_hidden_n[r]; i++)
       fprintf(fp, "%s\n", g_hidden_items[r][i]);
   }
+  if (!containers_write_section(fp)) return 0;
   fprintf(fp, "NOTES\n%d\n", g_note_n);
   for (i = 0; i < g_note_n; i++) fprintf(fp, "%s\n", g_notes[i]);
   fprintf(fp, "READIED\n");
@@ -3268,6 +4335,8 @@ static int write_save_file_path(const char *path) {
   pc_write_save(fp);
   fprintf(fp, "FOCUS\n");
   fprintf(fp, "%s\n", g_last_focus[0] ? g_last_focus : "");
+  fprintf(fp, "DROPPED\n");
+  fprintf(fp, "%s\n", g_last_dropped[0] ? g_last_dropped : "");
   fprintf(fp, "TOPIC\n");
   fprintf(fp, "%s\n", g_last_topic[0] ? g_last_topic : "");
   fprintf(fp, "LASTNPC\n");
@@ -3302,12 +4371,31 @@ static int write_save_file_path(const char *path) {
 #ifdef AETER_MINIGAMES
   {
     MgtPersistentState mgst;
+    fprintf(fp, "CRAFTPROF\n%d\n", g_craft_prof_n);
+    for (i = 0; i < g_craft_prof_n; i++) {
+      CraftSavedProfile *cp = &g_craft_prof[i];
+      fprintf(fp, "%s\n", cp->name);
+      fprintf(fp, "%d %d %d %d %d %d %d %d %d %d %d %d %d\n", cp->hrd, cp->shp,
+              cp->flx, cp->dur, cp->wgt, cp->grp, cp->bnd, cp->utl, cp->quality,
+              cp->disp_dur, cp->disp_shp, cp->disp_hnd, cp->disp_wgt);
+    }
+    fprintf(fp, "LOCKPICK\n%d %d\n", g_lockpick_last_noise, g_lockpick_suspicion);
     game_mgt_capture_profile(&mgst);
     if (!mgt_profile_write_embedded(fp, &mgst)) {
       (void)fclose(fp);
       return 0;
     }
   }
+#else
+  fprintf(fp, "CRAFTPROF\n%d\n", g_craft_prof_n);
+  for (i = 0; i < g_craft_prof_n; i++) {
+    CraftSavedProfile *cp = &g_craft_prof[i];
+    fprintf(fp, "%s\n", cp->name);
+    fprintf(fp, "%d %d %d %d %d %d %d %d %d %d %d %d %d\n", cp->hrd, cp->shp,
+            cp->flx, cp->dur, cp->wgt, cp->grp, cp->bnd, cp->utl, cp->quality,
+            cp->disp_dur, cp->disp_shp, cp->disp_hnd, cp->disp_wgt);
+  }
+  fprintf(fp, "LOCKPICK\n%d %d\n", g_lockpick_last_noise, g_lockpick_suspicion);
 #endif
   if (fflush(fp) != 0 || ferror(fp)) {
     (void)fclose(fp);
@@ -3541,6 +4629,13 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
   g_note_n = 0;
   if (!fgets(buf, sizeof buf, fp)) goto bad;
   chomp_line(buf);
+  if (strcmp(buf, "CONTAINERS") == 0) {
+    if (!containers_read_section(fp)) goto bad;
+    if (!fgets(buf, sizeof buf, fp)) goto bad;
+    chomp_line(buf);
+  } else {
+    containers_init_new_game();
+  }
   if (strcmp(buf, "NOTES") != 0) goto bad;
   if (!fgets(buf, sizeof buf, fp)) goto bad;
   {
@@ -3751,6 +4846,13 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
         if (!g_last_focus[0] || !inv_has(g_last_focus)) clear_focus();
         if (fgets(buf, sizeof buf, fp)) {
           chomp_line(buf);
+          if (strcmp(buf, "DROPPED") == 0 && fgets(buf, sizeof buf, fp)) {
+            chomp_line(buf);
+            fl = strnlen(buf, sizeof g_last_dropped - 1);
+            memcpy(g_last_dropped, buf, fl);
+            g_last_dropped[fl] = '\0';
+            if (fgets(buf, sizeof buf, fp)) chomp_line(buf);
+          }
           if (strcmp(buf, "TOPIC") == 0 && fgets(buf, sizeof buf, fp)) {
             chomp_line(buf);
             fl = strnlen(buf, sizeof g_last_topic - 1);
@@ -3827,6 +4929,41 @@ static int load_game_path(const char *path, char *msg, size_t msgcap) {
   } else {
     while (fgets(buf, sizeof buf, fp)) {
       chomp_line(buf);
+      if (strcmp(buf, "CRAFTPROF") == 0) {
+        int cn, ci;
+        g_craft_prof_n = 0;
+        if (!fgets(buf, sizeof buf, fp)) break;
+        chomp_line(buf);
+        cn = atoi(buf);
+        if (cn < 0) cn = 0;
+        if (cn > MAX_CRAFT_PROFILES) cn = MAX_CRAFT_PROFILES;
+        for (ci = 0; ci < cn; ci++) {
+          CraftSavedProfile *cp;
+          if (!fgets(buf, sizeof buf, fp)) break;
+          chomp_line(buf);
+          if (g_craft_prof_n >= MAX_CRAFT_PROFILES) continue;
+          cp = &g_craft_prof[g_craft_prof_n++];
+          copy_capped(cp->name, sizeof cp->name, buf);
+          if (!fgets(buf, sizeof buf, fp)) {
+            g_craft_prof_n--;
+            break;
+          }
+          chomp_line(buf);
+          if (sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d", &cp->hrd,
+                     &cp->shp, &cp->flx, &cp->dur, &cp->wgt, &cp->grp, &cp->bnd,
+                     &cp->utl, &cp->quality, &cp->disp_dur, &cp->disp_shp,
+                     &cp->disp_hnd, &cp->disp_wgt) < 13)
+            g_craft_prof_n--;
+        }
+        continue;
+      }
+      if (strcmp(buf, "LOCKPICK") == 0) {
+        if (fgets(buf, sizeof buf, fp)) {
+          chomp_line(buf);
+          sscanf(buf, "%d %d", &g_lockpick_last_noise, &g_lockpick_suspicion);
+        }
+        continue;
+      }
       if (strcmp(buf, "MGT") == 0) {
         if (mgt_profile_read_embedded(fp, &g_mgt_quicksave_profile))
           g_mgt_quicksave_valid = 1;
@@ -4221,6 +5358,8 @@ static const AetNpcRoutine NPC_ROUTINES[] = {
      "bard_stage"},
     {"traveling_merchant", "west_of_house", "tavern_exterior", "village_road",
      "west_of_house"},
+    {"bartender", "tavern_common_room", "tavern_common_room",
+     "tavern_common_room", "tavern_back_room"},
     {"farmer", "farm", "farm", "village_square", "farm"},
     {"missionary_elena", "temple_of_architect", "village_square",
      "temple_garden", "temple_of_architect"},
@@ -4247,6 +5386,31 @@ static const AetNpcRoutine *npc_routine_for(const char *slug) {
   return NULL;
 }
 
+static int npc_resolve_routine_query(const char *q, char *slug_out, size_t slugcap,
+                                     char *pretty_out, size_t prettycap) {
+  char buf[128], qn[MAX_ITEM_LEN], pretty[96];
+  size_t i;
+  if (!q || !q[0] || !slug_out || slugcap < 2) return 0;
+  strncpy(buf, q, sizeof buf - 1);
+  buf[sizeof buf - 1] = '\0';
+  strip_leading_articles(buf);
+  strip_trailing_space(buf);
+  query_norm_underscore(qn, sizeof qn, buf);
+  for (i = 0; i < (size_t)npc_routine_count(); i++) {
+    const AetNpcRoutine *rt = npc_routine_at(i);
+    if (!rt) continue;
+    entity_pretty(rt->slug, pretty, sizeof pretty);
+    if (!(str_ieq(rt->slug, buf) || strstr(rt->slug, qn) != NULL ||
+          str_ieq(pretty, buf) || strstr(pretty, buf) != NULL))
+      continue;
+    copy_capped(slug_out, slugcap, rt->slug);
+    if (pretty_out && prettycap > 1)
+      copy_capped(pretty_out, prettycap, pretty);
+    return 1;
+  }
+  return 0;
+}
+
 static const char *npc_routine_room_for_period(const AetNpcRoutine *rt,
                                                const char *period) {
   if (!rt) return NULL;
@@ -4256,12 +5420,38 @@ static const char *npc_routine_room_for_period(const AetNpcRoutine *rt,
   return rt->night_room;
 }
 
+static const char *npc_routine_next_period(const char *period) {
+  if (str_ieq(period, "morning")) return "afternoon";
+  if (str_ieq(period, "afternoon")) return "evening";
+  if (str_ieq(period, "evening")) return "night";
+  return "morning";
+}
+
+static const char *npc_routine_room_special(const AetNpcRoutine *rt,
+                                            const AetWorldClock *wc) {
+  if (!rt || !wc) return NULL;
+  if (str_ieq(rt->slug, "farmer")) {
+    int dow = wc->day % 7;
+    if ((dow == 0 || dow == 3) && str_ieq(wc->period, "afternoon"))
+      return "village_square";
+  }
+  if (str_ieq(rt->slug, "traveling_bard")) {
+    if (wc->day % 7 == 6 && str_ieq(wc->period, "evening"))
+      return "festival_stage";
+  }
+  if (str_ieq(rt->slug, "traveling_merchant")) {
+    if (wc->day % 7 == 5 && str_ieq(wc->period, "afternoon"))
+      return "village_square";
+  }
+  return npc_routine_room_for_period(rt, wc->period);
+}
+
 static const char *npc_room_slug_for_turn(const char *slug, int turns) {
   AetWorldClock wc;
   const AetNpcRoutine *rt = npc_routine_for(slug);
   if (!rt) return NULL;
   world_clock_for_turn(turns, &wc);
-  return npc_routine_room_for_period(rt, wc.period);
+  return npc_routine_room_special(rt, &wc);
 }
 
 static const char *npc_activity_for_period(const char *slug,
@@ -4352,13 +5542,12 @@ static const char *runtime_room_entity(int room) {
   if (base && base[0]) {
     base_rt = npc_routine_for(base);
     if (!base_rt) return base;
-    scheduled = npc_routine_room_for_period(base_rt, wc.period);
+    scheduled = npc_routine_room_special(base_rt, &wc);
     if (scheduled && world_room_index(scheduled) == room) return base;
     return "";
   }
   for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
-    const char *room_slug =
-        npc_routine_room_for_period(&NPC_ROUTINES[i], wc.period);
+    const char *room_slug = npc_routine_room_special(&NPC_ROUTINES[i], &wc);
     int rr = room_slug ? world_room_index(room_slug) : -1;
     if (rr == room) return NPC_ROUTINES[i].slug;
   }
@@ -4992,6 +6181,98 @@ static const char *best_lock_tool(void) {
   return "none";
 }
 
+#ifdef AETER_MINIGAMES
+static int count_adjacent_npcs(void);
+static int npc_in_adjacent_room(const char *slug) {
+  AetWorldClock wc;
+  size_t i;
+  int d;
+  if (!slug || !slug[0]) return 0;
+  get_world_clock(&wc);
+  for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
+    const char *rs = npc_routine_room_special(&NPC_ROUTINES[i], &wc);
+    int rr;
+    if (!NPC_ROUTINES[i].slug || !str_ieq(NPC_ROUTINES[i].slug, slug)) continue;
+    if (!rs) continue;
+    rr = world_room_index(rs);
+    if (rr < 0) continue;
+    for (d = 0; d < DIR_COUNT; d++) {
+      if (world_exit(g_room, d) == rr) return 1;
+    }
+  }
+  return 0;
+}
+
+static void game_mgt_apply_lockpick_stealth(MgtPersistentState *st, char *msg,
+                                            size_t cap) {
+  char tail[360];
+  const char *band;
+  int heard;
+  int si;
+  unsigned char f0;
+  if (!st) return;
+  tail[0] = '\0';
+  band = st->lock_noise_band[0] ? st->lock_noise_band : "LOW";
+  g_lockpick_last_noise = st->lock_exit_noise;
+  if (st->lock_exit_noise >= 70 || st->lock_exit_misses >= 2)
+    g_lockpick_suspicion += (st->lock_exit_noise >= 70 ? 3 : 1);
+  else if (st->lock_exit_noise >= 35)
+    g_lockpick_suspicion += 1;
+  if (g_lockpick_suspicion > 10) g_lockpick_suspicion = 10;
+
+  if (st->lock_pick_broken) {
+    const char *tool = best_lock_tool();
+    if (tool && strcmp(tool, "skeleton_key") && inv_remove_exact_one(tool)) {
+      snprintf(tail, sizeof tail,
+               "\n\nYour %s snaps and is ruined — removed from your pack.",
+               tool);
+    }
+  }
+
+  heard = count_adjacent_npcs() > 0 || npc_in_adjacent_room("village_guard");
+  if ((st->lock_exit_noise >= 70 || st->lock_exit_misses >= 2) && heard) {
+    if (npc_in_adjacent_room("village_guard")) {
+      si = soc_npc_ensure("village_guard");
+      if (si >= 0) {
+        f0 = g_soc_npc_friendship[si];
+        if ((int)g_soc_npc_friendship[si] > 2)
+          g_soc_npc_friendship[si] =
+              (unsigned char)((int)g_soc_npc_friendship[si] - 5);
+        rel_hist_push("village_guard", "lockpick alert",
+                      (int)g_soc_npc_friendship[si] - (int)f0, 0, 0);
+      }
+      snprintf(tail + strlen(tail), sizeof tail - strlen(tail),
+               "%s%sFrom the square, the village guard calls out: "
+               "\"Who's fiddling with that lock?\"",
+               tail[0] ? "" : "\n\n", tail[0] ? "" : "");
+    } else {
+      snprintf(tail + strlen(tail), sizeof tail - strlen(tail),
+               "%s%sA muffled voice nearby: \"Did you hear metal on metal?\"",
+               tail[0] ? "" : "\n\n", tail[0] ? "" : "");
+    }
+    causal_push("lockpick-noise", band);
+  } else if (st->lock_exit_noise >= 35 && st->last_success != 1) {
+    snprintf(tail + strlen(tail), sizeof tail - strlen(tail),
+             "%s%sYou freeze — the %s scrape might have carried.",
+             tail[0] ? "" : "\n\n", tail[0] ? "" : "", band);
+    causal_push("lockpick-noise", band);
+  } else if (st->lock_exit_noise >= 35 && st->last_success == 1) {
+    snprintf(tail + strlen(tail), sizeof tail - strlen(tail),
+             "%s%sThe lock yields with only %s noise.",
+             tail[0] ? "" : "\n\n", tail[0] ? "" : "", band);
+  }
+
+  if (tail[0] && msg && cap) {
+    size_t used = strlen(msg);
+    if (used && used + 1 < cap) {
+      snprintf(msg + used, cap - used, "%s", tail);
+    } else if (cap > 1) {
+      snprintf(msg, cap, "%s%s", msg[0] ? msg : st->last_banner, tail);
+    }
+  }
+}
+#endif
+
 static int exit_lock_info(int room, int dir, char *name, size_t namecap,
                           int *locked, int *difficulty) {
   const char *slug;
@@ -5051,8 +6332,7 @@ static void body_append_people_here(char *body, size_t cap) {
   get_world_clock(&wc);
   for (i = 0; i < sizeof NPC_ROUTINES / sizeof NPC_ROUTINES[0]; i++) {
     const char *slug = NPC_ROUTINES[i].slug;
-    const char *rs =
-        npc_routine_room_for_period(&NPC_ROUTINES[i], wc.period);
+    const char *rs = npc_routine_room_special(&NPC_ROUTINES[i], &wc);
     int rr;
     char op[64];
     if (!rs) continue;
@@ -5795,7 +7075,8 @@ static void fill_help_text(char *buf, size_t cap) {
       "  it | that | this  —  last item (take/drop) or last NPC (after who/talk)\n"
       "  lights  —  light ids; equip/hold/wield <item> | unequip | take off\n"
       "  search | scan | loot [value|weight] | compare <a>/<b> | who |\n"
-      "          who all | who global  —  current room vs world NPC placements | talk |\n"
+      "          who all | who global  —  routine-aware world NPC scan | talk |\n"
+      "          npc schedule <npc>  —  morning/afternoon/evening/night plan |\n"
       "          talk about <topic> | talk to <who> about <topic>\n"
       "          (after talk, numbered menu — reply 1–5, a label, or  goodbye )\n"
       "  topic | last topic | topic mood | topic heat | npc trust | npc leverage  —  last successful\n"
@@ -6345,6 +7626,19 @@ static int try_move_n_steps(int dir, int n, char *msg, size_t msgcap,
 }
 
 static int parse_direction_token(const char *tok, int *dir_out) {
+  static const struct {
+    const char *word;
+    int dir;
+  } kFuzzyDir[] = {{"north", DIR_N},
+                   {"south", DIR_S},
+                   {"east", DIR_E},
+                   {"west", DIR_W},
+                   {"northeast", DIR_NE},
+                   {"northwest", DIR_NW},
+                   {"southeast", DIR_SE},
+                   {"southwest", DIR_SW},
+                   {NULL, 0}};
+  int i, bestd = 3, besti = -1, ties = 0;
   if (!tok || !tok[0]) return 0;
   if (!strcmp(tok, "n") || !strcmp(tok, "north") || !strcmp(tok, "northward") ||
       !strcmp(tok, "northwards")) {
@@ -6429,6 +7723,21 @@ static int parse_direction_token(const char *tok, int *dir_out) {
   }
   if (!strcmp(tok, "square")) {
     *dir_out = DIR_SQUARE;
+    return 1;
+  }
+  for (i = 0; kFuzzyDir[i].word; i++) {
+    int d = levenshtein_upto(tok, kFuzzyDir[i].word, 2);
+    if (d > 2) continue;
+    if (d < bestd) {
+      bestd = d;
+      besti = i;
+      ties = 1;
+    } else if (d == bestd) {
+      ties++;
+    }
+  }
+  if (besti >= 0 && bestd <= 2 && ties == 1) {
+    *dir_out = kFuzzyDir[besti].dir;
     return 1;
   }
   return 0;
@@ -7242,6 +8551,66 @@ static const char *npc_pick_chatter(const AetNpcLineSet *set) {
   return set->chatter[h % n];
 }
 
+static void cmd_npc_schedule(const char *raw, char *msg, size_t msgcap) {
+  char qn[MAX_ITEM_LEN];
+  char buf[160];
+  AetWorldClock wc;
+  const AetNpcRoutine *rt = NULL;
+  const char *next_p;
+  size_t i;
+  if (!raw || !raw[0]) {
+    snprintf(msg, msgcap,
+             "Name an NPC:  npc schedule miller  or  routine blacksmith");
+    return;
+  }
+  strncpy(buf, raw, sizeof buf - 1);
+  buf[sizeof buf - 1] = '\0';
+  strip_leading_articles(buf);
+  strip_trailing_space(buf);
+  query_norm_underscore(qn, sizeof qn, buf);
+  rt = npc_routine_for(buf);
+  if (!rt) {
+    for (i = 0; i < npc_routine_count(); i++) {
+      const AetNpcRoutine *c = npc_routine_at(i);
+      char pretty[64];
+      entity_pretty(c->slug, pretty, sizeof pretty);
+      if (str_ieq(c->slug, buf) || str_ieq(pretty, buf) ||
+          strstr(c->slug, qn) != NULL || strstr(pretty, buf) != NULL) {
+        rt = c;
+        break;
+      }
+    }
+  }
+  if (!rt) {
+    snprintf(msg, msgcap,
+             "No daily routine on file for \"%s\". Try  who all  or  where <npc>.",
+             raw);
+    return;
+  }
+  get_world_clock(&wc);
+  next_p = npc_routine_next_period(wc.period);
+  {
+    char pretty[64];
+    const char *now_room = npc_routine_room_special(rt, &wc);
+    const char *next_room = npc_routine_room_for_period(rt, next_p);
+    const char *act = npc_activity_for_period(rt->slug, wc.period);
+    entity_pretty(rt->slug, pretty, sizeof pretty);
+    snprintf(msg, msgcap,
+             "Daily routine — %s\n\n"
+             "Now (%s): %s  [%s]\n"
+             "  %s\n\n"
+             "Morning   → %s\n"
+             "Afternoon → %s\n"
+             "Evening   → %s\n"
+             "Night     → %s\n\n"
+             "Next period (%s): %s",
+             pretty, wc.period, now_room ? resolve_world_title(world_room_index(now_room)) : "?",
+             now_room ? now_room : "?", act && act[0] ? act : "(no activity label)",
+             rt->morning_room, rt->afternoon_room, rt->evening_room, rt->night_room,
+             next_p, next_room ? next_room : "?");
+  }
+}
+
 static void cmd_who(char *msg, size_t msgcap, int global_mode) {
   const char *ent = world_room_entity(g_room);
   char pretty[128];
@@ -7256,41 +8625,53 @@ static void cmd_who(char *msg, size_t msgcap, int global_mode) {
     snprintf(msg, msgcap,
              "Global NPC presence scan\n\n"
              "%s\n\n"
-             "Live NPC placements in this build (%s):\n\n",
+             "Live NPC placements (%s clock):\n\n",
              banner, wc.period);
+    for (i = 0; i < npc_routine_count(); i++) {
+      const AetNpcRoutine *rt = npc_routine_at(i);
+      const char *room_slug = npc_routine_room_special(rt, &wc);
+      int rr = room_slug ? world_room_index(room_slug) : -1;
+      char who_pretty[96];
+      const char *act;
+      const char *next_p = npc_routine_next_period(wc.period);
+      const char *next_room = npc_routine_room_for_period(rt, next_p);
+      const char *tag = (rr == g_room) ? "  [here]" : "";
+      if (rr < 0) continue;
+      entity_pretty(rt->slug, who_pretty, sizeof who_pretty);
+      act = npc_activity_for_period(rt->slug, wc.period);
+      if (act && act[0])
+        body_append(msg, msgcap,
+                    "  • %-20s  —  %s  [%s]%s\n"
+                    "      activity: %s\n"
+                    "      next (%s): %s\n",
+                    who_pretty, resolve_world_title(rr), room_slug, tag, act,
+                    next_p, next_room ? next_room : "?");
+      else
+        body_append(msg, msgcap, "  • %-20s  —  %s  [%s]%s\n"
+                                 "      next (%s): %s\n",
+                    who_pretty, resolve_world_title(rr), room_slug, tag, next_p,
+                    next_room ? next_room : "?");
+      shown++;
+      if (strlen(msg) + 280 >= msgcap) break;
+    }
     for (i = 0; i < WORLD_ROOM_COUNT; i++) {
       const char *e = world_room_entity(i);
-      char row[256];
       char who_pretty[96];
-      const char *tag;
-      const char *act;
-      if (!e || !e[0]) continue;
+      if (!e || !e[0] || npc_routine_for(e)) continue;
       entity_pretty(e, who_pretty, sizeof who_pretty);
-      act = npc_activity_for_period(e, wc.period);
-      tag = (i == g_room) ? "  [here]" : "";
-      if (act && act[0])
-        body_append(msg, msgcap, "  • %-20s  —  %s  [%s]%s\n"
-                                 "      activity: %s\n",
-                    who_pretty, resolve_world_title(i), world_slug(i), tag, act);
-      else
-        body_append(msg, msgcap, "  • %-20s  —  %s  [%s]%s\n", who_pretty,
-                    resolve_world_title(i), world_slug(i), tag);
+      body_append(msg, msgcap, "  • %-20s  —  %s  [%s]%s\n", who_pretty,
+                  resolve_world_title(i), world_slug(i),
+                  (i == g_room) ? "  [here]" : "");
       shown++;
-      if (strlen(msg) + 280 >= msgcap) {
-        snprintf(row, sizeof row,
-                 "\n  ... truncated after %d placements (use bigger body cap if this world grows).\n",
-                 shown);
-        strncat(msg, row, msgcap - strlen(msg) - 1);
-        break;
-      }
+      if (strlen(msg) + 200 >= msgcap) break;
     }
     if (shown == 0) {
-      strncat(msg, "  (No room.entity NPC placements found in this build.)\n",
+      strncat(msg, "  (No NPC placements found in this build.)\n",
               msgcap - strlen(msg) - 1);
     } else {
       body_append(msg, msgcap,
                   "\nTotal placements: %d\n"
-                  "Try  where <npc>  for a name-targeted lookup, or plain  who  for the local room.\n",
+                  "Try  npc schedule <name>  for a full day plan, or  where <npc>  for lookup.\n",
                   shown);
     }
     return;
@@ -7714,19 +9095,23 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
   if (g_conv_active && g_conv_npc[0] && !str_ieq(ent, g_conv_npc)) conv_clear();
   entity_pretty(ent, pretty, sizeof pretty);
   if (target && target[0]) {
-    if (str_ieq(target, "it") || str_ieq(target, "that") ||
-        str_ieq(target, "this")) {
+    char resolved[MAX_ITEM_LEN];
+    int pr = parser_expand_npc_pronoun(target, resolved, sizeof resolved, msg,
+                                       msgcap);
+    if (pr < 0) return;
+    if (pr == 1) target = resolved;
+    else if (parser_query_is_object_pronoun(target)) {
       if (!g_last_npc[0]) {
-        snprintf(
-            msg, msgcap,
-            "No one in mind for \"it\" — try 'who' or 'talk to <name>'.");
+        snprintf(msg, msgcap,
+                 "No one in mind for \"it\" — try  who  or  talk to <name>.");
         return;
       }
       if (!str_ieq(ent, g_last_npc)) {
         snprintf(msg, msgcap,
-                 "Who you had in mind is not the one here now. Try 'who'.");
+                 "Who you had in mind is not the one here now. Try  who.");
         return;
       }
+      target = g_last_npc;
     } else {
       query_norm_underscore(norm, sizeof norm, target);
       if (!str_ieq(ent, target) && !str_ieq(pretty, target) &&
@@ -7876,15 +9261,6 @@ static void cmd_talk(const char *target, const char *topic, char *msg,
 static int take_item(const char *name, char *msg, size_t msgcap) {
   char target[MAX_ITEM_LEN];
   int i, j;
-  if (str_ieq(name, "it") || str_ieq(name, "that") || str_ieq(name, "this")) {
-    if (!g_last_focus[0]) {
-      snprintf(
-          msg, msgcap,
-          "You have nothing specific in mind. Examine or search something first.");
-      return 0;
-    }
-    name = g_last_focus;
-  }
   if (g_inv_n >= MAX_INV) {
     snprintf(msg, msgcap,
              "You cannot carry more (%d-item limit). Drop something first.",
@@ -7895,6 +9271,14 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
   i = resolve_room_item_query(name, target, sizeof target, msg, msgcap);
   if (i < 0) return 0;
   if (i == 0) {
+    char work[256], qnorm[MAX_ITEM_LEN];
+    int prep;
+    if (container_take_by_query(g_room, name, msg, msgcap)) return 1;
+    prep = parser_prepare_object_query(name, work, sizeof work, NULL, NULL, NULL, 0);
+    if (prep >= 0 && work[0]) {
+      query_norm_underscore(qnorm, sizeof qnorm, work);
+      if (container_hint_closed_item(g_room, work, qnorm, msg, msgcap)) return 0;
+    }
     snprintf(msg, msgcap, "You do not see that here.");
     return 0;
   }
@@ -7911,6 +9295,7 @@ static int take_item(const char *name, char *msg, size_t msgcap) {
           memcpy(g_room_items[g_room][j], g_room_items[g_room][j + 1], MAX_ITEM_LEN);
         g_room_item_n[g_room]--;
         g_score += 5;
+        if (item_is_container(taken)) container_on_item_taken(g_room, taken);
         if (cash > 0) {
           char cashb[48];
           g_coins += cash;
@@ -8061,10 +9446,14 @@ static void search_room(char *msg, size_t msgcap) {
 }
 
 static unsigned item_est_value(const char *s) {
+  CraftSavedProfile *sp = craft_profile_lookup(s);
   unsigned h = 5381u;
   const unsigned char *p;
   char low[MAX_ITEM_LEN];
   size_t i, L;
+  if (sp)
+    return (unsigned)(12u + (unsigned)sp->quality * 2u +
+                      (unsigned)sp->disp_shp * 3u + (unsigned)sp->disp_dur * 2u);
   if (!s || !s[0]) return 8u;
   L = strlen(s);
   if (L >= sizeof low) L = sizeof low - 1u;
@@ -8083,10 +9472,17 @@ static unsigned item_est_value(const char *s) {
 }
 
 static unsigned item_est_heft(const char *s) {
+  CraftSavedProfile *sp = craft_profile_lookup(s);
   unsigned h = 2166136261u;
   const unsigned char *p;
   char low[MAX_ITEM_LEN];
   size_t i, L;
+  if (sp) {
+    h = (unsigned)sp->disp_wgt;
+    if (h < 1u) h = 1u;
+    if (h > 99u) h = 99u;
+    return h;
+  }
   if (!s || !s[0]) return 5u;
   L = strlen(s);
   if (L >= sizeof low) L = sizeof low - 1u;
@@ -8203,6 +9599,8 @@ static void cmd_scan(char *msg, size_t msgcap) {
   } else
     strncat(msg, "Concealed: nothing hinted.\n", msgcap - strlen(msg) - 1);
 
+  container_scan_append(msg, msgcap, g_room);
+
   len = strlen(msg);
   if (len + 80 < msgcap && n_locked > 0)
     snprintf(msg + len, msgcap - len,
@@ -8271,51 +9669,63 @@ static void cmd_loot(char *msg, size_t msgcap, const char *sort) {
 
 static int resolve_compare_item(const char *raw, char *out, size_t outcap,
                                 char *err, size_t errcap) {
-  char q[256], qnorm[MAX_ITEM_LEN];
-  int i, n = 0;
-  char last[MAX_ITEM_LEN];
+  char work[256], qnorm[MAX_ITEM_LEN];
+  char picks[10][MAX_ITEM_LEN];
+  int ordinal = 0, exclude_last = 0;
+  int i, j, n = 0, prep;
   if (!raw || !raw[0]) {
     snprintf(err, errcap, "Name an object.");
     return 0;
   }
-  strncpy(q, raw, sizeof q - 1);
-  q[sizeof q - 1] = '\0';
-  strip_trailing_space(q);
-  strip_leading_articles(q);
-  if (!q[0]) {
+  prep = parser_prepare_object_query(raw, work, sizeof work, &ordinal,
+                                     &exclude_last, err, errcap);
+  if (prep < 0) return 0;
+  if (!work[0]) {
     snprintf(err, errcap, "Name an object.");
     return 0;
   }
-  query_norm_underscore(qnorm, sizeof qnorm, q);
-  last[0] = '\0';
+  query_norm_underscore(qnorm, sizeof qnorm, work);
   if (!room_too_dark_to_see()) {
     for (i = 0; i < g_room_item_n[g_room]; i++) {
-      if (!room_item_matches_query(g_room_items[g_room][i], q, qnorm)) continue;
-      n++;
-      strncpy(last, g_room_items[g_room][i], sizeof last - 1);
+      if (exclude_last && g_last_focus[0] &&
+          str_ieq(g_room_items[g_room][i], g_last_focus))
+        continue;
+      if (!room_item_matches_query(g_room_items[g_room][i], work, qnorm)) continue;
+      for (j = 0; j < n; j++)
+        if (str_ieq(picks[j], g_room_items[g_room][i])) break;
+      if (j < n) continue;
+      if (n < 10)
+        snprintf(picks[n++], sizeof picks[0], "%s", g_room_items[g_room][i]);
     }
   }
   for (i = 0; i < g_inv_n; i++) {
-    if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
-    n++;
-    strncpy(last, g_inv[i], sizeof last - 1);
+    if (exclude_last && g_last_focus[0] && str_ieq(g_inv[i], g_last_focus))
+      continue;
+    if (!room_item_matches_query(g_inv[i], work, qnorm)) continue;
+    for (j = 0; j < n; j++)
+      if (str_ieq(picks[j], g_inv[i])) break;
+    if (j < n) continue;
+    if (n < 10) snprintf(picks[n++], sizeof picks[0], "%s", g_inv[i]);
   }
-  last[sizeof last - 1] = '\0';
+  if (!room_too_dark_to_see())
+    container_append_open_contents_picks(g_room, work, qnorm, picks, &n,
+                                         exclude_last);
   if (n == 0) {
     snprintf(err, errcap,
              "No \"%s\" on the ground (visible) or in your pack.", raw);
     return 0;
   }
-  if (n > 1) {
-    snprintf(err, errcap,
-             "\"%s\" matches several things — use a clearer id (underscores "
-             "help).",
-             raw);
-    return 0;
+  if (n == 1 || (ordinal >= 1 && ordinal <= n)) {
+    const char *slug = picks[ordinal >= 1 ? ordinal - 1 : 0];
+    strncpy(out, slug, outcap - 1);
+    out[outcap - 1] = '\0';
+    return 1;
   }
-  strncpy(out, last, outcap - 1);
-  out[outcap - 1] = '\0';
-  return 1;
+  snprintf(err, errcap,
+           "\"%s\" matches several things — use a clearer id or an ordinal "
+           "(second pick, other pick).",
+           raw);
+  return 0;
 }
 
 static void cmd_compare(const char *rest, char *body, size_t cap) {
@@ -8382,6 +9792,34 @@ static void cmd_compare(const char *rest, char *body, size_t cap) {
   item_pretty(ib, pretty_b, sizeof pretty_b);
   la = inv_has(ia) ? "in pack" : "on ground here";
   lb = inv_has(ib) ? "in pack" : "on ground here";
+  {
+    CraftSavedProfile *spa = craft_profile_lookup(ia);
+    CraftSavedProfile *spb = craft_profile_lookup(ib);
+    if (spa || spb) {
+      snprintf(body, cap,
+               "=== APPRAISAL ===\n\n"
+               "%s\n\n"
+               "Forged-item stat profiles (saved with your quicksave).\n\n"
+               "%s\n"
+               "  Est. value: ~%u coin   Bulk: ~%u   (%s)\n"
+               "%s\n"
+               "  Est. value: ~%u coin   Bulk: ~%u   (%s)\n\n",
+               banner, pretty_a, va, ha, la, pretty_b, vb, hb, lb);
+      if (spa)
+        body_append(body, cap,
+                    "%s\n"
+                    "  Forge profile: Q:%d  Dur:%d  Sharp:%d  Handle:%d  Wgt:%d\n",
+                    pretty_a, spa->quality, spa->disp_dur, spa->disp_shp,
+                    spa->disp_hnd, spa->disp_wgt);
+      if (spb)
+        body_append(body, cap,
+                    "%s\n"
+                    "  Forge profile: Q:%d  Dur:%d  Sharp:%d  Handle:%d  Wgt:%d\n",
+                    pretty_b, spb->quality, spb->disp_dur, spb->disp_shp,
+                    spb->disp_hnd, spb->disp_wgt);
+      return;
+    }
+  }
 
   snprintf(body, cap,
            "=== APPRAISAL ===\n\n"
@@ -8436,15 +9874,6 @@ static int drop_item(const char *name, char *msg, size_t msgcap) {
     snprintf(msg, msgcap, "The floor here is too cluttered to drop that.");
     return 0;
   }
-  if (str_ieq(name, "it") || str_ieq(name, "that") || str_ieq(name, "this")) {
-    if (!g_last_focus[0]) {
-      snprintf(
-          msg, msgcap,
-          "You have nothing specific in mind. Examine something you are carrying.");
-      return 0;
-    }
-    name = g_last_focus;
-  }
   ix = -1;
   g_disambig_next_act = DISAMBIG_ACT_DROP;
   j = resolve_inv_item_query(name, &ix, msg, msgcap);
@@ -8464,6 +9893,9 @@ static int drop_item(const char *name, char *msg, size_t msgcap) {
   g_score += 1;
   if (str_ieq(g_ready_item, dropped)) g_ready_item[0] = '\0';
   eq_remove_item_from_slots(dropped);
+  remember_dropped_item(dropped);
+  remember_focus_item(dropped);
+  if (item_is_container(dropped)) container_on_item_dropped(g_room, dropped);
   item_pretty(dropped, pretty, sizeof pretty);
   if (str_ieq(dropped, "bucket"))
     snprintf(msg, msgcap,
@@ -8491,32 +9923,18 @@ static void cmd_equip(const char *rest, char *msg, size_t msgcap) {
     snprintf(msg, msgcap, "You relax your grip.");
     return;
   }
-  if (str_ieq(work, "it") || str_ieq(work, "that") || str_ieq(work, "this")) {
-    if (!g_last_focus[0]) {
-      snprintf(msg, msgcap,
-               "Nothing in mind — examine or take something first, or name an "
-               "item.");
-      return;
-    }
-    id = g_last_focus;
-  } else {
-    ix = -1;
-    {
-      int r;
-      g_disambig_next_act = DISAMBIG_ACT_EQUIP;
-      r = resolve_inv_item_query(work, &ix, msg, msgcap);
-      if (r < 0) return;
-      if (r == 0 || ix < 0) {
-        snprintf(msg, msgcap, "You are not carrying that.");
-        return;
-      }
-    }
-    if (ix < 0) {
+  ix = -1;
+  {
+    int r;
+    g_disambig_next_act = DISAMBIG_ACT_EQUIP;
+    r = resolve_inv_item_query(work, &ix, msg, msgcap);
+    if (r < 0) return;
+    if (r == 0 || ix < 0) {
       snprintf(msg, msgcap, "You are not carrying that.");
       return;
     }
-    id = g_inv[ix];
   }
+  id = g_inv[ix];
   ix = inv_find(id);
   if (ix < 0) {
     snprintf(msg, msgcap, "You are not carrying that.");
@@ -8824,6 +10242,11 @@ static void format_noise_body(char *body, size_t cap) {
              wc.period, wc.weather, (ent && ent[0]) ? ent : "none",
              adjacent_npcs, locks);
   }
+  if (g_lockpick_last_noise > 0 || g_lockpick_suspicion > 0) {
+    body_append(body, cap,
+                "Last lockpick noise: %d  Suspicion: %d/10\n",
+                g_lockpick_last_noise, g_lockpick_suspicion);
+  }
   if (!strcmp(band, "LOW"))
     body_append(body, cap,
                 "Quiet actions are unlikely to carry far. Careful lock work "
@@ -9014,45 +10437,59 @@ static void format_locate_body(char *body, size_t cap, const char *raw) {
   char qn[MAX_ITEM_LEN];
   char buf[160];
   char banner[256];
-  int i;
+  AetWorldClock wc;
+  size_t i;
+  int hits = 0;
   strncpy(buf, raw, sizeof buf - 1);
   buf[sizeof buf - 1] = '\0';
   strip_leading_articles(buf);
   strip_trailing_space(buf);
   query_norm_underscore(qn, sizeof qn, buf);
   pc_format_identity_banner(banner, sizeof banner);
+  get_world_clock(&wc);
   snprintf(body, cap, "%s\n\nSearch for \"%s\":\n\n", banner, raw);
-  for (i = 0; i < WORLD_ROOM_COUNT; i++) {
-    const char *ent = world_room_entity(i);
-    const AetNpcRoutine *rt;
+  for (i = 0; i < npc_routine_count(); i++) {
+    const AetNpcRoutine *rt = npc_routine_at(i);
+    char pretty[96];
+    char line[240];
+    const char *room_slug;
+    int rr;
+    const char *act;
+    entity_pretty(rt->slug, pretty, sizeof pretty);
+    if (!(str_ieq(rt->slug, buf) || strstr(rt->slug, qn) != NULL ||
+          str_ieq(pretty, buf) || strstr(pretty, buf) != NULL))
+      continue;
+    room_slug = npc_routine_room_special(rt, &wc);
+    rr = room_slug ? world_room_index(room_slug) : -1;
+    act = npc_activity_for_period(rt->slug, wc.period);
+    if (rr >= 0 && act && act[0])
+      snprintf(line, sizeof line,
+               "  %s  [%s]  —  %s  [%s]  (%s: %s)\n", pretty, rt->slug,
+               resolve_world_title(rr), room_slug, wc.period, act);
+    else if (rr >= 0)
+      snprintf(line, sizeof line, "  %s  [%s]  —  %s  [%s]  (%s routine)\n",
+               pretty, rt->slug, resolve_world_title(rr), room_slug, wc.period);
+    else
+      snprintf(line, sizeof line, "  %s  [%s]  —  (unknown room %s)\n", pretty,
+               rt->slug, room_slug ? room_slug : "?");
+    strncat(body, line, cap - strlen(body) - 1);
+    hits++;
+  }
+  for (i = 0; i < (size_t)WORLD_ROOM_COUNT; i++) {
+    const char *ent = world_room_entity((int)i);
     char pretty[96];
     char line[200];
-    if (!ent[0]) continue;
+    if (!ent[0] || npc_routine_for(ent)) continue;
     entity_pretty(ent, pretty, sizeof pretty);
-    rt = npc_routine_for(ent);
-    if (str_ieq(ent, buf) || strstr(ent, qn) != NULL ||
-        str_ieq(pretty, buf)) {
-      if (rt) {
-        AetWorldClock wc;
-        const char *act;
-        get_world_clock(&wc);
-        act = npc_activity_for_period(ent, wc.period);
-        if (act && act[0])
-          snprintf(line, sizeof line,
-                   "  %s  [%s]  —  %s  (%s routine: %s)\n", pretty, ent,
-                   resolve_world_title(i), wc.period, act);
-        else
-          snprintf(line, sizeof line, "  %s  [%s]  —  %s  (%s routine)\n", pretty,
-                   ent, resolve_world_title(i), wc.period);
-      } else {
-        snprintf(line, sizeof line, "  %s  [%s]  —  %s\n", pretty, ent,
-                 resolve_world_title(i));
-      }
+    if (str_ieq(ent, buf) || strstr(ent, qn) != NULL || str_ieq(pretty, buf)) {
+      snprintf(line, sizeof line, "  %s  [%s]  —  %s\n", pretty, ent,
+               resolve_world_title((int)i));
       strncat(body, line, cap - strlen(body) - 1);
+      hits++;
     }
   }
-  if (strlen(body) < 40)
-    strncat(body, "  (No static room.entity matches that name.)\n",
+  if (hits == 0)
+    strncat(body, "  (No NPC matches that name. Try  who all  or a shorter slug.)\n",
             cap - strlen(body) - 1);
 }
 
@@ -10708,20 +12145,62 @@ static void cmd_give(const char *rest, char *msg, size_t msgcap) {
   char taken[MAX_ITEM_LEN];
   char itempretty[96];
   char pretty[128];
+  char recipient_slug[MAX_ITEM_LEN];
   char *to_sep;
-  const char *ent = world_room_entity(g_room);
-  int ix;
-  if (!ent[0]) {
-    snprintf(msg, msgcap, "No one is here to receive anything.");
-    return;
-  }
+  const char *ent;
+  int ix, dest_room = -1, off_room_gift = 0;
+  ent = world_room_entity(g_room);
   strncpy(work, rest, sizeof work - 1);
   work[sizeof work - 1] = '\0';
   strip_trailing_space(work);
   to_sep = strstr(work, " to ");
   if (to_sep) {
+    char who[128];
+    int pr;
     *to_sep = '\0';
     strip_trailing_space(work);
+    strncpy(who, to_sep + 4, sizeof who - 1);
+    who[sizeof who - 1] = '\0';
+    strip_leading_articles(who);
+    pr = parser_expand_npc_pronoun(who, who, sizeof who, msg, msgcap);
+    if (pr < 0) return;
+    if (room_entity_matches_query_here(who, pretty, sizeof pretty)) {
+      ent = world_room_entity(g_room);
+      copy_capped(recipient_slug, sizeof recipient_slug, ent);
+    } else if (npc_resolve_routine_query(who, recipient_slug,
+                                         sizeof recipient_slug, pretty,
+                                         sizeof pretty)) {
+      const AetNpcRoutine *rt = npc_routine_for(recipient_slug);
+      AetWorldClock wc;
+      const char *dest_slug;
+      get_world_clock(&wc);
+      dest_slug = rt ? npc_routine_room_special(rt, &wc) : NULL;
+      dest_room = dest_slug ? world_room_index(dest_slug) : -1;
+      if (dest_room < 0) {
+        snprintf(msg, msgcap,
+                 "You are not sure where %s would be right now.", pretty);
+        return;
+      }
+      if (dest_room == g_room) {
+        snprintf(msg, msgcap,
+                 "%s ought to be here, but you do not see them.", pretty);
+        return;
+      }
+      off_room_gift = 1;
+    } else {
+      if (who[0])
+        snprintf(msg, msgcap, "%s is not here to receive anything.",
+                 pretty[0] ? pretty : who);
+      else
+        snprintf(msg, msgcap, "No one here matches that name.");
+      return;
+    }
+  } else {
+    if (!ent[0]) {
+      snprintf(msg, msgcap, "No one is here to receive anything.");
+      return;
+    }
+    copy_capped(recipient_slug, sizeof recipient_slug, ent);
   }
   strip_leading_articles(work);
   if (!work[0]) {
@@ -10737,16 +12216,36 @@ static void cmd_give(const char *rest, char *msg, size_t msgcap) {
       return;
     }
   }
-  entity_pretty(ent, pretty, sizeof pretty);
+  entity_pretty(recipient_slug, pretty, sizeof pretty);
   inv_take_out(ix, taken, sizeof taken);
   item_pretty(taken, itempretty, sizeof itempretty);
   if (str_ieq(g_last_focus, taken)) clear_focus();
   if (str_ieq(g_ready_item, taken)) g_ready_item[0] = '\0';
   g_score += 2;
-  if (aet_merchant_index(ent) >= 0)
-    merchant_rep_bump_gift(ent);
+  if (off_room_gift) {
+    char place[160];
+    if (g_room_item_n[dest_room] >= MAX_ITEMS_ROOM) {
+      inv_add(taken);
+      snprintf(msg, msgcap,
+               "You cannot leave %s at %s — there is no space.",
+               itempretty, resolve_world_title(dest_room));
+      return;
+    }
+    room_add_visible_item(dest_room, taken);
+    snprintf(place, sizeof place, "%s", resolve_world_title(dest_room));
+    if (aet_merchant_index(recipient_slug) >= 0)
+      merchant_rep_bump_gift(recipient_slug);
+    else
+      soc_bump_gift(recipient_slug);
+    snprintf(msg, msgcap,
+             "You leave %s at %s for %s to find later.",
+             itempretty, place, pretty);
+    return;
+  }
+  if (aet_merchant_index(recipient_slug) >= 0)
+    merchant_rep_bump_gift(recipient_slug);
   else
-    soc_bump_gift(ent);
+    soc_bump_gift(recipient_slug);
   snprintf(msg, msgcap,
            "You hand over %s to %s. They accept it with a cautious nod toward "
            "%s.",
@@ -11454,16 +12953,16 @@ static int consume_is_food_id(const char *id) {
 }
 
 static int consume_resolve_slot(const char *rest, char *work, size_t wcap) {
+  int ordinal = 0, exclude_last = 0;
+  int prep;
   strncpy(work, rest, wcap - 1);
   work[wcap - 1] = '\0';
   strip_leading_articles(work);
   strip_trailing_space(work);
   if (!work[0]) return -2;
-  if (str_ieq(work, "it") || str_ieq(work, "that") || str_ieq(work, "this")) {
-    if (!g_last_focus[0]) return -3;
-    strncpy(work, g_last_focus, wcap - 1);
-    work[wcap - 1] = '\0';
-  }
+  prep = parser_prepare_object_query(work, work, wcap, &ordinal, &exclude_last,
+                                     NULL, 0);
+  if (prep < 0) return -3;
   {
     int ix = -1;
     int r = resolve_inv_item_query(work, &ix, NULL, 0);
@@ -11895,6 +13394,10 @@ static int room_item_matches_query(const char *item, const char *q,
   char inorm[MAX_ITEM_LEN];
   char pretty[96];
   char pnorm[96];
+  char work[256];
+  char tok[64];
+  const char *p;
+  int tokens = 0;
   if (!item || !q[0]) return 0;
   query_norm_underscore(inorm, sizeof inorm, item);
   item_pretty(item, pretty, sizeof pretty);
@@ -11903,6 +13406,25 @@ static int room_item_matches_query(const char *item, const char *q,
   if (str_ieq(inorm, qnorm)) return 1;
   if (str_ieq(pretty, q) || str_ieq(pretty, qnorm)) return 1;
   if (str_ieq(pnorm, qnorm)) return 1;
+  strncpy(work, q, sizeof work - 1);
+  work[sizeof work - 1] = '\0';
+  strip_leading_articles(work);
+  strip_trailing_space(work);
+  for (p = work; *p;) {
+    size_t tn = 0;
+    while (*p == ' ') p++;
+    if (!*p) break;
+    while (p[tn] && p[tn] != ' ' && tn + 1 < sizeof tok) {
+      tok[tn] = p[tn];
+      tn++;
+    }
+    tok[tn] = '\0';
+    p += tn;
+    if (!tok[0]) continue;
+    tokens++;
+    if (!parser_token_matches_item(tok, item)) return 0;
+  }
+  if (tokens > 1) return 1;
   if (strstr(item, qnorm) != NULL) return 1;
   if (strstr(inorm, qnorm) != NULL) return 1;
   if (strstr(pnorm, qnorm) != NULL) return 1;
@@ -12078,27 +13600,47 @@ static int disambig_resolve_ambiguous(int act, int inv, const char *query,
 static int resolve_room_item_query(const char *name, char *resolved,
                                    size_t resolved_cap, char *msg,
                                    size_t msgcap) {
+  char work[256];
   char qnorm[MAX_ITEM_LEN];
   char picks[10][MAX_ITEM_LEN];
-  int i, n = 0;
+  int ordinal = 0, exclude_last = 0;
+  int i, n = 0, prep;
   if (!name || !name[0] || !resolved || resolved_cap < 2) return 0;
+  prep = parser_prepare_object_query(name, work, sizeof work, &ordinal,
+                                     &exclude_last, msg, msgcap);
+  if (prep < 0) return -1;
+  if (!work[0]) return 0;
+  name = work;
   query_norm_underscore(qnorm, sizeof qnorm, name);
   for (i = 0; i < g_room_item_n[g_room]; i++) {
     if (str_ieq(g_room_items[g_room][i], name) ||
         str_ieq(g_room_items[g_room][i], qnorm)) {
       snprintf(resolved, resolved_cap, "%s", g_room_items[g_room][i]);
+      remember_focus_item(g_room_items[g_room][i]);
       return 1;
     }
   }
   for (i = 0; i < g_room_item_n[g_room]; i++) {
+    if (exclude_last && g_last_focus[0] &&
+        str_ieq(g_room_items[g_room][i], g_last_focus))
+      continue;
     if (!room_item_matches_query(g_room_items[g_room][i], name, qnorm)) continue;
     if (n < (int)(sizeof picks / sizeof picks[0]))
       snprintf(picks[n], sizeof picks[n], "%s", g_room_items[g_room][i]);
     n++;
   }
+  container_append_open_contents_picks(g_room, name, qnorm, picks, &n,
+                                       exclude_last);
   if (n == 1) {
     snprintf(resolved, resolved_cap, "%s", picks[0]);
     disambig_remember(name, picks[0]);
+    remember_focus_item(picks[0]);
+    return 1;
+  }
+  if (n > 1 && ordinal >= 1 && ordinal <= n) {
+    snprintf(resolved, resolved_cap, "%s", picks[ordinal - 1]);
+    disambig_remember(name, picks[ordinal - 1]);
+    remember_focus_item(picks[ordinal - 1]);
     return 1;
   }
   if (n > 1) {
@@ -12109,29 +13651,44 @@ static int resolve_room_item_query(const char *name, char *resolved,
   }
   {
     char pretty[64];
+    char work[256], qnorm[MAX_ITEM_LEN];
     if (room_entity_matches_query_here(name, pretty, sizeof pretty)) {
       snprintf(msg, msgcap,
                "You cannot take %s - people are not inventory. Try talk to %s, who, or nearby npc.",
                pretty, pretty);
       return -1;
     }
+    query_norm_underscore(qnorm, sizeof qnorm, name);
+    strncpy(work, name, sizeof work - 1);
+    work[sizeof work - 1] = '\0';
+    if (container_hint_closed_item(g_room, work, qnorm, msg, msgcap)) return -1;
   }
   return 0;
 }
 
 static int resolve_inv_item_query(const char *name, int *ix_out, char *msg,
                                   size_t msgcap) {
+  char work[256];
   char qnorm[MAX_ITEM_LEN];
-  int i, n = 0, picks[10];
+  int ordinal = 0, exclude_last = 0;
+  int i, n = 0, picks[10], prep;
   if (!name || !name[0] || !ix_out) return 0;
+  prep = parser_prepare_object_query(name, work, sizeof work, &ordinal,
+                                     &exclude_last, msg, msgcap);
+  if (prep < 0) return -1;
+  if (!work[0]) return 0;
+  name = work;
   query_norm_underscore(qnorm, sizeof qnorm, name);
   for (i = 0; i < g_inv_n; i++) {
     if (str_ieq(g_inv[i], name) || str_ieq(g_inv[i], qnorm)) {
       *ix_out = i;
+      remember_focus_item(g_inv[i]);
       return 1;
     }
   }
   for (i = 0; i < g_inv_n; i++) {
+    if (exclude_last && g_last_focus[0] && str_ieq(g_inv[i], g_last_focus))
+      continue;
     if (!room_item_matches_query(g_inv[i], name, qnorm)) continue;
     if (n < (int)(sizeof picks / sizeof picks[0])) picks[n] = i;
     n++;
@@ -12139,6 +13696,13 @@ static int resolve_inv_item_query(const char *name, int *ix_out, char *msg,
   if (n == 1) {
     *ix_out = picks[0];
     disambig_remember(name, g_inv[picks[0]]);
+    remember_focus_item(g_inv[picks[0]]);
+    return 1;
+  }
+  if (n > 1 && ordinal >= 1 && ordinal <= n) {
+    *ix_out = picks[ordinal - 1];
+    disambig_remember(name, g_inv[picks[ordinal - 1]]);
+    remember_focus_item(g_inv[picks[ordinal - 1]]);
     return 1;
   }
   if (n > 1) {
@@ -12255,45 +13819,6 @@ static int reveal_hidden_item(const char *id) {
     return 1;
   }
   return 0;
-}
-
-static void cmd_open_mailbox(char *msg, size_t msgcap) {
-  char pretty[96];
-  int i, r;
-  const char *slug = world_slug(g_room);
-  if (!slug || strcmp(slug, "west_of_house") != 0) {
-    snprintf(msg, msgcap, "Nothing like that to open here.");
-    return;
-  }
-  if (inv_has("leaflet")) {
-    snprintf(msg, msgcap,
-             "The mailbox is empty now — the orientation leaflet is in your pack.");
-    return;
-  }
-  for (i = 0; i < g_room_item_n[g_room]; i++) {
-    if (str_ieq(g_room_items[g_room][i], "leaflet")) {
-      item_pretty("leaflet", pretty, sizeof pretty);
-      snprintf(msg, msgcap,
-               "The small mailbox is open. %s sits inside, ready to take.",
-               pretty);
-      return;
-    }
-  }
-  r = reveal_hidden_item("leaflet");
-  if (r == 1) {
-    item_pretty("leaflet", pretty, sizeof pretty);
-    snprintf(msg, msgcap,
-             "Opening the small mailbox reveals %s.", pretty);
-    return;
-  }
-  if (r < 0) {
-    snprintf(msg, msgcap,
-             "Something paper-thin is inside, but the ground is too cluttered "
-             "to pull it free.");
-    return;
-  }
-  snprintf(msg, msgcap,
-           "The mailbox creaks open. Rust, emptiness, and the memory of mail.");
 }
 
 static int content_item_response(const char *id, const char *mode, char *msg,
@@ -13297,6 +14822,7 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
                                 size_t msgcap) {
   char q[256];
   char qnorm[MAX_ITEM_LEN];
+  int ordinal = 0, exclude_last = 0;
   int i;
   const char *slug;
 
@@ -13333,15 +14859,25 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
     }
     return;
   }
-  if (str_ieq(q, "it") || str_ieq(q, "that") || str_ieq(q, "this")) {
-    if (!g_last_focus[0]) {
-      snprintf(msg, msgcap, "You have nothing in mind to examine yet.");
+  {
+    int prep = parser_prepare_object_query(q, q, sizeof q, &ordinal,
+                                           &exclude_last, msg, msgcap);
+    if (prep < 0) return;
+    if (!q[0]) {
+      snprintf(msg, msgcap, "Examine what?");
       return;
     }
-    strncpy(q, g_last_focus, sizeof q - 1);
-    q[sizeof q - 1] = '\0';
   }
   query_norm_underscore(qnorm, sizeof qnorm, q);
+
+  {
+    char cid[MAX_ITEM_LEN];
+    int cix = -1;
+    if (container_resolve_here(g_room, q, cid, sizeof cid, &cix) && cix >= 0) {
+      container_examine(cix, msg, msgcap);
+      return;
+    }
+  }
 
   if (world_room_is_dark(g_room) && !player_has_light_source()) {
     for (i = 0; i < g_inv_n; i++) {
@@ -13390,6 +14926,9 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
     char picks[DISAMBIG_PICK_MAX][MAX_ITEM_LEN];
     int pn = 0, j;
     for (i = 0; i < g_room_item_n[g_room]; i++) {
+      if (exclude_last && g_last_focus[0] &&
+          str_ieq(g_room_items[g_room][i], g_last_focus))
+        continue;
       if (!room_item_matches_query(g_room_items[g_room][i], q, qnorm)) continue;
       for (j = 0; j < pn; j++)
         if (str_ieq(picks[j], g_room_items[g_room][i])) break;
@@ -13400,6 +14939,8 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
       }
     }
     for (i = 0; i < g_inv_n; i++) {
+      if (exclude_last && g_last_focus[0] && str_ieq(g_inv[i], g_last_focus))
+        continue;
       if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
       for (j = 0; j < pn; j++)
         if (str_ieq(picks[j], g_inv[i])) break;
@@ -13409,6 +14950,8 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
         pn++;
       }
     }
+    container_append_open_contents_picks(g_room, q, qnorm, picks, &pn,
+                                         exclude_last);
     if (pn == 0) {
       snprintf(msg, msgcap, "You do not see anything like that here.");
       return;
@@ -13426,6 +14969,10 @@ static void examine_target_mode(const char *raw, const char *mode, char *msg,
       else
         snprintf(msg, msgcap, "You look closely at %.40s.", pretty);
       disambig_remember(q, picks[0]);
+      return;
+    }
+    if (pn > 1 && ordinal >= 1 && ordinal <= pn) {
+      examine_target_mode(picks[ordinal - 1], mode, msg, msgcap);
       return;
     }
     {
@@ -13500,34 +15047,30 @@ static int game_open_reader(const char *item_id, char *msg, size_t msgcap) {
 
 static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
                                 char *msg, size_t msgcap) {
-  char q[256];
+  char work[256];
   char qnorm[MAX_ITEM_LEN];
   char picks[DISAMBIG_PICK_MAX][MAX_ITEM_LEN];
-  int i, j, pn = 0;
+  int ordinal = 0, exclude_last = 0;
+  int i, j, pn = 0, prep;
 
   if (!id_out || idcap < 2) return 0;
   id_out[0] = '\0';
-  strncpy(q, raw, sizeof q - 1);
-  q[sizeof q - 1] = '\0';
-  strip_trailing_space(q);
-  strip_leading_articles(q);
-  if (!q[0]) {
+  prep = parser_prepare_object_query(raw, work, sizeof work, &ordinal,
+                                     &exclude_last, msg, msgcap);
+  if (prep < 0) {
+    if (msg && msgcap && !msg[0])
+      snprintf(msg, msgcap, "You have nothing in mind to read yet.");
+    return 0;
+  }
+  if (!work[0]) {
     snprintf(msg, msgcap, "Read what?");
     return 0;
   }
-  if (str_ieq(q, "it") || str_ieq(q, "that") || str_ieq(q, "this")) {
-    if (!g_last_focus[0]) {
-      snprintf(msg, msgcap, "You have nothing in mind to read yet.");
-      return 0;
-    }
-    strncpy(q, g_last_focus, sizeof q - 1);
-    q[sizeof q - 1] = '\0';
-  }
-  query_norm_underscore(qnorm, sizeof qnorm, q);
+  query_norm_underscore(qnorm, sizeof qnorm, work);
 
   if (world_room_is_dark(g_room) && !player_has_light_source()) {
     for (i = 0; i < g_inv_n; i++) {
-      if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
+      if (!room_item_matches_query(g_inv[i], work, qnorm)) continue;
       remember_focus_item(g_inv[i]);
       copy_capped(id_out, idcap, g_inv[i]);
       return 1;
@@ -13539,7 +15082,10 @@ static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
   }
 
   for (i = 0; i < g_room_item_n[g_room]; i++) {
-    if (!room_item_matches_query(g_room_items[g_room][i], q, qnorm)) continue;
+    if (exclude_last && g_last_focus[0] &&
+        str_ieq(g_room_items[g_room][i], g_last_focus))
+      continue;
+    if (!room_item_matches_query(g_room_items[g_room][i], work, qnorm)) continue;
     for (j = 0; j < pn; j++)
       if (str_ieq(picks[j], g_room_items[g_room][i])) break;
     if (j < pn) continue;
@@ -13549,7 +15095,9 @@ static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
     }
   }
   for (i = 0; i < g_inv_n; i++) {
-    if (!room_item_matches_query(g_inv[i], q, qnorm)) continue;
+    if (exclude_last && g_last_focus[0] && str_ieq(g_inv[i], g_last_focus))
+      continue;
+    if (!room_item_matches_query(g_inv[i], work, qnorm)) continue;
     for (j = 0; j < pn; j++)
       if (str_ieq(picks[j], g_inv[i])) break;
     if (j < pn) continue;
@@ -13565,15 +15113,21 @@ static int resolve_visible_item(const char *raw, char *id_out, size_t idcap,
   if (pn == 1) {
     remember_focus_item(picks[0]);
     copy_capped(id_out, idcap, picks[0]);
-    disambig_remember(q, picks[0]);
+    disambig_remember(work, picks[0]);
+    return 1;
+  }
+  if (ordinal >= 1 && ordinal <= pn) {
+    remember_focus_item(picks[ordinal - 1]);
+    copy_capped(id_out, idcap, picks[ordinal - 1]);
+    disambig_remember(work, picks[ordinal - 1]);
     return 1;
   }
   {
     char slug[MAX_ITEM_LEN];
     int r;
     g_disambig_next_act = DISAMBIG_ACT_EXAMINE;
-    r = disambig_resolve_ambiguous(DISAMBIG_ACT_EXAMINE, 0, q, picks, pn, slug,
-                                     sizeof slug, msg, msgcap);
+    r = disambig_resolve_ambiguous(DISAMBIG_ACT_EXAMINE, 0, work, picks, pn,
+                                     slug, sizeof slug, msg, msgcap);
     if (r == 1) {
       copy_capped(id_out, idcap, slug);
       remember_focus_item(slug);
@@ -13634,7 +15188,8 @@ static void normalize_aliases(char *line) {
              {"pickup ", 7, "take ", 5},    {"fetch ", 6, "take ", 5},
              {"grab ", 5, "take ", 5},       {"get ", 4, "take ", 5},
              {"deposit ", 8, "drop ", 5},    {"stash ", 6, "drop ", 5},
-             {"discard ", 8, "drop ", 5},    {"place ", 6, "drop ", 5},
+             {"discard ", 8, "drop ", 5},    {"remove ", 7, "drop ", 5},
+             {"place ", 6, "drop ", 5},
              {"put down ", 9, "drop ", 5},
              {"taste ", 6, "eat ", 4},       {"sip ", 4, "drink ", 6},
              {NULL, 0, NULL, 0}};
@@ -13761,7 +15316,7 @@ static int rewrite_to_move_or_approach(char *line, const char *rest) {
 static void split_preposition_phrase(char *text, const char **prep_out,
                                      char **rhs_out) {
   static const char *preps[] = {" with ", " using ", " on ", " onto ",
-                                " into ", " in ",    " at ", " to ",
+                                " into ", " in ",    " at ", " to ", " from ",
                                 NULL};
   int i;
   *prep_out = NULL;
@@ -13993,6 +15548,20 @@ static int parser_rewrite_protective_grab(char *line) {
   return 1;
 }
 
+static int parser_rewrite_talk_bare_pronoun(char *line) {
+  if (!strncmp(line, "talk ", 5) && strncmp(line, "talk to ", 8) &&
+      strncmp(line, "talk about ", 11)) {
+    char *p = line + 5;
+    while (*p == ' ') p++;
+    strip_leading_articles(p);
+    if (parser_query_is_npc_pronoun(p) && !strchr(p, ' ')) {
+      rewrite_command(line, "talk to", p);
+      return 1;
+    }
+  }
+  return 0;
+}
+
 static int parser_rewrite_speak_to(char *line) {
   static const char *const kSpeak[] = {
       "converse with ", "speak with ", "chat with ", "talk with ",
@@ -14039,6 +15608,7 @@ static int parser_rewrite_unlock_open_use(char *line) {
     ou_sk = 5;
   if (ou_sk) {
     char work[INPUT_LINE_MAX];
+    char usebuf[INPUT_LINE_MAX];
     char *target = line + ou_sk;
     strncpy(work, target, sizeof work - 1);
     work[sizeof work - 1] = '\0';
@@ -14046,8 +15616,11 @@ static int parser_rewrite_unlock_open_use(char *line) {
     if (rhs && rhs[0]) {
       if (strstr(rhs, "lockpick") || strstr(rhs, "pick"))
         rewrite_command(line, "use", "lockpick");
+      else if (work[0])
+        snprintf(usebuf, sizeof usebuf, "%s on %s", rhs, work);
       else
-        rewrite_command(line, "use", rhs);
+        snprintf(usebuf, sizeof usebuf, "%s", rhs);
+      rewrite_command(line, "use", usebuf);
       return 1;
     }
   }
@@ -14059,12 +15632,14 @@ static int parser_rewrite_unlock_open_use(char *line) {
       ua_sk = 4;
     if (ua_sk) {
       char work[INPUT_LINE_MAX];
+      char usebuf[INPUT_LINE_MAX];
       char *tool = line + ua_sk;
       strncpy(work, tool, sizeof work - 1);
       work[sizeof work - 1] = '\0';
       split_preposition_phrase(work, &prep, &rhs);
       if (rhs && rhs[0]) {
-        rewrite_command(line, "use", work);
+        snprintf(usebuf, sizeof usebuf, "%s on %s", work, rhs);
+        rewrite_command(line, "use", usebuf);
         return 1;
       }
       if (!strncmp(line, "apply ", 6)) {
@@ -14099,7 +15674,7 @@ static int parser_rewrite_take_drop_put(char *line) {
       strncpy(work, item, sizeof work - 1);
       work[sizeof work - 1] = '\0';
       split_preposition_phrase(work, &prep, &rhs);
-      if (rhs && rhs[0]) {
+      if (rhs && rhs[0] && parser_rhs_is_surface(rhs)) {
         rewrite_command(line, verb, work);
         return 1;
       }
@@ -14113,6 +15688,9 @@ static int parser_rewrite_take_drop_put(char *line) {
     if (rhs && rhs[0]) {
       if (strstr(rhs, "door") || strstr(rhs, "keyhole") || strstr(rhs, "lock"))
         rewrite_command(line, "use", work);
+      else if (prep && (strstr(prep, " in ") || strstr(prep, " into ") ||
+                        strstr(prep, " on ")))
+        return 0;
       else
         rewrite_command(line, "drop", work);
       return 1;
@@ -14225,6 +15803,78 @@ static int parser_rewrite_plain_english_queries(char *line) {
     rewrite_command(line, "look", "");
     return 1;
   }
+  if (!strcmp(line, "what is here") || !strcmp(line, "what's here") ||
+      !strcmp(line, "whats here") || !strcmp(line, "what is in the room") ||
+      !strcmp(line, "what is in here") || !strcmp(line, "what's in the room") ||
+      !strcmp(line, "what's in here")) {
+    rewrite_command(line, "scan", "");
+    return 1;
+  }
+  if (!strcmp(line, "what can i take") || !strcmp(line, "what is on the ground") ||
+      !strcmp(line, "what's on the ground") ||
+      !strcmp(line, "what is on the floor") ||
+      !strcmp(line, "what's on the floor")) {
+    rewrite_command(line, "loot", "");
+    return 1;
+  }
+  return 0;
+}
+
+static int parser_rewrite_what_in_container(char *line) {
+  static const char *const pfx[] = {
+      "what is inside the ", "what's inside the ", "whats inside the ",
+      "what is inside ",     "what's inside ",     "whats inside ",
+      "what is in the ",     "what's in the ",     "whats in the ",
+      "what is in ",         "what's in ",         "whats in ",
+      NULL};
+  int pi;
+  char rest[INPUT_LINE_MAX];
+  for (pi = 0; pfx[pi]; pi++) {
+    size_t pn = strlen(pfx[pi]);
+    const char *r;
+    if (strncmp(line, pfx[pi], pn) != 0) continue;
+    r = line + pn;
+    while (*r == ' ') r++;
+    if (!*r) return 0;
+    strncpy(rest, r, sizeof rest - 1);
+    rest[sizeof rest - 1] = '\0';
+    strip_terminal_punctuation(rest);
+    strip_leading_articles(rest);
+    if (!rest[0]) return 0;
+    rewrite_command(line, "examine", rest);
+    return 1;
+  }
+  return 0;
+}
+
+static int parser_rewrite_is_there(char *line) {
+  static const char *const pfx[] = {"is there a ", "is there an ", "is there ",
+                                    "are there any ", "are there ", NULL};
+  static const char *const tails[] = {" here", " in the room", " in here",
+                                      " around here", " nearby", NULL};
+  int pi, ti;
+  for (pi = 0; pfx[pi]; pi++) {
+    size_t pn = strlen(pfx[pi]);
+    char item[INPUT_LINE_MAX];
+    const char *rest;
+    if (strncmp(line, pfx[pi], pn) != 0) continue;
+    rest = line + pn;
+    strncpy(item, rest, sizeof item - 1);
+    item[sizeof item - 1] = '\0';
+    strip_terminal_punctuation(item);
+    for (ti = 0; tails[ti]; ti++) {
+      size_t tn = strlen(tails[ti]);
+      size_t il = strlen(item);
+      if (il >= tn && !strcmp(item + il - tn, tails[ti])) {
+        item[il - tn] = '\0';
+        strip_trailing_space(item);
+        break;
+      }
+    }
+    if (!item[0]) return 0;
+    rewrite_command(line, "find", item);
+    return 1;
+  }
   return 0;
 }
 
@@ -14300,6 +15950,24 @@ static int parser_rewrite_go_single_direction(char *line) {
 
 static void normalize_parser_intent(char *line) {
   static const ParserPrefixRewrite kPrefixRewrite[] = {
+      PREFIX_RW("can you show me what's in ", "examine", 1),
+      PREFIX_RW("can you show me what is in ", "examine", 1),
+      PREFIX_RW("show me what's in ", "examine", 1),
+      PREFIX_RW("show me what is in ", "examine", 1),
+      PREFIX_RW("could you show me what's in ", "examine", 1),
+      PREFIX_RW("could you show me what is in ", "examine", 1),
+      PREFIX_RW("would you show me what's in ", "examine", 1),
+      PREFIX_RW("would you show me what is in ", "examine", 1),
+      PREFIX_RW("can you check what's in ", "examine", 1),
+      PREFIX_RW("can you check what is in ", "examine", 1),
+      PREFIX_RW("i want to see what's in ", "examine", 1),
+      PREFIX_RW("i want to see what is in ", "examine", 1),
+      PREFIX_RW("could you tell me who is here", "who", 0),
+      PREFIX_RW("can you tell me who is here", "who", 0),
+      PREFIX_RW("who's here", "who", 0),
+      PREFIX_RW("whos here", "who", 0),
+      PREFIX_RW("where can i go from here", "exits", 0),
+      PREFIX_RW("where can i go next", "exits", 0),
       PREFIX_RW("show me where to find ", "find", 1),
       PREFIX_RW("could i get a look at ", "look at", 1),
       PREFIX_RW("can you tell me about ", "examine", 1),
@@ -14377,6 +16045,8 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("what can i do", "help", ""),
       EXACT_RW("what should i do", "help", ""),
       EXACT_RW("what can you do", "help", ""),
+      EXACT_RW("what should i do next", "objectives", ""),
+      EXACT_RW("what now", "objectives", ""),
       EXACT_RW("commands", "help", ""),
       EXACT_RW("crafting", "forge", ""),
       EXACT_RW("open forge", "forge", ""),
@@ -14582,6 +16252,7 @@ static void normalize_parser_intent(char *line) {
       EXACT_RW("detection risk", "noise", ""),
       EXACT_RW("how stealthy", "noise", ""),
       EXACT_RW("who is here", "who", ""),
+      EXACT_RW("who else is here", "who", ""),
       EXACT_RW("anyone here", "who", ""),
       EXACT_RW("npc role", "who", ""),
       EXACT_RW("who is this npc", "who", ""),
@@ -14679,6 +16350,7 @@ static void normalize_parser_intent(char *line) {
 
   if (parser_rewrite_note_prefixes(line)) return;
   if (parser_rewrite_plain_english_queries(line)) return;
+  if (parser_rewrite_is_there(line)) return;
   if (parser_apply_exact_rewrites(line, kExactRewrite)) return;
   if (parser_apply_prefix_rewrites(line, kPrefixRewrite)) return;
 
@@ -14688,11 +16360,13 @@ static void normalize_parser_intent(char *line) {
   if (parser_rewrite_question_examine(line)) return;
   if (parser_rewrite_describe_examine(line)) return;
   if (parser_rewrite_look_preposition(line)) return;
+  if (parser_rewrite_what_in_container(line)) return;
   if (parser_rewrite_interaction_phrases(line)) return;
   if (parser_rewrite_protective_grab(line)) return;
   if (parser_rewrite_mailbox_search_find(line)) return;
 
   if (parser_rewrite_speak_to(line)) return;
+  if (parser_rewrite_talk_bare_pronoun(line)) return;
   if (parser_rewrite_ask_about(line)) return;
   if (parser_rewrite_unlock_open_use(line)) return;
   if (parser_rewrite_take_drop_put(line)) return;
@@ -15250,6 +16924,59 @@ static void craft_profile_clamp(CraftMatProfile *p) {
 #undef CLAMP10
 }
 
+static CraftSavedProfile *craft_profile_lookup(const char *item) {
+  int i;
+  if (!item || !item[0]) return NULL;
+  for (i = 0; i < g_craft_prof_n; i++)
+    if (str_ieq(g_craft_prof[i].name, item)) return &g_craft_prof[i];
+  return NULL;
+}
+
+static void craft_profile_save(const char *name, const CraftAttr *sum, int bench_n,
+                               int quality, int st_dur, int st_shp, int st_hnd,
+                               int st_wgt) {
+  CraftSavedProfile *p;
+  int den = bench_n > 0 ? bench_n : 1;
+  int i;
+  if (!name || !name[0] || !sum) return;
+  p = craft_profile_lookup(name);
+  if (!p) {
+    if (g_craft_prof_n >= MAX_CRAFT_PROFILES) return;
+    p = &g_craft_prof[g_craft_prof_n++];
+    snprintf(p->name, sizeof p->name, "%s", name);
+  }
+  p->hrd = sum->hrd / den;
+  p->shp = sum->shp / den;
+  p->flx = sum->flx / den;
+  p->dur = sum->dur / den;
+  p->wgt = sum->wgt / den;
+  p->grp = sum->grp / den;
+  p->bnd = sum->bnd / den;
+  p->utl = sum->utl / den;
+  if (p->hrd < 0) p->hrd = 0;
+  if (p->hrd > 10) p->hrd = 10;
+  if (p->shp < 0) p->shp = 0;
+  if (p->shp > 10) p->shp = 10;
+  if (p->flx < 0) p->flx = 0;
+  if (p->flx > 10) p->flx = 10;
+  if (p->dur < 0) p->dur = 0;
+  if (p->dur > 10) p->dur = 10;
+  if (p->wgt < 0) p->wgt = 0;
+  if (p->wgt > 10) p->wgt = 10;
+  if (p->grp < 0) p->grp = 0;
+  if (p->grp > 10) p->grp = 10;
+  if (p->bnd < 0) p->bnd = 0;
+  if (p->bnd > 10) p->bnd = 10;
+  if (p->utl < 0) p->utl = 0;
+  if (p->utl > 10) p->utl = 10;
+  p->quality = quality;
+  p->disp_dur = st_dur;
+  p->disp_shp = st_shp;
+  p->disp_hnd = st_hnd;
+  p->disp_wgt = st_wgt;
+  (void)i;
+}
+
 static void craft_profile_for_item(const char *item, CraftMatProfile *out) {
   int i;
   char norm[MAX_ITEM_LEN];
@@ -15259,6 +16986,24 @@ static void craft_profile_for_item(const char *item, CraftMatProfile *out) {
   char mod_desc[256];
   if (!out) return;
   query_norm_underscore(norm, sizeof norm, item ? item : "");
+  {
+    CraftSavedProfile *saved = craft_profile_lookup(item);
+    if (saved) {
+      out->name = item;
+      out->mat_class = "Forged";
+      out->is_base_tool = 0;
+      out->hrd = saved->hrd;
+      out->shp = saved->shp;
+      out->flx = saved->flx;
+      out->dur = saved->dur;
+      out->wgt = saved->wgt;
+      out->grp = saved->grp;
+      out->bnd = saved->bnd;
+      out->utl = saved->utl;
+      if (saved->disp_shp >= 7 || saved->disp_dur >= 7) out->is_base_tool = 1;
+      return;
+    }
+  }
   if (aet_mods_crafting_profile(norm, mod_class, sizeof mod_class, &mod_base, &hrd,
                                 &shp, &flx, &dur, &wgt, &grp, &bnd, &utl)) {
     out->name = item;
@@ -15358,6 +17103,9 @@ static void grant_starting_loadout(void) {
     inv_add_unique("lockpick");
     inv_add_unique("bow");
     inv_add_unique("leaflet");
+    inv_add_unique("stick");
+    inv_add_unique("reed");
+    inv_add_unique("skeleton_key");
   }
 
   
@@ -16703,7 +18451,10 @@ static void run_material_forge(const char *pending_acc, int *did_fullscreen) {
       for (i = 0; i < bench_n; i++) {
         if (inv_remove_exact_one(bench[i])) eq_remove_item_from_slots(bench[i]);
       }
+      craft_compute_stats(&a, made, &st_dur, &st_shp, &st_hnd, &st_wgt, bench_n,
+                          &q_score);
       inv_add(made);
+      craft_profile_save(made, &a, bench_n, q_score, st_dur, st_shp, st_hnd, st_wgt);
       g_score += 8 + g_craft_proficiency;
       if (g_craft_proficiency < 10 && (rand() % 3 == 0)) g_craft_proficiency++;
       snprintf(msg, sizeof msg, "You set aside: %s", made);
@@ -18751,6 +20502,21 @@ static void process_command(char *line, char *msg, size_t msgcap,
                   pending_acc, did_fullscreen);
     return;
   }
+  if (!strcmp(line, "npc schedule") || !strcmp(line, "routine")) {
+    *turn_advance = 0;
+    cmd_npc_schedule("", msg, msgcap);
+    return;
+  }
+  if (!strncmp(line, "npc schedule ", 13)) {
+    *turn_advance = 0;
+    cmd_npc_schedule(line + 13, msg, msgcap);
+    return;
+  }
+  if (!strncmp(line, "routine ", 8)) {
+    *turn_advance = 0;
+    cmd_npc_schedule(line + 8, msg, msgcap);
+    return;
+  }
   if (!strcmp(line, "topic") || !strcmp(line, "last topic") ||
       !strcmp(line, "topic mood") || !strcmp(line, "topic heat")) {
     AetPcSave ps;
@@ -18858,7 +20624,62 @@ static void process_command(char *line, char *msg, size_t msgcap,
   if (!strncmp(line, "open mailbox", 12) ||
       !strncmp(line, "open the mailbox", 16)) {
     *turn_advance = 0;
-    cmd_open_mailbox(msg, msgcap);
+    container_open_cmd(g_room, "mailbox", msg, msgcap);
+    return;
+  }
+
+  if (!strncmp(line, "open ", 5)) {
+    const char *rest = line + 5;
+    while (*rest == ' ') rest++;
+    if (rest[0] && strcmp(line, "open door") && strcmp(line, "open the door")) {
+      *turn_advance = 0;
+      if (container_open_cmd(g_room, rest, msg, msgcap)) return;
+    }
+  }
+
+  if (!strncmp(line, "close ", 6)) {
+    const char *rest = line + 6;
+    while (*rest == ' ') rest++;
+    if (rest[0] && strcmp(line, "close door") && strcmp(line, "close the door") &&
+        strcmp(line, "shut door")) {
+      if (container_close_cmd(g_room, rest, msg, msgcap)) return;
+    }
+  }
+
+  if (!strncmp(line, "unlock ", 7)) {
+    char work[INPUT_LINE_MAX];
+    char *keyp = NULL;
+    const char *rest = line + 7;
+    *turn_advance = 0;
+    while (*rest == ' ') rest++;
+    if (!strcmp(rest, "door")) {
+      const char *room_slug = world_slug(g_room);
+      if (!room_slug || strcmp(room_slug, "front_door") != 0) {
+        snprintf(msg, msgcap, "Nothing to unlock here.");
+      } else if (!inv_has("house_key")) {
+        snprintf(msg, msgcap, "You have no key that fits.");
+      } else {
+        g_front_unlocked = 1;
+        snprintf(msg, msgcap,
+                 "The house key turns with a heavy click. The planks shift "
+                 "slightly.");
+      }
+      return;
+    }
+    strncpy(work, rest, sizeof work - 1);
+    work[sizeof work - 1] = '\0';
+    keyp = strstr(work, " with ");
+    if (!keyp) keyp = strstr(work, " using ");
+    if (keyp) {
+      *keyp = '\0';
+      strip_trailing_space(work);
+      keyp += 6;
+      while (*keyp == ' ') keyp++;
+    }
+    strip_leading_articles(work);
+    if (work[0] && container_unlock_cmd(g_room, work, keyp, msg, msgcap))
+      return;
+    snprintf(msg, msgcap, "Nothing to unlock here.");
     return;
   }
 
@@ -19091,8 +20912,29 @@ static void process_command(char *line, char *msg, size_t msgcap,
 
   if (!strncmp(line, "use ", 4)) {
     char *r = line + 4;
+    char *target = NULL;
+    char *on_sep;
+    char *with_sep;
     while (*r == ' ') r++;
+    on_sep = strstr(r, " on ");
+    with_sep = strstr(r, " with ");
+    if (on_sep) {
+      *on_sep = '\0';
+      target = on_sep + 4;
+      strip_trailing_space(r);
+      while (target && *target == ' ') target++;
+    } else if (with_sep) {
+      *with_sep = '\0';
+      target = with_sep + 6;
+      strip_trailing_space(r);
+      while (target && *target == ' ') target++;
+    }
     strip_leading_articles(r);
+    if (target) strip_leading_articles(target);
+    if (target && target[0]) {
+      if (container_unlock_cmd(g_room, target, r, msg, msgcap)) return;
+      if (container_lockpick_cmd(g_room, target, msg, msgcap)) return;
+    }
     if (strstr(r, "bandage") != NULL && inv_has("bandage")) {
       char tmp[MAX_ITEM_LEN];
       int ix = inv_find("bandage");
@@ -19110,7 +20952,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
                g_health, g_max_health);
       return;
     }
-    if (inv_has("bucket") && strstr(slug, "well") != NULL &&
+    if (inv_has("bucket") && target && strstr(target, "well") != NULL &&
         str_ieq(r, "bucket")) {
       snprintf(
           msg, msgcap,
@@ -19129,7 +20971,8 @@ static void process_command(char *line, char *msg, size_t msgcap,
       snprintf(msg, msgcap, "%s", Ub[(g_turns + 11) % nb]);
       return;
     }
-    if (strcmp(slug, "front_door") == 0 &&
+    if ((strcmp(slug, "front_door") == 0 || strcmp(slug, "west_of_house") == 0 ||
+         (target && (strstr(target, "door") || strstr(target, "keyhole")))) &&
         (strstr(r, "key") != NULL || str_ieq(r, "house_key"))) {
       if (!inv_has("house_key")) {
         snprintf(msg, msgcap, "You do not have that key.");
@@ -19141,7 +20984,8 @@ static void process_command(char *line, char *msg, size_t msgcap,
       }
       return;
     }
-    if (strcmp(slug, "east_of_house") == 0 &&
+    if ((strcmp(slug, "east_of_house") == 0 ||
+         (target && (strstr(target, "shed") || strstr(target, "lock")))) &&
         (strstr(r, "lockpick") != NULL || strstr(r, "pick") != NULL)) {
       if (!has_lockpick_tool()) {
         snprintf(msg, msgcap, "You need a working lockpick.");
@@ -19149,6 +20993,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
 #ifdef AETER_MINIGAMES
         if (try_minigame("lockpick", msg, msgcap)) {
           MgtPersistentState *st = mgt_host_state();
+          game_mgt_apply_lockpick_stealth(st, msg, msgcap);
           if (st && st->last_success == 1) g_shed_unlocked = 1;
           return;
         }
@@ -19179,6 +21024,7 @@ static void process_command(char *line, char *msg, size_t msgcap,
 #ifdef AETER_MINIGAMES
       if (try_minigame("lockpick", msg, msgcap)) {
         MgtPersistentState *st = mgt_host_state();
+        game_mgt_apply_lockpick_stealth(st, msg, msgcap);
         if (st && st->last_success == 1) g_shed_unlocked = 1;
         return;
       }
@@ -19500,6 +21346,28 @@ static void process_command(char *line, char *msg, size_t msgcap,
     return;
   }
 
+  if (!strncmp(line, "put ", 4)) {
+    char work[INPUT_LINE_MAX];
+    char *sep = NULL;
+    char *dest = NULL;
+    strncpy(work, line + 4, sizeof work - 1);
+    work[sizeof work - 1] = '\0';
+    sep = strstr(work, " into ");
+    if (sep)
+      dest = sep + 6;
+    else if ((sep = strstr(work, " in ")))
+      dest = sep + 4;
+    else if ((sep = strstr(work, " on ")))
+      dest = sep + 4;
+    if (sep && dest) {
+      *sep = '\0';
+      strip_trailing_space(work);
+      while (*dest == ' ') dest++;
+      container_put_in(g_room, work, dest, msg, msgcap);
+      return;
+    }
+  }
+
   if (!strncmp(line, "drop ", 5)) {
     const char *rest = line + 5;
     while (*rest == ' ') rest++;
@@ -19520,12 +21388,28 @@ static void process_command(char *line, char *msg, size_t msgcap,
   }
 
   if (!strncmp(line, "take ", 5)) {
+    char work[INPUT_LINE_MAX];
+    char *from;
     const char *rest = line + 5;
     while (*rest == ' ') rest++;
-    if (str_ieq(rest, "all"))
+    if (str_ieq(rest, "all")) {
       take_all(msg, msgcap);
-    else
-      take_item(rest, msg, msgcap);
+      return;
+    }
+    strncpy(work, rest, sizeof work - 1);
+    work[sizeof work - 1] = '\0';
+    from = strstr(work, " from ");
+    if (from && !parser_rhs_is_surface(from + 6)) {
+      *from = '\0';
+      strip_trailing_space(work);
+      if (str_ieq(work, "all")) {
+        container_take_all_from(g_room, from + 6, msg, msgcap);
+        return;
+      }
+      container_take_from(g_room, work, from + 6, msg, msgcap);
+      return;
+    }
+    take_item(rest, msg, msgcap);
     return;
   }
 
@@ -19600,6 +21484,7 @@ static void init_new_game(int start_room) {
   disambig_reset_all();
   init_items_from_world();
   place_persistent_story_items();
+  containers_init_new_game();
   apply_reference_new_game_bootstrap();
   g_room = start_room;
   g_turns = 0;
@@ -19622,9 +21507,13 @@ static void init_new_game(int start_room) {
   g_visited[start_room] = 1;
   g_transcript[0] = '\0';
   clear_focus();
+  g_last_dropped[0] = '\0';
   g_last_cmd[0] = '\0';
   cmd_hist_clear();
   g_craft_proficiency = 1;
+  g_craft_prof_n = 0;
+  g_lockpick_last_noise = 0;
+  g_lockpick_suspicion = 0;
   diag_clear();
   causal_clear();
   trade_history_clear();

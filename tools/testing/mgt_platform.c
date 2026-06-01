@@ -482,6 +482,13 @@ int mgt_autotest_active(void) {
   return e && e[0] && e[0] != '0';
 }
 
+int mgt_autotest_script(const char *id) {
+  const char *e;
+  if (!id || !id[0]) return 0;
+  e = getenv("MGT_AUTOTEST_SCRIPT");
+  return e && e[0] && !strcmp(e, id);
+}
+
 MgtKey mgt_poll_key(int timeout_ms, int *ch) {
 #if defined(_WIN32)
   unsigned long deadline = mgt_now_ms() + (unsigned long)(timeout_ms > 0 ? timeout_ms : 0);
@@ -527,7 +534,7 @@ int mgt_run_loop(void *ctx, void (*update)(void *ctx, double dt),
   int result = 0;
   int dirty = 1;
   int have_last_cells = 0;
-  int autotest_esc = mgt_autotest_active();
+  int autotest_esc = mgt_autotest_active() && !getenv("MGT_AUTOTEST_SCRIPT");
   const int animated = (update != NULL);
   const unsigned present_ms = animated ? 50u : 0u;
   const size_t cell_bytes = (size_t)MGT_CANVAS_W * (size_t)MGT_CANVAS_H;

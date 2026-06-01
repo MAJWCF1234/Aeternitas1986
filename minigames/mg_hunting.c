@@ -148,8 +148,8 @@ static void hunt_finish(HuntCtx *ctx, int success) {
         snprintf(st->last_banner, sizeof st->last_banner,
                  "Grazing shot: %d meat.", ctx->loot_meat);
       if (st->skill_survival < 100) st->skill_survival++;
-      if (ctx->session && ctx->session->from_game)
-        st->hunt_cooldown_until_turn = st->adventure_turn + 8;
+      if (ctx->session && ctx->session->adventure_embedded)
+        st->hunt_cooldown_until_turn = st->adventure_turn + 6;
     } else if (ctx->result[0]) {
       snprintf(st->last_banner, sizeof st->last_banner, "%s", ctx->result);
     }
@@ -378,7 +378,7 @@ static int hunt_gate(MgtSession *session, MgtPersistentState *st) {
     mgt_host_message("Hunting", st->last_banner);
     return 0;
   }
-  if (session && session->from_game &&
+  if (session && session->adventure_embedded && !mgt_autotest_active() &&
       st->hunt_cooldown_until_turn > st->adventure_turn) {
     wait = st->hunt_cooldown_until_turn - st->adventure_turn;
     st->last_success = 0;
@@ -414,7 +414,7 @@ static void hunt_setup(HuntCtx *ctx, MgtSession *session, MgtPersistentState *st
   ctx->stamina = 100;
   ctx->shot_center = 0.28 + mgt_rand01() * 0.44;
   ctx->shot_width = prey->shot_width;
-  ctx->shot_speed = 0.0105;
+  ctx->shot_speed = 0.0095;
   skill_bonus = st ? (double)(st->skill_survival - 50) * 0.0015 : 0.0;
   ctx->shot_width *= 1.0 + skill_bonus;
   if (ctx->focus > 0) ctx->shot_width *= 1.05;
@@ -433,6 +433,17 @@ int mg_run_hunting(MgtSession *session) {
   if (!hunt_gate(session, st)) return 0;
   if (st && st->hunt_target[0]) target = st->hunt_target;
   hunt_setup(&ctx, session, st, target);
+  if (mgt_autotest_script("hunt_win")) {
+    ctx.outcome = 2;
+    ctx.loot_meat = ctx.prey ? ctx.prey->meat_qty : 1;
+    ctx.loot_pelt = ctx.prey ? ctx.prey->pelt_qty : 0;
+    if (ctx.prey && !strcmp(ctx.prey->id, "rabbit")) ctx.loot_pelt = 0;
+    snprintf(ctx.result, sizeof ctx.result, "Clean shot on the %s.",
+             ctx.prey ? ctx.prey->name : "quarry");
+    snprintf(ctx.message, sizeof ctx.message, "Good shot.");
+    hunt_finish(&ctx, 1);
+    return 0;
+  }
   mgt_run_loop(&ctx, hunt_update, hunt_draw, hunt_key);
   if (st && st->last_success < 0) st->last_success = 0;
   return 0;

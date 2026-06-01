@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #define MGT_SAVE_MAGIC 0x3147544Du
-#define MGT_SAVE_VERSION 5
+#define MGT_SAVE_VERSION 6
 #define MGT_SAVE_VERSION_LEGACY 3
 #define MGT_FISH_INV_MAX 32
 #define MGT_FARM_W 10
@@ -85,6 +85,14 @@ typedef struct MgtPersistentState {
   unsigned play_count[MGT_PLAY_COUNT];
   char last_banner[128];
   int last_success;
+
+  int lock_exit_noise;
+  int lock_exit_misses;
+  int lock_pick_broken;
+  char lock_noise_band[8];
+  char lock_tool_id[24];
+  char lock_target_name[48];
+  char lock_target_dir[8];
 } MgtPersistentState;
 
 typedef struct MgtHarnessSave {

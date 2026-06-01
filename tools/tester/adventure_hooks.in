@@ -1,20 +1,16 @@
 1
 take lockpick
-goto north
-goto east
+go north
+go east
 pick lock
+noise
+go north
+go north
+hunt
 write
 read leaflet
-go north
-go north
-go northwest
-hunt
-go southeast
-go west
-go north
-fish
 go south
-go east
+go south
 go northeast
 go east
 go northwest

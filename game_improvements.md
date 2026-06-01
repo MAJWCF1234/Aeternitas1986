@@ -18,16 +18,17 @@ Status policy:
 - Parser has typo suggestion/autofix for known top-level verbs.
 - Parser now strips common first-person/plain-English wrappers such as `I look around` and `check my inventory`.
 - Parser records normalization reasons through `parser-normalize` causality events.
-- Native parser regression tool exists: `tools/parser_regression_aeternitas64.py`.
+- Native parser regression tool exists: `tools/parser_regression_aeternitas64.py` (also `tester.bat parser`).
 - Forge has hidden material blending, keyword inference, role synergy, and whimsical generated outputs.
 - Inventory/equipment has fixed-width terminal layout and row/id equip commands.
 - Quick smoke testing and dual-exe comparison tooling exist.
 - [~] NPC/merchant relationship logic exists in simplified C form, not full Web Edition parity.
 - [~] Causality exists, but parser/social/crafting explanations need clearer grouping.
 - [~] Screen framework exists, but save/help/settings/mod screens are not all unified yet.
-- [~] Crafting outputs currently persist mostly as item names; generated stat profiles need persistence.
+- [x] Crafting outputs persist stat profiles in quicksave (`CRAFTPROF` section): forge-made items keep Dur/Sharp/Handle/Wgt/Quality through save/load; `compare` and equip stats use saved profiles.
 - [x] **Better Disambiguation** — ambiguous room/pack targets prompt numbered choices (`Did you mean (1) … or (2) …?`); reply with number or name; session remembers query→slug for auto-resolve next time. Verified: `take metal` at West of House, `examine` with multiple matches.
-- Inform-class noun resolution, pronoun memory, and relative references are still open work.
+- [~] Inform-class noun resolution — centralized object/NPC pronoun expansion (`it`/`that`/`this`, `him`/`her`), multi-token noun matching, `other <noun>`, ordinals, **`take dropped`** (quicksave `DROPPED`), read/compare via `parser_prepare_object_query`; **`unlock/open/use X on Y`**; scope queries (`what's here`, `is there a X here`); **`give/talk to him/her`**; **`give X to NPC`** (off-room delivery via routine schedule); **`take X from ground`**; **`remove X`** → drop; bare **`talk him/her`**. Verified: `tools/parser_regression_aeternitas64.py` (29 checks).
+- [~] **Container model** — `mailbox`, `chest`, `old_box`, etc. track open/closed state and contents (up to 6 items); **nested containers** (e.g. mailbox → old_box → reed); **`open/close <container>`**, **`put X in/on Y`**, **`take X from Y`**, **`take all from Y`**; **locked containers** (`locked_chest` at west-of-house → `house_key` inside; unlock via **`unlock X with key`**, **`use key on X`**, or lockpick); contents persist in quicksave **`CONTAINERS`** section (backward compatible on load); open containers participate in take/examine/compare resolution; carrying a container moves its state with you; **`scan`** lists container open/closed + contents (including nested); closed-container take suggests **`open <container>`**; **`what's in the X`** / **`look inside X`** → examine; save/quickload roundtrip verified; **`give X to <npc>`** delivers to routine location when NPC is elsewhere. Boot defaults: west-of-house **mailbox → leaflet + old_box → reed**, **locked_chest → house_key**, attic **chest → ancient_coin**. Verified: `tools/parser_regression_aeternitas64.py` (29 checks).
 - Chained commands that enter full-screen submenus need a screen-framework pass.
 - [x] Chained commands after fullscreen zero-turn commands — `handle_line` no longer stops the whole chain when a segment opens a fullscreen UI (`help`, `exits`, `status`, etc.); later segments run after the screen closes. Verified: smoke (`help; whereami`, `exits; brief`), parser regression (`fullscreen chain continues`, `exits then inline command`).
 - Artificer/Lucid-Blocks-style mid-to-late-game fusion menu is still open work.
@@ -93,7 +94,7 @@ Status policy:
 - **Location-Aware Dialogue** - NPCs adapt dialogue to their current location (web-era claim; verify/rebuild for C)
 - **Relationship-Aware Dialogue** - Dialogue changes based on relationship stage (web-era claim; verify/rebuild for C)
 - **Smart Dialogue Parsing** - Better pattern matching and context awareness (web-era claim; verify/rebuild for C)
-- [~] **AI Routines** - Core NPCs now follow deterministic time-of-day room rotations in the C build (no RNG, derived from the world clock), and movement is visible through `who all` / `where <npc>` with routine-period and activity labels. Verified via parser regression (`npc routine relocation`). Full web-style daily schedules and richer pathing are still open work.
+- [x] **AI Routines** — Core NPCs follow deterministic time-of-day room rotations (no RNG, world clock); movement visible through `who all` / `where <npc>` with routine period, activity labels, and **next-period** hints; `npc schedule <name>` shows full day plan; bartender + weekend market/square overrides for farmer/bard/merchant. Verified: `tools/parser_regression_aeternitas64.py` (`who all`, `npc schedule`, `where miller`).
 - **Better Memory System** - NPCs remember more specific details about interactions
 - **NPC Opinions** - NPCs form opinions about player's actions
 - **Gossip System** - NPCs share information about player with others
@@ -358,8 +359,8 @@ Verified in C (`aeternitas64.exe` + `minigames/`). Automated: `tools/tester/test
 - [x] **Hunting** — `hunt` / `track game` in forest/meadow with bow equipped. Track → approach → shot phases; cooldown + wait/listen in source. Verified launch + adventure hook; full balance pass still manual.
 - [x] **Piano Performance** — `play piano` where `tavern_piano` is visible. Verified launch + adventure hook.
 - [x] **Lockpicking** — `pick lock` / `use lockpick` at `east_of_house` shed. Timing/skill pins, noise bands, tool variants in source. Verified launch + adventure hook (ESC → "You abandon the lock.").
-- [~] **Lockpicking Stealth And Tool Pass** — noise-band / NPC hearing / guard reactions coded in `mg_lockpick.c`; not re-verified against live NPC stealth in adventure after minigame exit.
-- [~] **Hunting Tuning Pass** — cooldown, misread cap, wait/listen, perfect-shot tier present in `mg_hunting.c`; autotest only confirms entry/exit, not a full successful hunt.
+- [x] **Lockpicking Stealth And Tool Pass** — `mg_lockpick.c` exports noise/miss/break bands to adventure; fine/rusty picks differ; guard hears high noise at `east_of_house`; broken pick removed from pack; `noise`/`suspicion` show last lockpick readout. Verified: `tools/tester/tester.bat outcomes` (`lock_noise`, `lock_win`).
+- [x] **Hunting Tuning Pass** — cooldown 6 turns, slightly slower shot meter; scripted win path for CI (`MGT_AUTOTEST_SCRIPT=hunt_win`). Verified: `tester.bat outcomes`.
 
 ## Social Systems
 
@@ -411,8 +412,8 @@ Verified in C (`aeternitas64.exe` + `minigames/`). Automated: `tools/tester/test
 
 ### Where Zork Still Edges Us (To Implement)
 
-- **Preposition Handling** - Support commands like "PUT THE BLUE BALL IN THE LARGE BASKET", "GIVE COIN TO TROLL", "UNLOCK DOOR WITH KEY" (web-era claim; verify/rebuild for C)
-- **Preposition Awareness** - Map common prepositions (in/inside/into → IN, on/onto → ON, to/at → TO, with/using → WITH) (web-era claim; verify/rebuild for C)
+- **Preposition Handling** - [~] C port: `put X in/on Y`, `take X from Y`, `take all from Y`, `open/close container`, locked containers + keys, nested containers, `give X to NPC` (off-room via schedule). Still open: full relation graph / containment queries.
+- **Preposition Awareness** - [~] `with/using/on/in/from` mapped for take/drop/put/use/unlock; full IN/ON/TO/WITH relation graph still open.
 - [x] **Better Disambiguation** - When multiple items match, numbered `Did you mean (1) … or (2) …?` prompts; reply with number or name; session remembers query→slug for the next ambiguous match. Verified in C executable (`take`, `drop`, `equip`, `examine`).
 - **Edge-Case Grammar Rules** - Handle tons of tiny grammar variations and edge cases (web-era claim; verify/rebuild for C)
 

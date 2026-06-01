@@ -71,5 +71,6 @@ int mgt_run_loop(void *ctx, void (*update)(void *ctx, double dt),
 void mgt_pause_panel(const char *title, const char *body);
 
 int mgt_autotest_active(void);
+int mgt_autotest_script(const char *id);
 
 #endif

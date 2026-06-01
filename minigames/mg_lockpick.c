@@ -32,6 +32,7 @@ typedef struct {
   double lock_noise;
   int rusty_wear;
   char tool_label[32];
+  char tool_id[24];
   int has_tension_wrench;
   int finished;
   int success;
@@ -44,6 +45,20 @@ static const char *noise_band_label(double n) {
   if (n >= 70.0) return "HIGH";
   if (n >= 35.0) return "MED";
   return "LOW";
+}
+
+static void lp_store_exit(LpCtx *ctx) {
+  MgtPersistentState *st = ctx ? ctx->st : NULL;
+  if (!st) return;
+  st->lock_exit_noise = (int)(ctx->lock_noise + 0.5);
+  if (st->lock_exit_noise < 0) st->lock_exit_noise = 0;
+  if (st->lock_exit_noise > 100) st->lock_exit_noise = 100;
+  st->lock_exit_misses = ctx->misses;
+  st->lock_pick_broken = (ctx->pick_integrity <= 0.0 && ctx->finished && !ctx->success) ? 1 : 0;
+  snprintf(st->lock_noise_band, sizeof st->lock_noise_band, "%s",
+           noise_band_label(ctx->lock_noise));
+  snprintf(st->lock_tool_id, sizeof st->lock_tool_id, "%s",
+           ctx->tool_id[0] ? ctx->tool_id : "lockpick");
 }
 
 static void lane_string(char *out, size_t cap, const LpCtx *ctx, int pin_i,
@@ -118,8 +133,8 @@ static void lp_draw(void *vctx, MgtCanvas *c) {
   snprintf(meter, sizeof meter, "Focus:%d", ctx->focus_charges);
   mgt_canvas_write(c, 58, 5, meter);
   snprintf(line, sizeof line, "Tool: %s%s  Noise: %s (%.0f)", ctx->tool_label,
-           ctx->has_tension_wrench ? " +Wrench" : "", noise_band_label(ctx->lock_noise),
-           ctx->lock_noise);
+           ctx->has_tension_wrench ? " +Wrench" : "",
+           noise_band_label(ctx->lock_noise), ctx->lock_noise);
   mgt_canvas_write(c, 4, 6, line);
   mgt_canvas_box(c, 4, 7, c->w - 8, 16, "PINS");
   for (i = 0; i < ctx->pin_count; i++) {
@@ -169,6 +184,7 @@ static void lp_finish(LpCtx *ctx, int success, const char *msg) {
   ctx->finished = 1;
   ctx->success = success;
   snprintf(ctx->message, sizeof ctx->message, "%s", msg ? msg : "");
+  lp_store_exit(ctx);
 }
 
 static void lp_miss_message(LpCtx *ctx) {
@@ -183,6 +199,20 @@ static void lp_miss_message(LpCtx *ctx) {
   snprintf(ctx->message, sizeof ctx->message, "%s", lines[pick]);
   snprintf(ctx->last_check, sizeof ctx->last_check, "Miss %d: timing slip",
            ctx->misses);
+}
+
+static double lp_miss_noise_delta(const LpCtx *ctx) {
+  double d = 18.0 + (double)ctx->difficulty * 4.0;
+  if (ctx->tool_id[0] && !strcmp(ctx->tool_id, "fine_lockpick")) d *= 0.55;
+  else if (ctx->tool_id[0] && !strcmp(ctx->tool_id, "rusty_pick")) d *= 1.35;
+  return d;
+}
+
+static double lp_hit_noise_delta(const LpCtx *ctx) {
+  double d = 4.0;
+  if (ctx->tool_id[0] && !strcmp(ctx->tool_id, "fine_lockpick")) d *= 0.5;
+  else if (ctx->tool_id[0] && !strcmp(ctx->tool_id, "rusty_pick")) d *= 1.25;
+  return d;
 }
 
 static int lp_key(void *vctx, MgtKey key, int ch) {
@@ -217,7 +247,7 @@ static int lp_key(void *vctx, MgtKey key, int ch) {
       ctx->pins[i].set = 1;
       ctx->pin_index++;
       ctx->speed += 0.055;
-      ctx->lock_noise += 4.0;
+      ctx->lock_noise += lp_hit_noise_delta(ctx);
       if (ctx->lock_noise > 100.0) ctx->lock_noise = 100.0;
       if (direct)
         snprintf(ctx->last_check, sizeof ctx->last_check, "Direct timing hit.");
@@ -233,7 +263,7 @@ static int lp_key(void *vctx, MgtKey key, int ch) {
     ctx->tension += 14.0 + (double)ctx->difficulty * 4.0;
     ctx->pick_integrity -=
         7.0 + (double)ctx->difficulty * 3.0 + (double)ctx->rusty_wear;
-    ctx->lock_noise += 18.0;
+    ctx->lock_noise += lp_miss_noise_delta(ctx);
     if (ctx->tension > 100.0) ctx->tension = 100.0;
     if (ctx->lock_noise > 100.0) ctx->lock_noise = 100.0;
     lp_miss_message(ctx);
@@ -249,6 +279,39 @@ static int lp_key(void *vctx, MgtKey key, int ch) {
   return 0;
 }
 
+static void lp_setup_tools(LpCtx *ctx, MgtPersistentState *st) {
+  ctx->tool_id[0] = '\0';
+  if (st && st->has_fine_pick) {
+    snprintf(ctx->tool_label, sizeof ctx->tool_label, "Fine Pick");
+    snprintf(ctx->tool_id, sizeof ctx->tool_id, "fine_lockpick");
+  } else if (st && st->has_basic_lockpick) {
+    snprintf(ctx->tool_label, sizeof ctx->tool_label, "Lockpick");
+    snprintf(ctx->tool_id, sizeof ctx->tool_id, "lockpick");
+  } else {
+    snprintf(ctx->tool_label, sizeof ctx->tool_label, "Rusty Pick");
+    snprintf(ctx->tool_id, sizeof ctx->tool_id, "rusty_pick");
+  }
+  ctx->has_tension_wrench = st ? st->has_tension_wrench : 1;
+  ctx->rusty_wear =
+      (st && st->has_rusty_pick && !st->has_basic_lockpick && !st->has_fine_pick)
+          ? 4
+          : 0;
+  ctx->pick_integrity = (ctx->rusty_wear > 0) ? 72.0 : 100.0;
+  ctx->focus_charges = 2 + ((st && st->has_fine_pick) ? 1 : 0);
+}
+
+static void lp_setup_target(LpCtx *ctx, MgtPersistentState *st) {
+  if (st && st->lock_target_name[0])
+    snprintf(ctx->target_name, sizeof ctx->target_name, "%s",
+             st->lock_target_name);
+  else
+    snprintf(ctx->target_name, sizeof ctx->target_name, "Shed Door");
+  if (st && st->lock_target_dir[0])
+    snprintf(ctx->target_dir, sizeof ctx->target_dir, "%s", st->lock_target_dir);
+  else
+    snprintf(ctx->target_dir, sizeof ctx->target_dir, "east");
+}
+
 int mg_run_lockpick(MgtSession *session) {
   LpCtx ctx;
   int i;
@@ -262,22 +325,8 @@ int mg_run_lockpick(MgtSession *session) {
   ctx.difficulty = st ? st->test_lock_difficulty : 1;
   if (ctx.difficulty < 1) ctx.difficulty = 1;
   if (ctx.difficulty > 2) ctx.difficulty = 2;
-  snprintf(ctx.target_name, sizeof ctx.target_name, "Cellar Door");
-  snprintf(ctx.target_dir, sizeof ctx.target_dir, "north");
-  if (st && st->has_fine_pick)
-    snprintf(ctx.tool_label, sizeof ctx.tool_label, "Fine Pick");
-  else if (st && st->has_basic_lockpick)
-    snprintf(ctx.tool_label, sizeof ctx.tool_label, "Lockpick");
-  else
-    snprintf(ctx.tool_label, sizeof ctx.tool_label, "Rusty Pick");
-  ctx.has_tension_wrench = st ? st->has_tension_wrench : 1;
-  ctx.rusty_wear =
-      (st && st->has_rusty_pick && !st->has_basic_lockpick && !st->has_fine_pick)
-          ? 4
-          : 0;
-  ctx.pick_integrity =
-      (ctx.rusty_wear > 0) ? 72.0 : 100.0;
-  ctx.focus_charges = 2 + ((st && st->has_fine_pick) ? 1 : 0);
+  lp_setup_target(&ctx, st);
+  lp_setup_tools(&ctx, st);
   ctx.pin_count = ctx.difficulty >= 2 ? 4 : 3;
   base_speed =
       (ctx.difficulty >= 2 ? 0.8 : 0.6) +
@@ -288,6 +337,7 @@ int mg_run_lockpick(MgtSession *session) {
     ctx.pins[i].center = 0.1 + mgt_rand01() * 0.8;
     ctx.pins[i].width =
         base_w + (ctx.has_tension_wrench ? 0.012 : 0.0);
+    if (st && st->has_fine_pick) ctx.pins[i].width += 0.008;
     if (ctx.pins[i].width < 0.025) ctx.pins[i].width = 0.025;
     if (ctx.pins[i].width > 0.09) ctx.pins[i].width = 0.09;
     ctx.pins[i].set = 0;
@@ -302,14 +352,46 @@ int mg_run_lockpick(MgtSession *session) {
     mgt_host_message("Lockpicking", ctx.message);
     return 0;
   }
+  if (mgt_autotest_script("lock_noise")) {
+    ctx.misses = 2;
+    ctx.lock_noise = 78.0;
+    ctx.finished = 1;
+    ctx.success = 0;
+    snprintf(ctx.message, sizeof ctx.message,
+             "Your pick slipped! A loud scrape — someone might have noticed.");
+    lp_store_exit(&ctx);
+    if (st) {
+      st->last_success = 0;
+      snprintf(st->last_banner, sizeof st->last_banner, "%s", ctx.message);
+    }
+    return 0;
+  }
+  if (mgt_autotest_script("lock_win")) {
+    ctx.finished = 1;
+    ctx.success = 1;
+    ctx.lock_noise = 12.0;
+    snprintf(ctx.message, sizeof ctx.message, "Lock opened.");
+    lp_store_exit(&ctx);
+    if (st) {
+      st->last_success = 1;
+      snprintf(st->last_banner, sizeof st->last_banner, "%s", ctx.message);
+    }
+    return 0;
+  }
   mgt_run_loop(&ctx, lp_update, lp_draw, lp_key);
   if (st) {
     if (ctx.finished) {
       if (ctx.success) st->skill_engineering++;
       st->last_success = ctx.success ? 1 : 0;
       snprintf(st->last_banner, sizeof st->last_banner, "%s", ctx.message);
+      lp_store_exit(&ctx);
     } else {
       st->last_success = -1;
+      st->lock_exit_noise = (int)(ctx.lock_noise + 0.5);
+      st->lock_exit_misses = ctx.misses;
+      st->lock_pick_broken = 0;
+      snprintf(st->lock_noise_band, sizeof st->lock_noise_band, "%s",
+               noise_band_label(ctx.lock_noise));
       snprintf(st->last_banner, sizeof st->last_banner,
                "You abandon the lock.");
     }

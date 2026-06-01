@@ -108,6 +108,16 @@ void mgt_sync_from_world(MgtPersistentState *st, const MgtGameSim *sim) {
   st->test_lock_difficulty = 1;
   if (!strcmp(slug, "hidden_cellar") || !strcmp(slug, "castle"))
     st->test_lock_difficulty = 2;
+  if (!strcmp(slug, "east_of_house")) {
+    snprintf(st->lock_target_name, sizeof st->lock_target_name, "Shed Door");
+    snprintf(st->lock_target_dir, sizeof st->lock_target_dir, "east");
+  } else if (!strcmp(slug, "hidden_cellar")) {
+    snprintf(st->lock_target_name, sizeof st->lock_target_name, "Cellar Door");
+    snprintf(st->lock_target_dir, sizeof st->lock_target_dir, "down");
+  } else {
+    st->lock_target_name[0] = '\0';
+    st->lock_target_dir[0] = '\0';
+  }
   if (!strcmp(slug, "deep_forest"))
     snprintf(st->hunt_target, sizeof st->hunt_target, "wolf");
   else if (strstr(slug, "forest") != NULL)
